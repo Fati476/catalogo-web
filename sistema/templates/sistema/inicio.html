@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo Web</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="container mt-5">
+
+    <h1 class="text-center mb-5">
+        Sistema Web de Catálogo y Cotización
+    </h1>
+
+    <div class="row">
+
+        {% for producto in productos %}
+
+        <div class="col-md-4 mb-4">
+
+            <div class="card h-100 shadow">
+
+                <!-- CARRUSEL -->
+                <div id="carousel{{ producto.id }}"
+                     class="carousel slide"
+                     data-bs-ride="carousel">
+
+                    <div class="carousel-inner">
+
+                        {% for imagen in producto.imagenes.all %}
+
+                        <div class="carousel-item {% if forloop.first %}active{% endif %}">
+
+                            <img src="{{ imagen.imagen.url }}"
+                                 class="d-block w-100"
+                                 style="height:250px; object-fit:cover;">
+
+                        </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                    <!-- BOTON ANTERIOR -->
+                    <button class="carousel-control-prev"
+                            type="button"
+                            data-bs-target="#carousel{{ producto.id }}"
+                            data-bs-slide="prev">
+
+                        <span class="carousel-control-prev-icon"></span>
+
+                    </button>
+
+                    <!-- BOTON SIGUIENTE -->
+                    <button class="carousel-control-next"
+                            type="button"
+                            data-bs-target="#carousel{{ producto.id }}"
+                            data-bs-slide="next">
+
+                        <span class="carousel-control-next-icon"></span>
+
+                    </button>
+
+                </div>
+
+                <!-- INFORMACION -->
+                <div class="card-body">
+
+                    <h5>{{ producto.nombre }}</h5>
+
+                    <p>{{ producto.descripcion }}</p>
+
+                    <h4>$ {{ producto.precio }}</h4>
+
+                    <span class="badge bg-primary">
+                        {{ producto.categoria.nombre }}
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+<!-- JS BOOTSTRAP -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
