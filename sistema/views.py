@@ -1,9 +1,11 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import Group
+from django.contrib.auth.decorators import login_required
 from .forms import RegistroForm
 from .models import Producto
 
 
+@login_required
 def inicio(request):
 
     productos = Producto.objects.all()
