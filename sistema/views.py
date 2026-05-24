@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import login_required
 from .forms import RegistroForm
-from .models import Producto
+from .models import Producto, Perfil
 
 
 @login_required
@@ -24,6 +24,15 @@ def registro(request):
         if form.is_valid():
 
             usuario = form.save()
+
+            municipio = request.POST.get('municipio')
+            estado = request.POST.get('estado')
+
+            Perfil.objects.create(
+                usuario=usuario,
+                municipio=municipio,
+                estado=estado
+            )
 
             grupo = Group.objects.get(name='Cliente')
 
