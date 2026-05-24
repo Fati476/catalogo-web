@@ -7,23 +7,39 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
+    <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
     <style>
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+        }
 
         body{
             height:100vh;
             display:flex;
             justify-content:center;
             align-items:center;
-            background: linear-gradient(135deg,#4facfe,#00f2fe);
+            background: linear-gradient(135deg,#667eea,#764ba2);
             font-family: Arial, Helvetica, sans-serif;
+            padding:20px;
+        }
+
+        .login-container{
+            width:100%;
+            max-width:420px;
         }
 
         .login-box{
-            background:white;
+            background:rgba(255,255,255,0.15);
+            backdrop-filter: blur(15px);
+            border-radius:25px;
             padding:40px;
-            width:400px;
-            border-radius:20px;
             box-shadow:0 10px 30px rgba(0,0,0,0.2);
+            color:white;
             animation: aparecer 0.6s ease;
         }
 
@@ -41,40 +57,84 @@
 
         .titulo{
             text-align:center;
-            margin-bottom:30px;
+            margin-bottom:10px;
             font-weight:bold;
-            color:#333;
+        }
+
+        .subtitulo{
+            text-align:center;
+            margin-bottom:30px;
+            opacity:0.8;
+        }
+
+        .input-group{
+            margin-bottom:20px;
+        }
+
+        .input-group-text{
+            border-radius:12px 0 0 12px;
+            border:none;
         }
 
         .form-control{
-            border-radius:12px;
+            border:none;
+            border-radius:0 12px 12px 0;
             padding:12px;
+        }
+
+        .form-control:focus{
+            box-shadow:none;
         }
 
         .btn-login{
             width:100%;
+            border:none;
             border-radius:12px;
             padding:12px;
-            background:#4facfe;
-            border:none;
-            color:white;
+            background:#ffffff;
+            color:#5a67d8;
             font-weight:bold;
             transition:0.3s;
         }
 
         .btn-login:hover{
-            background:#00c6fb;
-            transform:scale(1.02);
+            transform:scale(1.03);
+            background:#f1f1f1;
         }
 
-        .registro{
+        .links{
+            margin-top:20px;
             text-align:center;
-            margin-top:15px;
         }
 
-        .registro a{
+        .links a{
+            color:white;
             text-decoration:none;
-            font-weight:bold;
+            font-size:14px;
+        }
+
+        .links a:hover{
+            text-decoration:underline;
+        }
+
+        .toggle-password{
+            cursor:pointer;
+        }
+
+        .mensaje{
+            background:rgba(255,255,255,0.2);
+            padding:10px;
+            border-radius:10px;
+            margin-bottom:15px;
+            text-align:center;
+        }
+
+        @media(max-width:480px){
+
+            .login-box{
+                padding:30px 25px;
+            }
+
         }
 
     </style>
@@ -82,22 +142,66 @@
 </head>
 <body>
 
+<div class="login-container">
+
     <div class="login-box">
 
-        <h2 class="titulo">Iniciar Sesión</h2>
+        <h2 class="titulo">
+            Bienvenido
+        </h2>
+
+        <p class="subtitulo">
+            Inicia sesión para continuar
+        </p>
+
+        {% if form.errors %}
+            <div class="mensaje">
+                Usuario o contraseña incorrectos
+            </div>
+        {% endif %}
 
         <form method="POST">
 
             {% csrf_token %}
 
-            <div class="mb-3">
-                <label>Usuario</label>
-                <input type="text" name="username" class="form-control">
+            <div class="input-group">
+
+                <span class="input-group-text">
+                    <i class="fa-solid fa-user"></i>
+                </span>
+
+                <input 
+                    type="text"
+                    name="username"
+                    class="form-control"
+                    placeholder="Usuario"
+                    required
+                    aria-label="Usuario">
+
             </div>
 
-            <div class="mb-3">
-                <label>Contraseña</label>
-                <input type="password" name="password" class="form-control">
+            <div class="input-group">
+
+                <span class="input-group-text">
+                    <i class="fa-solid fa-lock"></i>
+                </span>
+
+                <input 
+                    type="password"
+                    name="password"
+                    id="password"
+                    class="form-control"
+                    placeholder="Contraseña"
+                    required
+                    aria-label="Contraseña">
+
+                <span class="input-group-text toggle-password"
+                    onclick="mostrarPassword()">
+
+                    <i class="fa-solid fa-eye"></i>
+
+                </span>
+
             </div>
 
             <button type="submit" class="btn-login">
@@ -106,16 +210,42 @@
 
         </form>
 
-        <div class="registro">
+        <div class="links mt-3">
+
+            <p>
+                <a href="#">
+                    ¿Olvidaste tu contraseña?
+                </a>
+            </p>
+
             <p>
                 ¿No tienes cuenta?
                 <a href="{% url 'registro' %}">
                     Regístrate
                 </a>
             </p>
+
         </div>
 
     </div>
+
+</div>
+
+<script>
+
+    function mostrarPassword(){
+
+        let password = document.getElementById('password');
+
+        if(password.type === 'password'){
+            password.type = 'text';
+        }else{
+            password.type = 'password';
+        }
+
+    }
+
+</script>
 
 </body>
 </html>
