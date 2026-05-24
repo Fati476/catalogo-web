@@ -10,12 +10,12 @@
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
     <!-- Bootstrap Icons -->
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <!-- Fuente -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
 
@@ -32,12 +32,13 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            padding: 20px;
         }
 
         .card-registro{
             width: 100%;
-            max-width: 480px;
-            background: #FFFFFF;
+            max-width: 520px;
+            background: white;
             border-radius: 25px;
             padding: 40px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.08);
@@ -45,6 +46,7 @@
         }
 
         @keyframes aparecer{
+
             from{
                 opacity: 0;
                 transform: translateY(20px);
@@ -54,11 +56,12 @@
                 opacity: 1;
                 transform: translateY(0);
             }
+
         }
 
         .logo{
-            width: 80px;
-            height: 80px;
+            width: 85px;
+            height: 85px;
             background: #2563EB;
             border-radius: 50%;
             display: flex;
@@ -70,7 +73,7 @@
 
         .logo i{
             color: white;
-            font-size: 35px;
+            font-size: 36px;
         }
 
         .titulo{
@@ -92,20 +95,21 @@
             color: #1E293B;
         }
 
-        .form-control{
+        .form-control,
+        .form-select{
             border-radius: 12px;
             padding: 12px;
             border: 1px solid #CBD5E1;
             transition: 0.3s;
         }
 
-        .form-control:focus{
+        .form-control:focus,
+        .form-select:focus{
             border-color: #2563EB;
-            box-shadow: 0 0 0 0.15rem rgba(37, 99, 235, 0.25);
+            box-shadow: 0 0 0 0.15rem rgba(37,99,235,0.25);
         }
 
         .input-group-text{
-            border-radius: 12px 0 0 12px;
             background: #F8FAFC;
             border: 1px solid #CBD5E1;
         }
@@ -140,10 +144,10 @@
         }
 
         .accesibilidad{
-            background: #F8FAFC;
-            border-radius: 12px;
-            padding: 12px;
             margin-top: 20px;
+            background: #F8FAFC;
+            padding: 14px;
+            border-radius: 14px;
             font-size: 13px;
             color: #475569;
         }
@@ -153,11 +157,19 @@
             margin-right: 5px;
         }
 
+        .toggle-password{
+            cursor: pointer;
+            background: #F8FAFC;
+        }
+
+        .toggle-password:hover{
+            background: #E2E8F0;
+        }
+
         @media(max-width: 576px){
 
             .card-registro{
-                margin: 20px;
-                padding: 30px 25px;
+                padding: 30px 22px;
             }
 
         }
@@ -181,12 +193,14 @@
     </h2>
 
     <p class="subtitulo">
-        Regístrate para acceder al catálogo web
+        Regístrate para solicitar cotizaciones y acceder al catálogo web
     </p>
 
     <form method="POST">
 
         {% csrf_token %}
+
+        <!-- Usuario -->
 
         <div class="mb-3">
 
@@ -210,6 +224,8 @@
 
         </div>
 
+        <!-- Correo -->
+
         <div class="mb-3">
 
             <label class="form-label">
@@ -232,6 +248,70 @@
 
         </div>
 
+        <!-- Municipio -->
+
+        <div class="mb-3">
+
+            <label class="form-label">
+                Municipio / Ciudad
+            </label>
+
+            <div class="input-group">
+
+                <span class="input-group-text">
+                    <i class="bi bi-geo-alt"></i>
+                </span>
+
+                <input type="text"
+                       name="municipio"
+                       class="form-control"
+                       placeholder="Ejemplo: Toluca, Metepec..."
+                       required>
+
+            </div>
+
+        </div>
+
+        <!-- Estado -->
+
+        <div class="mb-3">
+
+            <label class="form-label">
+                Estado
+            </label>
+
+            <div class="input-group">
+
+                <span class="input-group-text">
+                    <i class="bi bi-map"></i>
+                </span>
+
+                <select name="estado"
+                        class="form-select"
+                        required>
+
+                    <option value="">
+                        Seleccione un estado
+                    </option>
+
+                    <option>Estado de México</option>
+                    <option>Ciudad de México</option>
+                    <option>Jalisco</option>
+                    <option>Puebla</option>
+                    <option>Nuevo León</option>
+                    <option>Querétaro</option>
+                    <option>Hidalgo</option>
+                    <option>Morelos</option>
+                    <option>Otro</option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+        <!-- Contraseña -->
+
         <div class="mb-3">
 
             <label class="form-label">
@@ -246,13 +326,23 @@
 
                 <input type="password"
                        name="password1"
+                       id="password1"
                        class="form-control"
                        placeholder="Ingrese contraseña"
                        required>
 
+                <span class="input-group-text toggle-password"
+                      onclick="mostrarPassword('password1', this)">
+
+                    <i class="bi bi-eye"></i>
+
+                </span>
+
             </div>
 
         </div>
+
+        <!-- Confirmar contraseña -->
 
         <div class="mb-4">
 
@@ -268,9 +358,17 @@
 
                 <input type="password"
                        name="password2"
+                       id="password2"
                        class="form-control"
                        placeholder="Repita contraseña"
                        required>
+
+                <span class="input-group-text toggle-password"
+                      onclick="mostrarPassword('password2', this)">
+
+                    <i class="bi bi-eye"></i>
+
+                </span>
 
             </div>
 
@@ -307,17 +405,49 @@
     <div class="accesibilidad">
 
         <p class="mb-1">
+
             <i class="bi bi-universal-access"></i>
-            Diseño accesible y adaptable
+
+            Diseño inclusivo y adaptable para todos los usuarios.
+
         </p>
 
         <p class="mb-0">
-            Compatible con dispositivos móviles y tamaños de texto legibles.
+
+            Compatible con dispositivos móviles y lectura accesible.
+
         </p>
 
     </div>
 
 </div>
+
+<script>
+
+    function mostrarPassword(id, elemento){
+
+        let input = document.getElementById(id);
+        let icono = elemento.querySelector("i");
+
+        if(input.type === "password"){
+
+            input.type = "text";
+
+            icono.classList.remove("bi-eye");
+            icono.classList.add("bi-eye-slash");
+
+        }else{
+
+            input.type = "password";
+
+            icono.classList.remove("bi-eye-slash");
+            icono.classList.add("bi-eye");
+
+        }
+
+    }
+
+</script>
 
 </body>
 </html>
