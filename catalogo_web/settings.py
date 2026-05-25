@@ -87,6 +87,7 @@ DATABASES = {
     )
 }
 SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
+print("API KEY:", SENDGRID_API_KEY)
 
 DEFAULT_FROM_EMAIL = 'fm2290759@gmail.com'
 
