@@ -27,7 +27,7 @@
 
         body{
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #EFF6FF, #DBEAFE);
+            background: linear-gradient(135deg,#667eea,#764ba2);
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -38,8 +38,8 @@
         .card-registro{
             width: 100%;
             max-width: 520px;
-            background: white;
-            border-radius: 25px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 15px;
             padding: 40px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.08);
             animation: aparecer 0.5s ease;
@@ -79,28 +79,29 @@
         .titulo{
             text-align: center;
             font-weight: 700;
-            color: #0F172A;
+            color: white;
             margin-bottom: 8px;
         }
 
         .subtitulo{
             text-align: center;
-            color: #64748B;
+            color: rgba(255,255,255,0.8);
             margin-bottom: 30px;
             font-size: 14px;
         }
 
         .form-label{
             font-weight: 600;
-            color: #1E293B;
+            color: white;
         }
 
         .form-control,
         .form-select{
             border-radius: 12px;
             padding: 12px;
-            border: 1px solid #CBD5E1;
             transition: 0.3s;
+            background: rgba(255,255,255,0.9);
+            border: none;
         }
 
         .form-control:focus,
