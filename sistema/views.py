@@ -53,6 +53,3 @@ def registro(request):
     })
 
 
-def prueba(request):
-
-    return HttpResponse(settings.SENDGRID_API_KEY)
