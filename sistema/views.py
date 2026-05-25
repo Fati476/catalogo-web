@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import login_required
 
+from catalogo_web import settings
 from sistema.utils import enviar_correo
 from .forms import RegistroForm
 from .models import Producto, Perfil
@@ -54,13 +55,4 @@ def registro(request):
 
 def prueba(request):
 
-    enviado = enviar_correo(
-        "fm2290759@gmail.com",
-        "Prueba SendGrid",
-        "<h1>Hola desde Django</h1>"
-    )
-
-    if enviado:
-        return HttpResponse("Correo enviado")
-    else:
-        return HttpResponse("Error enviando correo")
+    return HttpResponse(settings.SENDGRID_API_KEY)
