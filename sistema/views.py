@@ -55,7 +55,7 @@ def registro(request):
 def prueba(request):
 
     enviado = enviar_correo(
-        "TU_CORREO@gmail.com",
+        "fm2290759@gmail.com",
         "Prueba SendGrid",
         "<h1>Hola desde Django</h1>"
     )
