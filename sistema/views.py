@@ -47,3 +47,14 @@ def registro(request):
     return render(request, 'registration/registro.html', {
         'form': form
     })
+
+
+def prueba(request):
+
+    enviar_correo(
+        'fm2290759@gmail.com',
+        'Prueba SendGrid',
+        '<h1>YA FUNCIONA 😭</h1>'
+    )
+
+    return HttpResponse("Correo enviado")

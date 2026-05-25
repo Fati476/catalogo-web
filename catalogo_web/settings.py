@@ -86,21 +86,9 @@ DATABASES = {
         'postgresql://catalogo_db_pcif_user:wR5GBWZgfhv4FygV8WgC2YBRdwpMcg4v@dpg-d893aomq1p3s73ffs6u0-a.oregon-postgres.render.com/catalogo_db_pcif'
     )
 }
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-
-EMAIL_HOST = 'smtp.sendgrid.net'
-
-EMAIL_PORT = 587
-
-EMAIL_USE_TLS = True
-
-EMAIL_HOST_USER = 'apikey'
-
-EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
 
 DEFAULT_FROM_EMAIL = 'fm2290759@gmail.com'
-
-EMAIL_TIMEOUT = 30
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
