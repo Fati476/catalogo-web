@@ -368,6 +368,21 @@
 
             </div>
 
+            <div class="mt-3">
+                <small id="caracteres" class="text-white d-block">
+                    Mínimo 8 caracteres, incluyendo mayúsculas, caracteres especiales y números.
+                </small>
+                <small id="mayuscula" class="text-white d-block">
+                    Al menos una letra mayúscula.
+                </small>
+                <small id="numero" class="text-white d-block">
+                    Al menos un número.
+                </small>
+                <small id="especial" class="text-white d-block">
+                    Al menos un carácter especial (ej: !@#$%^&*).
+                </small>
+            </div>
+
         </div>
 
         <!-- Confirmar contraseña -->
@@ -474,6 +489,66 @@
         }
 
     }
+
+</script>
+
+<script>
+
+    const passwordInput = document.getElementById("password1");
+
+    passwordInput.addEventListener("keyup", function(){
+
+        let password = passwordInput.value;
+
+        // 8 caracteres
+
+        if(password.length >= 8){
+
+            caracteres.innerHTML = "✅ Mínimo 8 caracteres";
+
+        }else{
+
+            caracteres.innerHTML = "❌ Mínimo 8 caracteres";
+
+        }
+
+        // Mayúscula
+
+        if(/[A-Z]/.test(password)){
+
+            mayuscula.innerHTML = "✅ Una letra mayúscula";
+
+        }else{
+
+            mayuscula.innerHTML = "❌ Una letra mayúscula";
+
+        }
+
+        // Número
+
+        if(/[0-9]/.test(password)){
+
+            numero.innerHTML = "✅ Un número";
+
+        }else{
+
+            numero.innerHTML = "❌ Un número";
+
+        }
+
+        // Especial
+
+        if(/[\W_]/.test(password)){
+
+            especial.innerHTML = "✅ Un carácter especial";
+
+        }else{
+
+            especial.innerHTML = "❌ Un carácter especial";
+
+        }
+
+    });
 
 </script>
 
