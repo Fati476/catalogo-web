@@ -204,7 +204,7 @@
         Regístrate para solicitar cotizaciones y acceder al catálogo web
     </p>
 
-    {% if form.errors %}
+    {% if form.errors and request.method == 'POST' %}
 
     <div class="alert alert-danger">
 
@@ -212,9 +212,13 @@
 
             {% for error in field.errors %}
 
-                <p class="mb-1">
-                    {{ error }}
-                </p>
+                {% if "password" not in error|lower %}
+
+                    <p class="mb-1">
+                        {{ error }}
+                    </p>
+
+                {% endif %}
 
             {% endfor %}
 
@@ -418,15 +422,14 @@
         </div>
 
         <button type="submit"
-                class="btn btn-registro w-100">
+            id="btnRegistro"
+            class="btn btn-registro w-100"
+            disabled>
 
-                id="btnRegistro"
-                disabled>
             <i class="bi bi-check-circle"></i>
             Registrarse
 
         </button>
-
     </form>
 
     <div class="extra-links">
@@ -503,11 +506,14 @@
 
         let password = passwordInput.value;
 
-        let valido = true;
+        let tiene8 = password.length >= 8;
+        let tieneMayuscula = /[A-Z]/.test(password);
+        let tieneNumero = /[0-9]/.test(password);
+        let tieneEspecial = /[\W_]/.test(password);
 
         // 8 caracteres
 
-        if(password.length >= 8){
+        if(tiene8){
 
             caracteres.innerHTML = "✅ Mínimo 8 caracteres";
 
@@ -515,12 +521,11 @@
 
             caracteres.innerHTML = "❌ Mínimo 8 caracteres";
 
-            valido = false;
         }
 
         // Mayúscula
 
-        if(/[A-Z]/.test(password)){
+        if(tieneMayuscula){
 
             mayuscula.innerHTML = "✅ Una letra mayúscula";
 
@@ -528,12 +533,11 @@
 
             mayuscula.innerHTML = "❌ Una letra mayúscula";
 
-            valido = false;
         }
 
         // Número
 
-        if(/[0-9]/.test(password)){
+        if(tieneNumero){
 
             numero.innerHTML = "✅ Un número";
 
@@ -541,12 +545,11 @@
 
             numero.innerHTML = "❌ Un número";
 
-            valido = false;
         }
 
         // Especial
 
-        if(/[\W_]/.test(password)){
+        if(tieneEspecial){
 
             especial.innerHTML = "✅ Un carácter especial";
 
@@ -554,12 +557,19 @@
 
             especial.innerHTML = "❌ Un carácter especial";
 
-            valido = false;
         }
 
         // Activar botón
 
-        btnRegistro.disabled = !valido;
+        if(tiene8 && tieneMayuscula && tieneNumero && tieneEspecial){
+
+            btnRegistro.disabled = false;
+
+        }else{
+
+            btnRegistro.disabled = true;
+
+        }
 
     });
 
