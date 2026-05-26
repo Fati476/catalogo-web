@@ -39,9 +39,10 @@
             width: 100%;
             max-width: 520px;
             background: rgba(255,255,255,0.15);
-            border-radius: 15px;
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
             padding: 40px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
             animation: aparecer 0.5s ease;
         }
 
@@ -106,17 +107,17 @@
 
         .form-control:focus,
         .form-select:focus{
-            border-color: #2563EB;
-            box-shadow: 0 0 0 0.15rem rgba(37,99,235,0.25);
+            box-shadow: 0 0 0 0.15rem rgba(255,255,255,0.25);
         }
 
         .input-group-text{
             background: #F8FAFC;
-            border: 1px solid #CBD5E1;
+            border: none;
         }
 
         .btn-registro{
-            background: #2563EB;
+            background: white;
+            color: #5a67d8;
             border: none;
             border-radius: 12px;
             padding: 12px;
@@ -125,7 +126,7 @@
         }
 
         .btn-registro:hover{
-            background: #1D4ED8;
+            background: #f1f1f1;
             transform: translateY(-1px);
         }
 
@@ -147,15 +148,15 @@
 
         .accesibilidad{
             margin-top: 20px;
-            background: #F8FAFC;
+            background: rgba(255,255,255,0.2);
             padding: 14px;
             border-radius: 14px;
             font-size: 13px;
-            color: #475569;
+            color: white;
         }
 
         .accesibilidad i{
-            color: #2563EB;
+            color: white;
             margin-right: 5px;
         }
 
@@ -166,6 +167,11 @@
 
         .toggle-password:hover{
             background: #E2E8F0;
+        }
+
+        .alert{
+            border-radius: 12px;
+            font-size: 14px;
         }
 
         @media(max-width: 576px){
@@ -197,6 +203,26 @@
     <p class="subtitulo">
         Regístrate para solicitar cotizaciones y acceder al catálogo web
     </p>
+
+    {% if form.errors %}
+
+    <div class="alert alert-danger">
+
+        {% for field in form %}
+
+            {% for error in field.errors %}
+
+                <p class="mb-1">
+                    {{ error }}
+                </p>
+
+            {% endfor %}
+
+        {% endfor %}
+
+    </div>
+
+    {% endif %}
 
     <form method="POST">
 
@@ -377,7 +403,7 @@
         </div>
 
         <button type="submit"
-                class="btn btn-primary btn-registro w-100">
+                class="btn btn-registro w-100">
 
             <i class="bi bi-check-circle"></i>
             Registrarse
