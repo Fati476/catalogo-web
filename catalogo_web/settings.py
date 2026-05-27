@@ -25,7 +25,11 @@ SECRET_KEY = 'django-insecure-!79j$6-mi#(mkb#yedccf(5q8vgq425-0sw@wn9px+b0idz!o=
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "False") == "True"
-ALLOWED_HOSTS = ['catalogo-web-s5um.onrender.com']
+ALLOWED_HOSTS = [
+    '127.0.0.1',
+    'localhost',
+    'catalogo-web-s5um.onrender.com'
+]
 
 CSRF_TRUSTED_ORIGINS = [
     'https://catalogo-web-s5um.onrender.com'
