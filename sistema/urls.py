@@ -20,13 +20,13 @@ urlpatterns = [
     ),
 
     path(
-        'admin/productos/',
+        'panel/productos/',
         views.lista_productos,
         name='lista_productos'
     ),
 
     path(
-        'admin/productos/agregar/',
+        'panel/productos/agregar/',
         views.agregar_producto,
         name='agregar_producto'
     ),
