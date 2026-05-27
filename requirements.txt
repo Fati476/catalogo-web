@@ -9,6 +9,7 @@ packaging==26.2
 pillow==12.2.0
 psycopg2-binary==2.9.12
 pycparser==3.0
+python-dotenv==1.2.2
 python-http-client==3.3.7
 sendgrid==6.12.5
 sqlparse==0.5.5
