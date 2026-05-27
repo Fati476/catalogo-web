@@ -31,11 +31,13 @@ def registro(request):
 
             municipio = request.POST.get('municipio')
             estado = request.POST.get('estado')
+            telefono = request.POST.get('telefono')
 
             Perfil.objects.create(
                 usuario=usuario,
                 municipio=municipio,
-                estado=estado
+                estado=estado,
+                telefono=telefono
             )
 
             return redirect('/accounts/login/')
