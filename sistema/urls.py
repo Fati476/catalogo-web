@@ -5,4 +5,5 @@ urlpatterns = [
     path('', views.inicio, name='inicio'),
 
     path('registro/', views.registro, name='registro'),
+    path('redireccion/', views.redireccion_inicio, name='redireccion'),
 ]

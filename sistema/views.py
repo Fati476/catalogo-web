@@ -8,6 +8,9 @@ from sistema.utils import enviar_correo
 from .forms import RegistroForm
 from .models import Producto, Perfil
 
+from django.contrib.auth import login
+
+
 
 @login_required
 def inicio(request):
@@ -53,4 +56,19 @@ def registro(request):
     return render(request, 'registration/registro.html', {
         'form': form
     })
+
+@login_required
+def redireccion_inicio(request):
+
+    if request.user.groups.filter(name='Administrador').exists():
+
+        return redirect('panel_admin')
+
+    elif request.user.groups.filter(name='Cliente').exists():
+
+        return redirect('inicio')
+
+    else:
+
+        return redirect('login')
 
