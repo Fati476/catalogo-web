@@ -38,10 +38,6 @@ def registro(request):
                 estado=estado
             )
 
-            grupo = Group.objects.get(name='Cliente')
-
-            usuario.groups.add(grupo)
-
             return redirect('login')
 
     else:
@@ -51,5 +47,4 @@ def registro(request):
     return render(request, 'registration/registro.html', {
         'form': form
     })
-
 
