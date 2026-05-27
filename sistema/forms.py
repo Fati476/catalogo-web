@@ -13,6 +13,19 @@ class RegistroForm(UserCreationForm):
         fields = ['username', 'email', 'password1', 'password2']
 
 
+    def clean_username(self):
+
+        username = self.cleaned_data.get('username')
+
+        if User.objects.filter(username=username).exists():
+
+            raise forms.ValidationError(
+                "Ese nombre de usuario ya existe."
+            )
+
+        return username
+
+
     def clean_password1(self):
 
         password = self.cleaned_data.get('password1')
