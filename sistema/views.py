@@ -5,6 +5,9 @@ from django.contrib.auth.models import Group
 from .forms import RegistroForm
 from .models import Producto, Perfil
 
+from .forms_producto import ProductoForm
+from .models import Producto
+
 
 @login_required
 def inicio(request):
@@ -71,3 +74,34 @@ def redireccion_inicio(request):
 def panel_admin(request):
 
     return render(request, 'admin/panel_admin.html')
+
+@login_required
+def lista_productos(request):
+
+    productos = Producto.objects.all()
+
+    return render(request, 'admin/productos/lista.html', {
+        'productos': productos
+    })
+
+
+@login_required
+def agregar_producto(request):
+
+    if request.method == 'POST':
+
+        form = ProductoForm(request.POST)
+
+        if form.is_valid():
+
+            form.save()
+
+            return redirect('lista_productos')
+
+    else:
+
+        form = ProductoForm()
+
+    return render(request, 'admin/productos/agregar.html', {
+        'form': form
+    })
