@@ -1,15 +1,9 @@
-from django.http import HttpResponse
 from django.shortcuts import render, redirect
-from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import Group
 
-from catalogo_web import settings
-from sistema.utils import enviar_correo
 from .forms import RegistroForm
 from .models import Producto, Perfil
-
-from django.contrib.auth import login
-
 
 
 @login_required
@@ -43,11 +37,10 @@ def registro(request):
                 telefono=telefono
             )
 
+            grupo = Group.objects.get(name='Cliente')
+            usuario.groups.add(grupo)
+
             return redirect('/accounts/login/')
-
-        else:
-
-            print(form.errors)
 
     else:
 
@@ -56,6 +49,7 @@ def registro(request):
     return render(request, 'registration/registro.html', {
         'form': form
     })
+
 
 @login_required
 def redireccion_inicio(request):
@@ -72,3 +66,8 @@ def redireccion_inicio(request):
 
         return redirect('login')
 
+
+@login_required
+def panel_admin(request):
+
+    return render(request, 'admin/panel_admin.html')
