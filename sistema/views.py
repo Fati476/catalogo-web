@@ -38,7 +38,11 @@ def registro(request):
                 estado=estado
             )
 
-            return redirect('login')
+            return redirect('/accounts/login/')
+
+        else:
+
+            print(form.errors)
 
     else:
 
