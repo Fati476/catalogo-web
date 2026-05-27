@@ -13,6 +13,9 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 from pathlib import Path
 import os 
 import dj_database_url
+from dotenv import load_dotenv
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -85,9 +88,11 @@ WSGI_APPLICATION = 'catalogo_web.wsgi.application'
 
 
 
+load_dotenv()
+
 DATABASES = {
     'default': dj_database_url.parse(
-        'postgresql://catalogo_db_pcif_user:wR5GBWZgfhv4FygV8WgC2YBRdwpMcg4v@dpg-d893aomq1p3s73ffs6u0-a.oregon-postgres.render.com/catalogo_db_pcif'
+        os.getenv('DATABASE_URL')
     )
 }
 SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
@@ -130,7 +135,7 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-LOGIN_REDIRECT_URL = 'redireccion'
+LOGIN_REDIRECT_URL = 'redireccion_inicio'
 LOGOUT_REDIRECT_URL = '/accounts/login/'
 LOGIN_URL = '/accounts/login/'
 
