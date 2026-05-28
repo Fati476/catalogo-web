@@ -116,7 +116,7 @@ def lista_categorias(request):
     categorias = Categoria.objects.all()
 
     return render(request,
-                  'panel/categorias/lista.html',
+                  'admin/categorias/lista.html',
                   {
                       'categorias': categorias
                   })
@@ -140,7 +140,7 @@ def agregar_categoria(request):
         form = CategoriaForm()
 
     return render(request,
-                  'panel/categorias/agregar.html',
+                  'admin/categorias/agregar.html',
                   {
                       'form': form
                   })
