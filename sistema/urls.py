@@ -19,17 +19,7 @@ urlpatterns = [
         name='panel_admin'
     ),
 
-    path(
-        'panel/productos/',
-        views.lista_productos,
-        name='lista_productos'
-    ),
-
-    path(
-        'panel/productos/agregar/',
-        views.agregar_producto,
-        name='agregar_producto'
-    ),
+    # CATEGORIAS
 
     path(
         'panel/categorias/',
@@ -41,6 +31,20 @@ urlpatterns = [
         'panel/categorias/agregar/',
         views.agregar_categoria,
         name='agregar_categoria'
+    ),
+
+    # PRODUCTOS
+
+    path(
+        'panel/productos/',
+        views.lista_productos,
+        name='lista_productos'
+    ),
+
+    path(
+        'panel/productos/agregar/',
+        views.agregar_producto,
+        name='agregar_producto'
     ),
 
 ]
