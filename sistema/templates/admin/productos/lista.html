@@ -65,8 +65,6 @@
 
             margin-left:15px;
 
-            transition:.3s;
-
         }
 
         .nav-link:hover{
@@ -99,9 +97,9 @@
 
         }
 
-        /* CARD TABLA */
+        /* CARD PRODUCTO */
 
-        .card-tabla{
+        .producto-card{
 
             background:white;
 
@@ -109,47 +107,64 @@
 
             border-radius:28px;
 
-            padding:35px;
+            overflow:hidden;
 
             box-shadow:0 10px 25px rgba(0,0,0,0.05);
 
-            margin-top:30px;
+            transition:.3s;
+
+            height:100%;
 
         }
 
-        /* TABLA */
+        .producto-card:hover{
 
-        .table{
-
-            margin-top:20px;
+            transform:translateY(-8px);
 
         }
 
-        .table thead{
+        .producto-img{
 
-            background:#EFF6FF;
+            width:100%;
+            height:240px;
 
-        }
+            object-fit:cover;
 
-        .table thead th{
-
-            color:#1E3A8A;
-
-            font-weight:600;
-
-            border:none;
-
-            padding:18px;
+            background:#E2E8F0;
 
         }
 
-        .table tbody td{
+        .producto-body{
 
-            padding:18px;
+            padding:25px;
 
-            vertical-align:middle;
+        }
 
-            border-color:#E2E8F0;
+        .producto-titulo{
+
+            font-size:22px;
+
+            font-weight:700;
+
+            color:#0F172A;
+
+        }
+
+        .producto-descripcion{
+
+            color:#64748B;
+
+            margin:15px 0;
+
+        }
+
+        .precio{
+
+            font-size:26px;
+
+            font-weight:700;
+
+            color:#16A34A;
 
         }
 
@@ -159,11 +174,21 @@
 
             color:#2563EB;
 
-            padding:10px 14px;
+            padding:10px 15px;
 
-            border-radius:12px;
+            border-radius:14px;
 
             font-size:13px;
+
+        }
+
+        .acciones{
+
+            margin-top:25px;
+
+            display:flex;
+
+            gap:10px;
 
         }
 
@@ -173,19 +198,27 @@
 
             border-radius:14px;
 
-            padding:12px 22px;
+            padding:12px 18px;
 
             font-weight:600;
 
         }
 
-        .acciones i{
+        .sin-imagen{
 
-            font-size:18px;
+            width:100%;
+            height:240px;
 
-            margin-right:10px;
+            background:#CBD5E1;
 
-            cursor:pointer;
+            display:flex;
+
+            justify-content:center;
+            align-items:center;
+
+            font-size:70px;
+
+            color:white;
 
         }
 
@@ -223,73 +256,50 @@
             <ul class="navbar-nav mx-auto">
 
                 <li class="nav-item">
-
                     <a class="nav-link"
                        href="{% url 'panel_admin' %}">
-
                         Inicio
-
                     </a>
-
                 </li>
 
                 <li class="nav-item">
-
                     <a class="nav-link"
                        href="#">
-
                         Dashboard
-
                     </a>
-
                 </li>
 
                 <li class="nav-item">
-
                     <a class="nav-link active"
                        href="{% url 'lista_productos' %}">
-
                         Productos
-
                     </a>
-
                 </li>
 
                 <li class="nav-item">
-
                     <a class="nav-link"
                        href="{% url 'lista_categorias' %}">
-
                         Categorías
-
                     </a>
-
                 </li>
 
                 <li class="nav-item">
-
                     <a class="nav-link"
                        href="#">
-
                         Cotizaciones
-
                     </a>
-
                 </li>
 
                 <li class="nav-item">
-
                     <a class="nav-link"
                        href="#">
-
                         Usuarios
-
                     </a>
-
                 </li>
 
             </ul>
 
+            <!-- PERFIL -->
 
             <div class="dropdown">
 
@@ -353,7 +363,7 @@
 
 <div class="contenido">
 
-    <div class="d-flex justify-content-between align-items-center">
+    <div class="d-flex justify-content-between align-items-center mb-5">
 
         <div>
 
@@ -377,92 +387,92 @@
 
     </div>
 
-    <!-- TABLA -->
+    <!-- PRODUCTOS -->
 
-    <div class="card-tabla">
+    <div class="row g-4">
 
-        <table class="table align-middle">
+        {% for producto in productos %}
 
-            <thead>
+        <div class="col-md-6 col-lg-4">
 
-                <tr>
+            <div class="producto-card">
 
-                    <th>Producto</th>
+                {% if producto.imagenes.first %}
 
-                    <th>Descripción</th>
+                    <img src="{{ producto.imagenes.first.imagen.url }}"
+                         class="producto-img">
 
-                    <th>Precio</th>
+                {% else %}
 
-                    <th>Categoría</th>
+                    <div class="sin-imagen">
 
-                    <th>Acciones</th>
+                        <i class="bi bi-image"></i>
 
-                </tr>
+                    </div>
 
-            </thead>
+                {% endif %}
 
-            <tbody>
+                <div class="producto-body">
 
-                {% for producto in productos %}
+                    <span class="badge-categoria">
 
-                <tr>
+                        {{ producto.categoria.nombre }}
 
-                    <td class="fw-semibold">
+                    </span>
+
+                    <h3 class="producto-titulo mt-3">
 
                         {{ producto.nombre }}
 
-                    </td>
+                    </h3>
 
-                    <td>
+                    <p class="producto-descripcion">
 
                         {{ producto.descripcion }}
 
-                    </td>
+                    </p>
 
-                    <td class="fw-bold text-success">
+                    <div class="precio">
 
                         ${{ producto.precio }}
 
-                    </td>
+                    </div>
 
-                    <td>
+                    <div class="acciones">
 
-                        <span class="badge-categoria">
+                        <button class="btn btn-primary btn-custom">
 
-                            {{ producto.categoria.nombre }}
+                            <i class="bi bi-pencil-square"></i>
+                            Editar
 
-                        </span>
+                        </button>
 
-                    </td>
+                        <button class="btn btn-danger btn-custom">
 
-                    <td class="acciones">
+                            <i class="bi bi-trash"></i>
+                            Eliminar
 
-                        <i class="bi bi-pencil-square text-primary"></i>
+                        </button>
 
-                        <i class="bi bi-trash text-danger"></i>
+                    </div>
 
-                    </td>
+                </div>
 
-                </tr>
+            </div>
 
-                {% empty %}
+        </div>
 
-                <tr>
+        {% empty %}
 
-                    <td colspan="5"
-                        class="text-center text-muted py-5">
+        <div class="text-center mt-5">
 
-                        No hay productos registrados
+            <h4 class="text-muted">
+                No hay productos registrados
+            </h4>
 
-                    </td>
+        </div>
 
-                </tr>
-
-                {% endfor %}
-
-            </tbody>
-
-        </table>
+        {% endfor %}
 
     </div>
 
