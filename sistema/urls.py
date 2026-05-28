@@ -31,4 +31,16 @@ urlpatterns = [
         name='agregar_producto'
     ),
 
+    path(
+        'panel/categorias/',
+        views.lista_categorias,
+        name='lista_categorias'
+    ),
+
+    path(
+        'panel/categorias/agregar/',
+        views.agregar_categoria,
+        name='agregar_categoria'
+    ),
+
 ]

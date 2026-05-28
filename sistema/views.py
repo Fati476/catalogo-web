@@ -8,6 +8,9 @@ from .models import Producto, Perfil
 from .forms_producto import ProductoForm
 from .models import Producto
 
+from .forms_categoria import CategoriaForm
+from .models import Categoria
+
 
 @login_required
 def inicio(request):
@@ -105,3 +108,39 @@ def agregar_producto(request):
     return render(request, 'admin/productos/agregar.html', {
         'form': form
     })
+
+
+@login_required
+def lista_categorias(request):
+
+    categorias = Categoria.objects.all()
+
+    return render(request,
+                  'panel/categorias/lista.html',
+                  {
+                      'categorias': categorias
+                  })
+
+
+@login_required
+def agregar_categoria(request):
+
+    if request.method == 'POST':
+
+        form = CategoriaForm(request.POST)
+
+        if form.is_valid():
+
+            form.save()
+
+            return redirect('lista_categorias')
+
+    else:
+
+        form = CategoriaForm()
+
+    return render(request,
+                  'panel/categorias/agregar.html',
+                  {
+                      'form': form
+                  })
