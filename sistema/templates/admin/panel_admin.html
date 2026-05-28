@@ -3,41 +3,70 @@
 <head>
 
     <meta charset="UTF-8">
+
     <title>Panel Administrador</title>
 
     <meta name="viewport"
           content="width=device-width, initial-scale=1">
 
+    <!-- Bootstrap -->
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
           rel="stylesheet">
+
+    <!-- Icons -->
 
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
+    <!-- Google Font -->
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
+
     <style>
 
-        body{
+        *{
             margin:0;
-            background:#F1F5F9;
-            font-family: Arial, sans-serif;
+            padding:0;
+            box-sizing:border-box;
+            font-family:'Poppins', sans-serif;
         }
+
+        body{
+
+            background:#EEF2F7;
+
+        }
+
+        /* SIDEBAR */
 
         .sidebar{
 
-            width:260px;
+            width:280px;
             height:100vh;
-            background:#111827;
+
+            background:linear-gradient(
+                180deg,
+                #111827,
+                #1E293B
+            );
+
             position:fixed;
-            padding:25px;
+
+            padding:30px 20px;
+
+            box-shadow:5px 0 20px rgba(0,0,0,0.1);
 
         }
 
         .logo{
 
             color:white;
-            font-size:30px;
-            font-weight:bold;
-            margin-bottom:40px;
+            font-size:34px;
+            font-weight:700;
+
+            margin-bottom:50px;
 
         }
 
@@ -45,17 +74,20 @@
 
             display:flex;
             align-items:center;
-            gap:12px;
 
-            color:#D1D5DB;
+            gap:15px;
+
             text-decoration:none;
 
-            padding:15px;
-            border-radius:12px;
+            color:#CBD5E1;
 
-            margin-bottom:10px;
+            padding:15px 18px;
 
-            transition:.3s;
+            border-radius:16px;
+
+            margin-bottom:15px;
+
+            transition:0.3s;
 
             font-size:17px;
 
@@ -63,61 +95,227 @@
 
         .menu a:hover{
 
-            background:#1F2937;
+            background:rgba(255,255,255,0.08);
+
             color:white;
+
+            transform:translateX(5px);
 
         }
 
+        .menu i{
+
+            font-size:20px;
+
+        }
+
+        /* CONTENIDO */
+
         .contenido{
 
-            margin-left:260px;
+            margin-left:280px;
+
             padding:40px;
+
+        }
+
+        .topbar{
+
+            display:flex;
+
+            justify-content:space-between;
+
+            align-items:center;
+
+            margin-bottom:40px;
 
         }
 
         .titulo{
 
-            font-size:45px;
-            font-weight:bold;
+            font-size:48px;
+
+            font-weight:700;
+
+            color:#111827;
 
         }
 
         .subtitulo{
 
-            color:gray;
-            margin-bottom:35px;
+            color:#64748B;
+
+            margin-top:5px;
 
         }
 
-        .card-panel{
+        .usuario{
 
-            border:none;
+            background:white;
+
+            padding:12px 20px;
+
+            border-radius:18px;
+
+            box-shadow:0 5px 15px rgba(0,0,0,0.05);
+
+            display:flex;
+
+            align-items:center;
+
+            gap:10px;
+
+        }
+
+        .usuario i{
+
+            font-size:28px;
+
+            color:#3B82F6;
+
+        }
+
+        /* ESTADISTICAS */
+
+        .estadistica{
+
+            background:white;
+
             border-radius:25px;
-            padding:25px;
-            box-shadow:0 5px 20px rgba(0,0,0,0.08);
 
-            transition:.3s;
+            padding:25px;
+
+            box-shadow:0 10px 25px rgba(0,0,0,0.05);
+
+            transition:0.3s;
 
         }
 
-        .card-panel:hover{
+        .estadistica:hover{
 
             transform:translateY(-5px);
 
         }
 
-        .icono{
+        .estadistica h5{
 
-            font-size:55px;
+            color:#64748B;
+
+            font-size:16px;
 
         }
 
-        .estadistica{
+        .estadistica h2{
+
+            margin-top:10px;
+
+            font-size:40px;
+
+            font-weight:700;
+
+            color:#111827;
+
+        }
+
+        /* CARDS */
+
+        .card-panel{
+
+            border:none;
+
+            border-radius:30px;
+
+            padding:35px;
 
             background:white;
+
+            box-shadow:0 10px 25px rgba(0,0,0,0.06);
+
+            transition:0.3s;
+
+            overflow:hidden;
+
+            position:relative;
+
+        }
+
+        .card-panel:hover{
+
+            transform:translateY(-8px);
+
+        }
+
+        .icono{
+
+            width:80px;
+            height:80px;
+
             border-radius:20px;
-            padding:20px;
-            box-shadow:0 5px 20px rgba(0,0,0,0.05);
+
+            display:flex;
+
+            justify-content:center;
+            align-items:center;
+
+            font-size:40px;
+
+            margin-bottom:25px;
+
+        }
+
+        .azul{
+            background:#DBEAFE;
+            color:#2563EB;
+        }
+
+        .verde{
+            background:#DCFCE7;
+            color:#16A34A;
+        }
+
+        .rojo{
+            background:#FEE2E2;
+            color:#DC2626;
+        }
+
+        .amarillo{
+            background:#FEF9C3;
+            color:#CA8A04;
+        }
+
+        .card-panel h2{
+
+            font-weight:700;
+
+            margin-bottom:10px;
+
+        }
+
+        .card-panel p{
+
+            color:#64748B;
+
+            margin-bottom:25px;
+
+        }
+
+        .btn-custom{
+
+            border:none;
+
+            padding:14px 25px;
+
+            border-radius:14px;
+
+            font-weight:600;
+
+            transition:0.3s;
+
+        }
+
+        .btn-custom:hover{
+
+            transform:scale(1.03);
 
         }
 
@@ -127,10 +325,12 @@
 
 <body>
 
+<!-- SIDEBAR -->
+
 <div class="sidebar">
 
     <div class="logo">
-        Admin Panel
+        Admin
     </div>
 
     <div class="menu">
@@ -160,7 +360,7 @@
             Usuarios
         </a>
 
-        <a href="/accounts/logout/" style="color:#EF4444;">
+        <a href="/accounts/logout/" style="color:#F87171;">
             <i class="bi bi-box-arrow-left"></i>
             Cerrar sesión
         </a>
@@ -169,15 +369,47 @@
 
 </div>
 
+<!-- CONTENIDO -->
+
 <div class="contenido">
 
-    <h1 class="titulo">
-        Bienvenido Administrador
-    </h1>
+    <div class="topbar">
 
-    <p class="subtitulo">
-        Panel de administración del catálogo
-    </p>
+        <div>
+
+            <h1 class="titulo">
+                Dashboard
+            </h1>
+
+            <p class="subtitulo">
+                Panel de administración del catálogo
+            </p>
+
+        </div>
+
+        <div class="usuario">
+
+            <i class="bi bi-person-circle"></i>
+
+            <div>
+
+                <strong>
+                    {{ request.user.username }}
+                </strong>
+
+                <br>
+
+                <small>
+                    Administrador
+                </small>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ESTADISTICAS -->
 
     <div class="row g-4 mb-5">
 
@@ -225,17 +457,19 @@
 
     </div>
 
+    <!-- CARDS -->
+
     <div class="row g-4">
 
         <div class="col-md-6">
 
-            <div class="card card-panel">
+            <div class="card-panel">
 
-                <div class="icono text-primary">
+                <div class="icono azul">
                     <i class="bi bi-box-seam"></i>
                 </div>
 
-                <h2 class="mt-3">
+                <h2>
                     Productos
                 </h2>
 
@@ -244,7 +478,7 @@
                 </p>
 
                 <a href="{% url 'lista_productos' %}"
-                   class="btn btn-primary">
+                   class="btn btn-primary btn-custom">
 
                     Entrar
 
@@ -256,13 +490,13 @@
 
         <div class="col-md-6">
 
-            <div class="card card-panel">
+            <div class="card-panel">
 
-                <div class="icono text-success">
+                <div class="icono verde">
                     <i class="bi bi-tags-fill"></i>
                 </div>
 
-                <h2 class="mt-3">
+                <h2>
                     Categorías
                 </h2>
 
@@ -271,7 +505,7 @@
                 </p>
 
                 <a href="{% url 'lista_categorias' %}"
-                   class="btn btn-success">
+                   class="btn btn-success btn-custom">
 
                     Entrar
 
@@ -283,13 +517,13 @@
 
         <div class="col-md-6">
 
-            <div class="card card-panel">
+            <div class="card-panel">
 
-                <div class="icono text-danger">
+                <div class="icono rojo">
                     <i class="bi bi-file-earmark-text"></i>
                 </div>
 
-                <h2 class="mt-3">
+                <h2>
                     Cotizaciones
                 </h2>
 
@@ -297,8 +531,10 @@
                     Revisar solicitudes de clientes
                 </p>
 
-                <button class="btn btn-danger">
+                <button class="btn btn-danger btn-custom">
+
                     Próximamente
+
                 </button>
 
             </div>
@@ -307,13 +543,13 @@
 
         <div class="col-md-6">
 
-            <div class="card card-panel">
+            <div class="card-panel">
 
-                <div class="icono text-warning">
+                <div class="icono amarillo">
                     <i class="bi bi-people-fill"></i>
                 </div>
 
-                <h2 class="mt-3">
+                <h2>
                     Usuarios
                 </h2>
 
@@ -321,8 +557,10 @@
                     Administrar usuarios registrados
                 </p>
 
-                <button class="btn btn-warning">
+                <button class="btn btn-warning btn-custom">
+
                     Próximamente
+
                 </button>
 
             </div>
