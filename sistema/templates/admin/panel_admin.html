@@ -4,7 +4,7 @@
 
     <meta charset="UTF-8">
 
-    <title>Dashboard</title>
+    <title>Inicio Admin</title>
 
     <meta name="viewport"
           content="width=device-width, initial-scale=1">
@@ -19,7 +19,7 @@
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-    <!-- Font -->
+    <!-- Fuente -->
 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
           rel="stylesheet">
@@ -27,9 +27,6 @@
     <style>
 
         *{
-            margin:0;
-            padding:0;
-            box-sizing:border-box;
             font-family:'Poppins', sans-serif;
         }
 
@@ -39,79 +36,50 @@
 
         }
 
-        /* SIDEBAR */
+        /* NAVBAR */
 
-        .sidebar{
+        .navbar-custom{
 
-            width:90px;
-            height:100vh;
+            background:white;
 
-            background:#0F172A;
+            padding:18px 40px;
 
-            position:fixed;
-
-            display:flex;
-
-            flex-direction:column;
-
-            align-items:center;
-
-            padding-top:25px;
+            box-shadow:0 5px 20px rgba(0,0,0,0.05);
 
         }
 
         .logo{
 
-            width:55px;
-            height:55px;
+            font-size:26px;
+            font-weight:700;
 
-            background:#2563EB;
-
-            border-radius:18px;
-
-            display:flex;
-
-            justify-content:center;
-            align-items:center;
-
-            color:white;
-
-            font-size:28px;
-
-            margin-bottom:50px;
+            color:#2563EB;
 
         }
 
-        .menu{
+        .nav-link{
 
-            width:100%;
-        }
+            color:#334155 !important;
 
-        .menu a{
+            font-weight:500;
 
-            width:100%;
-            height:70px;
-
-            display:flex;
-
-            justify-content:center;
-            align-items:center;
-
-            color:#CBD5E1;
-
-            text-decoration:none;
-
-            font-size:24px;
+            margin-left:15px;
 
             transition:.3s;
 
         }
 
-        .menu a:hover{
+        .nav-link:hover{
 
-            background:#1E293B;
+            color:#2563EB !important;
 
-            color:white;
+        }
+
+        .perfil{
+
+            font-size:32px;
+
+            color:#2563EB;
 
         }
 
@@ -119,37 +87,14 @@
 
         .contenido{
 
-            margin-left:90px;
-
-            padding:30px;
-
-        }
-
-        /* TOPBAR */
-
-        .topbar{
-
-            background:white;
-
-            border-radius:25px;
-
-            padding:20px 30px;
-
-            display:flex;
-
-            justify-content:space-between;
-
-            align-items:center;
-
-            box-shadow:0 5px 20px rgba(0,0,0,0.05);
-
-            margin-bottom:35px;
+            padding:50px;
 
         }
 
         .titulo{
 
-            font-size:32px;
+            font-size:40px;
+
             font-weight:700;
 
             color:#0F172A;
@@ -160,79 +105,23 @@
 
             color:#64748B;
 
-        }
-
-        .perfil{
-
-            display:flex;
-
-            align-items:center;
-
-            gap:15px;
-
-        }
-
-        .perfil i{
-
-            font-size:38px;
-
-            color:#2563EB;
+            margin-bottom:40px;
 
         }
 
         /* CARDS */
 
-        .card-estadistica{
+        .card-modulo{
 
             background:white;
 
             border:none;
 
-            border-radius:25px;
-
-            padding:25px;
-
-            box-shadow:0 10px 20px rgba(0,0,0,0.05);
-
-            transition:.3s;
-
-        }
-
-        .card-estadistica:hover{
-
-            transform:translateY(-5px);
-
-        }
-
-        .numero{
-
-            font-size:40px;
-
-            font-weight:700;
-
-            color:#0F172A;
-
-        }
-
-        .texto{
-
-            color:#64748B;
-
-        }
-
-        /* MODULOS */
-
-        .modulo{
-
-            background:white;
-
-            border:none;
-
-            border-radius:30px;
+            border-radius:28px;
 
             padding:35px;
 
-            box-shadow:0 10px 20px rgba(0,0,0,0.05);
+            box-shadow:0 10px 25px rgba(0,0,0,0.05);
 
             transition:.3s;
 
@@ -240,7 +129,7 @@
 
         }
 
-        .modulo:hover{
+        .card-modulo:hover{
 
             transform:translateY(-8px);
 
@@ -248,17 +137,17 @@
 
         .icono{
 
-            width:80px;
-            height:80px;
+            width:85px;
+            height:85px;
 
-            border-radius:20px;
+            border-radius:22px;
 
             display:flex;
 
             justify-content:center;
             align-items:center;
 
-            font-size:35px;
+            font-size:38px;
 
             margin-bottom:25px;
 
@@ -287,8 +176,8 @@
 
         .amarillo{
 
-            background:#FEF9C3;
-            color:#CA8A04;
+            background:#FEF3C7;
+            color:#D97706;
 
         }
 
@@ -298,9 +187,23 @@
 
             border-radius:14px;
 
-            padding:12px 22px;
+            padding:12px 25px;
 
             font-weight:600;
+
+        }
+
+        .card-modulo h3{
+
+            font-weight:700;
+
+            color:#0F172A;
+
+        }
+
+        .card-modulo p{
+
+            color:#64748B;
 
         }
 
@@ -310,165 +213,134 @@
 
 <body>
 
-<!-- SIDEBAR -->
+<!-- NAVBAR -->
 
-<div class="sidebar">
+<nav class="navbar navbar-expand-lg navbar-custom">
 
-    <div class="logo">
-        <i class="bi bi-grid-fill"></i>
+    <div class="container-fluid">
+
+        <a class="navbar-brand logo"
+           href="#">
+
+            Catálogo Admin
+
+        </a>
+
+        <button class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#menu">
+
+            <span class="navbar-toggler-icon"></span>
+
+        </button>
+
+        <div class="collapse navbar-collapse"
+             id="menu">
+
+            <ul class="navbar-nav mx-auto">
+
+                <li class="nav-item">
+
+                    <a class="nav-link"
+                       href="{% url 'panel_admin' %}">
+
+                        Inicio
+
+                    </a>
+
+                </li>
+
+                <li class="nav-item">
+
+                    <a class="nav-link"
+                       href="#">
+
+                        Dashboard
+
+                    </a>
+
+                </li>
+
+                <li class="nav-item">
+
+                    <a class="nav-link"
+                       href="{% url 'lista_productos' %}">
+
+                        Productos
+
+                    </a>
+
+                </li>
+
+                <li class="nav-item">
+
+                    <a class="nav-link"
+                       href="{% url 'lista_categorias' %}">
+
+                        Categorías
+
+                    </a>
+
+                </li>
+
+                <li class="nav-item">
+
+                    <a class="nav-link"
+                       href="#">
+
+                        Cotizaciones
+
+                    </a>
+
+                </li>
+
+                <li class="nav-item">
+
+                    <a class="nav-link"
+                       href="#">
+
+                        Usuarios
+
+                    </a>
+
+                </li>
+
+            </ul>
+
+            <div class="d-flex align-items-center gap-3">
+
+                <i class="bi bi-bell fs-5"></i>
+
+                <i class="bi bi-person-circle perfil"></i>
+
+            </div>
+
+        </div>
+
     </div>
 
-    <div class="menu">
-
-        <a href="{% url 'panel_admin' %}"
-           title="Dashboard">
-
-            <i class="bi bi-house-fill"></i>
-
-        </a>
-
-        <a href="{% url 'lista_productos' %}"
-           title="Productos">
-
-            <i class="bi bi-box-seam"></i>
-
-        </a>
-
-        <a href="{% url 'lista_categorias' %}"
-           title="Categorías">
-
-            <i class="bi bi-tags-fill"></i>
-
-        </a>
-
-        <a href="#"
-           title="Cotizaciones">
-
-            <i class="bi bi-file-earmark-text"></i>
-
-        </a>
-
-        <a href="#"
-           title="Usuarios">
-
-            <i class="bi bi-people-fill"></i>
-
-        </a>
-
-        <a href="/accounts/logout/"
-           title="Cerrar sesión">
-
-            <i class="bi bi-box-arrow-left"></i>
-
-        </a>
-
-    </div>
-
-</div>
+</nav>
 
 <!-- CONTENIDO -->
 
 <div class="contenido">
 
-    <!-- TOPBAR -->
+    <h1 class="titulo">
+        Bienvenida, {{ request.user.username }}
+    </h1>
 
-    <div class="topbar">
-
-        <div>
-
-            <h1 class="titulo">
-                Dashboard
-            </h1>
-
-            <p class="subtitulo">
-                Panel administrativo del catálogo
-            </p>
-
-        </div>
-
-        <div class="perfil">
-
-            <i class="bi bi-person-circle"></i>
-
-            <div>
-
-                <strong>
-                    {{ request.user.username }}
-                </strong>
-
-                <br>
-
-                <small class="text-muted">
-                    Administrador
-                </small>
-
-            </div>
-
-        </div>
-
-    </div>
-
-    <!-- ESTADISTICAS -->
-
-    <div class="row g-4 mb-4">
-
-        <div class="col-md-4">
-
-            <div class="card-estadistica">
-
-                <p class="texto">
-                    Productos
-                </p>
-
-                <h2 class="numero">
-                    {{ total_productos }}
-                </h2>
-
-            </div>
-
-        </div>
-
-        <div class="col-md-4">
-
-            <div class="card-estadistica">
-
-                <p class="texto">
-                    Categorías
-                </p>
-
-                <h2 class="numero">
-                    {{ total_categorias }}
-                </h2>
-
-            </div>
-
-        </div>
-
-        <div class="col-md-4">
-
-            <div class="card-estadistica">
-
-                <p class="texto">
-                    Cotizaciones
-                </p>
-
-                <h2 class="numero">
-                    0
-                </h2>
-
-            </div>
-
-        </div>
-
-    </div>
-
-    <!-- MODULOS -->
+    <p class="subtitulo">
+        Administra todo el catálogo desde aquí
+    </p>
 
     <div class="row g-4">
 
-        <div class="col-md-6">
+        <!-- PRODUCTOS -->
 
-            <div class="modulo">
+        <div class="col-md-6 col-lg-3">
+
+            <div class="card-modulo">
 
                 <div class="icono azul">
 
@@ -476,12 +348,12 @@
 
                 </div>
 
-                <h2>
+                <h3>
                     Productos
-                </h2>
+                </h3>
 
-                <p class="text-muted">
-                    Administra productos del catálogo
+                <p>
+                    Administra los productos del catálogo
                 </p>
 
                 <a href="{% url 'lista_productos' %}"
@@ -495,9 +367,11 @@
 
         </div>
 
-        <div class="col-md-6">
+        <!-- CATEGORIAS -->
 
-            <div class="modulo">
+        <div class="col-md-6 col-lg-3">
+
+            <div class="card-modulo">
 
                 <div class="icono verde">
 
@@ -505,12 +379,12 @@
 
                 </div>
 
-                <h2>
+                <h3>
                     Categorías
-                </h2>
+                </h3>
 
-                <p class="text-muted">
-                    Gestiona categorías del sistema
+                <p>
+                    Gestiona las categorías del sistema
                 </p>
 
                 <a href="{% url 'lista_categorias' %}"
@@ -524,9 +398,71 @@
 
         </div>
 
+        <!-- COTIZACIONES -->
+
+        <div class="col-md-6 col-lg-3">
+
+            <div class="card-modulo">
+
+                <div class="icono rojo">
+
+                    <i class="bi bi-file-earmark-text"></i>
+
+                </div>
+
+                <h3>
+                    Cotizaciones
+                </h3>
+
+                <p>
+                    Visualiza solicitudes de clientes
+                </p>
+
+                <button class="btn btn-danger btn-custom">
+
+                    Próximamente
+
+                </button>
+
+            </div>
+
+        </div>
+
+        <!-- USUARIOS -->
+
+        <div class="col-md-6 col-lg-3">
+
+            <div class="card-modulo">
+
+                <div class="icono amarillo">
+
+                    <i class="bi bi-people-fill"></i>
+
+                </div>
+
+                <h3>
+                    Usuarios
+                </h3>
+
+                <p>
+                    Administra usuarios registrados
+                </p>
+
+                <button class="btn btn-warning btn-custom">
+
+                    Próximamente
+
+                </button>
+
+            </div>
+
+        </div>
+
     </div>
 
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>
