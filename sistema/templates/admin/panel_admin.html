@@ -4,7 +4,7 @@
 
     <meta charset="UTF-8">
 
-    <title>Panel Administrador</title>
+    <title>Dashboard</title>
 
     <meta name="viewport"
           content="width=device-width, initial-scale=1">
@@ -19,7 +19,7 @@
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-    <!-- Google Font -->
+    <!-- Font -->
 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
           rel="stylesheet">
@@ -35,7 +35,7 @@
 
         body{
 
-            background:#EEF2F7;
+            background:#F1F5F9;
 
         }
 
@@ -43,69 +43,75 @@
 
         .sidebar{
 
-            width:280px;
+            width:90px;
             height:100vh;
 
-            background:linear-gradient(
-                180deg,
-                #111827,
-                #1E293B
-            );
+            background:#0F172A;
 
             position:fixed;
 
-            padding:30px 20px;
+            display:flex;
 
-            box-shadow:5px 0 20px rgba(0,0,0,0.1);
+            flex-direction:column;
+
+            align-items:center;
+
+            padding-top:25px;
 
         }
 
         .logo{
 
+            width:55px;
+            height:55px;
+
+            background:#2563EB;
+
+            border-radius:18px;
+
+            display:flex;
+
+            justify-content:center;
+            align-items:center;
+
             color:white;
-            font-size:34px;
-            font-weight:700;
+
+            font-size:28px;
 
             margin-bottom:50px;
 
         }
 
+        .menu{
+
+            width:100%;
+        }
+
         .menu a{
 
+            width:100%;
+            height:70px;
+
             display:flex;
+
+            justify-content:center;
             align-items:center;
-
-            gap:15px;
-
-            text-decoration:none;
 
             color:#CBD5E1;
 
-            padding:15px 18px;
+            text-decoration:none;
 
-            border-radius:16px;
+            font-size:24px;
 
-            margin-bottom:15px;
-
-            transition:0.3s;
-
-            font-size:17px;
+            transition:.3s;
 
         }
 
         .menu a:hover{
 
-            background:rgba(255,255,255,0.08);
+            background:#1E293B;
 
             color:white;
-
-            transform:translateX(5px);
-
-        }
-
-        .menu i{
-
-            font-size:20px;
 
         }
 
@@ -113,13 +119,21 @@
 
         .contenido{
 
-            margin-left:280px;
+            margin-left:90px;
 
-            padding:40px;
+            padding:30px;
 
         }
 
+        /* TOPBAR */
+
         .topbar{
+
+            background:white;
+
+            border-radius:25px;
+
+            padding:20px 30px;
 
             display:flex;
 
@@ -127,17 +141,18 @@
 
             align-items:center;
 
-            margin-bottom:40px;
+            box-shadow:0 5px 20px rgba(0,0,0,0.05);
+
+            margin-bottom:35px;
 
         }
 
         .titulo{
 
-            font-size:48px;
-
+            font-size:32px;
             font-weight:700;
 
-            color:#111827;
+            color:#0F172A;
 
         }
 
@@ -145,81 +160,71 @@
 
             color:#64748B;
 
-            margin-top:5px;
-
         }
 
-        .usuario{
-
-            background:white;
-
-            padding:12px 20px;
-
-            border-radius:18px;
-
-            box-shadow:0 5px 15px rgba(0,0,0,0.05);
+        .perfil{
 
             display:flex;
 
             align-items:center;
 
-            gap:10px;
+            gap:15px;
 
         }
 
-        .usuario i{
+        .perfil i{
 
-            font-size:28px;
+            font-size:38px;
 
-            color:#3B82F6;
-
-        }
-
-        /* ESTADISTICAS */
-
-        .estadistica{
-
-            background:white;
-
-            border-radius:25px;
-
-            padding:25px;
-
-            box-shadow:0 10px 25px rgba(0,0,0,0.05);
-
-            transition:0.3s;
-
-        }
-
-        .estadistica:hover{
-
-            transform:translateY(-5px);
-
-        }
-
-        .estadistica h5{
-
-            color:#64748B;
-
-            font-size:16px;
-
-        }
-
-        .estadistica h2{
-
-            margin-top:10px;
-
-            font-size:40px;
-
-            font-weight:700;
-
-            color:#111827;
+            color:#2563EB;
 
         }
 
         /* CARDS */
 
-        .card-panel{
+        .card-estadistica{
+
+            background:white;
+
+            border:none;
+
+            border-radius:25px;
+
+            padding:25px;
+
+            box-shadow:0 10px 20px rgba(0,0,0,0.05);
+
+            transition:.3s;
+
+        }
+
+        .card-estadistica:hover{
+
+            transform:translateY(-5px);
+
+        }
+
+        .numero{
+
+            font-size:40px;
+
+            font-weight:700;
+
+            color:#0F172A;
+
+        }
+
+        .texto{
+
+            color:#64748B;
+
+        }
+
+        /* MODULOS */
+
+        .modulo{
+
+            background:white;
 
             border:none;
 
@@ -227,19 +232,15 @@
 
             padding:35px;
 
-            background:white;
+            box-shadow:0 10px 20px rgba(0,0,0,0.05);
 
-            box-shadow:0 10px 25px rgba(0,0,0,0.06);
+            transition:.3s;
 
-            transition:0.3s;
-
-            overflow:hidden;
-
-            position:relative;
+            height:100%;
 
         }
 
-        .card-panel:hover{
+        .modulo:hover{
 
             transform:translateY(-8px);
 
@@ -257,45 +258,37 @@
             justify-content:center;
             align-items:center;
 
-            font-size:40px;
+            font-size:35px;
 
             margin-bottom:25px;
 
         }
 
         .azul{
+
             background:#DBEAFE;
             color:#2563EB;
+
         }
 
         .verde{
+
             background:#DCFCE7;
             color:#16A34A;
+
         }
 
         .rojo{
+
             background:#FEE2E2;
             color:#DC2626;
+
         }
 
         .amarillo{
+
             background:#FEF9C3;
             color:#CA8A04;
-        }
-
-        .card-panel h2{
-
-            font-weight:700;
-
-            margin-bottom:10px;
-
-        }
-
-        .card-panel p{
-
-            color:#64748B;
-
-            margin-bottom:25px;
 
         }
 
@@ -303,19 +296,11 @@
 
             border:none;
 
-            padding:14px 25px;
-
             border-radius:14px;
 
+            padding:12px 22px;
+
             font-weight:600;
-
-            transition:0.3s;
-
-        }
-
-        .btn-custom:hover{
-
-            transform:scale(1.03);
 
         }
 
@@ -330,39 +315,51 @@
 <div class="sidebar">
 
     <div class="logo">
-        Admin
+        <i class="bi bi-grid-fill"></i>
     </div>
 
     <div class="menu">
 
-        <a href="{% url 'panel_admin' %}">
-            <i class="bi bi-grid-fill"></i>
-            Dashboard
+        <a href="{% url 'panel_admin' %}"
+           title="Dashboard">
+
+            <i class="bi bi-house-fill"></i>
+
         </a>
 
-        <a href="{% url 'lista_productos' %}">
+        <a href="{% url 'lista_productos' %}"
+           title="Productos">
+
             <i class="bi bi-box-seam"></i>
-            Productos
+
         </a>
 
-        <a href="{% url 'lista_categorias' %}">
+        <a href="{% url 'lista_categorias' %}"
+           title="Categorías">
+
             <i class="bi bi-tags-fill"></i>
-            Categorías
+
         </a>
 
-        <a href="#">
+        <a href="#"
+           title="Cotizaciones">
+
             <i class="bi bi-file-earmark-text"></i>
-            Cotizaciones
+
         </a>
 
-        <a href="#">
+        <a href="#"
+           title="Usuarios">
+
             <i class="bi bi-people-fill"></i>
-            Usuarios
+
         </a>
 
-        <a href="/accounts/logout/" style="color:#F87171;">
+        <a href="/accounts/logout/"
+           title="Cerrar sesión">
+
             <i class="bi bi-box-arrow-left"></i>
-            Cerrar sesión
+
         </a>
 
     </div>
@@ -373,6 +370,8 @@
 
 <div class="contenido">
 
+    <!-- TOPBAR -->
+
     <div class="topbar">
 
         <div>
@@ -382,12 +381,12 @@
             </h1>
 
             <p class="subtitulo">
-                Panel de administración del catálogo
+                Panel administrativo del catálogo
             </p>
 
         </div>
 
-        <div class="usuario">
+        <div class="perfil">
 
             <i class="bi bi-person-circle"></i>
 
@@ -399,7 +398,7 @@
 
                 <br>
 
-                <small>
+                <small class="text-muted">
                     Administrador
                 </small>
 
@@ -411,15 +410,17 @@
 
     <!-- ESTADISTICAS -->
 
-    <div class="row g-4 mb-5">
+    <div class="row g-4 mb-4">
 
         <div class="col-md-4">
 
-            <div class="estadistica">
+            <div class="card-estadistica">
 
-                <h5>Total Productos</h5>
+                <p class="texto">
+                    Productos
+                </p>
 
-                <h2>
+                <h2 class="numero">
                     {{ total_productos }}
                 </h2>
 
@@ -429,11 +430,13 @@
 
         <div class="col-md-4">
 
-            <div class="estadistica">
+            <div class="card-estadistica">
 
-                <h5>Total Categorías</h5>
+                <p class="texto">
+                    Categorías
+                </p>
 
-                <h2>
+                <h2 class="numero">
                     {{ total_categorias }}
                 </h2>
 
@@ -443,11 +446,13 @@
 
         <div class="col-md-4">
 
-            <div class="estadistica">
+            <div class="card-estadistica">
 
-                <h5>Cotizaciones</h5>
+                <p class="texto">
+                    Cotizaciones
+                </p>
 
-                <h2>
+                <h2 class="numero">
                     0
                 </h2>
 
@@ -457,24 +462,26 @@
 
     </div>
 
-    <!-- CARDS -->
+    <!-- MODULOS -->
 
     <div class="row g-4">
 
         <div class="col-md-6">
 
-            <div class="card-panel">
+            <div class="modulo">
 
                 <div class="icono azul">
+
                     <i class="bi bi-box-seam"></i>
+
                 </div>
 
                 <h2>
                     Productos
                 </h2>
 
-                <p>
-                    Administrar productos del catálogo
+                <p class="text-muted">
+                    Administra productos del catálogo
                 </p>
 
                 <a href="{% url 'lista_productos' %}"
@@ -490,18 +497,20 @@
 
         <div class="col-md-6">
 
-            <div class="card-panel">
+            <div class="modulo">
 
                 <div class="icono verde">
+
                     <i class="bi bi-tags-fill"></i>
+
                 </div>
 
                 <h2>
                     Categorías
                 </h2>
 
-                <p>
-                    Administrar categorías del catálogo
+                <p class="text-muted">
+                    Gestiona categorías del sistema
                 </p>
 
                 <a href="{% url 'lista_categorias' %}"
@@ -510,58 +519,6 @@
                     Entrar
 
                 </a>
-
-            </div>
-
-        </div>
-
-        <div class="col-md-6">
-
-            <div class="card-panel">
-
-                <div class="icono rojo">
-                    <i class="bi bi-file-earmark-text"></i>
-                </div>
-
-                <h2>
-                    Cotizaciones
-                </h2>
-
-                <p>
-                    Revisar solicitudes de clientes
-                </p>
-
-                <button class="btn btn-danger btn-custom">
-
-                    Próximamente
-
-                </button>
-
-            </div>
-
-        </div>
-
-        <div class="col-md-6">
-
-            <div class="card-panel">
-
-                <div class="icono amarillo">
-                    <i class="bi bi-people-fill"></i>
-                </div>
-
-                <h2>
-                    Usuarios
-                </h2>
-
-                <p>
-                    Administrar usuarios registrados
-                </p>
-
-                <button class="btn btn-warning btn-custom">
-
-                    Próximamente
-
-                </button>
 
             </div>
 
