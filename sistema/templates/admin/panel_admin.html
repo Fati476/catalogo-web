@@ -3,130 +3,327 @@
 <head>
 
     <meta charset="UTF-8">
-
     <title>Panel Administrador</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
 
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
+    <style>
+
+        body{
+            margin:0;
+            background:#F1F5F9;
+            font-family: Arial, sans-serif;
+        }
+
+        .sidebar{
+
+            width:260px;
+            height:100vh;
+            background:#111827;
+            position:fixed;
+            padding:25px;
+
+        }
+
+        .logo{
+
+            color:white;
+            font-size:30px;
+            font-weight:bold;
+            margin-bottom:40px;
+
+        }
+
+        .menu a{
+
+            display:flex;
+            align-items:center;
+            gap:12px;
+
+            color:#D1D5DB;
+            text-decoration:none;
+
+            padding:15px;
+            border-radius:12px;
+
+            margin-bottom:10px;
+
+            transition:.3s;
+
+            font-size:17px;
+
+        }
+
+        .menu a:hover{
+
+            background:#1F2937;
+            color:white;
+
+        }
+
+        .contenido{
+
+            margin-left:260px;
+            padding:40px;
+
+        }
+
+        .titulo{
+
+            font-size:45px;
+            font-weight:bold;
+
+        }
+
+        .subtitulo{
+
+            color:gray;
+            margin-bottom:35px;
+
+        }
+
+        .card-panel{
+
+            border:none;
+            border-radius:25px;
+            padding:25px;
+            box-shadow:0 5px 20px rgba(0,0,0,0.08);
+
+            transition:.3s;
+
+        }
+
+        .card-panel:hover{
+
+            transform:translateY(-5px);
+
+        }
+
+        .icono{
+
+            font-size:55px;
+
+        }
+
+        .estadistica{
+
+            background:white;
+            border-radius:20px;
+            padding:20px;
+            box-shadow:0 5px 20px rgba(0,0,0,0.05);
+
+        }
+
+    </style>
+
 </head>
 
-<body class="bg-light">
+<body>
 
-<div class="d-flex">
+<div class="sidebar">
 
-    <!-- SIDEBAR -->
-    <div class="bg-dark text-white p-3"
-         style="width:250px; height:100vh;">
+    <div class="logo">
+        Admin Panel
+    </div>
 
-        <h3 class="mb-4">
-            Admin Panel
-        </h3>
+    <div class="menu">
 
-        <a href="{% url 'panel_admin' %}"
-           class="d-block text-white mb-3 text-decoration-none">
-
-            🏠 Dashboard
-
+        <a href="{% url 'panel_admin' %}">
+            <i class="bi bi-grid-fill"></i>
+            Dashboard
         </a>
 
-        <a href="{% url 'lista_productos' %}"
-           class="d-block text-white mb-3 text-decoration-none">
-
-            📦 Productos
-
+        <a href="{% url 'lista_productos' %}">
+            <i class="bi bi-box-seam"></i>
+            Productos
         </a>
 
-        <a href="{% url 'lista_categorias' %}"
-           class="d-block text-white mb-3 text-decoration-none">
-
-            🏷 Categorías
-
+        <a href="{% url 'lista_categorias' %}">
+            <i class="bi bi-tags-fill"></i>
+            Categorías
         </a>
 
-        <a href="/admin/"
-           class="d-block text-white mb-3 text-decoration-none">
-
-            ⚙ Django Admin
-
+        <a href="#">
+            <i class="bi bi-file-earmark-text"></i>
+            Cotizaciones
         </a>
 
-        <a href="{% url 'logout' %}"
-           class="d-block text-danger text-decoration-none">
+        <a href="#">
+            <i class="bi bi-people-fill"></i>
+            Usuarios
+        </a>
 
-            🚪 Cerrar sesión
-
+        <a href="/accounts/logout/" style="color:#EF4444;">
+            <i class="bi bi-box-arrow-left"></i>
+            Cerrar sesión
         </a>
 
     </div>
 
-    <!-- CONTENIDO -->
-    <div class="p-5 w-100">
+</div>
 
-        <h1 class="fw-bold">
-            Bienvenido {{ request.user.username }}
-        </h1>
+<div class="contenido">
 
-        <p class="text-muted">
-            Panel de administración del catálogo
-        </p>
+    <h1 class="titulo">
+        Bienvenido Administrador
+    </h1>
 
-        <!-- TARJETAS -->
-        <div class="row mt-4">
+    <p class="subtitulo">
+        Panel de administración del catálogo
+    </p>
 
-            <div class="col-md-4">
+    <div class="row g-4 mb-5">
 
-                <div class="card shadow border-0 rounded-4">
+        <div class="col-md-4">
 
-                    <div class="card-body">
+            <div class="estadistica">
 
-                        <h3>
-                            📦 Productos
-                        </h3>
+                <h5>Total Productos</h5>
 
-                        <p>
-                            Administrar productos
-                        </p>
-
-                        <a href="{% url 'lista_productos' %}"
-                           class="btn btn-primary">
-
-                            Entrar
-
-                        </a>
-
-                    </div>
-
-                </div>
+                <h2>
+                    {{ total_productos }}
+                </h2>
 
             </div>
 
-            <div class="col-md-4">
+        </div>
 
-                <div class="card shadow border-0 rounded-4">
+        <div class="col-md-4">
 
-                    <div class="card-body">
+            <div class="estadistica">
 
-                        <h3>
-                            🏷 Categorías
-                        </h3>
+                <h5>Total Categorías</h5>
 
-                        <p>
-                            Administrar categorías
-                        </p>
+                <h2>
+                    {{ total_categorias }}
+                </h2>
 
-                        <a href="{% url 'lista_categorias' %}"
-                           class="btn btn-success">
+            </div>
 
-                            Entrar
+        </div>
 
-                        </a>
+        <div class="col-md-4">
 
-                    </div>
+            <div class="estadistica">
 
+                <h5>Cotizaciones</h5>
+
+                <h2>
+                    0
+                </h2>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="row g-4">
+
+        <div class="col-md-6">
+
+            <div class="card card-panel">
+
+                <div class="icono text-primary">
+                    <i class="bi bi-box-seam"></i>
                 </div>
+
+                <h2 class="mt-3">
+                    Productos
+                </h2>
+
+                <p>
+                    Administrar productos del catálogo
+                </p>
+
+                <a href="{% url 'lista_productos' %}"
+                   class="btn btn-primary">
+
+                    Entrar
+
+                </a>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-6">
+
+            <div class="card card-panel">
+
+                <div class="icono text-success">
+                    <i class="bi bi-tags-fill"></i>
+                </div>
+
+                <h2 class="mt-3">
+                    Categorías
+                </h2>
+
+                <p>
+                    Administrar categorías del catálogo
+                </p>
+
+                <a href="{% url 'lista_categorias' %}"
+                   class="btn btn-success">
+
+                    Entrar
+
+                </a>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-6">
+
+            <div class="card card-panel">
+
+                <div class="icono text-danger">
+                    <i class="bi bi-file-earmark-text"></i>
+                </div>
+
+                <h2 class="mt-3">
+                    Cotizaciones
+                </h2>
+
+                <p>
+                    Revisar solicitudes de clientes
+                </p>
+
+                <button class="btn btn-danger">
+                    Próximamente
+                </button>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-6">
+
+            <div class="card card-panel">
+
+                <div class="icono text-warning">
+                    <i class="bi bi-people-fill"></i>
+                </div>
+
+                <h2 class="mt-3">
+                    Usuarios
+                </h2>
+
+                <p>
+                    Administrar usuarios registrados
+                </p>
+
+                <button class="btn btn-warning">
+                    Próximamente
+                </button>
 
             </div>
 

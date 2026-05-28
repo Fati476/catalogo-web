@@ -76,7 +76,15 @@ def redireccion_inicio(request):
 @login_required
 def panel_admin(request):
 
-    return render(request, 'admin/panel_admin.html')
+    total_productos = Producto.objects.count()
+    total_categorias = Categoria.objects.count()
+
+    return render(request,
+                  'admin/panel_admin.html',
+                  {
+                      'total_productos': total_productos,
+                      'total_categorias': total_categorias
+                  })
 
 @login_required
 def lista_productos(request):
