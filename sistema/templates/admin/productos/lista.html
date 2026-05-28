@@ -460,12 +460,13 @@
 
                     <div class="acciones">
 
-                        <button class="btn btn-primary btn-custom">
+                        <a href="{% url 'editar_producto' producto.id %}"
+                           class="btn btn-primary btn-custom">
 
                             <i class="bi bi-pencil-square"></i>
                             Editar
 
-                        </button>
+                        </a>
 
                         <button class="btn btn-danger btn-custom">
 

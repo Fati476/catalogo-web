@@ -51,4 +51,10 @@ urlpatterns = [
         name='agregar_producto'
     ),
 
+    path(
+        'panel/productos/editar/<int:id>/',
+        views.editar_producto,
+        name='editar_producto'
+    ),
+
 ]

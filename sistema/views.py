@@ -118,6 +118,37 @@ def agregar_producto(request):
     })
 
 
+
+@login_required
+def editar_producto(request, id):
+
+    producto = Producto.objects.get(id=id)
+
+    if request.method == 'POST':
+
+        form = ProductoForm(
+            request.POST,
+            instance=producto
+        )
+
+        if form.is_valid():
+
+            form.save()
+
+            return redirect('lista_productos')
+
+    else:
+
+        form = ProductoForm(instance=producto)
+
+    return render(request,
+                  'admin/productos/editar.html',
+                  {
+                      'form': form,
+                      'producto': producto
+                  })
+
+
 @login_required
 def lista_categorias(request):
 
