@@ -339,13 +339,20 @@
 
                     <li>
 
-                        <a class="dropdown-item text-danger"
-                           href="/accounts/logout/">
+                        <form method="POST"
+                              action="/accounts/logout/">
 
-                            <i class="bi bi-box-arrow-right"></i>
-                            Cerrar sesión
+                            {% csrf_token %}
 
-                        </a>
+                            <button type="submit"
+                                    class="dropdown-item text-danger">
+
+                                <i class="bi bi-box-arrow-right"></i>
+                                Cerrar sesión
+
+                            </button>
+
+                        </form>
 
                     </li>
 
