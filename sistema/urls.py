@@ -57,4 +57,11 @@ urlpatterns = [
         name='editar_producto'
     ),
 
+
+    path(
+        'panel/productos/imagen/eliminar/<int:id>/',
+        views.eliminar_imagen,
+        name='eliminar_imagen'
+    ),
+
 ]

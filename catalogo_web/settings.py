@@ -152,3 +152,9 @@ LOGIN_REDIRECT_URL = 'redireccion'
 LOGOUT_REDIRECT_URL = '/accounts/login/'
 LOGIN_URL = '/accounts/login/'
 
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+CLOUDINARY_STORAGE = {
+    'SECURE': True
+}

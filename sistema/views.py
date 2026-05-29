@@ -15,6 +15,8 @@ from .forms_imagen import ProductoImagenForm
 from .models import ProductoImagen
 
 
+from .models import ProductoImagens
+
 @login_required
 def inicio(request):
 
@@ -170,6 +172,18 @@ def editar_producto(request, id):
                       'imagenes': imagenes,
                       'imagen_form': imagen_form
                   })
+
+
+@login_required
+def eliminar_imagen(request, id):
+
+    imagen = ProductoImagen.objects.get(id=id)
+
+    producto_id = imagen.producto.id
+
+    imagen.delete()
+
+    return redirect('editar_producto', id=producto_id)
 
 @login_required
 def lista_categorias(request):
