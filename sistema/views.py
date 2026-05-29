@@ -15,7 +15,7 @@ from .forms_imagen import ProductoImagenForm
 from .models import ProductoImagen
 
 
-from .models import ProductoImagens
+from .models import ProductoImagen
 
 @login_required
 def inicio(request):
