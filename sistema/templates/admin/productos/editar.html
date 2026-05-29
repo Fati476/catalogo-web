@@ -158,10 +158,19 @@
             <div class="mb-4 mt-4">
 
                 <label>
-                    Agregar imagen
+                 Agregar imágenes
                 </label>
 
-                {{ imagen_form.imagen }}
+                <input type="file"
+                    name="imagen"
+                    id="imagenInput"
+                    multiple
+                    class="form-control">
+
+            </div>
+
+            <div class="row mt-4"
+                id="preview-container">
 
             </div>
 
@@ -205,6 +214,58 @@
     </div>
 
 </div>
+
+<script>
+
+const input = document.getElementById('imagenInput');
+
+const previewContainer = document.getElementById('preview-container');
+
+input.addEventListener('change', function() {
+
+    previewContainer.innerHTML = '';
+
+    const archivos = this.files;
+
+    for(let i = 0; i < archivos.length; i++){
+
+        const archivo = archivos[i];
+
+        const reader = new FileReader();
+
+        reader.onload = function(e){
+
+            const col = document.createElement('div');
+
+            col.classList.add('col-md-3', 'mb-3');
+
+            col.innerHTML = `
+            
+                <div class="card border-0 shadow-sm">
+
+                    <img src="${e.target.result}"
+                         class="img-fluid rounded"
+                         style="
+                            height:150px;
+                            width:100%;
+                            object-fit:cover;
+                         ">
+
+                </div>
+
+            `;
+
+            previewContainer.appendChild(col);
+
+        }
+
+        reader.readAsDataURL(archivo);
+
+    }
+
+});
+
+</script>
 
 </body>
 </html>
