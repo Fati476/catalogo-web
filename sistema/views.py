@@ -11,6 +11,9 @@ from .models import Producto
 from .forms_categoria import CategoriaForm
 from .models import Categoria
 
+from .forms_imagen import ProductoImagenForm
+from .models import ProductoImagen
+
 
 @login_required
 def inicio(request):
@@ -131,23 +134,42 @@ def editar_producto(request, id):
             instance=producto
         )
 
+        imagen_form = ProductoImagenForm(
+            request.POST,
+            request.FILES
+        )
+
         if form.is_valid():
 
             form.save()
 
-            return redirect('lista_productos')
+            if request.FILES.get('imagen'):
+
+                ProductoImagen.objects.create(
+                    producto=producto,
+                    imagen=request.FILES.get('imagen')
+                )
+
+            return redirect('editar_producto', id=producto.id)
 
     else:
 
         form = ProductoForm(instance=producto)
 
+        imagen_form = ProductoImagenForm()
+
+    imagenes = ProductoImagen.objects.filter(
+        producto=producto
+    )
+
     return render(request,
                   'admin/productos/editar.html',
                   {
                       'form': form,
-                      'producto': producto
+                      'producto': producto,
+                      'imagenes': imagenes,
+                      'imagen_form': imagen_form
                   })
-
 
 @login_required
 def lista_categorias(request):
@@ -183,3 +205,4 @@ def agregar_categoria(request):
                   {
                       'form': form
                   })
+
