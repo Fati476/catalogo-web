@@ -145,11 +145,13 @@ def editar_producto(request, id):
 
             form.save()
 
-            if request.FILES.get('imagen'):
+            imagenes = request.FILES.getlist('imagen')
 
-                ProductoImagen.objects.create(
+            for imagen in imagenes:
+
+                    ProductoImagen.objects.create(
                     producto=producto,
-                    imagen=request.FILES.get('imagen')
+                    imagen=imagen
                 )
 
             return redirect('editar_producto', id=producto.id)
