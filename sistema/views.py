@@ -136,11 +136,6 @@ def editar_producto(request, id):
             instance=producto
         )
 
-        imagen_form = ProductoImagenForm(
-            request.POST,
-            request.FILES
-        )
-
         if form.is_valid():
 
             form.save()
@@ -149,31 +144,33 @@ def editar_producto(request, id):
 
             for imagen in imagenes:
 
-                    ProductoImagen.objects.create(
+                ProductoImagen.objects.create(
                     producto=producto,
                     imagen=imagen
                 )
 
-            return redirect('editar_producto', id=producto.id)
+            return redirect(
+                'editar_producto',
+                id=producto.id
+            )
 
     else:
 
         form = ProductoForm(instance=producto)
 
-        imagen_form = ProductoImagenForm()
-
     imagenes = ProductoImagen.objects.filter(
         producto=producto
     )
 
-    return render(request,
-                  'admin/productos/editar.html',
-                  {
-                      'form': form,
-                      'producto': producto,
-                      'imagenes': imagenes,
-                      'imagen_form': imagen_form
-                  })
+    return render(
+        request,
+        'admin/productos/editar.html',
+        {
+            'form': form,
+            'producto': producto,
+            'imagenes': imagenes
+        }
+    )
 
 
 @login_required
