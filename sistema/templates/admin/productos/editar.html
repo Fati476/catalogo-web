@@ -174,26 +174,34 @@
 
             </div>
 
-            <div class="col-md-4 mb-3">
+            <div class="row mt-4">
 
-                <div class="position-relative">
+                {% for imagen in imagenes %}
             
-                    <img src="{{ imagen.imagen.url }}"
-                         class="img-fluid rounded shadow"
-                         style="
-                            height:180px;
-                            width:100%;
-                            object-fit:cover;
-                         ">
+                <div class="col-md-4 mb-3">
 
-                    <a href="{% url 'eliminar_imagen' imagen.id %}"
-                       class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2 rounded-circle">
+                    <div class="position-relative">
 
-                        <i class="bi bi-x-lg"></i>
+                        <img src="{{ imagen.imagen.url }}"
+                             class="img-fluid rounded shadow"
+                             style="
+                                height:180px;
+                                width:100%;
+                                object-fit:cover;
+                             ">
 
-                    </a>
+                        <a href="{% url 'eliminar_imagen' imagen.id %}"
+                           class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2 rounded-circle">
+
+                            <i class="bi bi-x-lg"></i>
+
+                        </a>
+
+                    </div>
 
                 </div>
+
+                {% endfor %}
 
             </div>
 
