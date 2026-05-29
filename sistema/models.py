@@ -1,3 +1,4 @@
+from cloudinary.models import CloudinaryField
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -25,7 +26,7 @@ class ProductoImagen(models.Model):
         on_delete=models.CASCADE,
         related_name='imagenes'
     )
-    imagen = models.ImageField(upload_to='productos/')
+    imagen = CloudinaryField('imagen')
 
     def __str__(self):
         return self.producto.nombre
