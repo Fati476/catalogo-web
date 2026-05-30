@@ -776,16 +776,25 @@
 
             </h5>
 
-            <input type="file"
-                   id="imagenesNueva"
-                   name="imagen"
-                   multiple
-                   class="form-control rounded-4 p-3 mb-4">
+            <div class="mb-4">
+
+                <input type="file"
+                       id="imagenesNueva"
+                       multiple
+                       class="form-control rounded-4 p-3">
+
+            </div>
 
             <div class="row"
                  id="previewNueva">
-
+            
             </div>
+
+            <input type="file"
+                   id="imagenesFinal"
+                   name="imagen"
+                   multiple
+                   hidden>
 
             <button type="submit"
                     class="btn btn-success w-100 rounded-pill py-3 fw-semibold">
@@ -863,48 +872,95 @@ window.addEventListener('load', function(){
 
 <script>
 
-const inputNueva =
+let imagenesSeleccionadas = [];
+
+const inputImagenes =
 document.getElementById('imagenesNueva');
 
-const previewNueva =
+const preview =
 document.getElementById('previewNueva');
 
-if(inputNueva){
+const inputFinal =
+document.getElementById('imagenesFinal');
 
-    inputNueva.addEventListener('change', function(){
+inputImagenes.addEventListener('change', function(){
 
-        previewNueva.innerHTML='';
+    const archivos = Array.from(this.files);
 
-        [...this.files].forEach(file=>{
+    archivos.forEach(archivo => {
 
-            const reader =
-            new FileReader();
-
-            reader.onload = function(e){
-
-                previewNueva.innerHTML += `
-
-                    <div class="col-6 mb-3">
-
-                        <img src="${e.target.result}"
-                             class="img-fluid rounded-4 shadow-sm"
-                             style="
-                                height:180px;
-                                width:100%;
-                                object-fit:cover;
-                             ">
-
-                    </div>
-
-                `;
-
-            };
-
-            reader.readAsDataURL(file);
-
-        });
+        imagenesSeleccionadas.push(archivo);
 
     });
+
+    renderizarImagenes();
+
+    this.value = "";
+
+});
+
+function renderizarImagenes(){
+
+    preview.innerHTML = "";
+
+    const dataTransfer = new DataTransfer();
+
+    imagenesSeleccionadas.forEach((archivo,index)=>{
+
+        dataTransfer.items.add(archivo);
+
+        const reader = new FileReader();
+
+        reader.onload = function(e){
+
+            const div =
+            document.createElement('div');
+
+            div.className =
+            'col-md-4 mb-4';
+
+            div.innerHTML = `
+
+                <div class="position-relative">
+
+                    <img src="${e.target.result}"
+                         class="img-fluid rounded-4 shadow-sm"
+                         style="
+                            height:180px;
+                            width:100%;
+                            object-fit:cover;
+                         ">
+
+                    <button type="button"
+                            class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2 rounded-circle"
+                            onclick="eliminarImagen(${index})">
+
+                        <i class="bi bi-x-lg"></i>
+
+                    </button>
+
+                </div>
+
+            `;
+
+            preview.appendChild(div);
+
+        }
+
+        reader.readAsDataURL(archivo);
+
+    });
+
+    inputFinal.files =
+    dataTransfer.files;
+
+}
+
+function eliminarImagen(index){
+
+    imagenesSeleccionadas.splice(index,1);
+
+    renderizarImagenes();
 
 }
 
