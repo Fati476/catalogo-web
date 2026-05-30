@@ -186,7 +186,7 @@ def eliminar_imagen(request, id):
 
     imagen.delete()
 
-    return redirect('editar_producto', id=producto_id)
+    return redirect('lista_productos')
 
 
 @login_required
