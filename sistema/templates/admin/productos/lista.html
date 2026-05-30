@@ -692,5 +692,33 @@ buscador.addEventListener('keyup', function() {
 
 </script>
 
+<script>
+
+window.addEventListener('load', function(){
+
+    const params = new URLSearchParams(window.location.search);
+
+    const editar = params.get('editar');
+
+    if(editar){
+
+        const offcanvasElement = document.getElementById(
+            `editarProducto${editar}`
+        );
+
+        if(offcanvasElement){
+
+            const bsOffcanvas = new bootstrap.Offcanvas(offcanvasElement);
+
+            bsOffcanvas.show();
+
+        }
+
+    }
+
+});
+
+</script>
+
 </body>
 </html>
