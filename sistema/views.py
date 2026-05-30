@@ -117,7 +117,16 @@ def agregar_producto(request):
 
         if form.is_valid():
 
-            form.save()
+            producto = form.save()
+
+            imagenes = request.FILES.getlist('imagen')
+
+            for imagen in imagenes:
+
+                ProductoImagen.objects.create(
+                    producto=producto,
+                    imagen=imagen
+                )
 
             return redirect('lista_productos')
 
@@ -125,9 +134,13 @@ def agregar_producto(request):
 
         form = ProductoForm()
 
-    return render(request, 'admin/productos/agregar.html', {
-        'form': form
-    })
+    return render(
+        request,
+        'admin/productos/agregar.html',
+        {
+            'form': form
+        }
+    )
 
 
 
