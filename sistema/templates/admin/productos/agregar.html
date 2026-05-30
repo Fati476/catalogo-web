@@ -70,6 +70,19 @@
             object-fit:cover;
         }
 
+        .preview-card{
+            position:relative;
+            border-radius:18px;
+            overflow:hidden;
+            box-shadow:0 5px 15px rgba(0,0,0,.08);
+        }
+
+        .preview-card img{
+            width:100%;
+            height:180px;
+            object-fit:cover;
+        }
+
     </style>
 
 </head>
@@ -189,16 +202,23 @@
 <script>
 
 const input = document.getElementById('imagenInput');
-
 const previewContainer = document.getElementById('preview-container');
+
+let archivosSeleccionados = [];
 
 input.addEventListener('change', function() {
 
+    archivosSeleccionados = Array.from(this.files);
+
+    mostrarPreview();
+
+});
+
+function mostrarPreview(){
+
     previewContainer.innerHTML = '';
 
-    const archivos = this.files;
-
-    for(let i = 0; i < archivos.length; i++){
+    archivosSeleccionados.forEach((archivo, index) => {
 
         const reader = new FileReader();
 
@@ -210,9 +230,17 @@ input.addEventListener('change', function() {
 
             col.innerHTML = `
 
-                <div class="preview-card">
+                <div class="position-relative preview-card">
 
                     <img src="${e.target.result}">
+
+                    <button type="button"
+                            class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2 rounded-circle"
+                            onclick="eliminarImagen(${index})">
+
+                        <i class="bi bi-x-lg"></i>
+
+                    </button>
 
                 </div>
 
@@ -222,11 +250,19 @@ input.addEventListener('change', function() {
 
         }
 
-        reader.readAsDataURL(archivos[i]);
+        reader.readAsDataURL(archivo);
 
-    }
+    });
 
-});
+}
+
+function eliminarImagen(index){
+
+    archivosSeleccionados.splice(index,1);
+
+    mostrarPreview();
+
+}
 
 </script>
 
