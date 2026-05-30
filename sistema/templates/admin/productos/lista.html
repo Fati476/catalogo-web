@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -9,17 +10,11 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1">
 
-    <!-- Bootstrap -->
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
           rel="stylesheet">
 
-    <!-- Icons -->
-
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
-    <!-- Fuente -->
 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
           rel="stylesheet">
@@ -31,197 +26,107 @@
         }
 
         body{
-
             background:#F1F5F9;
-
         }
 
-        /* NAVBAR */
-
         .navbar-custom{
-
             background:white;
-
             padding:18px 40px;
-
             box-shadow:0 5px 20px rgba(0,0,0,0.05);
-
         }
 
         .logo{
-
             font-size:26px;
             font-weight:700;
-
             color:#2563EB;
-
         }
-
-        .nav-link{
-
-            color:#334155 !important;
-
-            font-weight:500;
-
-            margin-left:15px;
-
-        }
-
-        .nav-link:hover{
-
-            color:#2563EB !important;
-
-        }
-
-        /* CONTENIDO */
 
         .contenido{
-
             padding:50px;
-
         }
 
         .titulo{
-
             font-size:38px;
-
             font-weight:700;
-
             color:#0F172A;
-
         }
 
         .subtitulo{
-
             color:#64748B;
-
         }
 
-        /* CARD PRODUCTO */
-
         .producto-card{
-
             background:white;
-
             border:none;
-
             border-radius:28px;
-
             overflow:hidden;
-
             box-shadow:0 10px 25px rgba(0,0,0,0.05);
-
             transition:.3s;
-
             height:100%;
-
         }
 
         .producto-card:hover{
-
             transform:translateY(-8px);
-
         }
 
         .producto-img{
-
             width:100%;
-            height:260px;
-
-            object-fit:contain;
-        
+            height:280px;
+            object-fit:cover;
             background:#F8FAFC;
-
-            padding:10px;
-        
         }
 
         .producto-body{
-
             padding:25px;
-
         }
 
         .producto-titulo{
-
             font-size:22px;
-
             font-weight:700;
-
             color:#0F172A;
-
         }
 
         .producto-descripcion{
-
             color:#64748B;
-
             margin:15px 0;
-
         }
 
         .precio{
-
             font-size:26px;
-
             font-weight:700;
-
             color:#16A34A;
-
         }
 
         .badge-categoria{
-
             background:#DBEAFE;
-
             color:#2563EB;
-
             padding:10px 15px;
-
             border-radius:14px;
-
             font-size:13px;
-
         }
 
         .acciones{
-
             margin-top:25px;
-
             display:flex;
-
             gap:10px;
-
         }
 
         .btn-custom{
-
             border:none;
-
             border-radius:14px;
-
             padding:12px 18px;
-
             font-weight:600;
-
         }
 
         .sin-imagen{
-
             width:100%;
-            height:240px;
-
+            height:280px;
             background:#CBD5E1;
-
             display:flex;
-
             justify-content:center;
             align-items:center;
-
             font-size:70px;
-
             color:white;
-
         }
 
     </style>
@@ -229,8 +134,6 @@
 </head>
 
 <body>
-
-<!-- NAVBAR -->
 
 <nav class="navbar navbar-expand-lg navbar-custom">
 
@@ -243,125 +146,9 @@
 
         </a>
 
-        <button class="navbar-toggler"
-                type="button"
-                data-bs-toggle="collapse"
-                data-bs-target="#menu">
-
-            <span class="navbar-toggler-icon"></span>
-
-        </button>
-
-        <div class="collapse navbar-collapse"
-             id="menu">
-
-            <ul class="navbar-nav mx-auto">
-
-                <li class="nav-item">
-                    <a class="nav-link"
-                       href="{% url 'panel_admin' %}">
-                        Inicio
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link"
-                       href="#">
-                        Dashboard
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link active"
-                       href="{% url 'lista_productos' %}">
-                        Productos
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link"
-                       href="{% url 'lista_categorias' %}">
-                        Categorías
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link"
-                       href="#">
-                        Cotizaciones
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link"
-                       href="#">
-                        Usuarios
-                    </a>
-                </li>
-
-            </ul>
-
-            <!-- PERFIL -->
-
-            <div class="dropdown">
-
-                <button class="btn d-flex align-items-center gap-3"
-                        type="button"
-                        data-bs-toggle="dropdown"
-                        style="border:none; background:none;">
-
-                    <i class="bi bi-bell fs-5"></i>
-
-                    <i class="bi bi-person-circle fs-3 text-primary"></i>
-
-                </button>
-
-                <ul class="dropdown-menu dropdown-menu-end shadow border-0 p-2">
-
-                    <li>
-
-                        <span class="dropdown-item-text fw-bold">
-
-                            {{ request.user.username }}
-
-                        </span>
-
-                    </li>
-
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
-
-                    <li>
-
-                        <form method="POST"
-                              action="/accounts/logout/">
-
-                            {% csrf_token %}
-
-                            <button type="submit"
-                                    class="dropdown-item text-danger">
-
-                                <i class="bi bi-box-arrow-right"></i>
-                                Cerrar sesión
-
-                            </button>
-
-                        </form>
-
-                    </li>
-
-                </ul>
-
-            </div>
-
-        </div>
-
     </div>
 
 </nav>
-
-<!-- CONTENIDO -->
 
 <div class="contenido">
 
@@ -389,6 +176,7 @@
 
     </div>
 
+    <!-- BUSCADOR -->
 
     <div class="mb-5">
 
@@ -401,9 +189,9 @@
             </span>
 
             <input type="text"
-                id="buscador"
-                class="form-control border-0 p-3"
-                placeholder="Buscar producto...">
+                   id="buscador"
+                   class="form-control border-0 p-3"
+                   placeholder="Buscar producto...">
 
         </div>
 
@@ -415,11 +203,13 @@
 
         {% for producto in productos %}
 
-        <div class="col-md-6 col-lg-4">
+        <div class="col-md-6 col-lg-4 producto-item">
 
             <div class="producto-card">
 
-                {% if producto.imagenes.all %}
+                <!-- CARRUSEL -->
+
+                {% if producto.imagenes.count > 0 %}
 
                 <div id="carousel{{ producto.id }}"
                      class="carousel slide"
@@ -474,6 +264,8 @@
 
                 {% endif %}
 
+                <!-- BODY -->
+
                 <div class="producto-body">
 
                     <span class="badge-categoria">
@@ -490,7 +282,7 @@
 
                     <p class="producto-descripcion">
 
-                        {{ producto.descripcion }}
+                        {{ producto.descripcion|truncatechars:90 }}
 
                     </p>
 
@@ -502,13 +294,18 @@
 
                     <div class="acciones">
 
-                        <a href="{% url 'editar_producto' producto.id %}"
-                           class="btn btn-primary btn-custom">
+                        <!-- EDITAR -->
+
+                        <button class="btn btn-primary btn-custom"
+                                data-bs-toggle="offcanvas"
+                                data-bs-target="#editarProducto{{ producto.id }}">
 
                             <i class="bi bi-pencil-square"></i>
                             Editar
 
-                        </a>
+                        </button>
+
+                        <!-- ELIMINAR -->
 
                         <a href="{% url 'eliminar_producto' producto.id %}"
                            class="btn btn-danger btn-custom"
@@ -543,37 +340,222 @@
 
 </div>
 
+<!-- OFFCANVAS -->
+
+{% for producto in productos %}
+
+<div class="offcanvas offcanvas-end"
+     tabindex="-1"
+     id="editarProducto{{ producto.id }}"
+     style="width:700px;">
+
+    <div class="offcanvas-header border-bottom">
+
+        <div>
+
+            <h3 class="fw-bold mb-0">
+
+                Editar producto
+
+            </h3>
+
+            <small class="text-muted">
+
+                {{ producto.nombre }}
+
+            </small>
+
+        </div>
+
+        <button type="button"
+                class="btn-close"
+                data-bs-dismiss="offcanvas">
+
+        </button>
+
+    </div>
+
+    <div class="offcanvas-body">
+
+        <form method="POST"
+              action="{% url 'editar_producto' producto.id %}"
+              enctype="multipart/form-data">
+
+            {% csrf_token %}
+
+            <div class="mb-4">
+
+                <label class="fw-semibold mb-2">
+
+                    Nombre
+
+                </label>
+
+                <input type="text"
+                       name="nombre"
+                       value="{{ producto.nombre }}"
+                       class="form-control p-3 rounded-4">
+
+            </div>
+
+            <div class="mb-4">
+
+                <label class="fw-semibold mb-2">
+
+                    Precio
+
+                </label>
+
+                <input type="number"
+                       step="0.01"
+                       name="precio"
+                       value="{{ producto.precio }}"
+                       class="form-control p-3 rounded-4">
+
+            </div>
+
+            <div class="mb-4">
+
+                <label class="fw-semibold mb-2">
+
+                    Descripción
+
+                </label>
+
+                <textarea name="descripcion"
+                          class="form-control p-3 rounded-4"
+                          rows="4">{{ producto.descripcion }}</textarea>
+
+            </div>
+
+            <div class="mb-4">
+
+                <label class="fw-semibold mb-2">
+
+                    Categoría
+
+                </label>
+
+                <select name="categoria"
+                        class="form-select p-3 rounded-4">
+
+                    {% for categoria in categorias %}
+
+                    <option value="{{ categoria.id }}"
+                        {% if producto.categoria.id == categoria.id %}
+                            selected
+                        {% endif %}>
+
+                        {{ categoria.nombre }}
+
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+            <hr class="my-4">
+
+            <h5 class="fw-bold mb-4">
+
+                Imágenes actuales
+
+            </h5>
+
+            <div class="row">
+
+                {% for imagen in producto.imagenes.all %}
+
+                <div class="col-6 mb-4">
+
+                    <div class="position-relative">
+
+                        <img src="{{ imagen.imagen.url }}"
+                             class="img-fluid rounded-4 shadow-sm"
+                             style="
+                                height:180px;
+                                width:100%;
+                                object-fit:cover;
+                             ">
+
+                        <a href="{% url 'eliminar_imagen' imagen.id %}"
+                           class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2 rounded-circle">
+
+                            <i class="bi bi-x-lg"></i>
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+            <hr class="my-4">
+
+            <h5 class="fw-bold mb-4">
+
+                Agregar imágenes
+
+            </h5>
+
+            <input type="file"
+                   name="imagen"
+                   multiple
+                   class="form-control rounded-4 p-3 mb-4">
+
+            <button type="submit"
+                    class="btn btn-primary w-100 rounded-pill py-3 fw-semibold">
+
+                <i class="bi bi-check-circle"></i>
+                Guardar cambios
+
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endfor %}
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
 
-    const buscador = document.getElementById('buscador');
+const buscador = document.getElementById('buscador');
 
-    buscador.addEventListener('keyup', function() {
+buscador.addEventListener('keyup', function() {
 
-        const texto = this.value.toLowerCase();
+    const texto = this.value.toLowerCase();
 
-        const productos = document.querySelectorAll('.col-md-6');
+    const productos = document.querySelectorAll('.producto-item');
 
-        productos.forEach(producto => {
+    productos.forEach(producto => {
 
-            const contenido = producto.textContent.toLowerCase();
+        const contenido = producto.textContent.toLowerCase();
 
-            if(contenido.includes(texto)){
+        if(contenido.includes(texto)){
 
-                producto.style.display = 'block';
+            producto.style.display = 'block';
 
-            } else {
+        } else {
 
-                producto.style.display = 'none';
+            producto.style.display = 'none';
 
-            }
-
-        });
+        }
 
     });
+
+});
 
 </script>
 
 </body>
 </html>
+```

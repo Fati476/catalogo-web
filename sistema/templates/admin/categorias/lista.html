@@ -162,6 +162,188 @@
 
                 {% endfor %}
 
+                
+                {% for producto in productos %}
+
+                <div class="offcanvas offcanvas-end"
+                     tabindex="-1"
+                     id="editarProducto{{ producto.id }}"
+                     style="width:700px;">
+
+                    <div class="offcanvas-header border-bottom">
+
+                        <div>
+
+                            <h3 class="fw-bold mb-0">
+
+                                Editar producto
+
+                            </h3>
+
+                            <small class="text-muted">
+
+                                {{ producto.nombre }}
+
+                            </small>
+
+                        </div>
+
+                        <button type="button"
+                                class="btn-close"
+                                data-bs-dismiss="offcanvas">
+
+                        </button>
+
+                    </div>
+
+                    <div class="offcanvas-body">
+
+                        <form class="form-editar-producto"
+                              data-id="{{ producto.id }}"
+                              enctype="multipart/form-data">
+
+                            {% csrf_token %}
+
+                            <div class="mb-4">
+
+                                <label class="fw-semibold mb-2">
+
+                                    Nombre
+
+                                </label>
+
+                                <input type="text"
+                                       name="nombre"
+                                       value="{{ producto.nombre }}"
+                                       class="form-control p-3 rounded-4">
+
+                            </div>
+
+                            <div class="mb-4">
+
+                                <label class="fw-semibold mb-2">
+
+                                    Precio
+
+                                </label>
+
+                                <input type="number"
+                                       step="0.01"
+                                       name="precio"
+                                       value="{{ producto.precio }}"
+                                       class="form-control p-3 rounded-4">
+
+                            </div>
+
+                            <div class="mb-4">
+
+                                <label class="fw-semibold mb-2">
+
+                                    Descripción
+
+                                </label>
+
+                                <textarea name="descripcion"
+                                          class="form-control p-3 rounded-4"
+                                          rows="4">{{ producto.descripcion }}</textarea>
+
+                            </div>
+
+                            <div class="mb-4">
+
+                                <label class="fw-semibold mb-2">
+
+                                    Categoría
+
+                                </label>
+
+                                <select name="categoria"
+                                        class="form-select p-3 rounded-4">
+
+                                    {% for categoria in categorias %}
+
+                                    <option value="{{ categoria.id }}"
+                                        {% if producto.categoria.id == categoria.id %}
+                                            selected
+                                        {% endif %}>
+
+                                        {{ categoria.nombre }}
+
+                                    </option>
+
+                                    {% endfor %}
+
+                                </select>
+
+                            </div>
+
+                            <hr class="my-4">
+
+                            <h5 class="fw-bold mb-4">
+
+                                Imágenes actuales
+
+                            </h5>
+
+                            <div class="row">
+
+                                {% for imagen in producto.imagenes.all %}
+
+                                <div class="col-6 mb-4">
+
+                                    <div class="position-relative">
+
+                                        <img src="{{ imagen.imagen.url }}"
+                                             class="img-fluid rounded-4 shadow-sm"
+                                             style="
+                                                height:180px;
+                                                width:100%;
+                                                object-fit:cover;
+                                             ">
+
+                                        <a href="{% url 'eliminar_imagen' imagen.id %}"
+                                           class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2 rounded-circle">
+
+                                            <i class="bi bi-x-lg"></i>
+
+                                        </a>
+
+                                    </div>
+
+                                </div>
+
+                                {% endfor %}
+
+                            </div>
+
+                            <hr class="my-4">
+
+                            <h5 class="fw-bold mb-4">
+
+                                Agregar imágenes
+
+                            </h5>
+
+                            <input type="file"
+                                   name="imagen"
+                                   multiple
+                                   class="form-control rounded-4 p-3 mb-4">
+
+                            <button type="submit"
+                                    class="btn btn-primary w-100 rounded-pill py-3 fw-semibold">
+
+                                <i class="bi bi-check-circle"></i>
+                                Guardar cambios
+
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+                {% endfor %}
             </tbody>
 
         </table>

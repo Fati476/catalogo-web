@@ -94,11 +94,18 @@ def panel_admin(request):
 @login_required
 def lista_productos(request):
 
-    productos = Producto.objects.all()
+    productos = Producto.objects.prefetch_related('imagenes').all()
 
-    return render(request, 'admin/productos/lista.html', {
-        'productos': productos
-    })
+    categorias = Categoria.objects.all()
+
+    
+    return render(request,
+                  'admin/productos/lista.html',
+                  {
+                      'productos': productos,
+                      'categorias': categorias
+                  })
+
 
 
 @login_required
