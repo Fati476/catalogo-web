@@ -181,6 +181,16 @@ def eliminar_imagen(request, id):
 
     return redirect('editar_producto', id=producto_id)
 
+
+@login_required
+def eliminar_producto(request, id):
+
+    producto = Producto.objects.get(id=id)
+
+    producto.delete()
+
+    return redirect('lista_productos')
+
 @login_required
 def lista_categorias(request):
 

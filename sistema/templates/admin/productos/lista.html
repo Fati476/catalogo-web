@@ -510,12 +510,14 @@
 
                         </a>
 
-                        <button class="btn btn-danger btn-custom">
+                        <a href="{% url 'eliminar_producto' producto.id %}"
+                           class="btn btn-danger btn-custom"
+                           onclick="return confirm('¿Eliminar producto?')">
 
                             <i class="bi bi-trash"></i>
                             Eliminar
 
-                        </button>
+                        </a>
 
                     </div>
 
