@@ -1,4 +1,4 @@
-```html
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -140,11 +140,147 @@
     <div class="container-fluid">
 
         <a class="navbar-brand logo"
-           href="{% url 'panel_admin' %}">
+           href="#">
 
             Catálogo Admin
 
         </a>
+
+        <button class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#menu">
+
+            <span class="navbar-toggler-icon"></span>
+
+        </button>
+
+        <div class="collapse navbar-collapse"
+             id="menu">
+
+            <ul class="navbar-nav mx-auto">
+
+                <li class="nav-item">
+
+                    <a class="nav-link"
+                       href="{% url 'panel_admin' %}">
+
+                        Inicio
+
+                    </a>
+
+                </li>
+
+                <li class="nav-item">
+
+                    <a class="nav-link"
+                       href="#">
+
+                        Dashboard
+
+                    </a>
+
+                </li>
+
+                <li class="nav-item">
+
+                    <a class="nav-link"
+                       href="{% url 'lista_productos' %}">
+
+                        Productos
+
+                    </a>
+
+                </li>
+
+                <li class="nav-item">
+
+                    <a class="nav-link"
+                       href="{% url 'lista_categorias' %}">
+
+                        Categorías
+
+                    </a>
+
+                </li>
+
+                <li class="nav-item">
+
+                    <a class="nav-link"
+                       href="#">
+
+                        Cotizaciones
+
+                    </a>
+
+                </li>
+
+                <li class="nav-item">
+
+                    <a class="nav-link"
+                       href="#">
+
+                        Usuarios
+
+                    </a>
+
+                </li>
+
+            </ul>
+
+            <div class="dropdown">
+
+                <button class="btn d-flex align-items-center gap-3"
+                        type="button"
+                        data-bs-toggle="dropdown"
+                        style="border:none; background:none;">
+
+                    <i class="bi bi-bell fs-5"></i>
+
+                    <i class="bi bi-person-circle perfil"></i>
+
+                </button>
+
+                <ul class="dropdown-menu dropdown-menu-end shadow border-0 p-2">
+
+                    <li>
+
+                        <span class="dropdown-item-text fw-bold">
+
+                            {{ request.user.username }}
+
+                        </span>
+
+                    </li>
+
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+
+                    <li>
+
+                        <form method="POST"
+                              action="/accounts/logout/">
+
+                            {% csrf_token %}
+
+                            <button type="submit"
+                                    class="dropdown-item text-danger">
+
+                                <i class="bi bi-box-arrow-right"></i>
+                                Cerrar sesión
+
+                            </button>
+
+                        </form>
+
+                    </li>
+
+                </ul>
+
+            </div>
+
+        </div>
 
     </div>
 
@@ -558,4 +694,3 @@ buscador.addEventListener('keyup', function() {
 
 </body>
 </html>
-```
