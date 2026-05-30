@@ -417,18 +417,58 @@
 
             <div class="producto-card">
 
-                {% if producto.imagenes.first %}
+                {% if producto.imagenes.all %}
 
-                    <img src="{{ producto.imagenes.first.imagen.url }}"
-                         class="producto-img">
+                <div id="carousel{{ producto.id }}"
+                     class="carousel slide"
+                     data-bs-ride="carousel">
+
+                    <div class="carousel-inner">
+
+                        {% for imagen in producto.imagenes.all %}
+
+                        <div class="carousel-item {% if forloop.first %}active{% endif %}">
+
+                            <img src="{{ imagen.imagen.url|cut:'http:'|add:'https:' }}"
+                                 class="producto-img">
+
+                        </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                    {% if producto.imagenes.count > 1 %}
+
+                    <button class="carousel-control-prev"
+                            type="button"
+                            data-bs-target="#carousel{{ producto.id }}"
+                            data-bs-slide="prev">
+
+                        <span class="carousel-control-prev-icon"></span>
+
+                    </button>
+
+                    <button class="carousel-control-next"
+                            type="button"
+                            data-bs-target="#carousel{{ producto.id }}"
+                            data-bs-slide="next">
+
+                        <span class="carousel-control-next-icon"></span>
+
+                    </button>
+
+                    {% endif %}
+
+                </div>
 
                 {% else %}
 
-                    <div class="sin-imagen">
+                <div class="sin-imagen">
 
-                        <i class="bi bi-image"></i>
+                    <i class="bi bi-image"></i>
 
-                    </div>
+                </div>
 
                 {% endif %}
 
