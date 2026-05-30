@@ -149,10 +149,7 @@ def editar_producto(request, id):
                     imagen=imagen
                 )
 
-            return redirect(
-                'editar_producto',
-                id=producto.id
-            )
+            return redirect('lista_productos')
 
     else:
 
