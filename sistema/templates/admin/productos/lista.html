@@ -332,6 +332,27 @@
 
         </div>
 
+        <div class="mt-3">
+
+            <select id="filtroCategoria"
+                    class="form-select">
+
+                <option value="">
+                    Todas las categorías
+                </option>
+
+                {% for categoria in categorias %}
+
+                <option value="{{ categoria.nombre|lower }}">
+                    {{ categoria.nombre }}
+                </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
     </div>
 
     <!-- PRODUCTOS -->
@@ -341,6 +362,7 @@
         {% for producto in productos %}
 
         <div class="col-md-6 col-lg-4 producto-item">
+            data-categoria="{{ producto.categoria.nombre|lower }}">
 
             <div class="producto-card">
 
@@ -878,34 +900,68 @@
 
 <script>
 
-const buscador = document.getElementById('buscador');
+const buscador =
+document.getElementById('buscador');
 
-buscador.addEventListener('keyup', function() {
+const filtroCategoria =
+document.getElementById('filtroCategoria');
 
-    const texto = this.value.toLowerCase();
+function filtrarProductos(){
 
-    const productos = document.querySelectorAll('.producto-item');
+    const texto =
+    buscador.value.toLowerCase();
+
+    const categoria =
+    filtroCategoria.value.toLowerCase();
+
+    const productos =
+    document.querySelectorAll('.producto-item');
 
     productos.forEach(producto => {
 
-        const contenido = producto.textContent.toLowerCase();
+        const contenido =
+        producto.textContent.toLowerCase();
 
-        if(contenido.includes(texto)){
+        const categoriaProducto =
+        producto.dataset.categoria;
 
-            producto.style.display = 'block';
+        const coincideTexto =
+        contenido.includes(texto);
 
-        } else {
+        const coincideCategoria =
+        categoria === "" ||
+        categoriaProducto === categoria;
 
-            producto.style.display = 'none';
+        if(
+            coincideTexto &&
+            coincideCategoria
+        ){
+
+            producto.style.display =
+            'block';
+
+        }else{
+
+            producto.style.display =
+            'none';
 
         }
 
     });
 
-});
+}
+
+buscador.addEventListener(
+    'keyup',
+    filtrarProductos
+);
+
+filtroCategoria.addEventListener(
+    'change',
+    filtrarProductos
+);
 
 </script>
-
 <script>
 
 window.addEventListener('load', function(){
