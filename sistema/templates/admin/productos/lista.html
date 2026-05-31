@@ -541,6 +541,49 @@
 
 </div>
 
+</div>
+
+<nav class="mt-5">
+
+    <ul class="pagination justify-content-center">
+
+        {% if productos.has_previous %}
+
+        <li class="page-item">
+            <a class="page-link"
+               href="?page={{ productos.previous_page_number }}">
+                Anterior
+            </a>
+        </li>
+
+        {% endif %}
+
+        {% for num in productos.paginator.page_range %}
+
+        <li class="page-item {% if productos.number == num %}active{% endif %}">
+            <a class="page-link"
+               href="?page={{ num }}">
+                {{ num }}
+            </a>
+        </li>
+
+        {% endfor %}
+
+        {% if productos.has_next %}
+
+        <li class="page-item">
+            <a class="page-link"
+               href="?page={{ productos.next_page_number }}">
+                Siguiente
+            </a>
+        </li>
+
+        {% endif %}
+
+    </ul>
+
+</nav>
+
 <!-- OFFCANVAS -->
 
 {% for producto in productos %}

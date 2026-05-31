@@ -91,20 +91,29 @@ def panel_admin(request):
                       'total_categorias': total_categorias
                   })
 
+from django.core.paginator import Paginator
+
 @login_required
 def lista_productos(request):
 
-    productos = Producto.objects.prefetch_related('imagenes').all()
+    productos = Producto.objects.all().order_by('-id')
+
+    paginator = Paginator(productos, 6)  # 6 productos por página
+
+    page = request.GET.get('page')
+
+    productos = paginator.get_page(page)
 
     categorias = Categoria.objects.all()
 
-    
-    return render(request,
-                  'admin/productos/lista.html',
-                  {
-                      'productos': productos,
-                      'categorias': categorias
-                  })
+    return render(
+        request,
+        'admin/productos/lista.html',
+        {
+            'productos': productos,
+            'categorias': categorias
+        }
+    )
 
 
 
