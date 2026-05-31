@@ -411,6 +411,16 @@
 
                     </span>
 
+                    {% if producto.estado %}
+                        <span class="badge bg-success ms-2">
+                            Activo
+                        </span>
+                    {% else %}
+                        <span class="badge bg-danger ms-2">
+                            Inactivo
+                        </span>
+                    {% endif %}
+
                     <h3 class="producto-titulo mt-3">
 
                         {{ producto.nombre }}
@@ -588,6 +598,29 @@
                     </option>
 
                     {% endfor %}
+
+                </select>
+
+            </div>
+
+            <div class="mb-4">
+
+                <label class="fw-semibold mb-2">
+                    Estado
+                </label>
+
+                <select name="estado"
+                        class="form-select p-3 rounded-4">
+
+                    <option value="True"
+                            {% if producto.estado %}selected{% endif %}>
+                        Activo
+                    </option>
+
+                    <option value="False"
+                            {% if not producto.estado %}selected{% endif %}>
+                        Inactivo
+                    </option>
 
                 </select>
 
@@ -773,6 +806,27 @@
                     </option>
 
                     {% endfor %}
+
+                </select>
+
+            </div>
+
+            <div class="mb-4">
+
+                <label class="fw-semibold mb-2">
+                    Estado
+                </label>
+
+                <select name="estado"
+                        class="form-select p-3 rounded-4">
+
+                    <option value="True" selected>
+                        Activo
+                    </option>
+
+                    <option value="False">
+                        Inactivo
+                    </option>
 
                 </select>
 
