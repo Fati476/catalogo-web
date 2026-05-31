@@ -640,10 +640,20 @@
 
             </h5>
 
+            <input type="file"            
+       id="imagenesEditar"
+       multiple
+                class="form-control rounded-4 p-3 mb-4">
+
+            <div class="row"
+                id="previewEditar">
+            </div>
+
             <input type="file"
-                   name="imagen"
-                   multiple
-                   class="form-control rounded-4 p-3 mb-4">
+                id="imagenesFinalEditar"
+                name="imagen"
+                multiple
+                hidden>
 
             <button type="submit"
                     class="btn btn-primary w-100 rounded-pill py-3 fw-semibold">
@@ -961,6 +971,107 @@ function eliminarImagen(index){
     imagenesSeleccionadas.splice(index,1);
 
     renderizarImagenes();
+
+}
+
+</script>
+
+
+<script>
+
+let imagenesEditar = [];
+
+const inputEditar =
+document.getElementById('imagenesEditar');
+
+const previewEditar =
+document.getElementById('previewEditar');
+
+const finalEditar =
+document.getElementById('imagenesFinalEditar');
+
+if(inputEditar){
+
+    inputEditar.addEventListener('change', function(){
+
+        const archivos = Array.from(this.files);
+
+        archivos.forEach(archivo => {
+
+            imagenesEditar.push(archivo);
+
+        });
+
+        renderizarEditar();
+
+        this.value = "";
+
+    });
+
+}
+
+function renderizarEditar(){
+
+    previewEditar.innerHTML = "";
+
+    const dataTransfer = new DataTransfer();
+
+    imagenesEditar.forEach((archivo,index)=>{
+
+        dataTransfer.items.add(archivo);
+
+        const reader = new FileReader();
+
+        reader.onload = function(e){
+
+            const div =
+            document.createElement('div');
+
+            div.className =
+            'col-md-4 mb-4';
+
+            div.innerHTML = `
+
+                <div class="position-relative">
+
+                    <img src="${e.target.result}"
+                         class="img-fluid rounded-4 shadow-sm"
+                         style="
+                            height:180px;
+                            width:100%;
+                            object-fit:cover;
+                         ">
+
+                    <button type="button"
+                            class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2 rounded-circle"
+                            onclick="eliminarEditar(${index})">
+
+                        <i class="bi bi-x-lg"></i>
+
+                    </button>
+
+                </div>
+
+            `;
+
+            previewEditar.appendChild(div);
+
+        }
+
+        reader.readAsDataURL(archivo);
+
+    });
+
+    finalEditar.files =
+    dataTransfer.files;
+
+}
+
+function eliminarEditar(index){
+
+    imagenesEditar.splice(index,1);
+
+    renderizarEditar();
 
 }
 
