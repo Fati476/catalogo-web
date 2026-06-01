@@ -493,7 +493,21 @@
 
 </div>
 
+{% if messages %}
 
+    {% for message in messages %}
+
+        <div class="alert alert-success shadow-sm rounded-4 border-0 mb-4">
+
+            <i class="bi bi-check-circle-fill"></i>
+
+            {{ message }}
+
+        </div>
+
+    {% endfor %}
+
+{% endif %}
 
 <div class="modal fade"
      id="modalCategoria"

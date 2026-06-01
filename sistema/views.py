@@ -18,6 +18,9 @@ from .models import ProductoImagen
 
 from .models import ProductoImagen
 
+from django.contrib import messages
+
+
 @login_required
 def inicio(request):
 
@@ -279,11 +282,19 @@ def editar_categoria(request, id):
 
     return redirect('lista_categorias')
 
+
 @login_required
 def eliminar_categoria(request, id):
 
     categoria = Categoria.objects.get(id=id)
 
+    nombre = categoria.nombre
+
     categoria.delete()
+
+    messages.success(
+        request,
+        f'La categoría "{nombre}" fue eliminada correctamente.'
+    )
 
     return redirect('lista_categorias')
