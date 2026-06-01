@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
+from django.core.paginator import Paginator
 
 from .forms import RegistroForm
 from .models import Producto, Perfil
@@ -223,13 +224,21 @@ def eliminar_producto(request, id):
 @login_required
 def lista_categorias(request):
 
-    categorias = Categoria.objects.all()
+    categorias_lista = Categoria.objects.all().order_by('nombre')
 
-    return render(request,
-                  'admin/categorias/lista.html',
-                  {
-                      'categorias': categorias
-                  })
+    paginator = Paginator(categorias_lista, 5)
+
+    page_number = request.GET.get('page')
+
+    categorias = paginator.get_page(page_number)
+
+    return render(
+        request,
+        'admin/categorias/lista.html',
+        {
+            'categorias': categorias
+        }
+    )
 
 
 @login_required
@@ -255,3 +264,46 @@ def agregar_categoria(request):
                       'form': form
                   })
 
+
+@login_required
+def editar_categoria(request, id):
+
+    categoria = Categoria.objects.get(id=id)
+
+    if request.method == 'POST':
+
+        form = CategoriaForm(
+            request.POST,
+            instance=categoria
+        )
+
+        if form.is_valid():
+
+            form.save()
+
+            return redirect('lista_categorias')
+
+    else:
+
+        form = CategoriaForm(
+            instance=categoria
+        )
+
+    return render(
+        request,
+        'admin/categorias/editar.html',
+        {
+            'form': form,
+            'categoria': categoria
+        }
+    )
+
+
+@login_required
+def eliminar_categoria(request, id):
+
+    categoria = Categoria.objects.get(id=id)
+
+    categoria.delete()
+
+    return redirect('lista_categorias')

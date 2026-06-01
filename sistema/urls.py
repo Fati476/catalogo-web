@@ -37,6 +37,19 @@ urlpatterns = [
         name='agregar_categoria'
     ),
 
+
+    path(
+        'panel/categorias/editar/<int:id>/',
+        views.editar_categoria,
+        name='editar_categoria'
+    ),
+
+    path(
+        'panel/categorias/eliminar/<int:id>/',
+        views.eliminar_categoria,
+        name='eliminar_categoria'
+    ),
+
     # PRODUCTOS
 
     path(
