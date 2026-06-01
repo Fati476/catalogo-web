@@ -272,32 +272,12 @@ def editar_categoria(request, id):
 
     if request.method == 'POST':
 
-        form = CategoriaForm(
-            request.POST,
-            instance=categoria
-        )
+        categoria.nombre = request.POST.get('nombre')
+        categoria.descripcion = request.POST.get('descripcion')
 
-        if form.is_valid():
+        categoria.save()
 
-            form.save()
-
-            return redirect('lista_categorias')
-
-    else:
-
-        form = CategoriaForm(
-            instance=categoria
-        )
-
-    return render(
-        request,
-        'admin/categorias/editar.html',
-        {
-            'form': form,
-            'categoria': categoria
-        }
-    )
-
+    return redirect('lista_categorias')
 
 @login_required
 def eliminar_categoria(request, id):
