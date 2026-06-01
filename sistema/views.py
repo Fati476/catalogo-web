@@ -253,7 +253,12 @@ def agregar_categoria(request):
 
         if form.is_valid():
 
-            form.save()
+            categoria = form.save()
+
+            messages.success(
+                request,
+                f'Categoría "{categoria.nombre}" creada correctamente.'
+            )
 
             return redirect('lista_categorias')
 
@@ -280,6 +285,11 @@ def editar_categoria(request, id):
 
         categoria.save()
 
+        messages.success(
+            request,
+            'Categoría actualizada correctamente.'
+        )
+
     return redirect('lista_categorias')
 
 
@@ -287,6 +297,15 @@ def editar_categoria(request, id):
 def eliminar_categoria(request, id):
 
     categoria = Categoria.objects.get(id=id)
+
+    if categoria.producto_set.exists():
+
+        messages.error(
+            request,
+            f'No puedes eliminar la categoría "{categoria.nombre}" porque tiene productos asociados.'
+        )
+
+        return redirect('lista_categorias')
 
     nombre = categoria.nombre
 
