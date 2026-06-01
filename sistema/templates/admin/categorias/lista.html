@@ -251,6 +251,7 @@
 
                             <th>Nombre</th>
                             <th>Descripción</th>
+                            <th>Productos</th>
                             <th width="180">Acciones</th>
 
                         </tr>
@@ -269,6 +270,11 @@
 
                             <td>
                                 {{ categoria.descripcion }}
+                            </td>
+                            <td>
+                                <span class="badge bg-primary">
+                                    {{ categoria.total_productos }}
+                                </span>
                             </td>
 
                             <td>

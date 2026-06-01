@@ -20,6 +20,8 @@ from .models import ProductoImagen
 
 from django.contrib import messages
 
+from django.db.models import Count
+
 
 @login_required
 def inicio(request):
@@ -227,7 +229,9 @@ def eliminar_producto(request, id):
 @login_required
 def lista_categorias(request):
 
-    categorias_lista = Categoria.objects.all().order_by('nombre')
+    categorias_lista = Categoria.objects.annotate(
+        total_productos=Count('producto')
+    ).order_by('nombre')
 
     paginator = Paginator(categorias_lista, 5)
 
