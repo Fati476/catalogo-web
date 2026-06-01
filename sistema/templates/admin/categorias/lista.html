@@ -134,28 +134,24 @@
                 <button class="btn d-flex align-items-center gap-3"
                         type="button"
                         data-bs-toggle="dropdown"
-                        aria-expanded="false"
                         style="border:none; background:none;">
 
                     <i class="bi bi-bell fs-5"></i>
-                    <i class="bi bi-person-circle fs-4"></i>
+
+                    <i class="bi bi-person-circle perfil"></i>
 
                 </button>
 
-                <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-4">
+                <ul class="dropdown-menu dropdown-menu-end shadow border-0 p-2">
 
                     <li>
-                        <a class="dropdown-item py-2" href="#">
-                            <i class="bi bi-person me-2"></i>
-                            Mi perfil
-                        </a>
-                    </li>
 
-                    <li>
-                        <a class="dropdown-item py-2" href="#">
-                            <i class="bi bi-gear me-2"></i>
-                            Configuración
-                        </a>
+                        <span class="dropdown-item-text fw-bold">
+
+                            {{ request.user.username }}
+
+                        </span>
+
                     </li>
 
                     <li>
@@ -163,11 +159,22 @@
                     </li>
 
                     <li>
-                        <a class="dropdown-item text-danger py-2"
-                           href="{% url 'logout' %}">
-                            <i class="bi bi-box-arrow-right me-2"></i>
-                            Cerrar sesión
-                        </a>
+
+                        <form method="POST"
+                              action="/accounts/logout/">
+
+                            {% csrf_token %}
+
+                            <button type="submit"
+                                    class="dropdown-item text-danger">
+
+                                <i class="bi bi-box-arrow-right"></i>
+                                Cerrar sesión
+
+                            </button>
+
+                        </form>
+
                     </li>
 
                 </ul>
