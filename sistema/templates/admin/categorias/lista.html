@@ -283,9 +283,10 @@
 
                                     </button>
 
-                                    <a href="{% url 'eliminar_categoria' categoria.id %}"
-                                       class="btn btn-danger btn-sm rounded-3"
-                                       onclick="return confirm('¿Eliminar esta categoría?')">
+                                    <a href="#"
+                                       class="btn btn-danger btn-sm rounded-3 btn-eliminar"
+                                       data-url="{% url 'eliminar_categoria' categoria.id %}"
+                                       data-nombre="{{ categoria.nombre }}">
 
                                         <i class="bi bi-trash"></i>
 
@@ -586,6 +587,48 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+
+document.querySelectorAll('.btn-eliminar').forEach(btn => {
+
+    btn.addEventListener('click', function(e){
+
+        e.preventDefault();
+
+        const url = this.dataset.url;
+        const nombre = this.dataset.nombre;
+
+        Swal.fire({
+
+            title: '¿Eliminar categoría?',
+            text: `Se eliminará "${nombre}" permanentemente.`,
+            icon: 'warning',
+
+            showCancelButton: true,
+
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+
+        }).then((result) => {
+
+            if(result.isConfirmed){
+
+                window.location.href = url;
+
+            }
+
+        });
+
+    });
+
+});
+
+</script>
 
 </body>
 
