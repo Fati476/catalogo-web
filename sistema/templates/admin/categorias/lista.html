@@ -17,57 +17,45 @@
 
     <style>
 
+        *{
+            font-family:'Poppins',sans-serif;
+        }
+
         body{
-            background: #F1F5F9;
+            background:#F1F5F9;
         }
 
-        .sidebar{
-
-            width: 250px;
-            height: 100vh;
-            background: #111827;
-            position: fixed;
-            padding-top: 30px;
-
+        .navbar-custom{
+            background:white;
+            padding:18px 40px;
+            box-shadow:0 5px 20px rgba(0,0,0,0.05);
         }
 
-        .sidebar h3{
-            color: white;
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .sidebar a{
-
-            display: block;
-            color: #D1D5DB;
-            padding: 15px 25px;
-            text-decoration: none;
-            transition: 0.3s;
-
-        }
-
-        .sidebar a:hover{
-
-            background: #1F2937;
-            color: white;
-
+        .logo{
+            font-size:26px;
+            font-weight:700;
+            color:#2563EB;
         }
 
         .contenido{
-
-            margin-left: 250px;
-            padding: 40px;
-
+            padding:50px;
         }
 
-        .card-tabla{
+        .titulo{
+            font-size:38px;
+            font-weight:700;
+            color:#0F172A;
+        }
 
-            background: white;
-            border-radius: 18px;
-            padding: 25px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        .subtitulo{
+            color:#64748B;
+        }
 
+        .btn-custom{
+            border:none;
+            border-radius:14px;
+            padding:12px 18px;
+            font-weight:600;
         }
 
     </style>
@@ -105,22 +93,22 @@
 
 <div class="contenido">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-5">
 
         <div>
 
-            <h2 class="fw-bold">
+            <h1 class="titulo">
                 Categorías
-            </h2>
+            </h1>
 
-            <p class="text-muted">
-                Administración de categorías
+            <p class="subtitulo">
+                Administra todas las categorías del catálogo
             </p>
 
         </div>
 
         <a href="{% url 'agregar_categoria' %}"
-           class="btn btn-dark">
+           class="btn btn-primary btn-custom">
 
             <i class="bi bi-plus-circle"></i>
             Nueva categoría
@@ -129,64 +117,113 @@
 
     </div>
 
-    <div class="card-tabla">
+    <!-- BUSCADOR -->
 
-        <table class="table align-middle">
+    <div class="mb-5">
 
-            <thead>
+        <div class="input-group shadow-sm">
 
-                <tr>
+            <span class="input-group-text bg-white border-0">
 
-                    <th>Nombre</th>
-                    <th>Descripción</th>
-                    <th class="text-center">Acciones</th>
+                <i class="bi bi-search"></i>
 
-                </tr>
+            </span>
 
-            </thead>
+            <input type="text"
+                   id="buscadorCategoria"
+                   class="form-control border-0 p-3"
+                   placeholder="Buscar categoría...">
 
-            <tbody>
-
-                {% for categoria in categorias %}
-
-                <tr>
-
-                    <td>
-                        {{ categoria.nombre }}
-                    </td>
-
-                    <td>
-                        {{ categoria.descripcion }}
-                    </td>
-
-                    <td class="text-center">
-
-                        <button class="btn btn-primary btn-sm">
-
-                            <i class="bi bi-pencil-square"></i>
-
-                        </button>
-
-                        <button class="btn btn-danger btn-sm">
-
-                            <i class="bi bi-trash"></i>
-
-                        </button>
-
-                    </td>
-
-                </tr>
-
-                {% endfor %}
-
-                
-                
-            </tbody>
-
-        </table>
+        </div>
 
     </div>
 
+    <!-- TABLA -->
+
+    <div class="card border-0 shadow-sm rounded-4">
+
+        <div class="card-body p-4">
+
+            <div class="table-responsive">
+
+                <table class="table align-middle mb-0">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Nombre</th>
+                            <th>Descripción</th>
+                            <th width="180">Acciones</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="tablaCategorias">
+
+                        {% for categoria in categorias %}
+
+                        <tr class="fila-categoria">
+
+                            <td class="nombre-categoria fw-semibold">
+                                {{ categoria.nombre }}
+                            </td>
+
+                            <td>
+                                {{ categoria.descripcion }}
+                            </td>
+
+                            <td>
+
+                                <div class="d-flex gap-2">
+
+                                    <a href="#"
+                                       class="btn btn-primary btn-sm rounded-3">
+
+                                        <i class="bi bi-pencil-square"></i>
+
+                                    </a>
+
+                                    <a href="#"
+                                       class="btn btn-danger btn-sm rounded-3">
+
+                                        <i class="bi bi-trash"></i>
+
+                                    </a>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                        {% empty %}
+
+                        <tr>
+
+                            <td colspan="3"
+                                class="text-center text-muted py-5">
+
+                                No hay categorías registradas
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- PAGINACIÓN -->
 
     {% if categorias.has_other_pages %}
 
@@ -209,17 +246,36 @@
 
             {% endif %}
 
-            <li class="page-item active">
+            {% for num in categorias.paginator.page_range %}
 
-                <span class="page-link">
+                {% if categorias.number == num %}
 
-                    Página {{ categorias.number }}
-                    de
-                    {{ categorias.paginator.num_pages }}
+                    <li class="page-item active">
 
-                </span>
+                        <span class="page-link">
 
-            </li>
+                            {{ num }}
+
+                        </span>
+
+                    </li>
+
+                {% else %}
+
+                    <li class="page-item">
+
+                        <a class="page-link"
+                           href="?page={{ num }}">
+
+                            {{ num }}
+
+                        </a>
+
+                    </li>
+
+                {% endif %}
+
+            {% endfor %}
 
             {% if categorias.has_next %}
 
@@ -240,9 +296,46 @@
 
     </nav>
 
-    {% endif %}    
+    {% endif %}
 
 </div>
 
 </body>
+
+
+<script>
+
+const buscadorCategoria =
+document.getElementById('buscadorCategoria');
+
+buscadorCategoria.addEventListener('keyup', function(){
+
+    const texto =
+    this.value.toLowerCase();
+
+    const filas =
+    document.querySelectorAll('.fila-categoria');
+
+    filas.forEach(fila => {
+
+        const nombre =
+        fila.querySelector('.nombre-categoria')
+            .textContent
+            .toLowerCase();
+
+        if(nombre.includes(texto)){
+
+            fila.style.display = '';
+
+        }else{
+
+            fila.style.display = 'none';
+
+        }
+
+    });
+
+});
+
+</script>
 </html>
