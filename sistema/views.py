@@ -29,9 +29,10 @@ from .models import SolicitudCotizacion
 @login_required
 def inicio(request):
 
-    productos = Producto.objects.filter(
-        estado=True
-    )
+    productos_destacados = Producto.objects.filter(
+        estado=True,
+        destacado=True
+    ).order_by('-id')[:6]
 
     categorias = Categoria.objects.all()
 
@@ -39,7 +40,7 @@ def inicio(request):
         request,
         'sistema/inicio.html',
         {
-            'productos': productos,
+            'productos_destacados': productos_destacados,
             'categorias': categorias
         }
     )
