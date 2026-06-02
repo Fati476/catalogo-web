@@ -342,7 +342,7 @@ def dashboard(request):
 
     return render(
         request,
-        'admin/dashboard.html',
+        'admin/dashboard/dashboard.html',
         {
             'total_productos': total_productos,
             'total_categorias': total_categorias,
