@@ -25,24 +25,7 @@
                 Catálogo
             </a>
 
-        <!-- BUSCADOR (SIEMPRE VISIBLE) -->
-            <form class="d-flex flex-grow-1 mx-3">
-
-                <div class="input-group">
-
-                    <input type="text"
-                           class="form-control bg-light border-0"
-                           placeholder="Buscar productos...">
-
-                    <button class="btn btn-warning">
-                        🔍
-                    </button>
-
-                </div>
-
-            </form>
-
-        <!-- BOTÓN MENU (SOLO MÓVIL) -->
+        <!-- BOTÓN MÓVIL -->
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -52,25 +35,11 @@
 
                 <ul class="navbar-nav ms-auto text-center gap-lg-3 mt-2 mt-lg-0">
 
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">🏠 Inicio</a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">📂 Categorías</a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">📋 Cotizaciones</a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">❤️ Favoritos</a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">👤 Perfil</a>
-                    </li>
+                    <li class="nav-item"><a class="nav-link" href="#">🏠 Inicio</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">📂 Categorías</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">📋 Cotizaciones</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">❤️ Favoritos</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">👤 Perfil</a></li>
 
                 </ul>
 
@@ -78,7 +47,27 @@
 
         </div>
 
-    </nav>   
+    </nav>  
+    
+    <div class="container-fluid mt-5 pt-5 px-3">
+
+        <div class="input-group shadow-sm rounded-pill overflow-hidden">
+
+            <span class="input-group-text bg-white border-0">
+                🔍
+            </span>
+
+            <input type="text"
+                   class="form-control border-0 bg-white"
+                   placeholder="Buscar productos...">
+
+            <button class="btn btn-warning">
+                Buscar
+            </button>
+
+        </div>
+
+    </div>
 
     <!-- BANNER -->
 
