@@ -387,9 +387,18 @@ def cambiar_estado_usuario(request, id):
 
     usuario.save()
 
-    messages.success(
-        request,
-        f'Estado de {usuario.username} actualizado correctamente.'
-    )
+    if usuario.is_active:
+
+        messages.success(
+            request,
+            f'El usuario "{usuario.username}" fue activado.'
+        )
+
+    else:
+
+        messages.success(
+            request,
+            f'El usuario "{usuario.username}" fue desactivado.'
+        )
 
     return redirect('lista_usuarios')

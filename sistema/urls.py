@@ -115,4 +115,11 @@ urlpatterns = [
         name='cambiar_estado_usuario'
     ),
 
+
+    path(
+        'panel/usuarios/estado/<int:id>/',
+        views.cambiar_estado_usuario,
+        name='cambiar_estado_usuario'
+    ),
+
 ]
