@@ -16,25 +16,25 @@
 
     <!-- HEADER -->
 
-    <nav class="navbar bg-white shadow-sm fixed-top"style="z-index:1030;">
+    <nav class="navbar bg-white shadow-sm fixed-top" style="z-index:1030;">
 
-        <div class="container-fluid px-3">
+        <div class="container-fluid flex-wrap">
 
         <!-- LOGO -->
             <a class="navbar-brand fw-bold text-warning fs-4" href="#">
                 Catálogo
             </a>
 
-        <!-- BUSCADOR -->
-            <form class="d-flex flex-grow-1 mx-3">
+        <!-- BUSCADOR (ocupa toda la fila en móvil) -->
+            <form class="d-flex w-100 w-md-50 my-2 my-md-0">
 
                 <div class="input-group">
 
                     <input type="text"
                            class="form-control border-0 bg-light"
-                           placeholder="Buscar productos, marcas y más...">
+                           placeholder="Buscar productos...">
 
-                    <button class="btn btn-warning" type="submit">
+                    <button class="btn btn-warning">
                         🔍
                     </button>
 
@@ -42,39 +42,34 @@
 
             </form>
 
-        <!-- ICONOS -->
-            <div class="d-flex align-items-center gap-4">
+        <!-- MENÚ ICONOS -->
+            <div class="d-flex justify-content-between w-100 w-md-auto gap-3 mt-2 mt-md-0 text-center">
 
-                <a href="#" class="text-dark text-decoration-none text-center">
-                    🏠<br>
-                    <small>Inicio</small>
+                <a href="#" class="text-dark text-decoration-none small">
+                    🏠<br>Inicio
                 </a>
 
-                <a href="#" class="text-dark text-decoration-none text-center">
-                    📂<br>
-                    <small>Categorías</small>
+                <a href="#" class="text-dark text-decoration-none small">
+                    📂<br>Categorías
                 </a>
 
-                <a href="#" class="text-dark text-decoration-none text-center">
-                    📋<br>
-                    <small>Cotizaciones</small>
+                <a href="#" class="text-dark text-decoration-none small">
+                    📋<br>Cotizaciones
                 </a>
 
-                <a href="#" class="text-dark text-decoration-none text-center">
-                    ❤️<br>
-                    <small>Favoritos</small>
+                <a href="#" class="text-dark text-decoration-none small">
+                    ❤️<br>Favoritos
                 </a>
 
-                <a href="#" class="text-dark text-decoration-none text-center">
-                    👤<br>
-                    <small>Perfil</small>
+                <a href="#" class="text-dark text-decoration-none small">
+                    👤<br>Perfil
                 </a>
 
             </div>
 
         </div>
 
-    </nav>
+    </nav>    
 
     <!-- BANNER -->
 
