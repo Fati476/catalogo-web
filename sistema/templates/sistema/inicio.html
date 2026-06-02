@@ -11,7 +11,7 @@
 
 <body style="background:#F5F7FB; padding-top:75px;">
 
-<div class="container-fluid py-4 px-3">
+<div class="container-fluid px-3">
      
 
     <!-- HEADER -->
@@ -49,7 +49,7 @@
 
     </nav>  
     
-    <div class="px-3 mb-4">
+    <div class="mb-4">
 
         <div class="input-group shadow-sm rounded-pill overflow-hidden">
 
@@ -71,14 +71,14 @@
 
     <!-- BANNER -->
 
-    <div class="px-3 mb-5">
+    <div class="mb-4">
 
         <div class="rounded-4 p-4 text-white"
              style="background:linear-gradient(135deg,#5563FF,#E06ACF);">
 
-            <h4 class="fw-bold mb-0">
-                Encuentra los mejores productos...
-            </h4>
+            <h5 class="fw-bold mb-0">
+                Encuentra los mejores productos
+            </h5>
 
         </div>
 
@@ -86,30 +86,19 @@
 
     <!-- CATEGORIAS -->
 
-    <div class="px-3 mb-5">
+    <div class="mb-4">
 
-        <div class="d-flex justify-content-between mb-3">
-
-            <h4 class="fw-bold mb-0">
-                Categorías
-            </h4>
-
-            <a href="#" class="text-decoration-none fw-bold">
-
-                Ver todas
-
-            </a>
-
+        <div class="d-flex justify-content-between mb-2">
+            <h5 class="fw-bold mb-0">Categorías</h5>
+            <a href="#" class="text-decoration-none">Ver todas</a>
         </div>
 
         <div class="d-flex flex-wrap gap-2">
 
             {% for categoria in categorias %}
 
-            <span class="badge rounded-pill bg-white text-dark shadow-sm p-3">
-
+            <span class="badge bg-white text-dark shadow-sm rounded-pill px-3 py-2">
                 {{ categoria.nombre }}
-
             </span>
 
             {% endfor %}
@@ -120,76 +109,55 @@
 
     <!-- PRODUCTOS -->
 
-    <div class="px-3">
+    <div class="mb-5">
 
         <div class="d-flex justify-content-between mb-3">
-
-            <h4 class="fw-bold mb-0">
-                Productos destacados
-            </h4>
-
-            <a href="#" class="text-decoration-none fw-bold">
-
-                Ver todos
-
-            </a>
-
+            <h5 class="fw-bold mb-0">Productos destacados</h5>
+            <a href="#" class="text-decoration-none">Ver todos</a>
         </div>
 
         <div class="row g-3">
 
             {% for producto in productos_destacados %}
 
-            <div class="col-md-4 col-lg-3">
+            <div class="col-6 col-md-4 col-lg-3">
 
                 <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden">
 
-                    {% if producto.imagenes.count > 0 %}
+                <!-- IMAGEN / CARRUSEL -->
+                    {% if producto.imagenes.all %}
 
-                    <div id="carousel{{ producto.id }}" class="carousel slide" data-bs-ride="carousel">                    
+                        <div id="carousel{{ producto.id }}" class="carousel slide" data-bs-ride="carousel">
 
-                        <div class="carousel-inner">
+                            <div class="carousel-inner">
 
-                            {% for imagen in producto.imagenes.all %}
+                                {% for imagen in producto.imagenes.all %}
 
-                            <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                                <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                                    <img src="{{ imagen.imagen.url }}"
+                                         class="d-block w-100"
+                                         style="height:160px; object-fit:cover;">
+                                </div>
 
-                                <img src="{{ imagen.imagen.url }}"
-                                     class="d-block w-100"
-                                     style="height:150px; object-fit:cover;">
+                                {% endfor %}
 
                             </div>
 
-                            {% endfor %}
-
                         </div>
-
-                        {% if producto.imagenes.count > 1 %}
-                        <button class="carousel-control-prev" type="button"
-                                data-bs-target="#carousel{{ producto.id }}" data-bs-slide="prev">
-                            <span class="carousel-control-prev-icon"></span>
-                        </button>
-
-                        <button class="carousel-control-next" type="button"
-                                data-bs-target="#carousel{{ producto.id }}" data-bs-slide="next">
-                            <span class="carousel-control-next-icon"></span>
-                        </button>
-                        {% endif %}
-
-                    </div>
 
                     {% else %}
 
-                    <!-- fallback igual al admin -->
-                    <div class="d-flex justify-content-center align-items-center bg-light"
-                         style="height:150px;">
+                    <!-- FALLBACK -->
+                        <div class="d-flex justify-content-center align-items-center bg-light"
+                             style="height:160px;">
 
-                        <i class="bi bi-image text-secondary" style="font-size:50px;"></i>
+                            <i class="bi bi-image text-secondary" style="font-size:40px;"></i>
 
-                    </div>
+                        </div>
 
                     {% endif %}
 
+                <!-- BODY -->
                     <div class="card-body">
 
                         <h6 class="fw-bold mb-1">
@@ -199,22 +167,23 @@
                         <small class="text-muted d-block mb-2">
                             {{ producto.categoria.nombre }}
                         </small>
+
+                    <!-- ESTADO -->
                         {% if producto.estado %}
-                            <span class="badge rounded-pill bg-success px-3 py-2 mb-2">
-                                Activo
-                            </span>
+                            <span class="badge bg-success mb-2">Activo</span>
                         {% else %}
-                            <span class="badge rounded-pill bg-danger px-3 py-2 mb-2">
-                                Inactivo
-                            </span>
+                            <span class="badge bg-danger mb-2">Inactivo</span>
                         {% endif %}
 
-                        <p class="text-muted small mb-2">
-                            {{ producto.descripcion|truncatechars:80 }}
+                    <!-- DESCRIPCIÓN -->
+                        <p class="small text-muted mb-2">
+                            {{ producto.descripcion|truncatechars:70 }}
                         </p>
-                        <div class="precio d-flex align-items-center gap-2 text-primary fw-semibold mt-2">
 
-                            <i class="bi bi-cash-coin" style="font-size:18px;"></i>
+                    <!-- PRECIO COTIZACIÓN -->
+                        <div class="d-flex align-items-center gap-2 text-primary fw-semibold">
+
+                            <i class="bi bi-cash-coin"></i>
 
                             <span>Sujeto a cotización</span>
 
