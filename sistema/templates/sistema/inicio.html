@@ -16,60 +16,70 @@
 
     <!-- HEADER -->
 
-    <nav class="navbar bg-white shadow-sm fixed-top" style="z-index:1030;">
+    <nav class="navbar navbar-expand-lg bg-white shadow-sm fixed-top" style="z-index:1030;">
 
-        <div class="container-fluid flex-wrap">
+        <div class="container-fluid px-3">
 
         <!-- LOGO -->
             <a class="navbar-brand fw-bold text-warning fs-4" href="#">
                 Catálogo
             </a>
 
-        <!-- BUSCADOR (ocupa toda la fila en móvil) -->
-            <form class="d-flex w-100 w-md-50 my-2 my-md-0">
+        <!-- BOTÓN HAMBURGUESA (SOLO MÓVIL) -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
 
-                <div class="input-group">
+        <!-- CONTENIDO -->
+            <div class="collapse navbar-collapse" id="menuNav">
 
-                    <input type="text"
-                           class="form-control border-0 bg-light"
-                           placeholder="Buscar productos...">
+            <!-- BUSCADOR -->
+                <form class="d-flex mx-lg-3 my-2 my-lg-0 flex-grow-1">
 
-                    <button class="btn btn-warning">
-                        🔍
-                    </button>
+                    <div class="input-group">
 
-                </div>
+                        <input type="text"
+                               class="form-control bg-light border-0"
+                               placeholder="Buscar productos...">
 
-            </form>
+                        <button class="btn btn-warning">
+                            🔍
+                        </button>
 
-        <!-- MENÚ ICONOS -->
-            <div class="d-flex justify-content-between w-100 w-md-auto gap-3 mt-2 mt-md-0 text-center">
+                    </div>
 
-                <a href="#" class="text-dark text-decoration-none small">
-                    🏠<br>Inicio
-                </a>
+                </form>
 
-                <a href="#" class="text-dark text-decoration-none small">
-                    📂<br>Categorías
-                </a>
+            <!-- MENÚ -->
+                <ul class="navbar-nav ms-auto text-center gap-lg-3">
 
-                <a href="#" class="text-dark text-decoration-none small">
-                    📋<br>Cotizaciones
-                </a>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">🏠 Inicio</a>
+                    </li>
 
-                <a href="#" class="text-dark text-decoration-none small">
-                    ❤️<br>Favoritos
-                </a>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">📂 Categorías</a>
+                    </li>
 
-                <a href="#" class="text-dark text-decoration-none small">
-                    👤<br>Perfil
-                </a>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">📋 Cotizaciones</a>
+                    </li>
 
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">❤️ Favoritos</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">👤 Perfil</a>
+                    </li>
+
+                </ul>
+    
             </div>
 
         </div>
 
-    </nav>    
+    </nav>   
 
     <!-- BANNER -->
 
