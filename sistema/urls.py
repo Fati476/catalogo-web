@@ -25,6 +25,12 @@ urlpatterns = [
         name='panel_admin'
     ),
 
+    path(
+        'inicio/',
+        views.inicio,
+        name='inicio'
+    ),
+
     # CATEGORIAS
 
     path(
