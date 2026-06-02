@@ -217,9 +217,9 @@
             </span>
 
             <input type="text"
-                   id="buscadorCategoria"
+                   id="buscadorUsuario"
                    class="form-control border-0 p-3"
-                   placeholder="Buscar categoría...">
+                   placeholder="Buscar usuario...">
 
         </div>
 
@@ -529,13 +529,11 @@ buscador.addEventListener('keyup', function(){
     document.querySelectorAll('.fila-usuario')
     .forEach(fila => {
 
-        const nombre =
-        fila.querySelector('.nombre-usuario')
-        .textContent
-        .toLowerCase();
+        const contenido =
+        fila.textContent.toLowerCase();
 
         fila.style.display =
-        nombre.includes(texto)
+        contenido.includes(texto)
         ? ''
         : 'none';
 
