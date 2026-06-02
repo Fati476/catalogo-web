@@ -1,6 +1,8 @@
 from django.urls import path
 from . import views
 from django.contrib.auth import views as auth_views
+
+from django.contrib.auth.models import User
 urlpatterns = [
 
     path(
@@ -91,6 +93,20 @@ urlpatterns = [
         'dashboard/',
         views.dashboard,
         name='dashboard'
+    ),
+
+    # USUARIOS
+
+    path(
+        'panel/usuarios/',
+        views.lista_usuarios,
+        name='lista_usuarios'
+    ),
+
+    path(
+        'panel/usuarios/estado/<int:id>/',
+        views.cambiar_estado_usuario,
+        name='cambiar_estado_usuario'
     ),
 
 ]

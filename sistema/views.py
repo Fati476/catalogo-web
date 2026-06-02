@@ -22,6 +22,7 @@ from django.contrib import messages
 
 from django.db.models import Count
 
+from django.contrib.auth.models import User
 
 @login_required
 def inicio(request):
@@ -351,3 +352,44 @@ def dashboard(request):
             'ultimos_productos': ultimos_productos
         }
     )
+
+
+@login_required
+def lista_usuarios(request):
+
+    usuarios_lista = User.objects.select_related(
+        'perfil'
+    ).all().order_by('username')
+
+    paginator = Paginator(
+        usuarios_lista,
+        5
+    )
+
+    page_number = request.GET.get('page')
+
+    usuarios = paginator.get_page(page_number)
+
+    return render(
+        request,
+        'admin/usuarios/lista.html',
+        {
+            'usuarios': usuarios
+        }
+    )
+
+@login_required
+def cambiar_estado_usuario(request, id):
+
+    usuario = User.objects.get(id=id)
+
+    usuario.is_active = not usuario.is_active
+
+    usuario.save()
+
+    messages.success(
+        request,
+        f'Estado de {usuario.username} actualizado correctamente.'
+    )
+
+    return redirect('lista_usuarios')
