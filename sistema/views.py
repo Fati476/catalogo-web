@@ -29,11 +29,20 @@ from .models import SolicitudCotizacion
 @login_required
 def inicio(request):
 
-    productos = Producto.objects.all()
+    productos = Producto.objects.filter(
+        estado=True
+    )
 
-    return render(request, 'sistema/inicio.html', {
-        'productos': productos
-    })
+    categorias = Categoria.objects.all()
+
+    return render(
+        request,
+        'sistema/inicio.html',
+        {
+            'productos': productos,
+            'categorias': categorias
+        }
+    )
 
 
 def registro(request):
@@ -433,3 +442,6 @@ def lista_solicitudes(request):
             'cotizadas': cotizadas
         }
     )
+
+
+#Clientes 
