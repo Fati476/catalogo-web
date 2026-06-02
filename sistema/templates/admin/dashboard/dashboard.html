@@ -122,7 +122,81 @@ body{
                 </a>
             </li>
 
+            <li class="nav-item">
+
+                <a class="nav-link"
+                    href="#">
+
+                    Cotizaciones
+
+                </a>
+
+            </li>
+
+            <li class="nav-item">
+
+                <a class="nav-link"
+                    href="#">
+
+                    Usuarios
+
+                </a>
+
+            </li>
+
         </ul>
+
+        <div class="dropdown">
+
+            <button class="btn d-flex align-items-center gap-3"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                    style="border:none; background:none;">
+
+                <i class="bi bi-bell fs-5"></i>
+
+                <i class="bi bi-person-circle perfil"></i>
+
+            </button>
+
+            <ul class="dropdown-menu dropdown-menu-end shadow border-0 p-2">
+
+                <li>
+
+                    <span class="dropdown-item-text fw-bold">
+
+                        {{ request.user.username }}
+
+                    </span>
+
+                </li>
+
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+
+                <li>
+
+                    <form method="POST"
+                            action="/accounts/logout/">
+
+                        {% csrf_token %}
+
+                        <button type="submit"
+                                class="dropdown-item text-danger">
+
+                            <i class="bi bi-box-arrow-right"></i>
+                            Cerrar sesión
+
+                        </button>
+
+                    </form>
+
+                </li>
+
+            </ul>
+
+        </div>
 
     </div>
 
