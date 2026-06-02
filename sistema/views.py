@@ -301,6 +301,7 @@ def editar_categoria(request, id):
 
         categoria.nombre = request.POST.get('nombre')
         categoria.descripcion = request.POST.get('descripcion')
+        categoria.destacada = request.POST.get('destacada') == 'on'
 
         categoria.save()
 
