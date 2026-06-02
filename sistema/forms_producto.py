@@ -11,7 +11,6 @@ class ProductoForm(forms.ModelForm):
         fields = [
             'nombre',
             'descripcion',
-            'precio',
             'categoria',
             'estado',
             'destacado'
@@ -24,10 +23,6 @@ class ProductoForm(forms.ModelForm):
             }),
 
             'descripcion': forms.Textarea(attrs={
-                'class': 'form-control'
-            }),
-
-            'precio': forms.NumberInput(attrs={
                 'class': 'form-control'
             }),
 

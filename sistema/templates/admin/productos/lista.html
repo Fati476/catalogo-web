@@ -473,7 +473,7 @@
                             Inactivo
                         </span>
                     {% endif %}
-                    
+
                     {% if producto.destacado %}
                         <span class="badge bg-warning text-dark ms-2">
                             ⭐ Destacado
@@ -494,7 +494,8 @@
 
                     <div class="precio">
 
-                        ${{ producto.precio }}
+                        <i class="bi bi-file-earmark-text"></i>
+                        Precio sujeto a cotización
 
                     </div>
 
@@ -647,21 +648,7 @@
 
             </div>
 
-            <div class="mb-4">
-
-                <label class="fw-semibold mb-2">
-
-                    Precio
-
-                </label>
-
-                <input type="number"
-                       step="0.01"
-                       name="precio"
-                       value="{{ producto.precio }}"
-                       class="form-control p-3 rounded-4">
-
-            </div>
+            
 
             <div class="mb-4">
 
@@ -886,20 +873,7 @@
 
             </div>
 
-            <div class="mb-4">
-
-                <label class="fw-semibold mb-2">
-
-                    Precio
-
-                </label>
-
-                <input type="number"
-                       step="0.01"
-                       name="precio"
-                       class="form-control p-3 rounded-4">
-
-            </div>
+            
 
             <div class="mb-4">
 

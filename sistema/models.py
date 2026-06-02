@@ -18,7 +18,10 @@ class Producto(models.Model):
 
     precio = models.DecimalField(
         max_digits=10,
-        decimal_places=2
+        decimal_places=2,
+        null=True,
+        blank=True
+        
     )
 
     categoria = models.ForeignKey(
