@@ -321,3 +321,33 @@ def eliminar_categoria(request, id):
     )
 
     return redirect('lista_categorias')
+
+
+@login_required
+def dashboard(request):
+
+    total_productos = Producto.objects.count()
+
+    total_categorias = Categoria.objects.count()
+
+    productos_activos = Producto.objects.filter(
+        estado=True
+    ).count()
+
+    productos_inactivos = Producto.objects.filter(
+        estado=False
+    ).count()
+
+    ultimos_productos = Producto.objects.order_by('-id')[:5]
+
+    return render(
+        request,
+        'admin/dashboard.html',
+        {
+            'total_productos': total_productos,
+            'total_categorias': total_categorias,
+            'productos_activos': productos_activos,
+            'productos_inactivos': productos_inactivos,
+            'ultimos_productos': ultimos_productos
+        }
+    )

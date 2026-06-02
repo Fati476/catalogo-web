@@ -85,4 +85,12 @@ urlpatterns = [
         name='eliminar_imagen'
     ),
 
+    #DASHBOARD
+
+    path(
+        'dashboard/',
+        views.dashboard,
+        name='dashboard'
+    ),
+
 ]
