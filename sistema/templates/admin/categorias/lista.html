@@ -266,6 +266,11 @@
 
                             <td class="nombre-categoria fw-semibold">
                                 {{ categoria.nombre }}
+                                {% if categoria.destacada %}
+                                    <span class="badge bg-warning text-dark ms-2">
+                                        ⭐ Destacada
+                                    </span>
+                                {% endif %}
                             </td>
 
                             <td>
