@@ -10,7 +10,8 @@ class CategoriaForm(forms.ModelForm):
 
         fields = [
             'nombre',
-            'descripcion'
+            'descripcion',
+            'destacada'
         ]
 
         widgets = {
@@ -24,6 +25,10 @@ class CategoriaForm(forms.ModelForm):
                 'class': 'form-control',
                 'placeholder': 'Descripción categoría',
                 'rows': 4
+            }),
+
+            'destacada': forms.CheckboxInput(attrs={
+                'class': 'form-check-input'
             })
 
         }

@@ -34,14 +34,16 @@ def inicio(request):
         destacado=True
     ).order_by('-id')[:6]
 
-    categorias = Categoria.objects.all()
+    categorias_destacadas = Categoria.objects.filter(
+        destacada=True
+    ).order_by('-id')[:3]
 
     return render(
         request,
         'sistema/inicio.html',
         {
             'productos_destacados': productos_destacados,
-            'categorias': categorias
+            'categorias_destacadas': categorias_destacadas
         }
     )
 
