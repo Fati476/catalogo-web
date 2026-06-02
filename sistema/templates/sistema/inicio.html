@@ -25,33 +25,32 @@
                 Catálogo
             </a>
 
-        <!-- BOTÓN HAMBURGUESA (SOLO MÓVIL) -->
+        <!-- BUSCADOR (SIEMPRE VISIBLE) -->
+            <form class="d-flex flex-grow-1 mx-3">
+
+                <div class="input-group">
+
+                    <input type="text"
+                           class="form-control bg-light border-0"
+                           placeholder="Buscar productos...">
+
+                    <button class="btn btn-warning">
+                        🔍
+                    </button>
+
+                </div>
+
+            </form>
+
+        <!-- BOTÓN MENU (SOLO MÓVIL) -->
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
-        <!-- CONTENIDO -->
+        <!-- MENÚ -->
             <div class="collapse navbar-collapse" id="menuNav">
 
-            <!-- BUSCADOR -->
-                <form class="d-flex mx-lg-3 my-2 my-lg-0 flex-grow-1">
-
-                    <div class="input-group">
-
-                        <input type="text"
-                               class="form-control bg-light border-0"
-                               placeholder="Buscar productos...">
-
-                        <button class="btn btn-warning">
-                            🔍
-                        </button>
-
-                    </div>
-
-                </form>
-
-            <!-- MENÚ -->
-                <ul class="navbar-nav ms-auto text-center gap-lg-3">
+                <ul class="navbar-nav ms-auto text-center gap-lg-3 mt-2 mt-lg-0">
 
                     <li class="nav-item">
                         <a class="nav-link" href="#">🏠 Inicio</a>
@@ -74,7 +73,7 @@
                     </li>
 
                 </ul>
-    
+
             </div>
 
         </div>
