@@ -121,31 +121,83 @@
 
             {% for producto in productos_destacados %}
 
-            <div class="col-6">
+            <div class="col-md-4 col-lg-3">
 
-                <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden">
 
-                    {% if producto.imagenes.first %}
+                    {% if producto.imagenes.count > 0 %}
 
-                    <img src="{{ producto.imagenes.first.imagen.url }}"
-                         class="card-img-top rounded-top-4"
-                         style="height:140px; object-fit:cover;">
+                    <div id="carousel{{ producto.id }}"
+                         class="carousel slide"
+                         data-bs-ride="carousel">
+
+                        <div class="carousel-inner">
+
+                            {% for imagen in producto.imagenes.all %}
+
+                            <div class="carousel-item {% if forloop.first %}active{% endif %}">
+
+                                <img src="{{ imagen.imagen.url }}"
+                                     class="card-img-top"
+                                     style="height:130px; object-fit:cover;">
+
+                            </div>
+
+                            {% endfor %}
+
+                        </div>
+
+                        {% if producto.imagenes.count > 1 %}
+
+                        <button class="carousel-control-prev"
+                                type="button"
+                                data-bs-target="#carousel{{ producto.id }}"
+                                data-bs-slide="prev">
+
+                            <span class="carousel-control-prev-icon"></span>
+
+                        </button>
+
+                        <button class="carousel-control-next"
+                                type="button"
+                                data-bs-target="#carousel{{ producto.id }}"
+                                data-bs-slide="next">
+
+                            <span class="carousel-control-next-icon"></span>
+
+                        </button>
+
+                        {% endif %}
+
+                    </div>
 
                     {% endif %}
 
                     <div class="card-body">
 
-                        <h6 class="fw-bold">
-
+                        <h6 class="fw-bold mb-1">
                             {{ producto.nombre }}
-
                         </h6>
 
-                        <small class="text-muted">
-
+                        <small class="text-muted d-block mb-2">
                             {{ producto.categoria.nombre }}
-
                         </small>
+                        {% if producto.estado %}
+                            <span class="badge rounded-pill bg-success px-3 py-2 mb-2">
+                                Activo
+                            </span>
+                        {% else %}
+                            <span class="badge rounded-pill bg-danger px-3 py-2 mb-2">
+                                Inactivo
+                            </span>
+                        {% endif %}
+                        <div class="precio d-flex align-items-center gap-2 text-primary fw-semibold mt-2">
+
+                            <i class="bi bi-cash-coin" style="font-size:18px;"></i>
+
+                            <span>Sujeto a cotización</span>
+
+                        </div>
 
                     </div>
 
@@ -163,44 +215,37 @@
 
 <!-- MENU INFERIOR -->
 
-<nav class="fixed-bottom bg-white border-top">
+<nav class="navbar navbar-expand-lg bg-white shadow-sm mb-4">
 
-    <div class="d-flex justify-content-around text-center py-2">
+    <div class="container">
 
-        <a href="#" class="text-decoration-none text-dark">
-
-            🏠<br>
-            <small>Inicio</small>
-
+        <a class="navbar-brand fw-bold" href="#">
+            Catálogo
         </a>
 
-        <a href="#" class="text-decoration-none text-dark">
+        <div class="navbar-nav ms-auto">
 
-            📂<br>
-            <small>Categorías</small>
+            <a class="nav-link" href="#">
+                🏠 Inicio
+            </a>
 
-        </a>
+            <a class="nav-link" href="#">
+                📂 Categorías
+            </a>
 
-        <a href="#" class="text-decoration-none text-dark">
+            <a class="nav-link" href="#">
+                📋 Cotizaciones
+            </a>
 
-            📋<br>
-            <small>Cotizaciones</small>
+            <a class="nav-link" href="#">
+                ❤️ Favoritos
+            </a>
 
-        </a>
+            <a class="nav-link" href="#">
+                👤 Perfil
+            </a>
 
-        <a href="#" class="text-decoration-none text-dark">
-
-            ❤️<br>
-            <small>Favoritos</small>
-
-        </a>
-
-        <a href="#" class="text-decoration-none text-dark">
-
-            👤<br>
-            <small>Perfil</small>
-
-        </a>
+        </div>
 
     </div>
 
