@@ -122,4 +122,11 @@ urlpatterns = [
         name='cambiar_estado_usuario'
     ),
 
+    #Cotizaciones
+    path(
+        'panel/solicitudes/',
+        views.lista_solicitudes,
+        name='lista_solicitudes'
+    ),
+
 ]

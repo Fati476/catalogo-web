@@ -4,7 +4,7 @@
 
     <meta charset="UTF-8">
 
-    <title>Usuarios</title>
+    <title>Cotizaciones</title>
 
     <meta name="viewport"
           content="width=device-width, initial-scale=1">
@@ -74,7 +74,7 @@
     <div class="container-fluid">
 
         <a class="navbar-brand logo" href="#">
-            Catálogo Admin
+            Cotizaciones 
         </a>
 
         <button class="navbar-toggler"
@@ -194,13 +194,80 @@
         <div>
 
             <h1 class="titulo">
-                Usuarios
+                Solicitudes de Cotización
             </h1>
 
+            <p class="subtitulo">
+                Gestiona las solicitudes enviadas por los clientes
+            </p>
 
         </div>
 
-        
+    </div>
+
+    <!-- TARJETAS -->
+
+    <div class="row mb-5">
+
+        <div class="col-md-4">
+
+            <div class="card border-0 shadow-sm rounded-4">
+
+                <div class="card-body">
+
+                    <h6 class="text-muted">
+                        Pendientes
+                    </h6>
+
+                    <h2 class="fw-bold text-warning">
+                        {{ pendientes }}
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-4">
+
+            <div class="card border-0 shadow-sm rounded-4">
+
+                <div class="card-body">
+
+                    <h6 class="text-muted">
+                        Revisadas
+                    </h6>
+
+                    <h2 class="fw-bold text-primary">
+                        {{ revisadas }}
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-4">
+
+            <div class="card border-0 shadow-sm rounded-4">
+
+                <div class="card-body">
+
+                    <h6 class="text-muted">
+                        Cotizadas
+                    </h6>
+
+                    <h2 class="fw-bold text-success">
+                        {{ cotizadas }}
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
 
     </div>
 
@@ -217,9 +284,9 @@
             </span>
 
             <input type="text"
-                   id="buscadorUsuario"
+                   id="buscadorSolicitud"
                    class="form-control border-0 p-3"
-                   placeholder="Buscar usuario...">
+                   placeholder="Buscar cliente...">
 
         </div>
 
@@ -233,60 +300,85 @@
 
             <div class="table-responsive">
 
-                <table class="table align-middle mb-0">
+                <table class="table align-middle">
 
                     <thead>
 
                         <tr>
-                            <th>Usuario</th>
-                            <th>Correo</th>
-                            <th>Rol</th>
+
+                            <th>ID</th>
+                            <th>Cliente</th>
+                            <th>Fecha</th>
+                            <th>Productos</th>
                             <th>Estado</th>
-                            <th width="180">Acciones</th>
+                            <th width="120">Acción</th>
+
                         </tr>
 
                     </thead>
 
-                    <tbody id="tablaUsuarios">
+                    <tbody>
 
-                        {% for usuario in usuarios %}
+                        {% for solicitud in solicitudes %}
 
-                        <tr class="fila-usuario">
-
-                            <td class="nombre-usuario fw-semibold">
-                                {{ usuario.username }}
-                            </td>
-
-                            <td>
-                                {{ usuario.email }}
-                            </td>
+                        <tr class="fila-solicitud">
 
                             <td>
 
-                                {% if usuario.groups.first %}
+                                #{{ solicitud.id }}
 
-                                    {{ usuario.groups.first.name }}
+                            </td>
 
-                                {% else %}
+                            <td class="nombre-cliente fw-semibold">
 
-                                    Sin rol
-
-                                {% endif %}
+                                {{ solicitud.cliente.username }}
 
                             </td>
 
                             <td>
 
-                                {% if usuario.is_active %}
+                                {{ solicitud.fecha|date:"d/m/Y H:i" }}
+
+                            </td>
+
+                            <td>
+
+                                {{ solicitud.detalles.count }}
+
+                            </td>
+
+                            <td>
+
+                                {% if solicitud.estado == 'Pendiente' %}
+
+                                    <span class="badge bg-warning text-dark">
+
+                                        Pendiente
+
+                                    </span>
+
+                                {% elif solicitud.estado == 'Revisada' %}
+
+                                    <span class="badge bg-primary">
+
+                                        Revisada
+
+                                    </span>
+
+                                {% elif solicitud.estado == 'Cotizada' %}
 
                                     <span class="badge bg-success">
-                                        Activo
+
+                                        Cotizada
+
                                     </span>
 
                                 {% else %}
 
                                     <span class="badge bg-danger">
-                                        Inactivo
+
+                                        Rechazada
+
                                     </span>
 
                                 {% endif %}
@@ -295,32 +387,12 @@
 
                             <td>
 
-                                <div class="d-flex gap-2">
+                                <a href="#"
+                                   class="btn btn-primary btn-sm rounded-3">
 
-                                    <button class="btn btn-primary btn-sm rounded-3"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#usuario{{ usuario.id }}">
+                                    <i class="bi bi-eye"></i>
 
-                                        <i class="bi bi-eye"></i>
-
-                                    </button>
-
-                                    <a href="{% url 'cambiar_estado_usuario' usuario.id %}"
-                                    class="btn btn-warning btn-sm rounded-3">
-
-                                        {% if usuario.is_active %}
-
-                                            <i class="bi bi-person-x"></i>
-
-                                        {% else %}
-
-                                            <i class="bi bi-person-check"></i>
-
-                                        {% endif %}
-
-                                    </a>
-
-                                </div>
+                                </a>
 
                             </td>
 
@@ -330,20 +402,16 @@
 
                         <tr>
 
-                            <td colspan="5"
+                            <td colspan="6"
                                 class="text-center text-muted py-5">
 
-                                No hay usuarios registrados
+                                No existen solicitudes de cotización
 
                             </td>
 
                         </tr>
 
                         {% endfor %}
-
-                        
-
-                        
 
                     </tbody>
 
@@ -354,145 +422,6 @@
         </div>
 
     </div>
-
-
-    {% for usuario in usuarios %}
-
-    <div class="modal fade"
-         id="usuario{{ usuario.id }}"
-         tabindex="-1">
-
-        <div class="modal-dialog">
-
-            <div class="modal-content rounded-4 border-0 shadow">
-
-                <div class="modal-header">
-
-                    <h5 class="fw-bold">
-                        Información del usuario
-                    </h5>
-
-                    <button type="button"
-                            class="btn-close"
-                            data-bs-dismiss="modal">
-                    </button>
-
-                </div>
-
-                <div class="modal-body">
-
-                    <p><strong>Usuario:</strong> {{ usuario.username }}</p>
-
-                    <p><strong>Correo:</strong> {{ usuario.email }}</p>
-
-                    <p>
-                        <strong>Rol:</strong>
-
-                        {% if usuario.groups.first %}
-                            {{ usuario.groups.first.name }}
-                        {% endif %}
-
-                    </p>
-
-                    <p>
-                        <strong>Municipio:</strong>
-                        {{ usuario.perfil.municipio }}
-                    </p>
-
-                    <p>
-                        <strong>Estado:</strong>
-                        {{ usuario.perfil.estado }}
-                    </p>
-
-                    <p>
-                    <strong>Teléfono:</strong>
-                        {{ usuario.perfil.telefono }}
-                    </p>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-    {% endfor %}
-
-    <!-- PAGINACIÓN -->
-
-    {% if categorias.has_other_pages %}
-
-    <nav class="mt-4">
-
-        <ul class="pagination justify-content-center">
-
-            {% if categorias.has_previous %}
-
-            <li class="page-item">
-
-                <a class="page-link"
-                   href="?page={{ categorias.previous_page_number }}">
-
-                    Anterior
-
-                </a>
-
-            </li>
-
-            {% endif %}
-
-            {% for num in categorias.paginator.page_range %}
-
-                {% if categorias.number == num %}
-
-                    <li class="page-item active">
-
-                        <span class="page-link">
-
-                            {{ num }}
-
-                        </span>
-
-                    </li>
-
-                {% else %}
-
-                    <li class="page-item">
-
-                        <a class="page-link"
-                           href="?page={{ num }}">
-
-                            {{ num }}
-
-                        </a>
-
-                    </li>
-
-                {% endif %}
-
-            {% endfor %}
-
-            {% if categorias.has_next %}
-
-            <li class="page-item">
-
-                <a class="page-link"
-                   href="?page={{ categorias.next_page_number }}">
-
-                    Siguiente
-
-                </a>
-
-            </li>
-
-            {% endif %}
-
-        </ul>
-
-    </nav>
-
-    {% endif %}
 
 </div>
 
@@ -517,23 +446,28 @@
 
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
 
 const buscador =
-document.getElementById('buscadorUsuario');
+document.getElementById('buscadorSolicitud');
 
 buscador.addEventListener('keyup', function(){
 
-    const texto = this.value.toLowerCase();
+    const texto =
+    this.value.toLowerCase();
 
-    document.querySelectorAll('.fila-usuario')
+    document
+    .querySelectorAll('.fila-solicitud')
     .forEach(fila => {
 
-        const contenido =
-        fila.textContent.toLowerCase();
+        const nombre =
+        fila.querySelector('.nombre-cliente')
+        .textContent
+        .toLowerCase();
 
         fila.style.display =
-        contenido.includes(texto)
+        nombre.includes(texto)
         ? ''
         : 'none';
 
@@ -542,7 +476,6 @@ buscador.addEventListener('keyup', function(){
 });
 
 </script>
-
 
 
 

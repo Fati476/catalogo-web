@@ -24,6 +24,8 @@ from django.db.models import Count
 
 from django.contrib.auth.models import User
 
+from .models import SolicitudCotizacion
+
 @login_required
 def inicio(request):
 
@@ -402,3 +404,32 @@ def cambiar_estado_usuario(request, id):
         )
 
     return redirect('lista_usuarios')
+
+
+@login_required
+def lista_solicitudes(request):
+
+    solicitudes = SolicitudCotizacion.objects.all().order_by('-fecha')
+
+    pendientes = solicitudes.filter(
+        estado='Pendiente'
+    ).count()
+
+    revisadas = solicitudes.filter(
+        estado='Revisada'
+    ).count()
+
+    cotizadas = solicitudes.filter(
+        estado='Cotizada'
+    ).count()
+
+    return render(
+        request,
+        'admin/solicitudes/lista.html',
+        {
+            'solicitudes': solicitudes,
+            'pendientes': pendientes,
+            'revisadas': revisadas,
+            'cotizadas': cotizadas
+        }
+    )

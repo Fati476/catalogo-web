@@ -51,11 +51,12 @@ class Perfil(models.Model):
         return self.usuario.username
     
 
-class Cotizacion(models.Model):
+class SolicitudCotizacion(models.Model):
 
     ESTADOS = [
         ('Pendiente', 'Pendiente'),
-        ('Aprobada', 'Aprobada'),
+        ('Revisada', 'Revisada'),
+        ('Cotizada', 'Cotizada'),
         ('Rechazada', 'Rechazada'),
     ]
 
@@ -74,21 +75,20 @@ class Cotizacion(models.Model):
         default='Pendiente'
     )
 
-    total = models.DecimalField(
-        max_digits=12,
-        decimal_places=2,
-        default=0
+    comentario = models.TextField(
+        blank=True,
+        null=True
     )
 
     def __str__(self):
 
-        return f'Cotización #{self.id}'
+        return f"Solicitud #{self.id}"
     
 
-class DetalleCotizacion(models.Model):
+class DetalleSolicitud(models.Model):
 
-    cotizacion = models.ForeignKey(
-        Cotizacion,
+    solicitud = models.ForeignKey(
+        SolicitudCotizacion,
         on_delete=models.CASCADE,
         related_name='detalles'
     )
@@ -102,16 +102,6 @@ class DetalleCotizacion(models.Model):
         default=1
     )
 
-    precio = models.DecimalField(
-        max_digits=10,
-        decimal_places=2
-    )
-
-    subtotal = models.DecimalField(
-        max_digits=12,
-        decimal_places=2
-    )
-
     def __str__(self):
 
-        return f'{self.producto.nombre}'
+        return self.producto.nombre
