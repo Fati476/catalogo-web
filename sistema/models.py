@@ -11,9 +11,15 @@ class Categoria(models.Model):
 
 
 class Producto(models.Model):
+
     nombre = models.CharField(max_length=100)
+
     descripcion = models.TextField()
-    precio = models.DecimalField(max_digits=10, decimal_places=2)
+
+    precio = models.DecimalField(
+        max_digits=10,
+        decimal_places=2
+    )
 
     categoria = models.ForeignKey(
         Categoria,
@@ -23,6 +29,11 @@ class Producto(models.Model):
     estado = models.BooleanField(
         default=True,
         verbose_name="Activo"
+    )
+
+    destacado = models.BooleanField(
+        default=False,
+        verbose_name="Producto destacado"
     )
 
 

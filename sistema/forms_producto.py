@@ -13,7 +13,8 @@ class ProductoForm(forms.ModelForm):
             'descripcion',
             'precio',
             'categoria',
-            'estado'
+            'estado',
+            'destacado'
         ]
 
         widgets = {
@@ -35,6 +36,10 @@ class ProductoForm(forms.ModelForm):
             }),
 
             'estado': forms.Select(attrs={
+                'class': 'form-select'
+            }),
+
+            'destacado': forms.Select(attrs={
                 'class': 'form-select'
             }),
 
