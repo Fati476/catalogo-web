@@ -449,3 +449,17 @@ def lista_solicitudes(request):
 
 
 #Clientes 
+
+def productos_por_categoria(request, id):
+
+    categoria = Categoria.objects.get(id=id)
+
+    productos = Producto.objects.filter(
+        categoria=categoria,
+        estado=True
+    )
+
+    return render(request, 'sistema/productos_categoria.html', {
+        'categoria': categoria,
+        'productos': productos
+    })

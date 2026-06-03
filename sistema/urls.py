@@ -58,7 +58,7 @@ urlpatterns = [
         name='eliminar_categoria'
     ),
 
-    
+    path('categoria/<int:id>/', views.productos_por_categoria, name='productos_categoria'),
 
     # PRODUCTOS
 
