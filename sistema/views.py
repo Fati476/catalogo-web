@@ -38,12 +38,20 @@ def inicio(request):
         destacada=True
     ).order_by('-id')[:3]
 
+    favoritos_ids = Favorito.objects.filter(
+        usuario=request.user
+    ).values_list(
+        'producto_id',
+        flat=True
+    )
+
     return render(
         request,
         'sistema/inicio.html',
         {
             'productos_destacados': productos_destacados,
-            'categorias_destacadas': categorias_destacadas
+            'categorias_destacadas': categorias_destacadas,
+            'favoritos_ids': favoritos_ids
         }
     )
 
