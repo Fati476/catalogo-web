@@ -44,15 +44,40 @@
 
 <div class="container mt-4">
 
-    <h3 class="fw-bold mb-4">
-        {{ categoria.nombre }}
-    </h3>
+    <div class="bg-white shadow-sm rounded-4 p-4 mb-4">
+
+        <h3 class="fw-bold mb-1">
+            📂 {{ categoria.nombre }}
+        </h3>
+
+        <p class="text-muted mb-0">
+            Estás viendo todos los productos de esta categoría.
+        </p>
+
+    </div>
+
+    <div class="mb-4">
+
+        <div class="input-group shadow-sm rounded-pill overflow-hidden">
+
+            <span class="input-group-text bg-white border-0">
+                🔍
+            </span>
+
+            <input type="text"
+                   id="buscarProducto"
+                   class="form-control border-0"
+                   placeholder="Buscar productos...">
+
+        </div>
+
+    </div>
 
     <div class="row g-3">
 
         {% for producto in productos %}
 
-        <div class="col-6 col-md-4">
+        <div class="col-6 col-md-4 producto-card">
 
             <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden position-relative">
 
@@ -70,18 +95,49 @@
             <!-- IMAGEN -->
                 {% if producto.imagenes.all|length > 0 %}
 
-                    <img src="{{ producto.imagenes.all.0.imagen.url }}"
-                         class="w-100"
-                         style="height:180px; object-fit:contain; background:white;">
+                <div id="carousel{{ producto.id }}"
+                        class="carousel slide"
+                        data-bs-ride="carousel">
 
-                {% else %}
+                    <div class="carousel-inner">
 
-                    <div class="d-flex justify-content-center align-items-center bg-light"
-                         style="height:180px;">
+                        {% for imagen in producto.imagenes.all %}
 
-                        <i class="bi bi-image text-secondary fs-1"></i>
+                        <div class="carousel-item {% if forloop.first %}active{% endif %}">
+
+                            <img src="{{ imagen.imagen.url }}"
+                                    class="d-block w-100"
+                                    style="height:220px; object-fit:contain; background:white;">
+
+                        </div>
+
+                        {% endfor %}
 
                     </div>
+
+                    {% if producto.imagenes.all|length > 1 %}
+
+                    <button class="carousel-control-prev"
+                            type="button"
+                            data-bs-target="#carousel{{ producto.id }}"
+                            data-bs-slide="prev">
+
+                        <span class="carousel-control-prev-icon"></span>
+
+                    </button>
+
+                    <button class="carousel-control-next"
+                            type="button"
+                            data-bs-target="#carousel{{ producto.id }}"
+                            data-bs-slide="next">
+
+                        <span class="carousel-control-next-icon"></span>
+
+                    </button>
+
+                    {% endif %}
+
+                </div>
 
                 {% endif %}
 
@@ -184,6 +240,28 @@ document.querySelectorAll('.favorito-btn').forEach(btn => {
     });
 
 });
+</script>
+
+<script>
+
+document.getElementById('buscarProducto').addEventListener('keyup', function(){
+
+    let texto = this.value.toLowerCase();
+
+    document.querySelectorAll('.producto-card').forEach(card => {
+
+        let nombre = card.innerText.toLowerCase();
+
+        if(nombre.includes(texto)){
+            card.style.display = '';
+        }else{
+            card.style.display = 'none';
+        }
+
+    });
+
+});
+
 </script>
 </body>
 </html>
