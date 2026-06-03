@@ -162,7 +162,15 @@
 
             <div class="col-6 col-md-4">
 
-                <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden product-card d-flex flex-column">
+                <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden product-card d-flex flex-column position-relative">
+
+                    <a href="{% url 'toggle_favorito' producto.id %}"
+                        class="position-absolute top-0 end-0 m-2 bg-white rounded-circle shadow-sm p-2"
+                        style="z-index:10;">
+
+                        <i class="bi bi-heart text-danger"></i>
+
+                    </a>
 
                 <!-- IMAGEN / CARRUSEL -->
                     {% if producto.imagenes.all|length > 0 %}

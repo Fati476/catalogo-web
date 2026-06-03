@@ -93,6 +93,12 @@ urlpatterns = [
         name='eliminar_imagen'
     ),
 
+    path(
+        'favorito/<int:producto_id>/',
+        views.toggle_favorito,
+        name='toggle_favorito'
+    ),
+
     #DASHBOARD
 
     path(
@@ -121,6 +127,8 @@ urlpatterns = [
         views.cambiar_estado_usuario,
         name='cambiar_estado_usuario'
     ),
+
+    
 
     #Cotizaciones
     path(

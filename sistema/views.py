@@ -4,7 +4,7 @@ from django.contrib.auth.models import Group
 from django.core.paginator import Paginator
 
 from .forms import RegistroForm
-from .models import Producto, Perfil
+from .models import Favorito, Producto, Perfil
 
 from .forms_producto import ProductoForm
 from .models import Producto
@@ -463,3 +463,19 @@ def productos_por_categoria(request, id):
         'categoria': categoria,
         'productos': productos
     })
+
+
+@login_required
+def toggle_favorito(request, producto_id):
+
+    producto = Producto.objects.get(id=producto_id)
+
+    favorito, creado = Favorito.objects.get_or_create(
+        usuario=request.user,
+        producto=producto
+    )
+
+    if not creado:
+        favorito.delete()
+
+    return redirect('inicio')
