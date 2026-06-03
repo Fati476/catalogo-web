@@ -4,7 +4,7 @@ from django.contrib.auth.models import Group
 from django.core.paginator import Paginator
 
 from .forms import RegistroForm
-from .models import Favorito, Producto, Perfil
+from .models import DetalleSolicitud, Favorito, Producto, Perfil
 
 from .forms_producto import ProductoForm
 from .models import Producto
