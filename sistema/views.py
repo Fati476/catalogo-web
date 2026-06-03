@@ -499,3 +499,25 @@ def toggle_favorito(request, producto_id):
         "estado": estado,
         "producto_id": producto_id
     })
+
+@login_required
+def agregar_cotizacion(request, producto_id):
+
+    producto = Producto.objects.get(id=producto_id)
+
+    solicitud, _ = SolicitudCotizacion.objects.get_or_create(
+        cliente=request.user,
+        estado='Pendiente'
+    )
+
+    detalle, creado = DetalleSolicitud.objects.get_or_create(
+        solicitud=solicitud,
+        producto=producto,
+        defaults={'cantidad': 1}
+    )
+
+    if not creado:
+        detalle.cantidad += 1
+        detalle.save()
+
+    return redirect('inicio')
