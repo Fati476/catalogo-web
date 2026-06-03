@@ -164,14 +164,15 @@
 
                 <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden product-card d-flex flex-column position-relative">
 
-                    <a href="{% url 'toggle_favorito' producto.id %}"
-                       class="position-absolute top-0 end-0 m-2 bg-white rounded-circle shadow-sm p-2"
+                    <a href="#"
+                       class="favorito-btn position-absolute top-0 end-0 m-2 bg-white rounded-circle shadow-sm p-2"
+                       data-id="{{ producto.id }}"
                        style="z-index:10;">
 
                         {% if producto.id in favoritos_ids %}
-                            <i class="bi bi-heart-fill text-danger"></i>
+                            <i class="bi bi-heart-fill text-danger" id="heart-{{ producto.id }}"></i>
                         {% else %}
-                            <i class="bi bi-heart text-danger"></i>
+                            <i class="bi bi-heart text-danger" id="heart-{{ producto.id }}"></i>
                         {% endif %}
 
                     </a>
@@ -281,7 +282,33 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
+<script>
+document.querySelectorAll('.favorito-btn').forEach(btn => {
 
+    btn.addEventListener('click', function(e){
+        e.preventDefault();
+
+        const productoId = this.dataset.id;
+        const icon = document.getElementById('heart-' + productoId);
+
+        fetch(`/favorito/${productoId}/`)
+        .then(response => response.json())
+        .then(data => {
+
+            if(data.estado === "agregado"){
+                icon.classList.remove("bi-heart");
+                icon.classList.add("bi-heart-fill");
+            } else {
+                icon.classList.remove("bi-heart-fill");
+                icon.classList.add("bi-heart");
+            }
+
+        });
+
+    });
+
+});
+</script>
 
 </body>
 </html>

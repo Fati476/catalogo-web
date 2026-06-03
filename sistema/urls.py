@@ -137,4 +137,7 @@ urlpatterns = [
         name='lista_solicitudes'
     ),
 
+
+    path('favorito/<int:producto_id>/', views.toggle_favorito, name='toggle_favorito'),
+
 ]

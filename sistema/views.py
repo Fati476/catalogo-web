@@ -26,8 +26,10 @@ from django.contrib.auth.models import User
 
 from .models import SolicitudCotizacion
 
+from django.http import JsonResponse
 @login_required
 def inicio(request):
+
 
     productos_destacados = Producto.objects.filter(
         estado=True,
@@ -478,12 +480,22 @@ def toggle_favorito(request, producto_id):
 
     producto = Producto.objects.get(id=producto_id)
 
-    favorito, creado = Favorito.objects.get_or_create(
+    favorito = Favorito.objects.filter(
         usuario=request.user,
         producto=producto
     )
 
-    if not creado:
+    if favorito.exists():
         favorito.delete()
+        estado = "eliminado"
+    else:
+        Favorito.objects.create(
+            usuario=request.user,
+            producto=producto
+        )
+        estado = "agregado"
 
-    return redirect('inicio')
+    return JsonResponse({
+        "estado": estado,
+        "producto_id": producto_id
+    })
