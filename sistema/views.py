@@ -531,3 +531,11 @@ def agregar_cotizacion(request, producto_id):
         detalle.save()
 
     return redirect('inicio')
+
+
+def todas_categorias(request):
+    categorias = Categoria.objects.all().order_by('nombre')
+
+    return render(request, 'sistema/todas_categorias.html', {
+        'categorias': categorias
+    })

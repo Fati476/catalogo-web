@@ -140,6 +140,8 @@ urlpatterns = [
 
     path('favorito/<int:producto_id>/', views.toggle_favorito, name='toggle_favorito'),
 
-    path('cotizar/<int:producto_id>/', views.agregar_cotizacion, name='agregar_cotizacion')
+    path('cotizar/<int:producto_id>/', views.agregar_cotizacion, name='agregar_cotizacion'),
+
+    path('categorias/', views.todas_categorias, name='todas_categorias'),
 
 ]
