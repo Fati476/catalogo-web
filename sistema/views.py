@@ -464,15 +464,25 @@ def productos_por_categoria(request, id):
 
     categoria = Categoria.objects.get(id=id)
 
-    productos = Producto.objects.filter(
+    productos_lista = Producto.objects.filter(
         categoria=categoria,
         estado=True
-    )
+    ).order_by('-id')
 
-    return render(request, 'sistema/productos_categoria.html', {
-        'categoria': categoria,
-        'productos': productos
-    })
+    paginator = Paginator(productos_lista, 6)  # 6 productos por página
+
+    page_number = request.GET.get('page')
+
+    productos = paginator.get_page(page_number)
+
+    return render(
+        request,
+        'sistema/productos_categoria.html',
+        {
+            'categoria': categoria,
+            'productos': productos
+        }
+    )
 
 
 @login_required

@@ -176,6 +176,58 @@
         {% endfor %}
 
     </div>
+    {% if productos.has_other_pages %}
+
+    <nav class="mt-4">
+
+        <ul class="pagination justify-content-center">
+
+            {% if productos.has_previous %}
+            <li class="page-item">
+                <a class="page-link"
+                href="?page={{ productos.previous_page_number }}">
+                    Anterior
+                </a>
+            </li>
+            {% endif %}
+
+            {% for num in productos.paginator.page_range %}
+
+                {% if productos.number == num %}
+
+                    <li class="page-item active">
+                        <span class="page-link">
+                            {{ num }}
+                        </span>
+                    </li>
+
+                {% else %}
+
+                    <li class="page-item">
+                        <a class="page-link"
+                        href="?page={{ num }}">
+                            {{ num }}
+                        </a>
+                    </li>
+
+                {% endif %}
+
+            {% endfor %}
+
+            {% if productos.has_next %}
+            <li class="page-item">
+                <a class="page-link"
+                href="?page={{ productos.next_page_number }}">
+                    Siguiente
+                </a>
+            </li>
+            {% endif %}
+
+        </ul>
+
+    </nav>
+
+    {% endif %}
 
 </div>
 
