@@ -469,18 +469,29 @@ def productos_por_categoria(request, id):
         estado=True
     ).order_by('-id')
 
-    paginator = Paginator(productos_lista, 6)  # 6 productos por página
+    paginator = Paginator(productos_lista, 6)
 
     page_number = request.GET.get('page')
 
     productos = paginator.get_page(page_number)
+
+    favoritos_ids = []
+
+    if request.user.is_authenticated:
+        favoritos_ids = Favorito.objects.filter(
+            usuario=request.user
+        ).values_list(
+            'producto_id',
+            flat=True
+        )
 
     return render(
         request,
         'sistema/productos_categoria.html',
         {
             'categoria': categoria,
-            'productos': productos
+            'productos': productos,
+            'favoritos_ids': favoritos_ids
         }
     )
 
