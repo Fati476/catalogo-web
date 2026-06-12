@@ -144,4 +144,12 @@ urlpatterns = [
 
     path('categorias/', views.todas_categorias, name='todas_categorias'),
 
+
+    #Todos los produtos 
+    path(
+        'productos/',
+        views.todos_productos,
+        name='todos_productos'
+    ),
+
 ]

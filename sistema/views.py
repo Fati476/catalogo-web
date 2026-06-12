@@ -539,3 +539,35 @@ def todas_categorias(request):
     return render(request, 'sistema/todas_categorias.html', {
         'categorias': categorias
     })
+
+
+
+
+def todos_productos(request):
+
+    productos_lista = Producto.objects.filter(
+        estado=True
+    ).order_by('-id')
+
+    paginator = Paginator(productos_lista, 12)
+
+    page = request.GET.get('page')
+
+    productos = paginator.get_page(page)
+
+    favoritos_ids = []
+
+    if request.user.is_authenticated:
+        favoritos_ids = request.user.favoritos.values_list(
+            'producto_id',
+            flat=True
+        )
+
+    return render(
+        request,
+        'todos_productos.html',
+        {
+            'productos': productos,
+            'favoritos_ids': favoritos_ids
+        }
+    )
