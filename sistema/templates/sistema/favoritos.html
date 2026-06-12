@@ -116,11 +116,12 @@
 
     </div>
 
-    <div class="row g-3">
+    <div class="row g-3" id="contenedor-productos">
+
 
         {% for producto in productos %}
 
-        <div class="col-6 col-lg-4 producto-card">
+        <div class="col-6 col-md-4 producto-card">
 
             <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden position-relative">
 
@@ -299,6 +300,21 @@ document.querySelectorAll('.favorito-btn').forEach(btn => {
 
                 if(card){
                     card.remove();
+                }
+
+                const restantes =
+                    document.querySelectorAll('.producto-card').length;
+
+                if(restantes === 0){
+
+                    document.getElementById('contenedor-productos').innerHTML = `
+                        <div class="col-12">
+                            <div class="alert alert-light text-center">
+                                No tienes productos en favoritos.
+                            </div>
+                        </div>
+                    `;
+
                 }
 
             }

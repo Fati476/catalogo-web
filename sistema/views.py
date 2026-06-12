@@ -593,10 +593,16 @@ def favoritos(request):
         flat=True
     )
 
-    productos = Producto.objects.filter(
+    productos_lista = Producto.objects.filter(
         id__in=favoritos_ids,
         estado=True
     ).order_by('-id')
+
+    paginator = Paginator(productos_lista, 12)
+
+    page = request.GET.get('page')
+
+    productos = paginator.get_page(page)
 
     return render(
         request,
