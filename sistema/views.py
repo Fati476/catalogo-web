@@ -555,17 +555,16 @@ def todos_productos(request):
 
     productos = paginator.get_page(page)
 
-    favoritos_ids = []
-
-    if request.user.is_authenticated:
-        favoritos_ids = request.user.favoritos.values_list(
-            'producto_id',
-            flat=True
-        )
+    favoritos_ids = Favorito.objects.filter(
+        usuario=request.user
+    ).values_list(
+        'producto_id',
+        flat=True
+    ) if request.user.is_authenticated else []
 
     return render(
         request,
-        'todos_productos.html',
+        'sistema/todos_productos.html',
         {
             'productos': productos,
             'favoritos_ids': favoritos_ids
