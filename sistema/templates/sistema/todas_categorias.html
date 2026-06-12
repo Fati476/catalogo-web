@@ -56,19 +56,61 @@
             📦 Catálogo
         </a>
 
-        <div class="collapse navbar-collapse show">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item"><a class="nav-link" href="#">🏠 Inicio</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'todas_categorias' %}">📂 Categorías</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">📋 Cotizaciones</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">❤️ Favoritos</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">👤 Perfil</a></li>
-                    <li class="nav-item">
-                        <a class="nav-link text-danger" href="{% url 'logout' %}">
-                            🚪 Cerrar sesión
-                        </a>
+        <!-- Botón hamburguesa -->
+        <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#menuNav"
+            aria-controls="menuNav"
+            aria-expanded="false"
+            aria-label="Toggle navigation">
+
+            <span class="navbar-toggler-icon"></span>
+
+        </button>
+
+        <!-- Menú -->
+        <div class="collapse navbar-collapse" id="menuNav">
+
+            <ul class="navbar-nav ms-auto text-center gap-lg-3 mt-2 mt-lg-0">
+
+                <li class="nav-item">
+                    <a class="nav-link" href="#">🏠 Inicio</a>
                 </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'todas_categorias' %}">
+                        📂 Categorías
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        📋 Cotizaciones
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        ❤️ Favoritos
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        👤 Perfil
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link text-danger" href="{% url 'logout' %}">
+                        🚪 Cerrar sesión
+                    </a>
+                </li>
+
             </ul>
+
         </div>
 
     </div>
