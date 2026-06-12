@@ -570,3 +570,28 @@ def todos_productos(request):
             'favoritos_ids': favoritos_ids
         }
     )
+
+
+@login_required
+def favoritos(request):
+
+    favoritos_ids = Favorito.objects.filter(
+        usuario=request.user
+    ).values_list(
+        'producto_id',
+        flat=True
+    )
+
+    productos = Producto.objects.filter(
+        id__in=favoritos_ids,
+        estado=True
+    ).order_by('-id')
+
+    return render(
+        request,
+        'sistema/favoritos.html',
+        {
+            'productos': productos,
+            'favoritos_ids': favoritos_ids
+        }
+    )

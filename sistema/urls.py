@@ -152,4 +152,10 @@ urlpatterns = [
         name='todos_productos'
     ),
 
+    path(
+        'favoritos/',
+        views.favoritos,
+        name='favoritos'
+    ),
+
 ]
