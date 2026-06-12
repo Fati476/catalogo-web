@@ -2,11 +2,25 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Todos los productos</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <style>
+
+        .product-card{
+            transition: all .2s ease;
+        }
+
+        .product-card:hover{
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0,0,0,.12);
+        }
+
+    </style>
 </head>
 
 <body style="background:#F5F7FB; padding-top:75px;">
@@ -143,7 +157,7 @@
                     <div class="carousel-inner">
                         {% for imagen in producto.imagenes.all %}
                         <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                            <img src="{{ imagen.imagen.url }}" class="d-block w-100" style="height:220px; object-fit:contain; background:white;">
+                            <img src="{{ imagen.imagen.url }}" class="d-block w-100" style="width:100%; height:180px; object-fit:contain; background:#fff;">
                         </div>
                         {% endfor %}
                     </div>
@@ -167,7 +181,7 @@
 
                 {% else %}
          <!-- FALLBACK SI NO HAY IMAGEN -->
-                <div class="d-flex justify-content-center align-items-center bg-light" style="height:220px;">
+                <div class="d-flex justify-content-center align-items-center bg-light" style="height:160px;">
                  <i class="bi bi-image text-secondary fs-1"></i>
                 </div>
                 {% endif %}
@@ -314,6 +328,10 @@ document.querySelectorAll('.favorito-btn').forEach(btn => {
                             </div>
                         </div>
                     `;
+                    const paginacion = document.querySelector('.pagination');
+                    if(paginacion){
+                        paginacion.closest('nav').remove();
+                    }
 
                 }
 
