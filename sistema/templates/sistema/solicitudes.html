@@ -114,30 +114,19 @@ href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.m
 
                 <div class="row align-items-center">
 
-            <!-- CHECKBOX + ELIMINAR -->
+            <!-- CHECKBOX -->
                     <div class="col-2 col-md-1 text-center">
 
-                        <div class="d-flex flex-column align-items-center gap-3">
-
-                            <input
-                                type="checkbox"
-                                class="form-check-input producto-check"
-                                value="{{ detalle.id }}"
-                                checked
-                            >
-
-                            <a href="#"
-                            class="btn btn-outline-danger btn-sm">
-
-                                <i class="bi bi-trash"></i>
-
-                            </a>
-
-                        </div>
+                        <input
+                            type="checkbox"
+                            class="form-check-input producto-check"
+                            value="{{ detalle.id }}"
+                            checked
+                        >
 
                     </div>
 
-            <!-- IMAGEN -->
+                    <!-- IMAGEN -->
                     <div class="col-4 col-md-2 text-center">
 
                         {% if detalle.producto.imagenes.first %}
@@ -165,16 +154,14 @@ href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.m
 
                     </div>
 
-            <!-- CANTIDAD -->
+            <!-- CANTIDAD + ELIMINAR -->
                     <div class="col-12 col-md-4 mt-3 mt-md-0">
 
                         <div class="d-flex justify-content-center align-items-center gap-2">
 
                             <a href="#"
-                            class="btn btn-outline-secondary btn-sm">
-
+                               class="btn btn-outline-secondary btn-sm">
                                 <i class="bi bi-dash"></i>
-
                             </a>
 
                             <span class="fw-bold fs-5">
@@ -182,10 +169,13 @@ href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.m
                             </span>
 
                             <a href="#"
-                            class="btn btn-outline-secondary btn-sm">
-
+                               class="btn btn-outline-secondary btn-sm">
                                 <i class="bi bi-plus"></i>
+                            </a>
 
+                            <a href="#"
+                               class="btn btn-outline-danger btn-sm ms-3">
+                                <i class="bi bi-trash"></i>
                             </a>
 
                         </div>
@@ -196,7 +186,6 @@ href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.m
 
             </div>
         </div>
-
         {% endfor %}
 
         <div class="bg-white shadow-sm rounded-4 p-4">
