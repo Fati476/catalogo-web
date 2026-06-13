@@ -89,16 +89,16 @@
     </div>
 </nav>
 
-<div class="container py-4">
+<div class="container-fluid px-3 px-lg-4 mt-4">
 
     <div class="bg-white shadow-sm rounded-4 p-4 mb-4">
 
-        <h3 class="fw-bold">
+        <h3 class="fw-bold mb-1">
             📋 Mi solicitud de cotización
         </h3>
 
         <p class="text-muted mb-0">
-            Aquí puedes revisar los productos agregados.
+            Revisa los productos agregados antes de enviar la solicitud.
         </p>
 
     </div>
@@ -107,21 +107,37 @@
 
         {% for detalle in solicitud.detalles.all %}
 
-        <div class="card border-0 shadow-sm mb-3">
+        <div class="card border-0 shadow-sm rounded-4 mb-3">
 
             <div class="card-body">
 
-                <h5>
-                    {{ detalle.producto.nombre }}
-                </h5>
+                <div class="row align-items-center">
 
-                <p class="text-muted">
-                    {{ detalle.producto.categoria.nombre }}
-                </p>
+                    <div class="col-12 col-md-8">
 
-                <span class="badge bg-primary">
-                    Cantidad: {{ detalle.cantidad }}
-                </span>
+                        <h5 class="fw-bold mb-1">
+                            {{ detalle.producto.nombre }}
+                        </h5>
+
+                        <p class="text-muted mb-2">
+                            {{ detalle.producto.categoria.nombre }}
+                        </p>
+
+                        <span class="badge bg-primary">
+                            Cantidad: {{ detalle.cantidad }}
+                        </span>
+
+                    </div>
+
+                    <div class="col-12 col-md-4 text-md-end mt-3 mt-md-0">
+
+                        <span class="text-success fw-bold">
+                            ✓ Listo para cotizar
+                        </span>
+
+                    </div>
+
+                </div>
 
             </div>
 
@@ -129,15 +145,57 @@
 
         {% endfor %}
 
-        <button class="btn btn-success w-100">
-            Enviar solicitud
-        </button>
+        <div class="bg-white shadow-sm rounded-4 p-4">
+
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+
+                <div>
+
+                    <h5 class="fw-bold mb-1">
+                        Productos seleccionados
+                    </h5>
+
+                    <p class="text-muted mb-0">
+                        {{ solicitud.detalles.count }} producto(s)
+                    </p>
+
+                </div>
+
+                <button class="btn btn-success btn-lg px-4">
+                    <i class="bi bi-send"></i>
+                    Enviar solicitud
+                </button>
+
+            </div>
+
+        </div>
 
     {% else %}
 
-        <div class="alert alert-light text-center">
+        <div class="card border-0 shadow-sm rounded-4">
 
-            No has agregado productos.
+            <div class="card-body text-center py-5">
+
+                <h4 class="mb-3">
+                    📦
+                </h4>
+
+                <h5>
+                    No has agregado productos
+                </h5>
+
+                <p class="text-muted">
+                    Explora el catálogo y agrega productos a tu solicitud.
+                </p>
+
+                <a href="{% url 'todos_productos' %}"
+                   class="btn btn-warning">
+
+                    Ver productos
+
+                </a>
+
+            </div>
 
         </div>
 
