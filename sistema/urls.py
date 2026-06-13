@@ -164,4 +164,23 @@ urlpatterns = [
         name='solicitudes'
     ),
 
+
+    path(
+        'solicitud/eliminar/<int:id>/',
+        views.eliminar_detalle,
+        name='eliminar_detalle'
+    ),
+
+    path(
+        'solicitud/aumentar/<int:id>/',
+        views.aumentar_cantidad,
+        name='aumentar_cantidad'
+    ),
+
+    path(
+        'solicitud/disminuir/<int:id>/',
+        views.disminuir_cantidad,
+        name='disminuir_cantidad'
+    ),
+
 ]

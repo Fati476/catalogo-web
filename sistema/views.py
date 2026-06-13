@@ -629,3 +629,44 @@ def solicitudes(request):
         }
     )
 
+
+@login_required
+def eliminar_detalle(request, id):
+
+    detalle = DetalleSolicitud.objects.get(
+        id=id,
+        solicitud__usuario=request.user
+    )
+
+    detalle.delete()
+
+    return redirect('solicitudes')
+
+
+@login_required
+def aumentar_cantidad(request, id):
+
+    detalle = DetalleSolicitud.objects.get(
+        id=id,
+        solicitud__usuario=request.user
+    )
+
+    detalle.cantidad += 1
+    detalle.save()
+
+    return redirect('solicitudes')
+
+
+@login_required
+def disminuir_cantidad(request, id):
+
+    detalle = DetalleSolicitud.objects.get(
+        id=id,
+        solicitud__usuario=request.user
+    )
+
+    if detalle.cantidad > 1:
+        detalle.cantidad -= 1
+        detalle.save()
+
+    return redirect('solicitudes')
