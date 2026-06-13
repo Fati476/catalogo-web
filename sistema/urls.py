@@ -158,4 +158,10 @@ urlpatterns = [
         name='favoritos'
     ),
 
+    path(
+        'solicitudes/',
+        views.solicitudes,
+        name='solicitudes'
+    ),
+
 ]

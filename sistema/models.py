@@ -65,61 +65,7 @@ class Perfil(models.Model):
     def __str__(self):
         return self.usuario.username
     
-
-class SolicitudCotizacion(models.Model):
-
-    ESTADOS = [
-        ('Pendiente', 'Pendiente'),
-        ('Revisada', 'Revisada'),
-        ('Cotizada', 'Cotizada'),
-        ('Rechazada', 'Rechazada'),
-    ]
-
-    cliente = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE
-    )
-
-    fecha = models.DateTimeField(
-        auto_now_add=True
-    )
-
-    estado = models.CharField(
-        max_length=20,
-        choices=ESTADOS,
-        default='Pendiente'
-    )
-
-    comentario = models.TextField(
-        blank=True,
-        null=True
-    )
-
-    def __str__(self):
-
-        return f"Solicitud #{self.id}"
-    
-
-class DetalleSolicitud(models.Model):
-
-    solicitud = models.ForeignKey(
-        SolicitudCotizacion,
-        on_delete=models.CASCADE,
-        related_name='detalles'
-    )
-
-    producto = models.ForeignKey(
-        Producto,
-        on_delete=models.CASCADE
-    )
-
-    cantidad = models.PositiveIntegerField(
-        default=1
-    )
-
-    def __str__(self):
-
-        return self.producto.nombre
+  
     
 
 class Favorito(models.Model):
@@ -135,3 +81,43 @@ class Favorito(models.Model):
 
     class Meta:
         unique_together = ('usuario', 'producto')
+
+
+class SolicitudCotizacion(models.Model):
+
+    usuario = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE
+    )
+
+    fecha = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    enviada = models.BooleanField(
+        default=False
+    )
+
+    def __str__(self):
+        return f"Solicitud #{self.id}"
+
+
+class DetalleSolicitud(models.Model):
+
+    solicitud = models.ForeignKey(
+        SolicitudCotizacion,
+        on_delete=models.CASCADE,
+        related_name="detalles"
+    )
+
+    producto = models.ForeignKey(
+        Producto,
+        on_delete=models.CASCADE
+    )
+
+    cantidad = models.PositiveIntegerField(
+        default=1
+    )
+
+    def __str__(self):
+        return self.producto.nombre

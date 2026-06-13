@@ -612,3 +612,21 @@ def favoritos(request):
             'favoritos_ids': favoritos_ids
         }
     )
+
+
+@login_required
+def solicitudes(request):
+
+    solicitud = SolicitudCotizacion.objects.filter(
+        usuario=request.user,
+        enviada=False
+    ).first()
+
+    return render(
+        request,
+        'sistema/solicitudes.html',
+        {
+            'solicitud': solicitud
+        }
+    )
+
