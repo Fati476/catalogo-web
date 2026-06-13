@@ -526,22 +526,21 @@ def agregar_cotizacion(request, producto_id):
 
     producto = Producto.objects.get(id=producto_id)
 
-    solicitud, _ = SolicitudCotizacion.objects.get_or_create(
-        cliente=request.user,
-        estado='Pendiente'
+    solicitud, creada = SolicitudCotizacion.objects.get_or_create(
+        usuario=request.user,
+        enviada=False
     )
 
     detalle, creado = DetalleSolicitud.objects.get_or_create(
         solicitud=solicitud,
-        producto=producto,
-        defaults={'cantidad': 1}
+        producto=producto
     )
 
     if not creado:
         detalle.cantidad += 1
         detalle.save()
 
-    return redirect('inicio')
+    return redirect('solicitudes')
 
 
 def todas_categorias(request):
