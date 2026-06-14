@@ -106,10 +106,11 @@ href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.m
     </div>
 
     {% if solicitud %}
-
+    <div id="lista-productos">
         {% for detalle in solicitud.detalles.all %}
 
-        <div id="detalle-{{ detalle.id }}" class="card border-0 shadow-sm rounded-4 mb-3">
+        <div id="detalle-{{ detalle.id }}" 
+            class="card border-0 shadow-sm rounded-4 mb-3">
             <div class="card-body">
 
                 <div class="row align-items-center">
@@ -200,8 +201,9 @@ href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.m
             </div>
         </div>
         {% endfor %}
-
-        <div class="bg-white shadow-sm rounded-4 p-4">
+    </div>
+        <div id="resumen-solicitud"
+            class="bg-white shadow-sm rounded-4 p-4">
 
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
 
@@ -211,8 +213,11 @@ href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.m
                         Productos seleccionados
                     </h5>
 
-                    <p class="text-muted mb-0">
+                    <p id="contador-productos"
+                       class="text-muted mb-0">
+
                         {{ solicitud.detalles.count }} producto(s)
+
                     </p>
 
                 </div>
@@ -339,8 +344,45 @@ document.querySelectorAll('.btn-eliminar').forEach(btn => {
                     if(data.ok){
 
                         document
-                        .getElementById(`detalle-${id}`)
-                        .remove();
+                            .getElementById(`detalle-${id}`)
+                            .remove();
+
+                        const productos =
+                            document.querySelectorAll(
+                                '#lista-productos .card'
+                            );
+
+                        if(productos.length === 0){
+
+                            document.getElementById(
+                                'lista-productos'
+                            ).innerHTML = `
+                                <div class="card border-0 shadow-sm rounded-4">
+                                    <div class="card-body text-center py-5">
+
+                                        <h4 class="mb-3">📦</h4>
+
+                                        <h5>
+                                            No has agregado productos
+                                        </h5>
+
+                                        <p class="text-muted">
+                                            Explora el catálogo y agrega productos.
+                                        </p>
+
+                                        <a href="/productos/"
+                                           class="btn btn-warning">
+
+                                            Ver productos
+
+                                        </a>
+
+                                    </div>
+                                </div>
+                            `;
+
+                            
+                        }
 
                     }
 
