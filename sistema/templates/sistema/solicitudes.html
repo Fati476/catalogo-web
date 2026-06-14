@@ -268,7 +268,7 @@ document.querySelectorAll('.btn-aumentar').forEach(btn => {
 
         const id = this.dataset.id;
 
-        fetch(`/solicitudes/aumentar/${id}/`)
+        fetch(`/solicitud/aumentar/${id}/`)
         .then(response => response.json())
         .then(data => {
 
@@ -290,7 +290,7 @@ document.querySelectorAll('.btn-disminuir').forEach(btn => {
 
         const id = this.dataset.id;
 
-        fetch(`/solicitudes/disminuir/${id}/`)
+        fetch(`/solicitud/disminuir/${id}/`)
         .then(response => response.json())
         .then(data => {
 
