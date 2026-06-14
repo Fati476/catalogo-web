@@ -621,6 +621,10 @@ def solicitudes(request):
         enviada=False
     ).first()
 
+    if solicitud and not solicitud.detalles.exists():
+        solicitud.delete()
+        solicitud = None
+
     return render(
         request,
         'sistema/solicitudes.html',
