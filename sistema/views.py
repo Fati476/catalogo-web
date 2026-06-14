@@ -654,7 +654,9 @@ def aumentar_cantidad(request, id):
     detalle.cantidad += 1
     detalle.save()
 
-    return redirect('solicitudes')
+    return JsonResponse({
+        'cantidad': detalle.cantidad
+    })
 
 
 @login_required
@@ -669,4 +671,6 @@ def disminuir_cantidad(request, id):
         detalle.cantidad -= 1
         detalle.save()
 
-    return redirect('solicitudes')
+    return JsonResponse({
+        'cantidad': detalle.cantidad
+    })

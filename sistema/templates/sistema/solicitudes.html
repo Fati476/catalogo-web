@@ -159,22 +159,33 @@ href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.m
 
                         <div class="d-flex justify-content-center align-items-center gap-2">
 
-                            <a href="{% url 'disminuir_cantidad' detalle.id %}"
-                               class="btn btn-outline-secondary btn-sm">
+                            <a href="#"
+                               class="btn btn-outline-secondary btn-sm btn-disminuir"
+                               data-id="{{ detalle.id }}">
+
                                 <i class="bi bi-dash"></i>
+
                             </a>
 
-                            <span class="fw-bold fs-5">
+                            <span
+                                id="cantidad-{{ detalle.id }}"
+                                class="fw-bold fs-5">
+
                                 {{ detalle.cantidad }}
+
                             </span>
 
-                            <a href="{% url 'aumentar_cantidad' detalle.id %}"
-                               class="btn btn-outline-secondary btn-sm">
+                            <a href="#"
+                               class="btn btn-outline-secondary btn-sm btn-aumentar"
+                               data-id="{{ detalle.id }}">
+
                                 <i class="bi bi-plus"></i>
+
                             </a>
 
                             <a href="{% url 'eliminar_detalle' detalle.id %}"
-                               class="btn btn-outline-danger btn-sm ms-3">
+                               class="btn btn-outline-danger btn-sm ms-3"
+                                onclick="return confirm('¿Deseas eliminar este producto de la solicitud?')">
                                 <i class="bi bi-trash"></i>
                             </a>
 
@@ -246,5 +257,53 @@ href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.m
 
 </div>
 
+
+<script>
+
+document.querySelectorAll('.btn-aumentar').forEach(btn => {
+
+    btn.addEventListener('click', function(e){
+
+        e.preventDefault();
+
+        const id = this.dataset.id;
+
+        fetch(`/solicitudes/aumentar/${id}/`)
+        .then(response => response.json())
+        .then(data => {
+
+            document.getElementById(
+                `cantidad-${id}`
+            ).innerText = data.cantidad;
+
+        });
+
+    });
+
+});
+
+document.querySelectorAll('.btn-disminuir').forEach(btn => {
+
+    btn.addEventListener('click', function(e){
+
+        e.preventDefault();
+
+        const id = this.dataset.id;
+
+        fetch(`/solicitudes/disminuir/${id}/`)
+        .then(response => response.json())
+        .then(data => {
+
+            document.getElementById(
+                `cantidad-${id}`
+            ).innerText = data.cantidad;
+
+        });
+
+    });
+
+});
+
+</script>
 </body>
 </html>
