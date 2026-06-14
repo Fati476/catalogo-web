@@ -640,7 +640,9 @@ def eliminar_detalle(request, id):
 
     detalle.delete()
 
-    return redirect('solicitudes')
+    return JsonResponse({
+        'ok': True
+    })
 
 
 @login_required
