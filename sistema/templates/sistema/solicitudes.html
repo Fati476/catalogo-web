@@ -346,7 +346,14 @@ document.querySelectorAll('.btn-eliminar').forEach(btn => {
                         document
                             .getElementById(`detalle-${id}`)
                             .remove();
+                        const total =
+                            document.querySelectorAll(
+                                '#lista-productos .card'
+                            ).length;
 
+                        document.getElementById(
+                            'contador-productos'
+                        ).innerText = `${total} producto(s)`;
                         const productos =
                             document.querySelectorAll(
                                 '#lista-productos .card'
