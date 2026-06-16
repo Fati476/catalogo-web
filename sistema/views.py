@@ -708,3 +708,20 @@ def enviar_solicitud(request):
     return JsonResponse({
         "ok": True
     })
+
+
+@login_required
+def mis_cotizaciones(request):
+
+    solicitudes = SolicitudCotizacion.objects.filter(
+        usuario=request.user,
+        enviada=True
+    ).order_by("-fecha")
+
+    return render(
+        request,
+        "sistema/mis_cotizaciones.html",
+        {
+            "solicitudes": solicitudes
+        }
+    )

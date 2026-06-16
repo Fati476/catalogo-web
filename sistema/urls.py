@@ -189,4 +189,10 @@ urlpatterns = [
         name="enviar_solicitud",
     ),
 
+    path(
+        "cotizaciones/",
+        views.mis_cotizaciones,
+        name="mis_cotizaciones"
+    ),
+
 ]
