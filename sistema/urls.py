@@ -183,4 +183,10 @@ urlpatterns = [
         name='disminuir_cantidad'
     ),
 
+    path(
+        "solicitud/enviar/",
+        views.enviar_solicitud,
+        name="enviar_solicitud",
+    ),
+
 ]

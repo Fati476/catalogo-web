@@ -680,3 +680,31 @@ def disminuir_cantidad(request, id):
     return JsonResponse({
         'cantidad': detalle.cantidad
     })
+
+
+@login_required
+def enviar_solicitud(request):
+
+    solicitud = SolicitudCotizacion.objects.filter(
+        usuario=request.user,
+        enviada=False
+    ).first()
+
+    if solicitud is None:
+        return JsonResponse({
+            "ok": False,
+            "mensaje": "No existe una solicitud activa."
+        })
+
+    if not solicitud.detalles.exists():
+        return JsonResponse({
+            "ok": False,
+            "mensaje": "No hay productos en la solicitud."
+        })
+
+    solicitud.enviada = True
+    solicitud.save()
+
+    return JsonResponse({
+        "ok": True
+    })
