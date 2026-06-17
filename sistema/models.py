@@ -85,6 +85,12 @@ class Favorito(models.Model):
 
 class SolicitudCotizacion(models.Model):
 
+    ESTADOS = [
+        ("revision", "En revisión"),
+        ("cotizada", "Cotizada"),
+        ("rechazada", "Rechazada"),
+    ]
+
     usuario = models.ForeignKey(
         User,
         on_delete=models.CASCADE
@@ -98,9 +104,19 @@ class SolicitudCotizacion(models.Model):
         default=False
     )
 
+    estado = models.CharField(
+        max_length=20,
+        choices=ESTADOS,
+        default="revision"
+    )
+
+    motivo_rechazo = models.TextField(
+        blank=True,
+        null=True
+    )
+
     def __str__(self):
         return f"Solicitud #{self.id}"
-
 
 class DetalleSolicitud(models.Model):
 
