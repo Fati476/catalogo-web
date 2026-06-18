@@ -119,8 +119,27 @@
                         </h5>
 
                         <p class="text-muted mb-0">
-                            {{ solicitud.fecha }}
+                            {{ solicitud.fecha|date:"d/m/Y" }} • {{ solicitud.fecha|time:"H:i" }}
                         </p>
+
+                        <hr>
+
+                        <h6 class="text-uppercase text-secondary small fw-bold">
+                            Productos solicitados
+                        </h6>
+
+                        {% if solicitud.detalles.exists %}
+                            <ul class="list-group list-group-flush">
+                                {% for detalle in solicitud.detalles.all %}
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <span>{{ detalle.producto.nombre }}</span>
+                                        <span class="badge bg-secondary">
+                                            x{{ detalle.cantidad }}
+                                        </span>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
 
                     </div>
 
@@ -152,14 +171,25 @@
 
                         {% endif %}
 
-                        {% if solicitud.estado == "rechazada" and solicitud.motivo_rechazo %}
+                        
 
-                            <div class="mt-2">
-                                <small class="text-danger">
-                                    <strong>Motivo:</strong>
-                                    {{ solicitud.motivo_rechazo }}
-                                </small>
-                            </div>
+                        {% if solicitud.estado == "revision" %}
+
+                        <div class="alert alert-warning mt-3 mb-0">
+                            ⏳ Tu solicitud está siendo revisada por nuestro equipo.
+                        </div>
+
+                        {% elif solicitud.estado == "cotizada" %}
+
+                        <div class="alert alert-success mt-3 mb-0">
+                            ✅ Tu cotización está lista para descargarse.
+                        </div>
+
+                        {% elif solicitud.estado == "rechazada" and solicitud.motivo_rechazo %}
+
+                        <div class="alert alert-danger mt-3 mb-0">
+                            ❌ <strong>Motivo:</strong> {{ solicitud.motivo_rechazo }}
+                        </div>
 
                         {% endif %}
 
