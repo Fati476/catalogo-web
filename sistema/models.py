@@ -84,30 +84,26 @@ class Favorito(models.Model):
 
 
 class SolicitudCotizacion(models.Model):
-
     ESTADOS = [
         ("revision", "En revisión"),
         ("cotizada", "Cotizada"),
         ("rechazada", "Rechazada"),
     ]
 
-    usuario = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE
-    )
-
-    fecha = models.DateTimeField(
-        auto_now_add=True
-    )
-
-    enviada = models.BooleanField(
-        default=False
-    )
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    fecha = models.DateTimeField(auto_now_add=True)
+    enviada = models.BooleanField(default=False)
 
     estado = models.CharField(
         max_length=20,
         choices=ESTADOS,
         default="revision"
+    )
+
+    pdf = models.FileField(
+        upload_to="cotizaciones/",
+        blank=True,
+        null=True
     )
 
     motivo_rechazo = models.TextField(

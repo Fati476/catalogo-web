@@ -137,6 +137,13 @@
                                 Cotizada
                             </span>
 
+                            {% if solicitud.pdf %}
+                                <a href="{{ solicitud.pdf.url }}"
+                                   class="btn btn-danger btn-sm ms-2">
+                                    📄 Descargar PDF
+                                </a>
+                            {% endif %}
+
                         {% elif solicitud.estado == "rechazada" %}
 
                             <span class="badge bg-danger fs-6 px-3 py-2">
@@ -156,17 +163,6 @@
 
                         {% endif %}
 
-                        <!-- Más adelante aquí irá el botón PDF -->
-
-                        <!--
-                        <a href="#"
-                           class="btn btn-primary btn-sm ms-2">
-
-                            <i class="bi bi-file-earmark-pdf"></i>
-                            Descargar PDF
-
-                        </a>
-                        -->
 
                     </div>
 
