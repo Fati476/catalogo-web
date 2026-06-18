@@ -195,4 +195,10 @@ urlpatterns = [
         name="mis_cotizaciones"
     ),
 
+    path(
+        "admin/cotizaciones/",
+        views.administrar_cotizaciones,
+        name="administrar_cotizaciones",
+    ),
+
 ]

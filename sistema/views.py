@@ -27,6 +27,9 @@ from django.contrib.auth.models import User
 from .models import SolicitudCotizacion
 
 from django.http import JsonResponse
+
+from django.contrib.admin.views.decorators import staff_member_required
+
 @login_required
 def inicio(request):
 
@@ -720,7 +723,24 @@ def mis_cotizaciones(request):
 
     return render(
         request,
-        "sistema/mis_cotizaciones.html",
+        "admin/categorias/mis_cotizaciones.html",
+        {
+            "solicitudes": solicitudes
+        }
+    )
+
+
+@staff_member_required
+def administrar_cotizaciones(request):
+    solicitudes = (
+        SolicitudCotizacion.objects
+        .filter(enviada=True)
+        .order_by("-fecha")
+    )
+
+    return render(
+        request,
+        "sistema/administrar_cotizaciones.html",
         {
             "solicitudes": solicitudes
         }
