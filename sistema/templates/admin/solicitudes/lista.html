@@ -331,7 +331,7 @@
 
                             <td class="nombre-cliente fw-semibold">
 
-                                {{ solicitud.cliente.username }}
+                                {{ solicitud.usuario.username }}
 
                             </td>
 
@@ -349,38 +349,20 @@
 
                             <td>
 
-                                {% if solicitud.estado == 'Pendiente' %}
-
+                                {% if solicitud.estado == "revision" %}
                                     <span class="badge bg-warning text-dark">
-
-                                        Pendiente
-
+                                        En revisión
                                     </span>
 
-                                {% elif solicitud.estado == 'Revisada' %}
-
-                                    <span class="badge bg-primary">
-
-                                        Revisada
-
-                                    </span>
-
-                                {% elif solicitud.estado == 'Cotizada' %}
-
+                                {% elif solicitud.estado == "cotizada" %}
                                     <span class="badge bg-success">
-
                                         Cotizada
-
                                     </span>
 
-                                {% else %}
-
+                                {% elif solicitud.estado == "rechazada" %}
                                     <span class="badge bg-danger">
-
                                         Rechazada
-
                                     </span>
-
                                 {% endif %}
 
                             </td>
