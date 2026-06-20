@@ -201,10 +201,4 @@ urlpatterns = [
         name="administrar_cotizaciones",
     ),
 
-    path(
-        "admin/cotizaciones/<int:id>/",
-        views.detalle_cotizacion,
-        name="detalle_cotizacion",
-    ),
-
 ]
