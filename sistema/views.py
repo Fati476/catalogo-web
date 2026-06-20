@@ -438,28 +438,28 @@ def cambiar_estado_usuario(request, id):
 @login_required
 def lista_solicitudes(request):
 
-    solicitudes = SolicitudCotizacion.objects.all().order_by('-fecha')
+    solicitudes = SolicitudCotizacion.objects.all().order_by("-fecha")
 
     pendientes = solicitudes.filter(
-        estado='Pendiente'
-    ).count()
-
-    revisadas = solicitudes.filter(
-        estado='Revisada'
+        estado="revision"
     ).count()
 
     cotizadas = solicitudes.filter(
-        estado='Cotizada'
+        estado="cotizada"
+    ).count()
+
+    rechazadas = solicitudes.filter(
+        estado="rechazada"
     ).count()
 
     return render(
         request,
-        'admin/solicitudes/lista.html',
+        "admin/solicitudes/lista.html",
         {
-            'solicitudes': solicitudes,
-            'pendientes': pendientes,
-            'revisadas': revisadas,
-            'cotizadas': cotizadas
+            "solicitudes": solicitudes,
+            "pendientes": pendientes,
+            "cotizadas": cotizadas,
+            "rechazadas": rechazadas,
         }
     )
 
@@ -750,18 +750,3 @@ def administrar_cotizaciones(request):
     )
 
 
-
-def detalle_cotizacion(request, id):
-
-    solicitud = get_object_or_404(
-        SolicitudCotizacion,
-        id=id
-    )
-
-    return render(
-        request,
-        "admin/solicitudes/detalle_cotizacion.html",
-        {
-            "solicitud": solicitud
-        }
-    )

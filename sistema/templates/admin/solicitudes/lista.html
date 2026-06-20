@@ -294,8 +294,9 @@
 
     <!-- TABLA -->
 
-    <div class="card border-0 shadow-sm rounded-4">
+    <!-- TABLA -->
 
+    <div class="card border-0 shadow-sm rounded-4">
         <div class="card-body p-4">
 
             <div class="table-responsive">
@@ -303,18 +304,14 @@
                 <table class="table align-middle">
 
                     <thead>
-
                         <tr>
-
                             <th>ID</th>
                             <th>Cliente</th>
                             <th>Fecha</th>
                             <th>Productos</th>
                             <th>Estado</th>
                             <th width="120">Acción</th>
-
                         </tr>
-
                     </thead>
 
                     <tbody>
@@ -323,28 +320,18 @@
 
                         <tr class="fila-solicitud">
 
-                            <td>
-
-                                #{{ solicitud.id }}
-
-                            </td>
+                            <td>#{{ solicitud.id }}</td>
 
                             <td class="nombre-cliente fw-semibold">
-
                                 {{ solicitud.usuario.username }}
-
                             </td>
 
                             <td>
-
                                 {{ solicitud.fecha|date:"d/m/Y H:i" }}
-
                             </td>
 
                             <td>
-
                                 {{ solicitud.detalles.count }}
-
                             </td>
 
                             <td>
@@ -370,6 +357,7 @@
                             <td>
 
                                 <button
+                                    type="button"
                                     class="btn btn-primary btn-sm rounded-3"
                                     data-bs-toggle="modal"
                                     data-bs-target="#modalCotizacion{{ solicitud.id }}">
@@ -383,129 +371,16 @@
                         </tr>
 
                         {% empty %}
-
+    
                         <tr>
 
-                            <td colspan="6"
-                                class="text-center text-muted py-5">
-
-                                No existen solicitudes de cotización
-
+                            <td colspan="6" class="text-center text-muted py-5">
+                                No existen solicitudes de cotización.
                             </td>
 
                         </tr>
 
                         {% endfor %}
-
-
-                        <div class="modal fade"
-                             id="modalCotizacion{{ solicitud.id }}"
-                             tabindex="-1">
-
-                            <div class="modal-dialog modal-xl modal-dialog-scrollable">
-
-                                <div class="modal-content">
-
-                                    <div class="modal-header">
-
-                                        <h5 class="modal-title">
-                                            Cotización #{{ solicitud.id }}
-                                        </h5>
-
-                                        <button
-                                            type="button"
-                                            class="btn-close"
-                                            data-bs-dismiss="modal">
-                                        </button>
-
-                                    </div>
-
-                                    <div class="modal-body">
-
-                                        <h6 class="fw-bold mb-3">
-                                            Cliente:
-                                            {{ solicitud.usuario.username }}
-                                        </h6>
-
-                                        <table class="table table-bordered">
-
-                                            <thead>
-
-                                                <tr>
-
-                                                    <th>Producto</th>
-                                                    <th>Cantidad</th>
-                                                    <th>Precio aplicado</th>
-
-                                                </tr>
-
-                                            </thead>
-
-                                            <tbody>
-
-                                                {% for detalle in solicitud.detalles.all %}
-
-                                                <tr>
-
-                                                    <td>
-                                                        {{ detalle.producto.nombre }}
-                                                    </td>
-
-                                                    <td>
-                                                        {{ detalle.cantidad }}
-                                                    </td>
-
-                                                    <td>
-
-                                                        <select class="form-select">
-
-                                                            <option>
-                                                                Precio San Mateo
-                                                                (${{ detalle.producto.precio_san_mateo }})
-                                                            </option>
-
-                                                            <option>
-                                                                Precio Fuera
-                                                                (${{ detalle.producto.precio_fuera }})
-                                                            </option>
-
-                                                        </select>
-
-                                                    </td>
-
-                                                </tr>
-
-                                                {% endfor %}
-
-                                            </tbody>
-
-                                        </table>
-
-                                    </div>
-
-                                    <div class="modal-footer">
-
-                                        <button
-                                            class="btn btn-success">
-
-                                            Generar cotización
-
-                                        </button>
-
-                                        <button
-                                            class="btn btn-danger">
-
-                                            Rechazar
-
-                                        </button>
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                        </div>
 
                     </tbody>
 
@@ -514,8 +389,129 @@
             </div>
 
         </div>
+    </div>
+
+<!-- MODALES -->
+    {% for solicitud in solicitudes %}
+
+    <div
+        class="modal fade"
+        id="modalCotizacion{{ solicitud.id }}"
+        tabindex="-1"
+        aria-hidden="true">
+
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+
+                    <h5 class="modal-title">
+                        Cotización #{{ solicitud.id }}
+                    </h5>
+
+                    <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal">
+                    </button>
+
+                </div>
+
+                <div class="modal-body">
+
+                    <h6 class="fw-bold mb-3">
+                        Cliente: {{ solicitud.usuario.username }}
+                    </h6>
+
+                    <table class="table table-bordered align-middle">
+
+                        <thead>
+
+                            <tr>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                                <th>Precio aplicado</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            {% for detalle in solicitud.detalles.all %}
+
+                            <tr>
+
+                                <td>
+                                    {{ detalle.producto.nombre }}
+                                </td>
+
+                                <td>
+                                    {{ detalle.cantidad }}
+                                </td>
+
+                                <td>
+
+                                    <select class="form-select">
+
+                                        <option>
+                                            Precio San Mateo (${{ detalle.producto.precio_san_mateo }})
+                                        </option>
+
+                                        <option>
+                                            Precio Fuera (${{ detalle.producto.precio_fuera }})
+                                        </option>
+
+                                    </select>
+
+                                </td>
+
+                            </tr>
+
+                            {% empty %}
+
+                            <tr>
+
+                                <td colspan="3" class="text-center text-muted">
+                                    No hay productos en esta solicitud.
+                                </td>
+
+                            </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button type="button" class="btn btn-success">
+                        Generar cotización
+                    </button>
+
+                    <button type="button" class="btn btn-danger">
+                        Rechazar
+                    </button>
+
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal">
+                        Cerrar
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
 
     </div>
+
+    {% endfor %}
 
 </div>
 
