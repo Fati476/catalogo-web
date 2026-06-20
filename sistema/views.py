@@ -726,7 +726,7 @@ def mis_cotizaciones(request):
 
     return render(
         request,
-        "admin/categorias/mis_cotizaciones.html",
+        "sistema/mis_cotizaciones.html",
         {
             "solicitudes": solicitudes
         }
