@@ -11,6 +11,8 @@ class ProductoForm(forms.ModelForm):
         fields = [
             'nombre',
             'descripcion',
+            'precio_san_mateo',
+            'precio_fuera',
             'categoria',
             'estado',
             'destacado'
@@ -24,6 +26,16 @@ class ProductoForm(forms.ModelForm):
 
             'descripcion': forms.Textarea(attrs={
                 'class': 'form-control'
+            }),
+
+            'precio_san_mateo': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'step': '0.01'
+            }),
+
+            'precio_fuera': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'step': '0.01'
             }),
 
             'categoria': forms.Select(attrs={

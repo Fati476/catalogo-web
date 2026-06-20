@@ -393,7 +393,7 @@
         <div class="col-md-6 col-lg-4 producto-item"
             data-categoria="{{ producto.categoria.nombre|lower }}"
             data-nombre="{{ producto.nombre|lower }}"
-            data-precio="{{ producto.precio }}">
+            data-precio="{{ producto.precio_san_mateo|default:0 }}"
 
             <div class="producto-card">
 
@@ -657,6 +657,42 @@
 
             </div>
 
+            <div class="row mb-4">
+
+                <div class="col-md-6">
+
+                    <label class="fw-semibold mb-2">
+                        Precio San Mateo
+                    </label>
+
+                    <input
+                        type="number"
+                        name="precio_san_mateo"
+                        class="form-control p-3 rounded-4"
+                        step="0.01"
+                        min="0"
+                        value="{{ producto.precio_san_mateo }}">
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <label class="fw-semibold mb-2">
+                        Precio Fuera
+                    </label>
+
+                    <input
+                        type="number"
+                        name="precio_fuera"
+                        class="form-control p-3 rounded-4"
+                        step="0.01"
+                        min="0"
+                        value="{{ producto.precio_fuera }}">
+
+                </div>
+
+            </div>
+
             <div class="mb-4">
 
                 <label class="fw-semibold mb-2">
@@ -879,6 +915,40 @@
                 <textarea name="descripcion"
                           class="form-control p-3 rounded-4"
                           rows="4"></textarea>
+
+            </div>
+
+            <div class="row mb-4">
+
+                <div class="col-md-6">
+
+                    <label class="fw-semibold mb-2">
+                        Precio San Mateo
+                    </label>
+
+                    <input
+                        type="number"
+                        name="precio_san_mateo"
+                        class="form-control p-3 rounded-4"
+                        step="0.01"
+                        min="0">
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <label class="fw-semibold mb-2">
+                        Precio Fuera
+                    </label>
+
+                    <input
+                        type="number"
+                        name="precio_fuera"
+                        class="form-control p-3 rounded-4"
+                        step="0.01"
+                        min="0">
+
+                </div>
 
             </div>
 
