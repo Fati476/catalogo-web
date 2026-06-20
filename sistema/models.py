@@ -17,12 +17,18 @@ class Producto(models.Model):
 
     descripcion = models.TextField()
 
-    precio = models.DecimalField(
+    precio_san_mateo = models.DecimalField(
         max_digits=10,
         decimal_places=2,
         null=True,
         blank=True
-        
+    )
+
+    precio_fuera = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True
     )
 
     categoria = models.ForeignKey(
@@ -39,6 +45,9 @@ class Producto(models.Model):
         default=False,
         verbose_name="Producto destacado"
     )
+
+    def __str__(self):
+        return self.nombre
 
 
 class ProductoImagen(models.Model):

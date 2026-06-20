@@ -30,6 +30,9 @@ from django.http import JsonResponse
 
 from django.contrib.admin.views.decorators import staff_member_required
 
+from django.shortcuts import get_object_or_404, render
+
+
 @login_required
 def inicio(request):
 
@@ -743,5 +746,22 @@ def administrar_cotizaciones(request):
         "sistema/administrar_cotizaciones.html",
         {
             "solicitudes": solicitudes
+        }
+    )
+
+
+
+def detalle_cotizacion(request, id):
+
+    solicitud = get_object_or_404(
+        SolicitudCotizacion,
+        id=id
+    )
+
+    return render(
+        request,
+        "admin/solicitudes/detalle_cotizacion.html",
+        {
+            "solicitud": solicitud
         }
     )

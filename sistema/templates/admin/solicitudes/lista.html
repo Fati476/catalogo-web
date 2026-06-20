@@ -369,12 +369,14 @@
 
                             <td>
 
-                                <a href="#"
-                                   class="btn btn-primary btn-sm rounded-3">
+                                <button
+                                    class="btn btn-primary btn-sm rounded-3"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#modalCotizacion{{ solicitud.id }}">
 
                                     <i class="bi bi-eye"></i>
 
-                                </a>
+                                </button>
 
                             </td>
 
@@ -394,6 +396,116 @@
                         </tr>
 
                         {% endfor %}
+
+
+                        <div class="modal fade"
+                             id="modalCotizacion{{ solicitud.id }}"
+                             tabindex="-1">
+
+                            <div class="modal-dialog modal-xl modal-dialog-scrollable">
+
+                                <div class="modal-content">
+
+                                    <div class="modal-header">
+
+                                        <h5 class="modal-title">
+                                            Cotización #{{ solicitud.id }}
+                                        </h5>
+
+                                        <button
+                                            type="button"
+                                            class="btn-close"
+                                            data-bs-dismiss="modal">
+                                        </button>
+
+                                    </div>
+
+                                    <div class="modal-body">
+
+                                        <h6 class="fw-bold mb-3">
+                                            Cliente:
+                                            {{ solicitud.usuario.username }}
+                                        </h6>
+
+                                        <table class="table table-bordered">
+
+                                            <thead>
+
+                                                <tr>
+
+                                                    <th>Producto</th>
+                                                    <th>Cantidad</th>
+                                                    <th>Precio aplicado</th>
+
+                                                </tr>
+
+                                            </thead>
+
+                                            <tbody>
+
+                                                {% for detalle in solicitud.detalles.all %}
+
+                                                <tr>
+
+                                                    <td>
+                                                        {{ detalle.producto.nombre }}
+                                                    </td>
+
+                                                    <td>
+                                                        {{ detalle.cantidad }}
+                                                    </td>
+
+                                                    <td>
+
+                                                        <select class="form-select">
+
+                                                            <option>
+                                                                Precio San Mateo
+                                                                (${{ detalle.producto.precio_san_mateo }})
+                                                            </option>
+
+                                                            <option>
+                                                                Precio Fuera
+                                                                (${{ detalle.producto.precio_fuera }})
+                                                            </option>
+
+                                                        </select>
+
+                                                    </td>
+
+                                                </tr>
+
+                                                {% endfor %}
+
+                                            </tbody>
+
+                                        </table>
+
+                                    </div>
+
+                                    <div class="modal-footer">
+
+                                        <button
+                                            class="btn btn-success">
+
+                                            Generar cotización
+
+                                        </button>
+
+                                        <button
+                                            class="btn btn-danger">
+
+                                            Rechazar
+
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
 
                     </tbody>
 
