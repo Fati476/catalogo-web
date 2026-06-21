@@ -156,12 +156,10 @@
                                 Cotizada
                             </span>
 
-                            
                             <a href="{% url 'descargar_cotizacion_pdf' solicitud.id %}"
-                                class="btn btn-danger btn-sm ms-2">
+                               class="btn btn-danger btn-sm ms-2">
                                 📄 Descargar PDF
                             </a>
-                        {% endif %}
 
                         {% elif solicitud.estado == "rechazada" %}
 
