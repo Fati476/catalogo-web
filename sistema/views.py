@@ -33,6 +33,12 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.shortcuts import get_object_or_404, render
 
 
+from django.http import HttpResponse
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet
+
+
 @login_required
 def inicio(request):
 
@@ -752,18 +758,90 @@ def administrar_cotizaciones(request):
 
 @login_required
 def generar_cotizacion(request, id):
-    solicitud = get_object_or_404(SolicitudCotizacion, id=id)
+    solicitud = get_object_or_404(
+        SolicitudCotizacion,
+        id=id
+    )
 
     if request.method == "POST":
+
+        # Guardar los precios elegidos
         for detalle in solicitud.detalles.all():
-            precio = request.POST.get(f"precio_{detalle.id}")
+
+            precio = request.POST.get(
+                f"precio_{detalle.id}"
+            )
 
             if precio:
                 detalle.precio_aplicado = precio
                 detalle.save()
 
+        # Cambiar estado a cotizada
         solicitud.estado = "cotizada"
         solicitud.save()
 
     return redirect("lista_solicitudes")
+
+
+
+
+
+@login_required
+def descargar_cotizacion_pdf(request, id):
+    solicitud = get_object_or_404(SolicitudCotizacion, id=id)
+
+    response = HttpResponse(content_type="application/pdf")
+    response["Content-Disposition"] = (
+        f'attachment; filename="cotizacion_{solicitud.id}.pdf"'
+    )
+
+    doc = SimpleDocTemplate(response)
+    styles = getSampleStyleSheet()
+
+    elementos = []
+
+    elementos.append(
+        Paragraph(f"<b>Cotización #{solicitud.id}</b>", styles["Title"])
+    )
+
+    elementos.append(
+        Paragraph(
+            f"Cliente: {solicitud.usuario.username}",
+            styles["Normal"]
+        )
+    )
+
+    datos = [["Producto", "Cantidad", "Precio", "Subtotal"]]
+
+    total = 0
+
+    for detalle in solicitud.detalles.all():
+        precio = detalle.precio_aplicado or 0
+        subtotal = precio * detalle.cantidad
+        total += subtotal
+
+        datos.append([
+            detalle.producto.nombre,
+            str(detalle.cantidad),
+            f"${precio:.2f}",
+            f"${subtotal:.2f}",
+        ])
+
+    datos.append(["", "", "TOTAL", f"${total:.2f}"])
+
+    tabla = Table(datos)
+
+    tabla.setStyle(TableStyle([
+        ("GRID", (0, 0), (-1, -1), 1, colors.grey),
+        ("BACKGROUND", (0, 0), (-1, 0), colors.lightgrey),
+        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+        ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+        ("BOTTOMPADDING", (0, 0), (-1, 0), 8),
+    ]))
+
+    elementos.append(tabla)
+
+    doc.build(elementos)
+
+    return response
 

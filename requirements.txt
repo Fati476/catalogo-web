@@ -16,6 +16,7 @@ psycopg2-binary==2.9.12
 pycparser==3.0
 python-dotenv==1.2.2
 python-http-client==3.3.7
+reportlab==5.0.0
 requests==2.34.2
 sendgrid==6.12.5
 six==1.17.0

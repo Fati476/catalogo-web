@@ -207,4 +207,10 @@ urlpatterns = [
         name="generar_cotizacion",
     ),
 
+    path(
+        "panel/solicitudes/pdf/<int:id>/",
+        views.descargar_cotizacion_pdf,
+        name="descargar_cotizacion_pdf",
+    ),
+
 ]
