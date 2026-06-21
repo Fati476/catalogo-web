@@ -403,107 +403,111 @@
         <div class="modal-dialog modal-xl modal-dialog-scrollable">
 
             <div class="modal-content">
+                <form method="POST" action="{% url 'generar_cotizacion' solicitud.id %}">
+                    {% csrf_token %}
+                    <div class="modal-header">
 
-                <div class="modal-header">
+                        <h5 class="modal-title">
+                            Cotización #{{ solicitud.id }}
+                        </h5>
 
-                    <h5 class="modal-title">
-                        Cotización #{{ solicitud.id }}
-                    </h5>
+                        <button
+                            type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal">
+                        </button>
 
-                    <button
-                        type="button"
-                        class="btn-close"
-                        data-bs-dismiss="modal">
-                    </button>
+                    </div>
 
-                </div>
+                    <div class="modal-body">
 
-                <div class="modal-body">
+                        <h6 class="fw-bold mb-3">
+                            Cliente: {{ solicitud.usuario.username }}
+                        </h6>
 
-                    <h6 class="fw-bold mb-3">
-                        Cliente: {{ solicitud.usuario.username }}
-                    </h6>
+                        <table class="table table-bordered align-middle">
 
-                    <table class="table table-bordered align-middle">
+                            <thead>
 
-                        <thead>
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Cantidad</th>
+                                    <th>Precio aplicado</th>
+                                </tr>
 
-                            <tr>
-                                <th>Producto</th>
-                                <th>Cantidad</th>
-                                <th>Precio aplicado</th>
-                            </tr>
+                            </thead>
 
-                        </thead>
+                            <tbody>
 
-                        <tbody>
+                                {% for detalle in solicitud.detalles.all %}
 
-                            {% for detalle in solicitud.detalles.all %}
+                                <tr>
 
-                            <tr>
+                                    <td>
+                                        {{ detalle.producto.nombre }}
+                                    </td>
 
-                                <td>
-                                    {{ detalle.producto.nombre }}
-                                </td>
+                                    <td>
+                                        {{ detalle.cantidad }}
+                                    </td>
 
-                                <td>
-                                    {{ detalle.cantidad }}
-                                </td>
+                                    <td>
 
-                                <td>
+                                        <select
+                                            class="form-select"
+                                            name="precio_{{ detalle.id }}">
 
-                                    <select class="form-select">
+                                                <option value="{{ detalle.producto.precio_san_mateo }}">
+                                                Precio San Mateo (${{ detalle.producto.precio_san_mateo }})
+                                            </option>
 
-                                        <option>
-                                            Precio San Mateo (${{ detalle.producto.precio_san_mateo }})
-                                        </option>
+                                            <option value="{{ detalle.producto.precio_fuera }}">
+                                                Precio Fuera (${{ detalle.producto.precio_fuera }})
+                                            </option>
 
-                                        <option>
-                                            Precio Fuera (${{ detalle.producto.precio_fuera }})
-                                        </option>
+                                        </select>
 
-                                    </select>
+                                    </td>
+                                </tr>
 
-                                </td>
+                                {% empty %}
 
-                            </tr>
+                                <tr>
 
-                            {% empty %}
+                                    <td colspan="3" class="text-center text-muted">
+                                        No hay productos en esta solicitud.
+                                    </td>
 
-                            <tr>
+                                </tr>
 
-                                <td colspan="3" class="text-center text-muted">
-                                    No hay productos en esta solicitud.
-                                </td>
+                                {% endfor %}
 
-                            </tr>
+                            </tbody>
 
-                            {% endfor %}
+                        </table>
 
-                        </tbody>
+                    </div>
 
-                    </table>
+                    <div class="modal-footer">
 
-                </div>
-
-                <div class="modal-footer">
-
-                    <button type="button" class="btn btn-success">
+                        <button type="submit" class="btn btn-success">
                         Generar cotización
-                    </button>
+                        </button>
 
-                    <button type="button" class="btn btn-danger">
-                        Rechazar
-                    </button>
+                        <button type="button" class="btn btn-danger">
+                            Rechazar
+                        </button>
 
-                    <button
-                        type="button"
-                        class="btn btn-secondary"
-                        data-bs-dismiss="modal">
-                        Cerrar
-                    </button>
+                        <button
+                            type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+                            Cerrar
+                        </button>
 
-                </div>
+                    </div>
+
+                </form>
 
             </div>
 

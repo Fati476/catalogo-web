@@ -750,3 +750,20 @@ def administrar_cotizaciones(request):
     )
 
 
+@login_required
+def generar_cotizacion(request, id):
+    solicitud = get_object_or_404(SolicitudCotizacion, id=id)
+
+    if request.method == "POST":
+        for detalle in solicitud.detalles.all():
+            precio = request.POST.get(f"precio_{detalle.id}")
+
+            if precio:
+                detalle.precio_aplicado = precio
+                detalle.save()
+
+        solicitud.estado = "cotizada"
+        solicitud.save()
+
+    return redirect("lista_solicitudes")
+

@@ -201,4 +201,10 @@ urlpatterns = [
         name="administrar_cotizaciones",
     ),
 
+    path(
+        "panel/solicitudes/generar/<int:id>/",
+        views.generar_cotizacion,
+        name="generar_cotizacion",
+    ),
+
 ]
