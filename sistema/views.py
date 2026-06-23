@@ -462,6 +462,9 @@ def lista_solicitudes(request):
         estado="rechazada"
     ).count()
 
+    abrir_modal = request.session.pop("abrir_modal", None)
+
+
     return render(
         request,
         "admin/solicitudes/lista.html",
@@ -470,7 +473,8 @@ def lista_solicitudes(request):
             "pendientes": pendientes,
             "cotizadas": cotizadas,
             "rechazadas": rechazadas,
-        }
+            "abrir_modal": abrir_modal,
+        },
     )
 
 
@@ -759,7 +763,6 @@ def administrar_cotizaciones(request):
         }
     )
 
-
 from decimal import Decimal, InvalidOperation
 
 @login_required
@@ -782,18 +785,24 @@ def generar_cotizacion(request, id):
                     request,
                     f"El producto '{detalle.producto.nombre}' no tiene precio asignado."
                 )
+
+                request.session["abrir_modal"] = solicitud.id
                 return redirect("lista_solicitudes")
 
             try:
                 detalle.precio_aplicado = Decimal(precio)
                 detalle.save()
+
             except InvalidOperation:
                 messages.error(
                     request,
                     f"El precio del producto '{detalle.producto.nombre}' es inválido."
                 )
+
+                request.session["abrir_modal"] = solicitud.id
                 return redirect("lista_solicitudes")
 
+        # Todo salió bien
         solicitud.estado = "cotizada"
         solicitud.save()
 

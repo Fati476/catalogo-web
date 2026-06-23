@@ -421,6 +421,16 @@
 
                     <div class="modal-body">
 
+                        {% if request.session.abrir_modal == solicitud.id %}
+                            {% if messages %}
+                                {% for message in messages %}
+                                    <div class="alert alert-danger">
+                                        {{ message }}
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        {% endif %}
+
                         <h6 class="fw-bold mb-3">
                             Cliente: {{ solicitud.usuario.username }}
                         </h6>
@@ -453,17 +463,25 @@
 
                                     <td>
 
-                                        <select
-                                            class="form-select"
-                                            name="precio_{{ detalle.id }}">
+                                        <select class="form-select" name="precio_{{ detalle.id }}">
 
+                                            {% if detalle.producto.precio_san_mateo %}
                                                 <option value="{{ detalle.producto.precio_san_mateo }}">
-                                                Precio San Mateo (${{ detalle.producto.precio_san_mateo }})
-                                            </option>
+                                                    Precio San Mateo (${{ detalle.producto.precio_san_mateo }})
+                                                </option>
+                                            {% endif %}
 
-                                            <option value="{{ detalle.producto.precio_fuera }}">
-                                                Precio Fuera (${{ detalle.producto.precio_fuera }})
-                                            </option>
+                                            {% if detalle.producto.precio_fuera %}
+                                                <option value="{{ detalle.producto.precio_fuera }}">
+                                                    Precio Fuera (${{ detalle.producto.precio_fuera }})
+                                                </option>
+                                            {% endif %}
+
+                                            {% if not detalle.producto.precio_san_mateo and not detalle.producto.precio_fuera %}
+                                                <option value="" selected disabled>
+                                                    ⚠️ Este producto no tiene precios configurados
+                                                </option>
+                                            {% endif %}
 
                                         </select>
 
@@ -519,21 +537,7 @@
 
 </div>
 
-{% if messages %}
 
-    {% for message in messages %}
-
-        <div class="alert alert-success shadow-sm rounded-4 border-0 mb-4">
-
-            <i class="bi bi-check-circle-fill"></i>
-
-            {{ message }}
-
-        </div>
-
-    {% endfor %}
-
-{% endif %}
 
 
 
@@ -571,7 +575,24 @@ buscador.addEventListener('keyup', function(){
 
 </script>
 
+{% if abrir_modal %}
 
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    var modal = document.getElementById(
+        "modalCotizacion{{ abrir_modal }}"
+    );
+
+    if (modal) {
+        var bsModal = new bootstrap.Modal(modal);
+        bsModal.show();
+    }
+
+});
+</script>
+
+{% endif %}
 
 </body>
 
