@@ -760,8 +760,7 @@ def administrar_cotizaciones(request):
     )
 
 
-from decimal import Decimal
-from django.contrib import messages
+from decimal import Decimal, InvalidOperation
 
 @login_required
 def generar_cotizacion(request, id):
@@ -777,16 +776,23 @@ def generar_cotizacion(request, id):
 
             precio = request.POST.get(f"precio_{detalle.id}")
 
-            # Si no se capturó precio o viene vacío
-            if precio is None or precio.strip() == "":
+            # Si no se capturó un precio
+            if not precio or precio.strip() == "":
                 messages.error(
                     request,
-                    f"El producto '{detalle.producto.nombre}' no tiene un precio asignado. Asigna un precio antes de generar la cotización."
+                    f"El producto '{detalle.producto.nombre}' no tiene precio asignado."
                 )
                 return redirect("lista_solicitudes")
 
-            detalle.precio_aplicado = Decimal(precio)
-            detalle.save()
+            try:
+                detalle.precio_aplicado = Decimal(precio)
+                detalle.save()
+            except InvalidOperation:
+                messages.error(
+                    request,
+                    f"El precio del producto '{detalle.producto.nombre}' es inválido."
+                )
+                return redirect("lista_solicitudes")
 
         solicitud.estado = "cotizada"
         solicitud.save()
