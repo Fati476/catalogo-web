@@ -773,25 +773,21 @@ def generar_cotizacion(request, id):
 
     if request.method == "POST":
 
-        # Guardar los precios elegidos
         for detalle in solicitud.detalles.all():
 
-            precio = request.POST.get(
-                f"precio_{detalle.id}"
-            )
+            precio = request.POST.get(f"precio_{detalle.id}")
 
-            # Validar que se haya capturado un precio
-            if not precio:
+            # Si no se capturó precio o viene vacío
+            if precio is None or precio.strip() == "":
                 messages.error(
                     request,
-                    f"Debes capturar el precio para el producto '{detalle.producto.nombre}'."
+                    f"El producto '{detalle.producto.nombre}' no tiene un precio asignado. Asigna un precio antes de generar la cotización."
                 )
                 return redirect("lista_solicitudes")
 
             detalle.precio_aplicado = Decimal(precio)
             detalle.save()
 
-        # Cambiar estado a cotizada
         solicitud.estado = "cotizada"
         solicitud.save()
 
