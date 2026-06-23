@@ -765,6 +765,8 @@ def administrar_cotizaciones(request):
 
 from decimal import Decimal, InvalidOperation
 
+from .email_utils import enviar_correo_prueba
+
 @login_required
 def generar_cotizacion(request, id):
 
@@ -805,6 +807,18 @@ def generar_cotizacion(request, id):
         # Todo salió bien
         solicitud.estado = "cotizada"
         solicitud.save()
+        try:
+            enviar_correo_prueba(solicitud.usuario.email)
+            messages.success(
+                request,
+                "La cotización fue generada y el correo fue enviado correctamente."
+            )
+        except Exception as e:
+            print("Error enviando correo:", e)
+            messages.warning(
+                request,
+                "La cotización se generó, pero ocurrió un problema al enviar el correo."
+            )
 
         messages.success(
             request,
