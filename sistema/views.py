@@ -760,8 +760,12 @@ def administrar_cotizaciones(request):
     )
 
 
+from decimal import Decimal
+from django.contrib import messages
+
 @login_required
 def generar_cotizacion(request, id):
+
     solicitud = get_object_or_404(
         SolicitudCotizacion,
         id=id
@@ -776,16 +780,27 @@ def generar_cotizacion(request, id):
                 f"precio_{detalle.id}"
             )
 
-            if precio:
-                detalle.precio_aplicado = precio
-                detalle.save()
+            # Validar que se haya capturado un precio
+            if not precio:
+                messages.error(
+                    request,
+                    f"Debes capturar el precio para el producto '{detalle.producto.nombre}'."
+                )
+                return redirect("lista_solicitudes")
+
+            detalle.precio_aplicado = Decimal(precio)
+            detalle.save()
 
         # Cambiar estado a cotizada
         solicitud.estado = "cotizada"
         solicitud.save()
 
-    return redirect("lista_solicitudes")
+        messages.success(
+            request,
+            "La cotización fue generada correctamente."
+        )
 
+    return redirect("lista_solicitudes")
 
 
 
