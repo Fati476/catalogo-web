@@ -34,10 +34,14 @@ from django.shortcuts import get_object_or_404, render
 
 
 from django.http import HttpResponse
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet
-
+from reportlab.lib.enums import TA_CENTER
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from django.conf import settings
+import os
 
 @login_required
 def inicio(request):
@@ -785,63 +789,271 @@ def generar_cotizacion(request, id):
 
 
 
-
 @login_required
 def descargar_cotizacion_pdf(request, id):
-    solicitud = get_object_or_404(SolicitudCotizacion, id=id)
+
+    solicitud = get_object_or_404(
+        SolicitudCotizacion,
+        id=id
+    )
 
     response = HttpResponse(content_type="application/pdf")
     response["Content-Disposition"] = (
         f'attachment; filename="cotizacion_{solicitud.id}.pdf"'
     )
 
-    doc = SimpleDocTemplate(response)
-    styles = getSampleStyleSheet()
+    pdf = canvas.Canvas(response, pagesize=letter)
 
-    elementos = []
+    width, height = letter
 
-    elementos.append(
-        Paragraph(f"<b>Cotización #{solicitud.id}</b>", styles["Title"])
+    # ==========================
+    # LOGO
+    # ==========================
+
+    logo_path = os.path.join(
+        settings.BASE_DIR,
+        "static",
+        "img",
+        "logo_cooperativa.png"
     )
 
-    elementos.append(
-        Paragraph(
-            f"Cliente: {solicitud.usuario.username}",
-            styles["Normal"]
+    if os.path.exists(logo_path):
+        pdf.drawImage(
+            logo_path,
+            30,
+            height - 100,
+            width=90,
+            height=90,
+            mask="auto",
+            preserveAspectRatio=True
         )
+
+    # ==========================
+    # ENCABEZADO
+    # ==========================
+
+    pdf.setFont("Helvetica-Bold", 17)
+
+    pdf.drawCentredString(
+        width / 2 + 40,
+        height - 45,
+        "Comercializadora Cooperativa de Sustancias Químicas"
     )
 
-    datos = [["Producto", "Cantidad", "Precio", "Subtotal"]]
+    pdf.drawCentredString(
+        width / 2 + 40,
+        height - 65,
+        "para uso del Artesano Pirotécnico, S.A. de C.V."
+    )
+
+    pdf.setFont("Helvetica", 10)
+
+    pdf.drawCentredString(
+        width / 2 + 40,
+        height - 82,
+        "Venta de Sustancias Químicas para la Pirotecnia,"
+    )
+
+    pdf.drawCentredString(
+        width / 2 + 40,
+        height - 95,
+        "Venta de Artificios Pirotécnicos y Transporte Especializado"
+    )
+
+    # línea roja
+    pdf.setStrokeColorRGB(0.75, 0, 0)
+    pdf.setLineWidth(2)
+
+    pdf.line(
+        30,
+        height - 105,
+        width - 30,
+        height - 105
+    )
+
+    # ==========================
+    # TITULO
+    # ==========================
+
+    pdf.setFillColorRGB(0, 0, 0)
+
+    pdf.setFont("Helvetica-Bold", 18)
+
+    pdf.drawCentredString(
+        width / 2,
+        height - 145,
+        "COTIZACIÓN"
+    )
+
+    pdf.setFont("Helvetica", 11)
+
+    pdf.drawString(
+        40,
+        height - 175,
+        f"No. {solicitud.id}"
+    )
+
+    pdf.drawString(
+        40,
+        height - 195,
+        f"Cliente: {solicitud.usuario.username}"
+    )
+
+    pdf.drawString(
+        40,
+        height - 215,
+        f"Fecha: {solicitud.fecha.strftime('%d/%m/%Y')}"
+    )
+
+    # ==========================
+    # TABLA
+    # ==========================
+
+    y = height - 255
+
+    pdf.setFillColorRGB(0.90, 0.90, 0.90)
+
+    pdf.rect(
+        35,
+        y,
+        540,
+        22,
+        fill=1
+    )
+
+    pdf.setFillColorRGB(0, 0, 0)
+
+    pdf.setFont("Helvetica-Bold", 10)
+
+    pdf.drawString(45, y + 7, "Producto")
+    pdf.drawString(315, y + 7, "Cantidad")
+    pdf.drawString(395, y + 7, "Precio")
+    pdf.drawString(485, y + 7, "Subtotal")
+
+    y -= 20
 
     total = 0
 
+    pdf.setFont("Helvetica", 10)
+
     for detalle in solicitud.detalles.all():
-        precio = detalle.precio_aplicado or 0
+
+        precio = float(detalle.precio_aplicado or 0)
+
         subtotal = precio * detalle.cantidad
+
         total += subtotal
 
-        datos.append([
-            detalle.producto.nombre,
-            str(detalle.cantidad),
-            f"${precio:.2f}",
-            f"${subtotal:.2f}",
-        ])
+        pdf.drawString(
+            45,
+            y,
+            detalle.producto.nombre[:45]
+        )
 
-    datos.append(["", "", "TOTAL", f"${total:.2f}"])
+        pdf.drawString(
+            330,
+            y,
+            str(detalle.cantidad)
+        )
 
-    tabla = Table(datos)
+        pdf.drawString(
+            395,
+            y,
+            f"${precio:,.2f}"
+        )
 
-    tabla.setStyle(TableStyle([
-        ("GRID", (0, 0), (-1, -1), 1, colors.grey),
-        ("BACKGROUND", (0, 0), (-1, 0), colors.lightgrey),
-        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-        ("ALIGN", (0, 0), (-1, -1), "CENTER"),
-        ("BOTTOMPADDING", (0, 0), (-1, 0), 8),
-    ]))
+        pdf.drawString(
+            485,
+            y,
+            f"${subtotal:,.2f}"
+        )
 
-    elementos.append(tabla)
+        y -= 18
 
-    doc.build(elementos)
+    # ==========================
+    # TOTAL
+    # ==========================
+
+    y -= 20
+
+    pdf.setFont("Helvetica-Bold", 14)
+
+    pdf.drawRightString(
+        560,
+        y,
+        f"TOTAL: ${total:,.2f}"
+    )
+
+    # ==========================
+    # OBSERVACIONES
+    # ==========================
+
+    y -= 45
+
+    pdf.setFont("Helvetica", 10)
+
+    pdf.drawString(
+        40,
+        y,
+        "• Cotización válida por 15 días naturales."
+    )
+
+    y -= 18
+
+    pdf.drawString(
+        40,
+        y,
+        "• Precios sujetos a cambios sin previo aviso."
+    )
+
+    y -= 18
+
+    pdf.drawString(
+        40,
+        y,
+        "• Gracias por confiar en Cooperativa Pirotécnica."
+    )
+
+    # ==========================
+    # PIE
+    # ==========================
+
+    pdf.setStrokeColorRGB(0.75, 0, 0)
+
+    pdf.line(
+        30,
+        65,
+        width - 30,
+        65
+    )
+
+    pdf.setFont("Helvetica", 8)
+
+    pdf.drawString(
+        30,
+        48,
+        "San Mateo Tlalchichilpan, Almoloya de Juárez, Edo. de México"
+    )
+
+    pdf.drawString(
+        30,
+        34,
+        "C.P. 50900"
+    )
+
+    pdf.drawRightString(
+        width - 30,
+        48,
+        "Tel. 725 136 07 31"
+    )
+
+    pdf.drawRightString(
+        width - 30,
+        34,
+        "comer_coop_2013@live.com.mx"
+    )
+
+    pdf.save()
 
     return response
 
