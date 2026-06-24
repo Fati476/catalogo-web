@@ -515,8 +515,8 @@
                         <a
                             href="{% url 'rechazar_cotizacion' solicitud.id %}"
                             class="btn btn-danger"
-                            onclick="return confirm('¿Seguro que deseas rechazar esta solicitud?');"
-                        >                        
+                            onclick="confirmarRechazo(event, this.href)"
+                        >
                             Rechazar
                         </a>
 
@@ -597,6 +597,35 @@ document.addEventListener("DOMContentLoaded", function () {
 </script>
 
 {% endif %}
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+function confirmarRechazo(event, url) {
+
+    event.preventDefault();
+
+    Swal.fire({
+        title: "¿Estás seguro?",
+        html: `
+            <p>Esta acción marcará la solicitud como <b>rechazada</b>.</p>
+            <p>Además, se enviará una notificación al cliente.</p>
+        `,
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Rechazar solicitud",
+        cancelButtonText: "Volver",
+        confirmButtonColor: "#d33"
+    }).then((result) => {
+
+        if (result.isConfirmed) {
+            window.location.href = url;
+        }
+
+    });
+
+}
+</script>
 
 </body>
 
