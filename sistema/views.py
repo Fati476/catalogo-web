@@ -765,7 +765,7 @@ def administrar_cotizaciones(request):
 
 from decimal import Decimal, InvalidOperation
 
-from .email_utils import enviar_cotizacion
+from .email_utils import enviar_cotizacion, enviar_correo_rechazo
 
 @login_required
 def generar_cotizacion(request, id):
@@ -831,6 +831,42 @@ def generar_cotizacion(request, id):
             )
 
         return redirect("lista_solicitudes")
+    
+
+
+@login_required
+def rechazar_cotizacion(request, id):
+
+    solicitud = get_object_or_404(
+        SolicitudCotizacion,
+        id=id
+    )
+
+    solicitud.estado = "rechazada"
+    solicitud.save()
+
+    try:
+        enviar_correo_rechazo(
+            solicitud.usuario.email,
+            solicitud.id
+        )
+
+        messages.success(
+            request,
+            "La solicitud fue rechazada y el cliente fue notificado por correo."
+        )
+
+    except Exception as e:
+
+        print("Error enviando correo:", e)
+
+        messages.warning(
+            request,
+            "La solicitud fue rechazada, pero no se pudo enviar el correo."
+        )
+
+    return redirect("lista_solicitudes")
+
 
 
 

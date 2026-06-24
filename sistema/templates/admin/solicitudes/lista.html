@@ -512,9 +512,13 @@
                         Generar cotización
                         </button>
 
-                        <button type="button" class="btn btn-danger">
+                        <a
+                            href="{% url 'rechazar_cotizacion' solicitud.id %}"
+                            class="btn btn-danger"
+                            onclick="return confirm('¿Seguro que deseas rechazar esta solicitud?');"
+                        >                        
                             Rechazar
-                        </button>
+                        </a>
 
                         <button
                             type="button"

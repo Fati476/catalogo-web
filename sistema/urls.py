@@ -213,4 +213,10 @@ urlpatterns = [
         name="descargar_cotizacion_pdf",
     ),
 
+    path(
+        "cotizaciones/rechazar/<int:id>/",
+        views.rechazar_cotizacion,
+        name="rechazar_cotizacion",
+    ),
+
 ]
