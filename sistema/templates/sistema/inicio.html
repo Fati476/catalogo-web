@@ -11,23 +11,42 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <style>
-    .hero{
-        min-height:90vh;
+    .hero-video{
+        position:relative;
+        height:100vh;
+        overflow:hidden;
+        border-radius:25px;
+    }
 
-        background:
-        linear-gradient(
-            rgba(0,0,0,.55),
-            rgba(0,0,0,.65)
-        ),
-        url("/static/img/banner_inicio.jpg");
+    .hero-video video{
+        position:absolute;
+        top:0;
+        left:0;
+        width:100%;
+        height:100%;
+        object-fit:cover;
+    }
 
-        background-size:cover;
-        background-position:center;
+    .overlay{
+        position:absolute;
+        top:0;
+        left:0;
+        width:100%;
+        height:100%;
+        background:rgba(0,0,0,.55);
+    }
 
+    .hero-content{
+        position:relative;
+        z-index:2;
+        height:100%;
         display:flex;
+        flex-direction:column;
+        justify-content:center;
         align-items:center;
-
-        border-radius:30px;
+        text-align:center;
+        color:white;
+        padding:20px;
     }
 
     .product-card{
@@ -95,7 +114,31 @@
     section{
         margin-bottom:20px;
     }
+
+    .hero-content h1{
+        animation: fadeUp 1.2s ease;
+    }
+
+    .hero-content p{
+        animation: fadeUp 1.8s ease;
+    }
+
+    @keyframes fadeUp{
+
+        from{
+            opacity:0;
+            transform:translateY(40px);
+        }
+
+        to{
+            opacity:1;
+            transform:translateY(0);
+        }
+
+    }
     </style>
+
+    
     
 
     
@@ -204,41 +247,41 @@
     </nav>
 
     
-    <section class="hero">
+    <section class="hero-video">
 
-        <div class="container text-center text-white">
+        <video autoplay muted loop playsinline>
+            <source src="{% static 'videos/video.mp4' %}" type="video/mp4">
+        </video>
 
-            <span class="badge bg-warning text-dark fs-6 mb-4">
+        <div class="overlay"></div>
+
+        <div class="hero-content">
+
+            <span class="badge bg-warning text-dark mb-3">
                 🔥 Cooperativa Pirotécnica
             </span>
 
-            <h1 class="display-1 fw-bold">
-                Calidad, Seguridad
+            <h1 class="display-2 fw-bold">
+                Calidad y Confianza
                 <br>
-                    e Innovación
+                para la Industria Pirotécnica
             </h1>
 
-            <p class="lead col-lg-8 mx-auto mt-4">
-
-                Soluciones especializadas para la industria
-                pirotécnica y gestión de cotizaciones.
-
+            <p class="lead mt-3">
+                Soluciones especializadas, cotizaciones rápidas
+                y atención personalizada.
             </p>
 
             <div class="mt-4">
 
                 <a href="{% url 'todos_productos' %}"
-                   class="btn btn-warning btn-lg rounded-pill px-5">
-
+                   class="btn btn-warning btn-lg rounded-pill me-2">
                     Ver Catálogo
-
                 </a>
 
                 <a href="{% url 'solicitudes' %}"
-                   class="btn btn-outline-light btn-lg rounded-pill px-5">
-
+                   class="btn btn-outline-light btn-lg rounded-pill">
                     Solicitar Cotización
-
                 </a>
 
             </div>
