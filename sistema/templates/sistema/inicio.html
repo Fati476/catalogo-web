@@ -46,6 +46,34 @@
         transform:translateY(-4px);
         box-shadow:0 12px 25px rgba(0,0,0,.12);
     }
+
+    .card{
+        transition: all .3s ease;
+    }
+
+    .card:hover{
+        transform: translateY(-8px);
+        box-shadow: 0 18px 35px rgba(0,0,0,.18) !important;
+    }
+
+    .product-card{
+        border-radius:20px;
+        overflow:hidden;
+        transition:all .35s;
+    }
+
+    .product-card:hover{
+        transform:translateY(-10px);
+        box-shadow:0 18px 35px rgba(0,0,0,.18);
+    }
+
+    .product-card img{
+        transition:.4s;
+    }
+
+    .product-card:hover img{
+        transform:scale(1.05);
+    }
     </style>
 
     
@@ -61,8 +89,8 @@
 
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top"
         style="
-           background: rgba(20,20,20,.35);
-           backdrop-filter: blur(12px);
+           background: linear-gradient(90deg,#2b0000,#4d0a0a);
+           box-shadow: 0 3px 15px rgba(0,0,0,.3);
         ">
         <div class="container-fluid px-3">
 
@@ -158,15 +186,19 @@
 
         <div class="container text-white">
 
-            <h1 class="display-3 fw-bold">
-                Cooperativa
+            <span class="badge bg-warning text-dark mb-3 fs-6">
+                🔥 Empresa especializada en el sector pirotécnico
+            </span>
+
+            <h1 class="display-2 fw-bold">
+                Calidad y confianza
                 <br>
-                Pirotécnica
+                para la industria pirotécnica
             </h1>
 
-            <p class="lead col-lg-6 mt-3">
-                Comercialización de sustancias químicas y productos
-                especializados para el sector pirotécnico.
+            <p class="lead col-lg-7 mt-4">
+                Descubre nuestro catálogo de productos especializados y solicita
+                cotizaciones personalizadas de forma rápida y sencilla.
             </p>
 
             <div class="mt-4">
@@ -295,51 +327,59 @@
 
             {% endfor %}
 
-            <section class="py-5">
-
-                <h2 class="fw-bold text-center mb-5">
-                    ¿Por qué elegir Cooperativa Pirotécnica?
-                </h2>
-
-                <div class="row text-center">
-
-                    <div class="col-md-3">
-                        <h1>⚡</h1>
-                        <h5>Respuesta rápida</h5>
-                    </div>
-
-                    <div class="col-md-3">
-                        <h1>🧪</h1>
-                        <h5>Productos especializados</h5>
-                    </div>
-
-                    <div class="col-md-3">
-                        <h1>📄</h1>
-                        <h5>Cotizaciones en PDF</h5>
-                    </div>
-
-                    <div class="col-md-3">
-                        <h1>🤝</h1>
-                        <h5>Atención personalizada</h5>
-                    </div>
-
-                </div>
-
-            </section>
+            
 
         </div>
 
     </div>
 
+    <section class="py-5">
+
+        <h2 class="fw-bold text-center mb-5">
+            ¿Por qué elegir Cooperativa Pirotécnica?
+        </h2>
+
+        <div class="row text-center">
+
+            <div class="col-md-3">
+                <h1>⚡</h1>
+                <h5>Respuesta rápida</h5>
+            </div>
+
+            <div class="col-md-3">
+                <h1>🧪</h1>
+                <h5>Productos especializados</h5>
+            </div>
+
+            <div class="col-md-3">
+                <h1>📄</h1>
+                <h5>Cotizaciones en PDF</h5>
+            </div>
+
+            <div class="col-md-3">
+                <h1>🤝</h1>
+                <h5>Atención personalizada</h5>
+            </div>
+
+        </di    
+    </section>
+
     <!-- PRODUCTOS -->
 
     <div class="mb-5">
 
-        <div class="d-flex justify-content-between mb-3">
-            <h2 class="fw-bold mb-0 text-center w-100">
+        <div class="text-center mb-4">
+            <h2 class="fw-bold">
                 Productos destacados
             </h2>
-            <a href="{% url 'todos_productos' %}" class="text-decoration-none">Ver todos</a>
+
+            <p class="text-muted">
+                Descubre algunos de los productos disponibles en nuestro catálogo.
+            </p>
+
+            <a href="{% url 'todos_productos' %}" class="btn btn-outline-dark rounded-pill">
+                Ver catálogo completo
+            </a>
         </div>
 
         <div class="row g-3">
@@ -471,6 +511,24 @@
 </div>
 
 <!-- MENU INFERIOR -->
+
+<section class="my-5 p-5 rounded-4 text-center text-white"
+         style="background:linear-gradient(90deg,#2b0000,#5c1010);">
+
+    <h2 class="fw-bold">
+        ¿Listo para solicitar una cotización?
+    </h2>
+
+    <p class="mt-3">
+        Agrega productos a tu solicitud y recibe una cotización personalizada.
+    </p>
+
+    <a href="{% url 'solicitudes' %}"
+       class="btn btn-warning btn-lg rounded-pill mt-2">
+        Solicitar ahora
+    </a>
+
+</section>
 
 <footer class="mt-5 py-5 text-center text-white"
         style="background:#2b0000;">
