@@ -52,18 +52,21 @@
 </head>
 
 
-<body style="background:#F5F7FB; padding-top:75px;">
+<body style="background:#fffdf8; padding-top:75px;">
 
 <div class="container-fluid px-3">
      
 
     <!-- HEADER -->
 
-    <nav class="navbar navbar-expand-lg navbar-dark"
-        style="background:#2b0000;">
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top"
+        style="
+           background: rgba(20,20,20,.35);
+           backdrop-filter: blur(12px);
+        ">
         <div class="container-fluid px-3">
 
-            <a class="navbar-brand fw-bold d-flex align-items-center">
+            <a class="navbar-brand fw-bold d-flex align-items-center" href="{% url 'inicio' %}">
                 <img src="{% static 'img/logo_cooperativa.png' %}"
                      height="45"
                      class="me-2">
@@ -187,6 +190,40 @@
         </div>
 
     </section>
+
+    <div class="row text-center my-5">
+
+        <div class="col-md-4">
+            <div class="card border-0 shadow rounded-4 p-4 h-100">
+                <i class="bi bi-shield-check text-warning fs-1"></i>
+                <h5 class="mt-3">Productos certificados</h5>
+                <p class="text-muted">
+                    Sustancias químicas y materiales de calidad para el sector pirotécnico.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-0 shadow rounded-4 p-4 h-100">
+                <i class="bi bi-truck text-warning fs-1"></i>
+                <h5 class="mt-3">Cobertura nacional</h5>
+                <p class="text-muted">
+                    Atención y distribución para clientes en distintas regiones.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-0 shadow rounded-4 p-4 h-100">
+                <i class="bi bi-file-earmark-text text-warning fs-1"></i>
+                <h5 class="mt-3">Cotizaciones rápidas</h5>
+                <p class="text-muted">
+                    Solicita productos y recibe una cotización personalizada en PDF.
+                </p>
+            </div>
+        </div>
+
+    </div>
     <div class="mb-4">
 
         <div class="input-group shadow-sm rounded-pill overflow-hidden">
@@ -232,13 +269,20 @@
                 <a href="{% url 'productos_categoria' categoria.id %}"
                    class="text-decoration-none">
 
-                    <div class="card border-0 shadow-sm rounded-4 text-center p-4 h-100">
+                    <div class="card border-0 shadow rounded-4 text-center p-5 h-100">
 
-                        <div style="font-size:45px">
+                        <div class="rounded-circle bg-warning-subtle mx-auto mb-3"
+                             style="width:80px;height:80px;
+                                    display:flex;
+                                    align-items:center;
+                                    justify-content:center;
+                                    font-size:40px;">
+
                             🎆
+
                         </div>
 
-                        <h5 class="mt-3 fw-bold">
+                        <h5 class="fw-bold">
                             {{ categoria.nombre }}
                         </h5>
 
@@ -246,9 +290,42 @@
 
                 </a>
 
+
             </div>
 
             {% endfor %}
+
+            <section class="py-5">
+
+                <h2 class="fw-bold text-center mb-5">
+                    ¿Por qué elegir Cooperativa Pirotécnica?
+                </h2>
+
+                <div class="row text-center">
+
+                    <div class="col-md-3">
+                        <h1>⚡</h1>
+                        <h5>Respuesta rápida</h5>
+                    </div>
+
+                    <div class="col-md-3">
+                        <h1>🧪</h1>
+                        <h5>Productos especializados</h5>
+                    </div>
+
+                    <div class="col-md-3">
+                        <h1>📄</h1>
+                        <h5>Cotizaciones en PDF</h5>
+                    </div>
+
+                    <div class="col-md-3">
+                        <h1>🤝</h1>
+                        <h5>Atención personalizada</h5>
+                    </div>
+
+                </div>
+
+            </section>
 
         </div>
 
@@ -259,7 +336,9 @@
     <div class="mb-5">
 
         <div class="d-flex justify-content-between mb-3">
-            <h5 class="fw-bold mb-0">Productos destacados</h5>
+            <h2 class="fw-bold mb-0 text-center w-100">
+                Productos destacados
+            </h2>
             <a href="{% url 'todos_productos' %}" class="text-decoration-none">Ver todos</a>
         </div>
 
@@ -393,7 +472,22 @@
 
 <!-- MENU INFERIOR -->
 
+<footer class="mt-5 py-5 text-center text-white"
+        style="background:#2b0000;">
 
+    <h4 class="fw-bold">
+        Cooperativa Pirotécnica
+    </h4>
+
+    <p class="mb-0">
+        Precio, calidad y servicio.
+    </p>
+
+    <small class="text-light">
+        © 2025 Todos los derechos reservados.
+    </small>
+
+</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
