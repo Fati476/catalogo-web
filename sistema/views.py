@@ -765,7 +765,7 @@ def administrar_cotizaciones(request):
 
 from decimal import Decimal, InvalidOperation
 
-from .email_utils import enviar_correo_prueba
+from .email_utils import enviar_cotizacion
 
 @login_required
 def generar_cotizacion(request, id):
@@ -803,29 +803,34 @@ def generar_cotizacion(request, id):
 
                 request.session["abrir_modal"] = solicitud.id
                 return redirect("lista_solicitudes")
-
         # Todo salió bien
         solicitud.estado = "cotizada"
         solicitud.save()
+
         try:
-            enviar_correo_prueba(solicitud.usuario.email)
+            pdf_response = descargar_cotizacion_pdf(request, solicitud.id)
+            pdf_bytes = pdf_response.content
+
+            enviar_cotizacion(
+                solicitud.usuario.email,
+                pdf_bytes,
+                solicitud.id,
+            )
+
             messages.success(
                 request,
-                "La cotización fue generada y el correo fue enviado correctamente."
+                "La cotización fue generada y enviada correctamente al cliente."
             )
+
         except Exception as e:
             print("Error enviando correo:", e)
+
             messages.warning(
                 request,
-                "La cotización se generó, pero ocurrió un problema al enviar el correo."
+                "La cotización se generó correctamente, pero ocurrió un problema al enviar el correo."
             )
 
-        messages.success(
-            request,
-            "La cotización fue generada correctamente."
-        )
-
-    return redirect("lista_solicitudes")
+        return redirect("lista_solicitudes")
 
 
 
