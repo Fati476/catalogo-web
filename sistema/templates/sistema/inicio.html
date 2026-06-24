@@ -15,7 +15,6 @@
         position:relative;
         height:100vh;
         overflow:hidden;
-        border-radius:25px;
     }
 
     .hero-video video{
@@ -135,6 +134,37 @@
             transform:translateY(0);
         }
 
+    }
+
+    .hero-video::after{
+        content:"";
+        position:absolute;
+        bottom:-1px;
+        left:0;
+
+        width:100%;
+        height:120px;
+
+        background:#fffdf8;
+
+        border-radius:100% 100% 0 0;
+
+        z-index:3;
+    }
+
+    .hero-wave{
+        position:absolute;
+        bottom:0;
+        left:0;
+        width:100%;
+        line-height:0;
+        z-index:5;
+    }
+
+    .hero-wave svg{
+        display:block;
+        width:100%;
+        height:120px;
     }
     </style>
 
@@ -283,6 +313,14 @@
 
             </div>
 
+        </div>
+
+        <div class="hero-wave">
+            <svg viewBox="0 0 1440 150" preserveAspectRatio="none">
+                <path fill="#fffdf8"
+                      d="M0,96L80,106.7C160,117,320,139,480,138.7C640,139,800,117,960,101.3C1120,85,1280,75,1360,69.3L1440,64L1440,160L1360,160C1280,160,1120,160,960,160C800,160,640,160,480,160C320,160,160,160,80,160L0,160Z">
+                </path>
+            </svg>
         </div>
 
     </section>
