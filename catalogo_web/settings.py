@@ -112,7 +112,7 @@ DATABASES = {
 SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY")
 print("API KEY:", SENDGRID_API_KEY)
 
-DEFAULT_FROM_EMAIL = "fm2290759@gmail.com" 
+DEFAULT_FROM_EMAIL = "catalogowebempresa@gmail.com" 
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
