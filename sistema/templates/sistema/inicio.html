@@ -278,11 +278,17 @@
 
     <div class="mb-4">
 
-        <div class="d-flex justify-content-between mb-2">
-            <h2 class="fw-bold text-center mb-5">
-                Categorias 
+        <div class="position-relative mb-4">
+
+            <h2 class="fw-bold text-center m-0">
+                Categorías
             </h2>
-            <a href="{% url 'todas_categorias' %}" class="text-decoration-none">Ver todas</a>
+
+            <a href="{% url 'todas_categorias' %}"
+               class="position-absolute top-50 end-0 translate-middle-y text-decoration-none">
+                Ver todas
+            </a>
+
         </div>
 
         <div class="row g-2">
@@ -333,7 +339,7 @@
         <div class="text-center mb-5">
             
 
-            <h2 class="fw-bold text-center mb-5">
+            <h2 class="fw-bold text-center mt-5 mb-5">
                 Productos
             </h2>
 
