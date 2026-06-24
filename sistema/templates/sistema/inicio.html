@@ -166,6 +166,79 @@
         width:100%;
         height:120px;
     }
+    .middle-section {
+        padding: 120px 0;
+        background: transparent; /* Sin fondo nuevo */
+    }
+
+/* Animación general de entrada */
+    .middle-content {
+        max-width: 900px;
+        margin: auto;
+        text-align: center;
+        opacity: 0;
+        animation: fadeUpContent 1.2s ease forwards;
+    }
+
+/* Título con animación explosiva */
+    .middle-content h2 {
+        font-size: 3.2rem;
+        font-weight: 800;
+        margin-bottom: 25px;
+        opacity: 0;
+        animation: titlePop 1s ease forwards 0.3s;
+    }
+
+    @keyframes titlePop {
+        0% {
+            opacity: 0;
+            transform: translateY(40px) scale(0.8);
+        }
+        60% {
+            transform: translateY(-10px) scale(1.05);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+/* Párrafo con fade suave */
+    .middle-content p {
+        font-size: 1.25rem;
+        color: #666;
+        margin-bottom: 35px;
+        opacity: 0;
+        animation: fadeUpText 1s ease forwards 0.7s;
+    }
+
+    @keyframes fadeUpText {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+/* Botón con efecto "explosivo" al aparecer y hover */
+    .middle-content a {
+        opacity: 0;
+        animation: fadeUpText 1s ease forwards 1.1s;
+        display: inline-block;
+        transition: all 0.4s ease;
+    }
+
+    .middle-content a:hover {
+        transform: scale(1.08) translateY(-4px);
+        box-shadow: 0 10px 25px rgba(255, 140, 0, 0.4);
+    }
+
+/* Animación base de subida */
+    @keyframes fadeUpContent {
+        to {
+            opacity: 1;
+    }
+    }
+
     </style>
 
     
@@ -327,6 +400,27 @@
             </svg>
         </div>
 
+    </section>
+
+    <!-- MIDDLE SECTION -->
+    <section class="middle-section">
+        <div class="middle-bg-overlay"></div>
+    
+        <div class="container">
+            <div class="middle-content">
+                <h2>Nuestra Misión</h2>
+            
+                <p>
+                    Brindar soluciones especializadas para la industria pirotécnica mediante 
+                    productos de calidad, atención personalizada y procesos eficientes.
+                </p>
+
+                <a href="{% url 'todos_productos' %}" 
+                   class="btn btn-warning btn-lg rounded-pill pulse-btn">
+                    Explorar Catálogo
+                </a>
+            </div>
+        </div>
     </section>
 
 
