@@ -136,15 +136,25 @@
 
     }
 
-    .hero-video{
-        position:relative;
-        height:100vh;
-        overflow:hidden;
+    .hero-video::after{
+        content:"";
+        position:absolute;
+        bottom:-1px;
+        left:0;
+
+        width:100%;
+        height:120px;
+
+        background:#fffdf8;
+
+        border-radius:100% 100% 0 0;
+
+        z-index:3;
     }
 
     .hero-wave{
         position:absolute;
-        bottom:-1px;
+        bottom:0;
         left:0;
         width:100%;
         line-height:0;
@@ -306,14 +316,10 @@
         </div>
 
         <div class="hero-wave">
-            <svg xmlns="http://www.w3.org/2000/svg"
-                 viewBox="0 0 1440 320">
-
+            <svg viewBox="0 0 1440 150" preserveAspectRatio="none">
                 <path fill="#fffdf8"
-                      fill-opacity="1"
-                      d="M0,224L80,234.7C160,245,320,267,480,261.3C640,256,800,224,960,208C1120,192,1280,192,1360,192L1440,192L1440,320L1360,320C1280,320,1120,320,960,320C800,320,640,320,480,320C320,320,160,320,80,320L0,320Z">
+                      d="M0,96L80,106.7C160,117,320,139,480,138.7C640,139,800,117,960,101.3C1120,85,1280,75,1360,69.3L1440,64L1440,160L1360,160C1280,160,1120,160,960,160C800,160,640,160,480,160C320,160,160,160,80,160L0,160Z">
                 </path>
-
             </svg>
         </div>
 
