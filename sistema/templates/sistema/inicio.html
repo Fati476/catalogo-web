@@ -162,9 +162,8 @@
     }
 
     .hero-wave svg{
-        display:block;
         width:100%;
-        height:120px;
+        height:70px;
     }
     .middle-section {
         background: #f8f9fa;
@@ -231,6 +230,16 @@
         margin-bottom:15px;
     }
     
+    .footer-wave{
+        line-height:0;
+        margin-top:80px;
+    }
+
+    .footer-wave svg{
+        display:block;
+        width:100%;
+        height:70px;
+    }
 
 
     </style>
@@ -385,9 +394,9 @@
         </div>
 
         <div class="hero-wave">
-            <svg viewBox="0 0 1440 150" preserveAspectRatio="none">
+            <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
                 <path fill="#fffdf8"
-                      d="M0,96L80,106.7C160,117,320,139,480,138.7C640,139,800,117,960,101.3C1120,85,1280,75,1360,69.3L1440,64L1440,160L1360,160C1280,160,1120,160,960,160C800,160,640,160,480,160C320,160,160,160,80,160L0,160Z">
+                    d="M0,96L120,85C240,75,480,53,720,53C960,53,1200,75,1320,85L1440,96L1440,120L0,120Z">
                 </path>
             </svg>
         </div>
@@ -427,34 +436,36 @@
 </div>
 
 <!-- MENU INFERIOR -->
+<div class="footer-wave">
+    <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+        <path fill="rgba(15,15,15,.85)"
+            d="M0,24L120,35C240,45,480,67,720,67C960,67,1200,45,1320,35L1440,24L1440,120L0,120Z">
+        </path>
+    </svg>
+</div>
 
 
+<footer class="text-center text-white py-5"
+        style="
+        background:rgba(15,15,15,.85);
+        backdrop-filter:blur(15px);
+        ">
 
-<footer class="footer-custom">
+    <img src="{% static 'img/logo_cooperativa.png' %}"
+         height="70"
+         class="mb-3">
 
-    <div class="footer-wave">
+    <h4 class="fw-bold">
+        Cooperativa Pirotécnica
+    </h4>
 
-        <svg viewBox="0 0 1440 150" preserveAspectRatio="none">
-            <path fill="rgba(15,15,15,.85)"
-                  d="M0,96L80,106.7C160,117,320,139,480,138.7C640,139,800,117,960,101.3C1120,85,1280,75,1360,69.3L1440,64L1440,160L1360,160C1280,160,1120,160,960,160C800,160,640,160,480,160C320,160,160,160,80,160L0,160Z">
-            </path>
-        </svg>
+    <p class="text-light">
+        Soluciones especializadas para la industria pirotécnica.
+    </p>
 
-    </div>
-
-    <div class="footer-content">
-
-        <h3>Cooperativa Pirotécnica</h3>
-
-        <p>
-            Calidad, confianza y atención especializada.
-        </p>
-
-        <small>
-            © 2025 Todos los derechos reservados.
-        </small>
-
-    </div>
+    <small class="text-secondary">
+        © 2025 Todos los derechos reservados.
+    </small>
 
 </footer>
 
