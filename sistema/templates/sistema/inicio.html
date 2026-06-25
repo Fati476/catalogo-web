@@ -166,11 +166,6 @@
         margin-top:120px;
     }
 
-    .footer-wave{
-        line-height:0;
-    }
-
-
     .footer-content{
         background:rgba(15,15,15,.85);
     backdrop-filter:blur(15px);
@@ -188,17 +183,13 @@
     
     .footer-wave{
         line-height:0;
-        margin: top -20px;
+        margin-top:-1px;
     }
 
     .footer-wave svg{
         display:block;
         width:100%;
         height: 120px;
-    }
-
-    .footer-wave svg{
-        transform:rotate(180deg);
     }
     .hero-video{
         min-height:100vh;
@@ -397,7 +388,7 @@
             </div>
 </section>
 
-<div class="container mt-5">
+<div class="container mt-3">
 
     <div class="row text-center g-4">
 
@@ -453,11 +444,11 @@
 
 <!-- MENU INFERIOR -->
 <div class="footer-wave">
-        <svg viewBox="0 0 1440 320" preserveAspectRatio="none">
-            <path fill="#111827"
-            d="M0,224L80,213.3C160,203,320,181,480,186.7C640,192,800,224,960,224C1120,224,1280,192,1360,176L1440,160L1440,320L0,320Z">
-            </path>
-        </svg>
+    <svg viewBox="0 0 1440 320" preserveAspectRatio="none">
+        <path fill="#111827"
+        d="M0,160L80,149.3C160,139,320,117,480,122.7C640,128,800,160,960,165.3C1120,171,1280,149,1360,138.7L1440,128L1440,320L0,320Z">
+        </path>
+    </svg>
 </div>
 
 <footer style="
@@ -465,7 +456,7 @@ background:#111827;
 color:white;
 padding:80px 20px;
 text-align:center;
-margin-top:80px;
+margin-top:0;
 ">
 
     <img src="{% static 'img/logo_cooperativa.png' %}"
