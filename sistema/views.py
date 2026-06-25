@@ -145,10 +145,13 @@ def lista_productos(request):
 
     productos = Producto.objects.all().order_by('-id')
 
-    paginator = Paginator(productos, 6)  # 6 productos por página
+    # agregar primera imagen
+    for producto in productos:
+        producto.imagen_principal = producto.imagenes.first()
+
+    paginator = Paginator(productos, 6)
 
     page = request.GET.get('page')
-
     productos = paginator.get_page(page)
 
     categorias = Categoria.objects.all()

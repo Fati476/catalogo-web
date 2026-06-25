@@ -205,35 +205,23 @@
                 </a>
 
          <!-- IMAGEN / CARRUSEL -->
-                {% if producto.imagenes.all|length > 0 %}
-                <div id="carousel{{ producto.id }}" class="carousel slide" data-bs-ride="carousel">
+                {% if producto.imagen_principal %}
 
-                    <div class="carousel-inner">
-                        {% for imagen in producto.imagenes.all %}
-                        <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                            <img src="{{ imagen.imagen.url }}" class="d-block w-100" style="width:100%; height:180px; object-fit:contain; background:#fff;">
-                        </div>
-                        {% endfor %}
-                    </div>
-
-                    {% if producto.imagenes.all|length > 1 %}
-                    <button class="carousel-control-prev" type="button" data-bs-target="#carousel{{ producto.id }}" data-bs-slide="prev">
-                        <span class="carousel-control-prev-icon"></span>
-                    </button>
-                    <button class="carousel-control-next" type="button" data-bs-target="#carousel{{ producto.id }}" data-bs-slide="next">
-                        <span class="carousel-control-next-icon"></span>
-                    </button>
-                    {% endif %}
-
-                    <div class="carousel-indicators">
-                        {% for imagen in producto.imagenes.all %}
-                        <button type="button" data-bs-target="#carousel{{ producto.id }}" data-bs-slide-to="{{ forloop.counter0 }}" class="{% if forloop.first %}active{% endif %}"></button>
-                        {% endfor %}
-                    </div>
-
-                </div>
+                <img src="{{ producto.imagen_principal.imagen.url }}"
+                    class="card-img-top"
+                    style="
+                        height:240px;
+                        object-fit:cover;
+                    ">
 
                 {% else %}
+
+                <div class="d-flex justify-content-center align-items-center bg-light"
+                    style="height:240px;">
+                    <i class="bi bi-image fs-1 text-secondary"></i>
+                </div>
+
+                {% endif %}
          <!-- FALLBACK SI NO HAY IMAGEN -->
                 <div class="d-flex justify-content-center align-items-center bg-light" style="height:160px;">
                  <i class="bi bi-image text-secondary fs-1"></i>
@@ -251,24 +239,9 @@
                         {{ producto.categoria.nombre }}
                     </small>
 
-                    {% if producto.estado %}
-                        <span class="badge bg-success mb-2">Activo</span>
-                    {% else %}
-                        <span class="badge bg-danger mb-2">Inactivo</span>
-                    {% endif %}
-
-                    <p class="small text-muted mb-2">
-                        {{ producto.descripcion|truncatechars:70 }}
-                    </p>
-
-                    <div class="d-flex align-items-center gap-2 text-primary fw-semibold mb-3">
-                        <i class="bi bi-cash-coin"></i>
-                        <span>Sujeto a cotización</span>
-                    </div>
-
             <!-- BOTÓN COTIZAR -->
-                    <a href="{% url 'agregar_cotizacion' producto.id %}" class="btn btn-warning btn-sm w-100 rounded-3">
-                        <i class="bi bi-cart-plus"></i> Agregar a solicitud
+                    <a href="#" class="btn btn-warning btn-sm w-100 rounded-3">
+                        <i class="bi bi-cart-plus"></i> Ver Producto 
                     </a>
 
                 </div>
