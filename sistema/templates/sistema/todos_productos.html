@@ -182,111 +182,67 @@
         </div>
     </div>
 
-    <div class="row g-3">
+    <div class="row g-4">
 
         {% for producto in productos %}
 
-        <div class="col-6 col-md-4 producto-card">
+        <div class="col-6 col-md-4 col-lg-3">
 
-            <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden position-relative">
+            <div class="card product-card h-100 border-0 shadow-sm rounded-4 overflow-hidden bg-white">
 
-         <!-- FAVORITO -->
-                <a href="#"
-                    class="favorito-btn position-absolute top-0 end-0 m-2 bg-white rounded-circle shadow-sm p-2"
-                    data-id="{{ producto.id }}"
-                    style="z-index:10;">
-
-                    {% if producto.id in favoritos_ids %}
-                        <i class="bi bi-heart-fill text-danger" id="heart-{{ producto.id }}"></i>
+            <!-- Imagen principal (solo la primera) -->
+                <a href="{% url 'detalle_producto' producto.id %}" class="text-decoration-none">
+                    {% if producto.imagenes.all|length > 0 %}
+                        {% with primera_imagen=producto.imagenes.all|first %}
+                        <img src="{{ primera_imagen.imagen.url }}" 
+                             class="card-img-top product-image" 
+                             style="height: 220px; object-fit: contain; background: #f8f9fa;"
+                             alt="{{ producto.nombre }}">
+                        {% endwith %}
                     {% else %}
-                        <i class="bi bi-heart text-danger" id="heart-{{ producto.id }}"></i>
+                        <div class="d-flex justify-content-center align-items-center bg-light" style="height: 220px;">
+                            <i class="bi bi-image text-secondary fs-1"></i>
+                        </div>
                     {% endif %}
-
                 </a>
 
-         <!-- IMAGEN / CARRUSEL -->
-                {% if producto.imagenes.all|length > 0 %}
-                <div id="carousel{{ producto.id }}" class="carousel slide" data-bs-ride="carousel">
-
-                    <div class="carousel-inner">
-                        {% for imagen in producto.imagenes.all %}
-                        <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                            <img src="{{ imagen.imagen.url }}" class="d-block w-100" style="width:100%; height:180px; object-fit:contain; background:#fff;">
-                        </div>
-                        {% endfor %}
-                    </div>
-
-                    {% if producto.imagenes.all|length > 1 %}
-                    <button class="carousel-control-prev" type="button" data-bs-target="#carousel{{ producto.id }}" data-bs-slide="prev">
-                        <span class="carousel-control-prev-icon"></span>
-                    </button>
-                    <button class="carousel-control-next" type="button" data-bs-target="#carousel{{ producto.id }}" data-bs-slide="next">
-                        <span class="carousel-control-next-icon"></span>
-                    </button>
+            <!-- Favorito -->
+                <a href="#" class="favorito-btn position-absolute top-0 end-0 m-3 bg-white rounded-circle shadow-sm p-2 z-3"
+                   data-id="{{ producto.id }}">
+                    {% if producto.id in favoritos_ids %}
+                        <i class="bi bi-heart-fill text-danger fs-5" id="heart-{{ producto.id }}"></i>
+                    {% else %}
+                        <i class="bi bi-heart text-danger fs-5" id="heart-{{ producto.id }}"></i>
                     {% endif %}
+                </a>
 
-                    <div class="carousel-indicators">
-                        {% for imagen in producto.imagenes.all %}
-                        <button type="button" data-bs-target="#carousel{{ producto.id }}" data-bs-slide-to="{{ forloop.counter0 }}" class="{% if forloop.first %}active{% endif %}"></button>
-                        {% endfor %}
-                    </div>
+            <!-- Contenido -->
+                <div class="card-body d-flex flex-column p-4">
 
-                </div>
-
-                {% else %}
-         <!-- FALLBACK SI NO HAY IMAGEN -->
-                <div class="d-flex justify-content-center align-items-center bg-light" style="height:160px;">
-                 <i class="bi bi-image text-secondary fs-1"></i>
-                </div>
-                {% endif %}
-
-         <!-- CONTENIDO -->
-                <div class="card-body d-flex flex-column">
-
-                    <h6 class="fw-bold mb-1 fs-6 fs-md-5">
-                        {{ producto.nombre }}
-                    </h6>
-
-                    <small class="text-muted d-block mb-2">
-                        {{ producto.categoria.nombre }}
-                    </small>
+                    <h6 class="fw-bold mb-1 line-clamp-2">{{ producto.nombre }}</h6>
+                    <small class="text-muted mb-3">{{ producto.categoria.nombre }}</small>
 
                     {% if producto.estado %}
-                        <span class="badge bg-success mb-2">Activo</span>
+                        <span class="badge bg-success mb-3">Activo</span>
                     {% else %}
-                        <span class="badge bg-danger mb-2">Inactivo</span>
+                        <span class="badge bg-danger mb-3">Inactivo</span>
                     {% endif %}
 
-                    <p class="small text-muted mb-2">
-                        {{ producto.descripcion|truncatechars:70 }}
+                    <p class="small text-muted flex-grow-1 line-clamp-3">
+                        {{ producto.descripcion|truncatechars:95 }}
                     </p>
 
-                    <div class="d-flex align-items-center gap-2 text-primary fw-semibold mb-3">
+                    <div class="d-flex align-items-center gap-2 text-warning fw-semibold mb-3">
                         <i class="bi bi-cash-coin"></i>
-                        <span>Sujeto a cotización</span>
+                        <small>Sujeto a cotización</small>
                     </div>
 
-            <!-- BOTÓN COTIZAR -->
-                    <a href="{% url 'agregar_cotizacion' producto.id %}" class="btn btn-warning btn-sm w-100 rounded-3">
-                        <i class="bi bi-cart-plus"></i> Agregar a solicitud
+                    <a href="{% url 'agregar_cotizacion' producto.id %}" 
+                       class="btn btn-warning rounded-3 mt-auto py-2 fw-bold">
+                        <i class="bi bi-cart-plus"></i> Agregar a Solicitud
                     </a>
-
                 </div>
-
             </div>
-
-        </div>
-
-        {% empty %}
-
-        <div class="col-12">
-
-            <div class="alert alert-light text-center">
-
-                No hay productos disponibles.
-
-                </div>
-
         </div>
 
         {% endfor %}

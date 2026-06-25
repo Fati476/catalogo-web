@@ -219,4 +219,6 @@ urlpatterns = [
         name="rechazar_cotizacion",
     ),
 
+    path('producto/<int:producto_id>/', views.detalle_producto, name='detalle_producto'),
+
 ]
