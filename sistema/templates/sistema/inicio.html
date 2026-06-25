@@ -260,17 +260,18 @@
     .flip-card-front {
         background: white;
         color: #1a1a1a;
+        border: 2px solid #f0f0f0;
     }
 
     .flip-card-back {
-        background: #e63939;
-        color: white;
+        background: white;
+        color: #1a1a1a;
+        border: 2px solid #e63939;
         transform: rotateY(180deg);
     }
 
-    .flip-card h3 {
-        font-size: 2.8rem;
-        margin-bottom: 8px;
+    .flip-card h3, .flip-card h4 {
+        margin-bottom: 10px;
     }
 
     </style>
@@ -489,25 +490,23 @@
         <!-- Tarjetas -->
         <div class="row g-5 justify-content-center">
 
-    
+    <!-- Tarjeta 1 -->
             <div class="col-md-4">
                 <div class="flip-card">
                     <div class="flip-card-inner">
-                <!-- Frente -->
                         <div class="flip-card-front">
                             <i class="bi bi-clock-history" style="font-size: 5.5rem; color: #e63939;"></i>
                             <h3 class="mt-4 fw-bold text-dark">24h</h3>
                         </div>
-                <!-- Atrás -->
                         <div class="flip-card-back">
-                            <h4 class="fw-bold text-white">Tiempo de respuesta</h4>
-                            <p class="text-white-50">Respuesta rápida y eficiente</p>
+                            <h4 class="fw-bold text-dark">Tiempo de respuesta</h4>
+                            <p class="text-muted">Respuesta rápida y eficiente</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-    
+    <!-- Tarjeta 2 -->
             <div class="col-md-4">
                 <div class="flip-card">
                     <div class="flip-card-inner">
@@ -516,14 +515,14 @@
                             <h3 class="mt-4 fw-bold text-dark">100%</h3>
                         </div>
                         <div class="flip-card-back">
-                            <h4 class="fw-bold text-white">Atención personalizada</h4>
-                            <p class="text-white-50">Acompañamiento en todo momento</p>
+                            <h4 class="fw-bold text-dark">Atención personalizada</h4>
+                            <p class="text-muted">Acompañamiento en todo momento</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-    
+    <!-- Tarjeta 3 -->
             <div class="col-md-4">
                 <div class="flip-card">
                     <div class="flip-card-inner">
@@ -532,13 +531,13 @@
                             <h3 class="mt-4 fw-bold text-dark">PDF</h3>
                         </div>
                         <div class="flip-card-back">
-                            <h4 class="fw-bold text-white">Cotizaciones digitales</h4>
-                            <p class="text-white-50">Recibe tu cotización al instante</p>
+                            <h4 class="fw-bold text-dark">Cotizaciones digitales</h4>
+                            <p class="text-muted">Recibe tu cotización al instante</p>
                         </div>
                     </div>
                 </div>
             </div>
-
+        
         </div>
     </div>
 </section>
