@@ -165,30 +165,6 @@
         width:100%;
         height:70px;
     }
-    .middle-section {
-        background: #f8f9fa;
-        padding: 100px 0;
-    }
-
-    .middle-content h2 {
-        font-size: 3.2rem;
-        font-weight: 900;
-        color: #1f1f1f;
-        margin-bottom: 25px;
-        animation: titlePop 1.2s ease forwards;
-    }
-
-    @keyframes titlePop {
-        0% { opacity: 0; transform: translateY(30px); }
-        100% { opacity: 1; transform: translateY(0); }
-    }
-
-    .middle-content p {
-        font-size: 1.25rem;
-        line-height: 1.7;
-        color: #444;
-        margin-bottom: 35px;
-    }
 
 
 
@@ -209,11 +185,6 @@
         line-height:0;
     }
 
-    .footer-wave svg{
-        display:block;
-        width:100%;
-        height:120px;
-    }
 
     .footer-content{
         background:rgba(15,15,15,.85);
@@ -238,7 +209,7 @@
     .footer-wave svg{
         display:block;
         width:100%;
-        height:70px;
+        height: 120px;
     }
 
 
@@ -403,34 +374,50 @@
 
     </section>
 
-    <!-- MIDDLE SECTION -->
-    <section class="middle-section py-5">
-        <div class="container">
-            <div class="row align-items-center">
-            
-            <!-- Imagen -->
-                <div class="col-lg-6 mb-4 mb-lg-0">
-                    <img src="/static/img/cooperativa-bodega.webp" 
-                        alt="Cooperativa Pirotécnica" 
-                        class="img-fluid rounded shadow">
-                </div>
-            
-            <!-- Texto -->
-                <div class="col-lg-6">
-                    <div class="middle-content">
-                        <h2>Nuestra Misión</h2>
-                        <p>
-                            Brindar soluciones especializadas para la industria pirotécnica mediante 
-                            productos de calidad, atención personalizada y procesos eficientes.
-                        </p>
-                    </div>
-                </div>
-            
-            </div>
+    
+
+    <section class="py-5">
+        <div class="container text-center">
+
+            <h2 class="display-5 fw-bold mb-4">
+                Soluciones para la Industria Pirotécnica
+            </h2>
+
+            <p class="lead text-muted mx-auto"
+               style="max-width:850px;">
+                Somos una empresa especializada en la distribución de
+                materiales y productos para el sector pirotécnico,
+                ofreciendo atención personalizada, procesos eficientes
+                y soluciones adaptadas a cada cliente.
+            </p>
+
         </div>
     </section>
 
+    <section class="py-5">
+        <div class="container">
 
+            <div class="row text-center g-4">
+
+                <div class="col-md-4">
+                    <h1 class="display-4 fw-bold text-warning">24h</h1>
+                    <p class="text-muted">Tiempo de respuesta</p>
+                </div>
+
+                <div class="col-md-4">
+                    <h1 class="display-4 fw-bold text-warning">100%</h1>
+                    <p class="text-muted">Atención personalizada</p>
+                </div>
+
+                <div class="col-md-4">
+                    <h1 class="display-4 fw-bold text-warning">PDF</h1>
+                    <p class="text-muted">Cotizaciones digitales</p>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
     <!-- CATEGORIAS -->
 
 </div>
@@ -439,7 +426,7 @@
 <div class="footer-wave">
     <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
         <path fill="rgba(15,15,15,.85)"
-            d="M0,24L120,35C240,45,480,67,720,67C960,67,1200,45,1320,35L1440,24L1440,120L0,120Z">
+            d="M0,96L120,85C240,75,480,53,720,53C960,53,1200,75,1320,85L1440,96L1440,120L0,120Z">
         </path>
     </svg>
 </div>
