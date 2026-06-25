@@ -1141,3 +1141,15 @@ def descargar_cotizacion_pdf(request, id):
 
     return response
 
+@login_required
+def detalle_producto(request, id):
+
+    producto = get_object_or_404(Producto, id=id)
+
+    return render(
+        request,
+        'sistema/detalle_producto.html',
+        {
+            'producto': producto
+        }
+    )
