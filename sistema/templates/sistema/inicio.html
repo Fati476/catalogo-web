@@ -168,23 +168,25 @@
     }
     .middle-section {
         position: relative;
-        padding: 160px 20px;
+        padding: 100px 20px;           /* Reducido para que no sea tan alta */
         color: white;
         overflow: hidden;
+        min-height: 520px;             /* Altura controlada */
     }
 
     .middle-bg {
         position: absolute;
         inset: 0;
         background: linear-gradient(
-            rgba(0, 0, 0, 0.75), 
-            rgba(0, 0, 0, 0.82)
-        ), url('/static/img/cooperativa-bodega.webp') center/cover no-repeat;
+            rgba(0, 0, 0, 0.78), 
+            rgba(0, 0, 0, 0.85)
+        ), url('/static/img/cooperativa-bodega.jpg') center/cover no-repeat;
         z-index: 1;
-        filter: brightness(0.85) contrast(1.1);   /* Mejora la foto */
+        background-position: center 30%;   /* Mueve un poco la imagen hacia arriba */
+    /* background-attachment: fixed; */ /* Descomenta si quieres efecto parallax */
     }
 
-/* Contenido centrado y con mejor legibilidad */
+/* Contenido */
     .middle-content {
         position: relative;
         z-index: 2;
@@ -192,6 +194,8 @@
         margin: 0 auto;
         text-align: center;
     }
+
+/* El resto de tus estilos de texto y botón se mantienen iguales */
 
 /* Título más fuerte */
     .middle-content h2 {
