@@ -168,7 +168,7 @@
     }
     .middle-section {
         position: relative;
-        padding: 140px 0;
+        padding: 160px 20px;
         color: white;
         overflow: hidden;
     }
@@ -176,25 +176,29 @@
     .middle-bg {
         position: absolute;
         inset: 0;
-        background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.75)), 
-                    url('/static/img/cooperativa-bodega.webp') center/cover no-repeat;
+        background: linear-gradient(
+            rgba(0, 0, 0, 0.75), 
+            rgba(0, 0, 0, 0.82)
+        ), url('/static/img/cooperativa-bodega.webp') center/cover no-repeat;
         z-index: 1;
+        filter: brightness(0.85) contrast(1.1);   /* Mejora la foto */
     }
 
-/* Contenido */
+/* Contenido centrado y con mejor legibilidad */
     .middle-content {
         position: relative;
         z-index: 2;
-        max-width: 900px;
-        margin: auto;
+        max-width: 820px;
+        margin: 0 auto;
         text-align: center;
     }
 
-/* Título */
+/* Título más fuerte */
     .middle-content h2 {
-        font-size: 3.4rem;
+        font-size: 3.6rem;
         font-weight: 900;
         margin-bottom: 25px;
+        text-shadow: 0 4px 15px rgba(0, 0, 0, 0.8);
         animation: titlePop 1.3s ease forwards;
     }
 
@@ -205,23 +209,25 @@
 
 /* Párrafo */
     .middle-content p {
-        font-size: 1.25rem;
-        line-height: 1.7;
-        max-width: 700px;
-        margin: 0 auto 40px;
+        font-size: 1.28rem;
+        line-height: 1.75;
+        max-width: 680px;
+        margin: 0 auto 45px;
+        text-shadow: 0 3px 10px rgba(0, 0, 0, 0.9);
         animation: fadeIn 1.2s ease forwards 0.4s;
-        opacity: 0;
+    opacity: 0;
     }
 
     @keyframes fadeIn {
         to { opacity: 1; }
     }
 
+
+
+
     </style>
 
     
-    
-
     
 </head>
 
@@ -388,8 +394,8 @@
             <div class="middle-content">
                 <h2>Nuestra Misión</h2>
                 <p>
-                    Brindar soluciones especializadas para la industria pirotécnica mediante 
-                    productos de calidad, atención personalizada y procesos eficientes.
+                 Brindar soluciones especializadas para la industria pirotécnica mediante 
+                 productos de calidad, atención personalizada y procesos eficientes.
                 </p>
             </div>
         </div>
