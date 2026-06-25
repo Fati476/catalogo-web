@@ -582,6 +582,10 @@ def todos_productos(request):
         estado=True
     ).order_by('-id')
 
+    # Asignar la primera imagen a cada producto
+    for producto in productos_lista:
+        producto.imagen_principal = producto.imagenes.first()
+
     paginator = Paginator(productos_lista, 12)
 
     page = request.GET.get('page')
@@ -1144,7 +1148,12 @@ def descargar_cotizacion_pdf(request, id):
 @login_required
 def detalle_producto(request, id):
 
-    producto = get_object_or_404(Producto, id=id)
+    producto = get_object_or_404(
+        Producto,
+        id=id
+    )
+
+    producto.imagen_principal = producto.imagenes.first()
 
     return render(
         request,
