@@ -203,6 +203,12 @@
     .hero-video{
         min-height:100vh;
     }
+    @media(max-width:768px){
+        .hero-content h1{
+            font-size:2.5rem !important;
+        }
+    }
+
     </style>
 
 
@@ -333,7 +339,8 @@
             <div class="hero-content">
 
 
-                <h1 class="display-2 fw-bold">
+                <h1 class="fw-bold"
+                    style="font-size:4.5rem; max-width:900px;">
                     Calidad y Confianza
                     <br>
                     para la Industria Pirotécnica
@@ -390,6 +397,59 @@
             </div>
 </section>
 
+<div class="container mt-5">
+
+    <div class="row text-center g-4">
+
+        <div class="col-md-4">
+            <div class="p-4">
+                <i class="bi bi-clock-history text-warning"
+                   style="font-size:60px;"></i>
+
+                <h2 class="fw-bold text-warning mt-3">
+                    24h
+                </h2>
+
+                <p class="text-muted">
+                    Tiempo de respuesta
+                </p>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="p-4">
+                <i class="bi bi-person-circle text-warning"
+                   style="font-size:60px;"></i>
+
+                <h2 class="fw-bold text-warning mt-3">
+                    100%
+                </h2>
+
+                <p class="text-muted">
+                    Atención personalizada
+                </p>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="p-4">
+                <i class="bi bi-file-earmark-pdf text-warning"
+                   style="font-size:60px;"></i>
+
+                <h2 class="fw-bold text-warning mt-3">
+                    PDF
+                </h2>
+
+                <p class="text-muted">
+                    Cotizaciones digitales
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
 
 <!-- MENU INFERIOR -->
 <div class="footer-wave">
@@ -400,7 +460,32 @@
         </svg>
 </div>
 
+<footer style="
+background:#111827;
+color:white;
+padding:80px 20px;
+text-align:center;
+margin-top:80px;
+">
 
+    <img src="{% static 'img/logo_cooperativa.png' %}"
+         height="80">
+
+    <h2 class="fw-bold mt-3">
+        Cooperativa Pirotécnica
+    </h2>
+
+    <p class="text-light">
+        Soluciones especializadas para la industria pirotécnica.
+    </p>
+
+    <hr class="w-50 mx-auto">
+
+    <small>
+        © 2025 Todos los derechos reservados.
+    </small>
+
+</footer>
 
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
