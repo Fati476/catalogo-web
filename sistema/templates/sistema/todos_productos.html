@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -35,6 +36,19 @@
             }
 
         }
+        .input-group:focus-within {        
+           box-shadow: 0 0 0 4px rgba(255, 193, 7, 0.3) !important;
+           border-color: #ffc107 !important;
+        }
+
+        #buscarProducto::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        #buscarProducto:focus {
+            outline: none;
+            box-shadow: none;
+        }
 
     </style>
     
@@ -43,11 +57,30 @@
 <body style="background:#F5F7FB; padding-top:75px;">
 
 <!-- NAVBAR (copias el mismo que ya tienes) -->
-<nav class="navbar navbar-expand-lg bg-white shadow-sm fixed-top">
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top rounded-pill"
+        style="
+           top:15px;
+           left:20px;
+           right:20px;
+           background:rgba(15,15,15,.55);
+           backdrop-filter:blur(15px);
+           box-shadow:0 10px 30px rgba(0,0,0,.25);
+        ">
     <div class="container-fluid px-3">
 
-        <a class="navbar-brand fw-bold text-warning fs-3" href="#">
-            📦 Catálogo
+        <a class="navbar-brand fw-bold d-flex align-items-center" href="{% url 'todas_categorias' %}">
+                <img src="{% static 'img/imagen.png' %}"
+                     height="55"
+                     class="me-2">
+
+                <div>
+                    <div class="text-warning fw-bold">
+                        Cooperativa
+                    </div>
+                    <small class="text-white">
+                        Pirotécnica
+                    </small>
+                </div>
         </a>
 
         <!-- Botón hamburguesa -->
@@ -124,33 +157,42 @@
 
 <div class="container-fluid px-3 px-lg-4 mt-4">
 
-    <div class="bg-white shadow-sm rounded-4 p-4 mb-4">
-
-        <h3 class="fw-bold mb-1">
-            📦 Todos los productos
-        </h3>
-
-        <p class="text-muted mb-0">
-            Explora todos los productos disponibles en el catálogo.
-        </p>
-
+    <div class="mb-5">
+        <div class="bg-white bg-opacity-10 backdrop-blur rounded-4 p-5 text-center border border-light border-opacity-10">
+             <h1 class="display-5 fw-bold text-white mb-3" 
+                 style="font-family: 'Neuton', serif; letter-spacing: -0.04em;">
+                 📦 Todos los Productos
+             </h1>
+        
+             <p class="lead text-light mb-0" style="max-width: 720px; margin: 0 auto;">
+                 Explora nuestro catálogo completo de sustancias químicas, 
+                 artificios pirotécnicos y materiales especializados para el artesano pirotécnico.
+             </p>
+        </div>
     </div>
 
-    <div class="mb-4">
-
-        <div class="input-group shadow-sm rounded-pill overflow-hidden">
-
-            <span class="input-group-text bg-white border-0">
-                🔍
+    <div class="mb-5">
+        <div class="input-group input-group-lg shadow-lg rounded-pill overflow-hidden" 
+            style="max-width: 620px; margin: 0 auto; border: 2px solid rgba(255,255,255,0.1);">
+        
+            <span class="input-group-text bg-transparent border-0 ps-4 text-light">
+                <i class="bi bi-search fs-4"></i>
             </span>
-
-            <input type="text"
-                   id="buscarProducto"
-                   class="form-control border-0"
-                   placeholder="Buscar productos...">
-
+        
+            <input type="text" 
+                    id="buscarProducto"
+                    class="form-control border-0 bg-transparent text-light py-3 px-2"
+                    placeholder="Buscar productos, sustancias o categorías..."
+                    style="font-size: 1.1rem; box-shadow: none;">
+        
+        <!-- Botón de limpiar (opcional pero muy útil) -->
+            <button type="button" 
+                    class="btn border-0 text-light pe-4" 
+                    id="clearSearch"
+                style="display: none;">
+                <i class="bi bi-x-circle-fill"></i>
+            </button>
         </div>
-
     </div>
 
     <div class="row g-3">
