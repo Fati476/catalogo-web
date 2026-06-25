@@ -96,8 +96,19 @@
         ">
     <div class="container-fluid px-3">
 
-        <a class="navbar-brand fw-bold text-warning fs-3" href="#">
-            📦 Catálogo
+        <a class="navbar-brand fw-bold d-flex align-items-center" href="{% url 'inicio' %}">
+                <img src="{% static 'img/imagen.png' %}"
+                     height="55"
+                     class="me-2">
+
+                <div>
+                    <div class="text-warning fw-bold">
+                        Cooperativa
+                    </div>
+                    <small class="text-white">
+                        Pirotécnica
+                    </small>
+                </div>
         </a>
 
         <!-- Botón hamburguesa -->
