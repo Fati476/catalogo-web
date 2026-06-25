@@ -136,21 +136,6 @@
 
     }
 
-    .hero-video::after{
-        content:"";
-        position:absolute;
-        bottom:-1px;
-        left:0;
-
-        width:100%;
-        height:120px;
-
-        background:#fffdf8;
-
-        border-radius:100% 100% 0 0;
-
-        z-index:3;
-    }
 
     .hero-wave{
         position:absolute;
@@ -212,8 +197,12 @@
         height: 120px;
     }
 
-
+    .footer-wave svg{
+        transform:rotate(180deg);
+    }
     </style>
+
+
 
     
     
@@ -369,9 +358,9 @@
             </div>
 
             <div class="hero-wave">
-                <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+                <svg viewBox="0 0 1440 320" preserveAspectRatio="none">
                     <path fill="#fffdf8"
-                        d="M0,96L120,85C240,75,480,53,720,53C960,53,1200,75,1320,85L1440,96L1440,120L0,120Z">
+                    d="M0,224L80,213.3C160,203,320,181,480,186.7C640,192,800,224,960,224C1120,224,1280,192,1360,176L1440,160L1440,320L0,320Z">
                     </path>
                 </svg>
             </div>
@@ -398,36 +387,12 @@
             </div>
     </section>
 
-    <section class="py-5">
-            <div class="container">
-
-                <div class="row text-center g-4">
-
-                    <div class="col-md-4">
-                        <h1 class="display-4 fw-bold text-warning">24h</h1>
-                        <p class="text-muted">Tiempo de respuesta</p>
-                    </div>
-
-                    <div class="col-md-4">
-                        <h1 class="display-4 fw-bold text-warning">100%</h1>
-                        <p class="text-muted">Atención personalizada</p>
-                    </div>
-
-                    <div class="col-md-4">
-                        <h1 class="display-4 fw-bold text-warning">PDF</h1>
-                        <p class="text-muted">Cotizaciones digitales</p>
-                    </div>
-
-                </div>
-
-            </div>
-    </section>
 
 <!-- MENU INFERIOR -->
     <div class="footer-wave">
-        <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
-            <path fill="rgba(15,15,15,.85)"
-                d="M0,96L120,85C240,75,480,53,720,53C960,53,1200,75,1320,85L1440,96L1440,120L0,120Z">
+        <svg viewBox="0 0 1440 320" preserveAspectRatio="none">
+            <path fill="#111827"
+            d="M0,224L80,213.3C160,203,320,181,480,186.7C640,192,800,224,960,224C1120,224,1280,192,1360,176L1440,160L1440,320L0,320Z">
             </path>
         </svg>
     </div>
