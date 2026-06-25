@@ -274,6 +274,29 @@
         margin-bottom: 10px;
     }
 
+    /* Para que los botones queden por encima de la onda */
+    .hero-wave {
+        position: relative;
+        z-index: 1;
+    }    
+
+    .hero-wave svg {
+        margin-top: -80px;   /* Ajusta este valor según tu onda */
+    }
+
+/* En móviles hacemos los botones un poco más compactos */
+    @media (max-width: 768px) {
+        .btn-lg {
+            font-size: 1.05rem !important;
+            padding: 14px 32px !important;
+            min-width: 200px !important;
+        }
+    
+        .mt-4 {
+            margin-top: 1.5rem !important;
+        }
+    }
+
     </style>
 
     <link href="https://fonts.googleapis.com/css2?family=Arvo:wght@700&display=swap" rel="stylesheet">
@@ -428,17 +451,24 @@
                     y atención personalizada.
                 </p>
 
-                <div class="mt-5 pb-5 d-flex flex-column flex-md-row gap-3 justify-content-center align-items-center">
-    
+                <div class="mt-4 pb-5 d-flex flex-column flex-md-row gap-3 justify-content-center align-items-center position-relative" style="z-index: 2;">
+
                     <a href="{% url 'todos_productos' %}" 
-                       class="btn btn-warning btn-lg rounded-pill px-6 py-3 fw-bold"
-                       style="min-width: 245px; font-size: 1.2rem;">
+                        class="btn btn-warning btn-lg rounded-pill px-5 py-3 fw-bold"
+                        style="font-family: 'Montserrat', sans-serif;
+                                font-size: 1.15rem;
+                                min-width: 220px;
+                                max-width: 280px;">
                         Ver Catálogo
                     </a>
 
                     <a href="{% url 'solicitudes' %}" 
-                       class="btn btn-outline-light btn-lg rounded-pill px-6 py-3 fw-bold"
-                       style="min-width: 245px; font-size: 1.2rem; border-width: 2.8px;">
+                        class="btn btn-outline-light btn-lg rounded-pill px-5 py-3 fw-bold"
+                        style="font-family: 'Montserrat', sans-serif;
+                                font-size: 1.15rem;
+                                min-width: 220px;
+                                max-width: 280px;
+                                border-width: 2.8px;">
                         Solicitar Cotización
                     </a>
 
