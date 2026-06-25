@@ -167,65 +167,39 @@
         height:120px;
     }
     .middle-section {
-        position: relative;
-        padding: 100px 20px;           /* Reducido para que no sea tan alta */
-        color: white;
-        overflow: hidden;
-        min-height: 520px;             /* Altura controlada */
+        background: #f8f9fa;
+        padding: 100px 0;
     }
 
-    .middle-bg {
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(
-            rgba(0, 0, 0, 0.78), 
-            rgba(0, 0, 0, 0.85)
-        ), url('/static/img/cooperativa-bodega.webp') center/cover no-repeat;
-        z-index: 1;
-        background-position: center 30%;   /* Mueve un poco la imagen hacia arriba */
-    /* background-attachment: fixed; */ /* Descomenta si quieres efecto parallax */
-    }
-
-/* Contenido */
-    .middle-content {
-        position: relative;
-        z-index: 2;
-        max-width: 820px;
-        margin: 0 auto;
-        text-align: center;
-    }
-
-/* El resto de tus estilos de texto y botón se mantienen iguales */
-
-/* Título más fuerte */
     .middle-content h2 {
-        font-size: 3.6rem;
+        font-size: 3.2rem;
         font-weight: 900;
+        color: #1f1f1f;
         margin-bottom: 25px;
-        text-shadow: 0 4px 15px rgba(0, 0, 0, 0.8);
-        animation: titlePop 1.3s ease forwards;
+        animation: titlePop 1.2s ease forwards;
     }
 
     @keyframes titlePop {
-        0% { opacity: 0; transform: translateY(40px); }
+        0% { opacity: 0; transform: translateY(30px); }
         100% { opacity: 1; transform: translateY(0); }
     }
 
-/* Párrafo */
     .middle-content p {
-        font-size: 1.28rem;
-        line-height: 1.75;
-        max-width: 680px;
-        margin: 0 auto 45px;
-        text-shadow: 0 3px 10px rgba(0, 0, 0, 0.9);
-        animation: fadeIn 1.2s ease forwards 0.4s;
-    opacity: 0;
+        font-size: 1.25rem;
+        line-height: 1.7;
+        color: #444;
+        margin-bottom: 35px;
     }
 
-    @keyframes fadeIn {
-        to { opacity: 1; }
-    }
 
+
+/* Imagen bonita */
+    .middle-section img {
+        width: 100%;
+        height: auto;
+        border-radius: 12px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    }
 
 
 
@@ -391,16 +365,31 @@
     </section>
 
     <!-- MIDDLE SECTION -->
-    <section class="middle-section">
-        <div class="middle-bg"></div>
-    
+    <section class="middle-section py-5">
         <div class="container">
-            <div class="middle-content">
-                <h2>Nuestra Misión</h2>
-                <p>
-                 Brindar soluciones especializadas para la industria pirotécnica mediante 
-                 productos de calidad, atención personalizada y procesos eficientes.
-                </p>
+            <div class="row align-items-center">
+            
+            <!-- Imagen -->
+                <div class="col-lg-6 mb-4 mb-lg-0">
+                    <img src="/static/img/cooperativa-bodega.jpg" 
+                        alt="Cooperativa Pirotécnica" 
+                        class="img-fluid rounded shadow">
+                </div>
+            
+            <!-- Texto -->
+                <div class="col-lg-6">
+                    <div class="middle-content">
+                        <h2>Nuestra Misión</h2>
+                        <p>
+                            Brindar soluciones especializadas para la industria pirotécnica mediante 
+                            productos de calidad, atención personalizada y procesos eficientes.
+                        </p>
+                        <a href="{% url 'todos_productos' %}" class="btn btn-explorer">
+                            Explorar Catálogo
+                        </a>
+                    </div>
+                </div>
+            
             </div>
         </div>
     </section>
