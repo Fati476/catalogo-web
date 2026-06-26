@@ -682,6 +682,7 @@ document.querySelectorAll('.favorito-btn').forEach(btn => {
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
+
     const container = document.getElementById("imageContainer");
     const img = document.getElementById("imagenPrincipal");
     const magnifier = document.getElementById("magnifier");
@@ -689,9 +690,12 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!container || !img || !magnifier) return;
 
     const zoom = 2.8;
+    const radio = 60;
 
     container.addEventListener("mousemove", function (e) {
+
         const rect = container.getBoundingClientRect();
+
         let x = e.clientX - rect.left;
         let y = e.clientY - rect.top;
 
@@ -700,22 +704,21 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        const radio = 60;
+        magnifier.style.display = "block";
 
         magnifier.style.left = (x - radio) + "px";
         magnifier.style.top = (y - radio) + "px";
 
-        const bgX = -(x * zoom - radio);
-        const bgY = -(y * zoom - radio);
-
         magnifier.style.backgroundImage = `url('${img.src}')`;
-        magnifier.style.backgroundSize = `${img.width * zoom}px ${img.height * zoom}px`;
-        magnifier.style.backgroundPosition = `${bgX}px ${bgY}px`;
+        magnifier.style.backgroundSize = `${rect.width * zoom}px ${rect.height * zoom}px`;
+        magnifier.style.backgroundPosition = `${-(x * zoom - radio)}px ${-(y * zoom - radio)}px`;
+
     });
 
-    container.addEventListener("mouseleave", () => {
+    container.addEventListener("mouseleave", function () {
         magnifier.style.display = "none";
     });
+
 });
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
