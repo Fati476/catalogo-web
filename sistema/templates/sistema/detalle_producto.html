@@ -199,6 +199,44 @@
         transform:scale(1.1);
     }
 
+    /* Fuentes */
+    @import url('https://fonts.googleapis.com/css2?family=Abril+Fatface&family=BioRhyme:wght@400;500;600&display=swap');
+
+/* Efecto Lupa */
+    #imageContainer {
+        position: relative;
+    }
+
+    #magnifier {
+        position: absolute;
+        width: 180px;
+        height: 180px;
+        border: 3px solid #ffc107;
+        border-radius: 50%;
+        box-shadow: 0 0 15px rgba(0,0,0,0.3);
+        background: url('{{ producto.imagen_principal.imagen.url }}') no-repeat;
+        background-size: 0;
+        pointer-events: none;
+        display: none;
+        z-index: 20;
+        overflow: hidden;
+    }
+
+/* Miniaturas */
+    .miniatura {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+    }
+
+    .miniatura:hover, .miniatura.activa {
+        border-color: #ffc107;
+        transform: scale(1.05);
+    }
+
     </style>
 
     <link href="https://fonts.googleapis.com/css2?family=Arvo:wght@700&display=swap" rel="stylesheet">
@@ -315,125 +353,100 @@
 </div> 
 
 <main style="flex:1; margin-top:110px;">
-
 <div class="container py-4">
 
     <div class="row justify-content-center align-items-start g-5">
 
-        <!-- Imagen -->
-
+        <!-- Imagen con Efecto Lupa -->
         <div class="col-lg-6">
-
             {% if producto.imagen_principal %}
-
                 <div class="galeria-producto">
 
-                    <div class="imagen-contenedor position-relative">
+                    <div class="imagen-contenedor position-relative rounded-4 shadow overflow-hidden" 
+                         style="height: 520px; cursor: crosshair;" id="imageContainer">
 
-                        <a href="#"
+                        <!-- Botón Favorito -->
+                        <a href="#" 
                            class="favorito-btn position-absolute top-0 end-0 m-3 bg-white rounded-circle shadow p-2"
                            data-id="{{ producto.id }}"
-                           style="z-index:20;">
-
+                           style="z-index:30;">
                             {% if producto.id in favoritos_ids %}
                                 <i class="bi bi-heart-fill text-danger fs-4" id="heart-{{ producto.id }}"></i>
                             {% else %}
                                 <i class="bi bi-heart text-danger fs-4" id="heart-{{ producto.id }}"></i>
                             {% endif %}
-
                         </a>
 
                         <img
                             id="imagenPrincipal"
                             src="{{ producto.imagen_principal.imagen.url }}"
-                            class="producto-principal shadow"
+                            class="producto-principal w-100 h-100 object-fit-cover"
                             alt="{{ producto.nombre }}">
 
+                        <!-- Lupa -->
+                        <div id="magnifier" class="magnifier"></div>
                     </div>
 
-                    <div class="miniaturas">
-
+                    <!-- Miniaturas -->
+                    <div class="miniaturas mt-3 d-flex gap-2">
                         {% for imagen in producto.imagenes.all %}
-
                             <img
                                 src="{{ imagen.imagen.url }}"
-                                class="miniatura {% if forloop.first %}activa{% endif %}"
+                                class="miniatura rounded-3 {% if forloop.first %}activa border border-warning border-2{% endif %}"
                                 onclick="cambiarImagen(this)">
-
                         {% endfor %}
-
                     </div>
-
                 </div>
-
             {% else %}
-
-                <div class="bg-light rounded-4 d-flex justify-content-center align-items-center"
-                style="height:350px">
-
-                Sin imagen
-
+                <div class="bg-light rounded-4 d-flex justify-content-center align-items-center" style="height:520px">
+                    Sin imagen
                 </div>
-
             {% endif %}
-
         </div>
 
         <!-- Información -->
-
         <div class="col-lg-5">
+            <div class="card border-0 shadow rounded-4 p-4 sticky-top" style="top:110px;">
 
-            <div class="card border-0 shadow rounded-4 p-4 sticky-top"
-                 style="top:110px;">
-
-                <small class="text-warning fw-bold text-uppercase">
+                <small class="text-warning fw-bold text-uppercase tracking-widest">
                     {{ producto.categoria.nombre }}
                 </small>
 
-                <h1 class="fw-bold mt-2 mb-3">
+                <h1 class="fw-bold mt-2 mb-3" style="font-family: 'Abril Fatface', serif; line-height: 1.1;">
                     {{ producto.nombre }}
                 </h1>
 
                 <div class="mb-4">
-
-                    <span class="badge bg-success fs-6 px-3 py-2">
+                    <span class="badge bg-success fs-6 px-3 py-2 rounded-pill">
                         Disponible
                     </span>
-
+                    <span class="ms-3 text-muted small fw-semibold">
+                        Sujeto a cotización
+                    </span>
                 </div>
 
-                <h5 class="fw-bold mb-3">
+                <h5 class="fw-bold mb-3" style="font-family: 'BioRhyme', serif;">
                     Descripción
                 </h5>
 
-                <p class="text-secondary">
-
+                <p class="text-secondary" style="font-family: 'BioRhyme', serif; line-height: 1.7;">
                     {{ producto.descripcion }}
-
                 </p>
 
-                <hr>
+                <hr class="my-4">
 
                 <div class="d-grid">
-
                     <a href="{% url 'agregar_cotizacion' producto.id %}"
-                       class="btn btn-warning btn-lg rounded-pill">
-
-                        <i class="bi bi-cart-plus"></i>
-
+                       class="btn btn-warning btn-lg rounded-pill py-3 fw-semibold">
+                        <i class="bi bi-cart-plus me-2"></i>
                         Agregar a solicitud
-
                     </a>
-
                 </div>
 
             </div>
-        
         </div>
     </div>
-
 </div>
-
 </main>
 
 <div class="footer-wave">
@@ -567,7 +580,49 @@ document.querySelectorAll('.favorito-btn').forEach(btn => {
 });
 </script>
 
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const container = document.getElementById("imageContainer");
+    const img = document.getElementById("imagenPrincipal");
+    const magnifier = document.getElementById("magnifier");
 
+    if (!container || !img || !magnifier) return;
+
+    const zoomLevel = 2.5; // Nivel de zoom (puedes cambiarlo)
+
+    container.addEventListener("mousemove", function(e) {
+        const rect = container.getBoundingClientRect();
+        
+        // Posición del mouse relativa a la imagen
+        let x = e.clientX - rect.left;
+        let y = e.clientY - rect.top;
+
+        // Evitar que la lupa se salga de los bordes
+        if (x < 0 || y < 0 || x > rect.width || y > rect.height) {
+            magnifier.style.display = "none";
+            return;
+        }
+
+        magnifier.style.display = "block";
+
+        // Posicionar la lupa
+        magnifier.style.left = (x - 90) + "px";   // 90 = mitad del tamaño de la lupa
+        magnifier.style.top = (y - 90) + "px";
+
+        // Calcular posición del fondo (efecto lupa)
+        const bgX = - (x * zoomLevel - 90);
+        const bgY = - (y * zoomLevel - 90);
+        
+        magnifier.style.backgroundImage = `url('${img.src}')`;
+        magnifier.style.backgroundSize = `${img.width * zoomLevel}px ${img.height * zoomLevel}px`;
+        magnifier.style.backgroundPosition = `${bgX}px ${bgY}px`;
+    });
+
+    container.addEventListener("mouseleave", function() {
+        magnifier.style.display = "none";
+    });
+});
+</script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
