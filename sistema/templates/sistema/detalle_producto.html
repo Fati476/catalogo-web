@@ -202,20 +202,15 @@
     /* Fuentes */
     @import url('https://fonts.googleapis.com/css2?family=Abril+Fatface&family=BioRhyme:wght@400;500;600&display=swap');
 
-/* Efecto Lupa */
-    #imageContainer {
-        position: relative;
-    }
-
+/* Lupa más pequeña */
     .magnifier {
         position: absolute;
-        width: 200px;
-        height: 200px;
-        border: 4px solid #ffc107;
+        width: 160px;          /* Más pequeña */
+        height: 160px;
+        border: 3px solid #ffc107;
         border-radius: 50%;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.3);
         background: url('{{ producto.imagen_principal.imagen.url }}') no-repeat;
-        background-size: 0;
         pointer-events: none;
         display: none;
         z-index: 25;
@@ -224,8 +219,8 @@
 
 /* Miniaturas */
     .miniatura {
-        width: 75px;
-        height: 75px;
+        width: 70px;
+        height: 70px;
         object-fit: cover;
         cursor: pointer;
         transition: all 0.3s ease;
@@ -234,7 +229,7 @@
 
     .miniatura:hover, .miniatura.activa {
         border-color: #ffc107;
-        transform: scale(1.08);
+        transform: scale(1.1);
     }
 
     </style>
@@ -357,41 +352,47 @@
 
     <div class="row justify-content-center align-items-start g-5">
 
-        <!-- === Imagen con Efecto Lupa === -->
+        <!-- === LADO IZQUIERDO - Imagen === -->
         <div class="col-lg-6">
             {% if producto.imagen_principal %}
-                <div class="galeria-producto">
+                <div class="galeria-producto bg-white rounded-4 shadow-sm overflow-hidden">
 
-                    <div class="imagen-contenedor position-relative rounded-4 shadow overflow-hidden" 
-                         style="height: 520px; cursor: crosshair;" id="imageContainer">
-
-                        <!-- Favorito -->
-                        <a href="#" 
-                           class="favorito-btn position-absolute top-0 end-0 m-3 bg-white rounded-circle shadow p-2"
-                           data-id="{{ producto.id }}"
-                           style="z-index:30;">
+                    <!-- Barra superior + Favorito -->
+                    <div class="d-flex justify-content-between align-items-center px-4 pt-3">
+                        <div class="bg-dark" style="height: 6px; width: 120px; border-radius: 3px;"></div>
+                        <a href="#" class="favorito-btn" data-id="{{ producto.id }}">
                             {% if producto.id in favoritos_ids %}
-                                <i class="bi bi-heart-fill text-danger fs-4"></i>
+                                <i class="bi bi-heart-fill text-danger fs-3"></i>
                             {% else %}
-                                <i class="bi bi-heart text-danger fs-4"></i>
+                                <i class="bi bi-heart text-danger fs-3"></i>
                             {% endif %}
                         </a>
+                    </div>
 
-                        <img
-                            id="imagenPrincipal"
-                            src="{{ producto.imagen_principal.imagen.url }}"
-                            class="w-100 h-100 object-fit-cover"
-                            alt="{{ producto.nombre }}">
-                        
-                        <!-- Lupa -->
+                    <!-- Imagen Grande con Lupa -->
+                    <div class="imagen-contenedor position-relative overflow-hidden" 
+                         style="height: 480px; cursor: crosshair;" id="imageContainer">
+
+                        <img id="imagenPrincipal"
+                             src="{{ producto.imagen_principal.imagen.url }}"
+                             class="w-100 h-100 object-fit-contain bg-light"
+                             alt="{{ producto.nombre }}">
+
+                        <!-- Lupa más pequeña -->
                         <div id="magnifier" class="magnifier"></div>
                     </div>
 
+                    <!-- Mensaje de agradecimiento -->
+                    <div class="p-4 text-center text-muted small">
+                        ¡Gracias por tu tiempo y colaboración!<br>
+                        Esta información nos ayudará a impulsar mejores prácticas en el uso de la IA.
+                    </div>
+
                     <!-- Miniaturas -->
-                    <div class="miniaturas mt-3 d-flex gap-2 justify-content-start">
+                    <div class="miniaturas d-flex gap-3 justify-content-center pb-4">
                         {% for imagen in producto.imagenes.all %}
                             <img src="{{ imagen.imagen.url }}" 
-                                 class="miniatura rounded-3 {% if forloop.first %}activa{% endif %}"
+                                 class="miniatura rounded-3 {% if forloop.first %}activa border border-warning{% endif %}"
                                  onclick="cambiarImagen(this)">
                         {% endfor %}
                     </div>
@@ -399,45 +400,35 @@
             {% endif %}
         </div>
 
-        <!-- === Información === -->
+        <!-- === LADO DERECHO - Información === -->
         <div class="col-lg-5">
-            <div class="card border-0 shadow rounded-4 p-4 sticky-top" style="top:110px;">
+            <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
 
-                <small class="text-warning fw-bold text-uppercase tracking-widest">
-                    {{ producto.categoria.nombre }}
-                </small>
+                <small class="text-uppercase fw-bold text-warning">CARTÓN 1</small>
 
-                <h1 class="fw-bold mt-2 mb-3" style="font-family: 'Abril Fatface', serif; line-height: 1.05;">
+                <h1 class="fw-bold mt-2 mb-3" style="font-family: 'Abril Fatface', serif; line-height: 1.1; font-size: 2.1rem;">
                     {{ producto.nombre }}
                 </h1>
 
-                <div class="mb-4 d-flex gap-2 align-items-center">
-                    <span class="badge bg-success px-3 py-2 rounded-pill fs-6">
-                        Disponible
-                    </span>
-                    <span class="badge bg-primary px-3 py-2 rounded-pill fs-6">
-                        Precio sujeto a cotización
-                    </span>
+                <div class="d-flex gap-2 mb-4">
+                    <span class="badge bg-success px-3 py-2 rounded-pill">Disponible</span>
+                    <span class="badge bg-primary px-3 py-2 rounded-pill">Precio sujeto a cotización</span>
                 </div>
 
-                <h5 class="fw-bold mb-3" style="font-family: 'BioRhyme', serif;">
-                    Descripción
-                </h5>
-
-                <p class="text-secondary lh-base" style="font-family: 'BioRhyme', serif;">
+                <h5 class="fw-bold mb-3" style="font-family: 'BioRhyme', serif;">Descripción</h5>
+                <p class="text-secondary" style="font-family: 'BioRhyme', serif; line-height: 1.7;">
                     {{ producto.descripcion }}
                 </p>
 
                 <hr class="my-4">
 
-                <div class="d-grid">
+                <div class="d-grid mt-auto">
                     <a href="{% url 'agregar_cotizacion' producto.id %}" 
-                       class="btn btn-warning btn-lg rounded-pill py-2.5 fw-semibold shadow-sm">
+                       class="btn btn-primary btn-lg rounded-pill py-3 fw-semibold shadow-sm">
                         <i class="bi bi-cart-plus me-2"></i>
                         Agregar a solicitud
                     </a>
                 </div>
-
             </div>
         </div>
     </div>
@@ -583,7 +574,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (!container || !img || !magnifier) return;
 
-    const zoom = 2.8;   // Ajusta el nivel de zoom aquí
+    const zoom = 2.8;
 
     container.addEventListener("mousemove", function (e) {
         const rect = container.getBoundingClientRect();
@@ -596,11 +587,11 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         magnifier.style.display = "block";
-        magnifier.style.left = (x - 100) + "px";
-        magnifier.style.top = (y - 100) + "px";
+        magnifier.style.left = (x - 80) + "px";   // Ajustado para lupa más pequeña
+        magnifier.style.top = (y - 80) + "px";
 
-        const bgX = -(x * zoom - 100);
-        const bgY = -(y * zoom - 100);
+        const bgX = -(x * zoom - 80);
+        const bgY = -(y * zoom - 80);
 
         magnifier.style.backgroundImage = `url('${img.src}')`;
         magnifier.style.backgroundSize = `${img.width * zoom}px ${img.height * zoom}px`;
