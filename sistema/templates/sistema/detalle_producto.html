@@ -90,111 +90,110 @@
         box-shadow:0 10px 30px rgba(0,0,0,.08);
 
     }
+    .galeria-producto{
+        display:flex;
+        flex-direction:column;
+        gap:16px;
+        background:#fff;
+        border-radius:26px;
+        box-shadow:0 18px 45px rgba(17,24,39,.10);
+        overflow:hidden;
+    }
+
+    .galeria-top{
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        padding:16px 24px 0;
+    }
+
+    .detalle-linea{
+        height:5px;
+        width:110px;
+        border-radius:999px;
+        background:linear-gradient(90deg,#111827,#9b7615);
+    }
+
+    .imagen-contenedor{
+        height:390px;
+        background:#f7f6f2;
+        padding:18px;
+        border-radius:0;
+        box-shadow:none;
+    }
 
     .producto-principal{
-
         width:100%;
-        height:420px;
+        height:100%;
         object-fit:contain;
-
     }
 
     .miniaturas{
-
         display:flex;
         gap:12px;
         overflow-x:auto;
-        padding-bottom:5px;
-
-    }
-
-    .miniaturas::-webkit-scrollbar{
-
-        height:6px;
-
-    }
-
-    .miniaturas::-webkit-scrollbar-thumb{
-
-        background:#c7c7c7;
-        border-radius:20px;
-
+        justify-content:center;
+        padding:0 20px 22px;
     }
 
     .miniatura{
-
-        width:90px;
-        height:90px;
-
+        width:68px;
+        height:68px;
         object-fit:cover;
-
-        border-radius:15px;
-
+        border-radius:14px;
         cursor:pointer;
-
-        border:3px solid transparent;
-
-        background:white;
-
-        padding:5px;
-
+        border:2px solid transparent;
+        background:#f7f6f2;
+        padding:4px;
         flex-shrink:0;
-
         transition:.25s;
-
     }
 
-    .miniatura:hover{
-
-        transform:scale(1.05);
-
-    }
-
+    .miniatura:hover,
     .miniatura.activa{
-
-        border-color:#ffc107;
-
+        border-color:#9b7615;
+        transform:translateY(-3px);
     }
 
-    @media(max-width:992px){
-
-    .producto-principal{
-
-    height:400px;
-
-    }
-
-    }
-
-    @media(max-width:768px){
-
-    .producto-principal{
-
-    height:300px;
-
-    }
-
-    .miniatura{
-
-    width:70px;
-
-    height:70px;
-
-    }
-
-    }
     .favorito-btn{
-        width:50px;
-        height:50px;
+        width:46px;
+        height:46px;
         display:flex;
         align-items:center;
         justify-content:center;
+        border-radius:50%;
+        background:#fff;
+        box-shadow:0 8px 20px rgba(0,0,0,.12);
         transition:.25s;
     }
 
     .favorito-btn:hover{
-        transform:scale(1.1);
+        transform:scale(1.08);
     }
+
+    @media(max-width:992px){
+        .imagen-contenedor{
+            height:340px;
+        }
+    }
+
+    @media(max-width:768px){
+        .imagen-contenedor{
+            height:280px;
+        }
+
+        .miniaturas{
+            justify-content:flex-start;
+        }
+
+        .miniatura{
+            width:62px;
+            height:62px;
+        }
+    }
+
+
+
 
     /* Fuentes */
     @import url('https://fonts.googleapis.com/css2?family=Abril+Fatface&family=BioRhyme:wght@400;500;600&display=swap');
@@ -214,20 +213,6 @@
         overflow:hidden;
     }
 
-/* Miniaturas */
-    .miniatura {
-        width: 70px;
-        height: 70px;
-        object-fit: cover;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        border: 2px solid transparent;
-    }
-
-    .miniatura:hover, .miniatura.activa {
-        border-color: #ffc107;
-        transform: scale(1.1);
-    }
     .badge-cotizacion{
 
         background:#7b1e3a;
@@ -245,106 +230,107 @@
 
     }
 
+    .info-producto{
+        border:0;
+        border-radius:26px;
+        background:#ffffff;
+        box-shadow:0 18px 45px rgba(17,24,39,.10);
+        overflow:hidden;
+    }
+
+    .info-producto::before{
+        content:"";
+        display:block;
+        height:7px;
+        background:linear-gradient(90deg,#111827,#9b7615,#111827);
+    }
+
+    .categoria-producto{
+        display:inline-block;
+        color:#111827;
+        font-weight:800;
+        letter-spacing:2px;
+        text-transform:uppercase;
+        font-size:.78rem;
+        border-bottom:3px solid #9b7615;
+        padding-bottom:6px;
+    }
+
+    .nombre-producto{
+        font-family:'Abril Fatface', serif;
+        color:#111827;
+        line-height:1.1;
+        font-size:2.15rem;
+    }
+
     .estado-producto{
         display:inline-flex;
         align-items:center;
-        gap:8px;
-        padding:8px 18px;
-        border-radius:30px;
-        background:#eef7f0;
-        color:#1f6b3b;
-        font-weight:600;
-        font-size:.9rem;
+        gap:7px;
+        padding:8px 15px;
+        border-radius:999px;
+        background:#f4f1ea;
+        color:#111827;
+        font-weight:700;
+        font-size:.86rem;
+    }
+
+    .estado-producto i{
+        color:#9b7615;
     }
 
     .cotizacion-producto{
         display:inline-flex;
         align-items:center;
-        padding:8px 18px;
-        border-radius:30px;
+        padding:8px 15px;
+        border-radius:999px;
         background:#111827;
-        color:#997000;
+        color:#d8b45d;
         font-family:'Gravitas One', serif;
-        font-size:.75rem;
-        letter-spacing:.5px;
+        font-size:.64rem;
+        letter-spacing:.4px;
+    }
+
+    .descripcion-titulo{
+        font-family:'BioRhyme', serif;
+        color:#111827;
+        font-weight:700;
+    }
+
+    .descripcion-producto{
+        font-family:'BioRhyme', serif;
+        color:#5f6673;
+        line-height:1.75;
     }
 
     .btn-solicitud{
-
         background:#111827;
         color:white;
-
-        border:none;
-
+        border:0;
         border-radius:16px;
-
-        padding:14px 22px;
-
-        font-weight:600;
-
-        transition:.3s;
-
+        padding:11px 20px;
+        font-weight:700;
+        box-shadow:0 12px 24px rgba(17,24,39,.18);
+        transition:.25s;
     }
 
     .btn-solicitud:hover{
-
-        background:#f4c542;
-
-        color:#111827;
-
+        background:#9b7615;
+        color:white;
         transform:translateY(-2px);
-
     }
 
-    .categoria-producto{
+    @media(max-width:768px){
+        .nombre-producto{
+            font-size:1.75rem;
+        }
 
-        display:inline-block;
-
-        color:#111827;
-
-        font-weight:700;
-
-        letter-spacing:2px;
-
-        text-transform:uppercase;
-
-        font-size:.8rem;
-
-        border-bottom:3px solid #f4c542;
-
-        padding-bottom:6px;
-
+        .cotizacion-producto{
+            font-size:.58rem;
+        }
     }
 
-    .info-producto{
-
-        border:none;
-
-        border-radius:24px;
-
-        background:white;
-
-        box-shadow:0 15px 45px rgba(0,0,0,.08);
-
-        overflow:hidden;
-
-    }
-
-    .info-producto::before{
-
-        content:"";
-
-        display:block;
-
-        height:6px;
     
-        background:linear-gradient(
-            90deg,
-            #111827,
-            #f4c542
-        );
-
-    }
 
     </style>
 
@@ -470,11 +456,11 @@
         <!-- === LADO IZQUIERDO - Imagen === -->
         <div class="col-lg-6">
             {% if producto.imagen_principal %}
-                <div class="galeria-producto bg-white rounded-4 shadow-sm overflow-hidden">
+                <div class="galeria-producto">
 
                     <!-- Barra superior + Favorito -->
-                    <div class="d-flex justify-content-between align-items-center px-4 pt-3">
-                        <div class="bg-dark" style="height: 6px; width: 120px; border-radius: 3px;"></div>
+                    <div class="galeria-top">
+                        <div class="detalle-linea"></div>
                         <a href="#" class="favorito-btn" data-id="{{ producto.id }}">
                             {% if producto.id in favoritos_ids %}
                                 <i class="bi bi-heart-fill text-danger fs-3"
@@ -487,13 +473,13 @@
                     </div>
 
                     <!-- Imagen Grande con Lupa -->
-                    <div class="imagen-contenedor position-relative overflow-hidden" 
-                         style="height: 420px; cursor: crosshair;" id="imageContainer">
+                    <div class="imagen-contenedor position-relative overflow-hidden"
+                        style="cursor: crosshair;" id="imageContainer">
 
                         <img id="imagenPrincipal"
-                             src="{{ producto.imagen_principal.imagen.url }}"
-                             class="w-100 h-100 object-fit-contain bg-light"
-                             alt="{{ producto.nombre }}">
+                            src="{{ producto.imagen_principal.imagen.url }}"
+                            class="producto-principal"
+                            alt="{{ producto.nombre }}">
 
                         <!-- Lupa más pequeña -->
                         <div id="magnifier" class="magnifier"></div>
@@ -501,7 +487,7 @@
 
 
                     <!-- Miniaturas -->
-                    <div class="miniaturas d-flex gap-3 justify-content-center pb-4">
+                    <div class="miniaturas">
                         {% for imagen in producto.imagenes.all %}
                             <img src="{{ imagen.imagen.url }}" 
                                  class="miniatura rounded-3 {% if forloop.first %}activa border border-warning{% endif %}"
@@ -514,13 +500,13 @@
 
         <!-- === LADO DERECHO - Información === -->
         <div class="col-lg-5">
-            <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+            <div class="info-producto p-4 h-100">
 
                 <span class="categoria-producto">
                     {{ producto.categoria.nombre }}
                 </span>
 
-                <h1 class="fw-bold mt-2 mb-3" style="font-family: 'Abril Fatface', serif; line-height: 1.1; font-size: 2.1rem;">
+                <h1 class="nombre-producto mt-3 mb-3">
                     {{ producto.nombre }}
                 </h1>
 
@@ -537,8 +523,8 @@
 
                 </div>
 
-                <h5 class="fw-bold mb-3" style="font-family: 'BioRhyme', serif;">Descripción</h5>
-                <p class="text-secondary" style="font-family: 'BioRhyme', serif; line-height: 1.7;">
+                <h5 class="descripcion-titulo mb-3">Descripción</h5>
+                <p class="descripcion-producto">
                     {{ producto.descripcion }}
                 </p>
 
