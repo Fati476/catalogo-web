@@ -163,7 +163,7 @@
 
 <div class="container py-5">
 
-    <div class="row">
+    <div class="row justify-content-center align-items-start g-5">
 
         <!-- Imagen -->
 
@@ -171,8 +171,15 @@
 
             {% if producto.imagen_principal %}
 
-                <img src="{{ producto.imagen_principal.imagen.url }}"
-                     class="img-fluid rounded-4 shadow">
+                <img
+                src="{{ producto.imagen_principal.imagen.url }}"
+                class="w-100 rounded-4 shadow"
+                style="
+                    height:600px;
+                    object-fit:contain;
+                    background:white;
+                    padding:25px;
+                ">
 
             {% else %}
 
@@ -189,37 +196,55 @@
 
         <!-- Información -->
 
-        <div class="col-lg-6">
+        <div class="col-lg-5">
 
-            <small class="text-warning fw-bold">
+            <div class="card border-0 shadow rounded-4 p-4 sticky-top"
+                 style="top:110px;">
 
-                {{ producto.categoria.nombre }}
+                <small class="text-warning fw-bold text-uppercase">
+                    {{ producto.categoria.nombre }}
+                </small>
 
-            </small>
+                <h1 class="fw-bold mt-2 mb-3">
+                    {{ producto.nombre }}
+                </h1>
 
-            <h1 class="display-4 fw-bold mt-2">
+                <div class="mb-4">
 
-                {{ producto.nombre }}
+                    <span class="badge bg-success fs-6 px-3 py-2">
+                        Disponible
+                    </span>
 
-            </h1>
+                </div>
 
-            <hr>
+                <h5 class="fw-bold mb-3">
+                    Descripción
+                </h5>
 
-            <p class="lead">
+                <p class="text-secondary">
 
-                {{ producto.descripcion }}
+                    {{ producto.descripcion }}
 
-            </p>
+                </p>
 
-            <a href="{% url 'agregar_cotizacion' producto.id %}"
-               class="btn btn-warning btn-lg rounded-pill mt-4">
+                <hr>
 
-                Agregar a solicitud
+                <div class="d-grid">
 
-            </a>
+                    <a href="{% url 'agregar_cotizacion' producto.id %}"
+                       class="btn btn-warning btn-lg rounded-pill">
 
+                        <i class="bi bi-cart-plus"></i>
+
+                        Agregar a solicitud
+
+                    </a>
+
+                </div>
+
+            </div>
+        
         </div>
-
     </div>
 
 </div>
