@@ -245,7 +245,106 @@
 
     }
 
+    .estado-producto{
+        display:inline-flex;
+        align-items:center;
+        gap:8px;
+        padding:8px 18px;
+        border-radius:30px;
+        background:#eef7f0;
+        color:#1f6b3b;
+        font-weight:600;
+        font-size:.9rem;
+    }
+
+    .cotizacion-producto{
+        display:inline-flex;
+        align-items:center;
+        padding:8px 18px;
+        border-radius:30px;
+        background:#111827;
+        color:#997000;
+        font-family:'Gravitas One', serif;
+        font-size:.75rem;
+        letter-spacing:.5px;
+    }
+
+    .btn-solicitud{
+
+        background:#111827;
+        color:white;
+
+        border:none;
+
+        border-radius:16px;
+
+        padding:14px 22px;
+
+        font-weight:600;
+
+        transition:.3s;
+
+    }
+
+    .btn-solicitud:hover{
+
+        background:#f4c542;
+
+        color:#111827;
+
+        transform:translateY(-2px);
+
+    }
+
+    .categoria-producto{
+
+        display:inline-block;
+
+        color:#111827;
+
+        font-weight:700;
+
+        letter-spacing:2px;
+
+        text-transform:uppercase;
+
+        font-size:.8rem;
+
+        border-bottom:3px solid #f4c542;
+
+        padding-bottom:6px;
+
+    }
+
+    .info-producto{
+
+        border:none;
+
+        border-radius:24px;
+
+        background:white;
+
+        box-shadow:0 15px 45px rgba(0,0,0,.08);
+
+        overflow:hidden;
+
+    }
+
+    .info-producto::before{
+
+        content:"";
+
+        display:block;
+
+        height:6px;
     
+        background:linear-gradient(
+            90deg,
+            #111827,
+            #f4c542
+        );
+
+    }
 
     </style>
 
@@ -417,15 +516,25 @@
         <div class="col-lg-5">
             <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
 
-                <small class="text-uppercase fw-bold text-warning">CARTÓN 1</small>
+                <span class="categoria-producto">
+                    {{ producto.categoria.nombre }}
+                </span>
 
                 <h1 class="fw-bold mt-2 mb-3" style="font-family: 'Abril Fatface', serif; line-height: 1.1; font-size: 2.1rem;">
                     {{ producto.nombre }}
                 </h1>
 
-                <div class="d-flex gap-2 mb-4">
-                    <span class="badge bg-success px-3 py-2 rounded-pill">Disponible</span>
-                    <span class="badge bg-primary px-3 py-2 rounded-pill">Precio sujeto a cotización</span>
+                <div class="d-flex flex-wrap gap-2 mb-4">
+
+                    <span class="estado-producto">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Disponible
+                    </span>
+
+                    <span class="cotizacion-producto">
+                        Precio sujeto a cotización
+                    </span>
+
                 </div>
 
                 <h5 class="fw-bold mb-3" style="font-family: 'BioRhyme', serif;">Descripción</h5>
@@ -436,10 +545,13 @@
                 <hr class="my-4">
 
                 <div class="d-grid mt-auto">
-                    <a href="{% url 'agregar_cotizacion' producto.id %}" 
-                       class="btn btn-primary btn-lg rounded-pill py-3 fw-semibold shadow-sm">
+                    <a href="{% url 'agregar_cotizacion' producto.id %}"
+                       class="btn btn-solicitud">
+
                         <i class="bi bi-cart-plus me-2"></i>
+
                         Agregar a solicitud
+
                     </a>
                 </div>
             </div>
