@@ -50,11 +50,164 @@
             box-shadow: none;
         }
 
+        .catalogo-hero{
+            position:relative;
+            min-height:280px;
+            border-radius:32px;
+            overflow:hidden;
+            background:
+                linear-gradient(90deg, rgba(17,24,39,.92), rgba(17,24,39,.55), rgba(17,24,39,.2)),
+                url("{% static 'img/banner_productos.png' %}");
+            background-size:cover;
+            background-position:center;
+            box-shadow:0 18px 45px rgba(17,24,39,.18);
+            display:flex;
+            align-items:center;
+            padding:45px;
+        }
+
+        .catalogo-hero-content{
+            max-width:650px;
+            color:white;
+            position:relative;
+            z-index:2;
+        }
+
+        .catalogo-etiqueta{
+            display:inline-block;
+            color:#d8b45d;
+            font-weight:800;
+            letter-spacing:2px;
+            text-transform:uppercase;
+            font-size:.8rem;
+         margin-bottom:12px;
+        }
+
+        .catalogo-hero h1{
+            font-family:'Arvo', serif;
+            font-size:2.7rem;
+            line-height:1.1;
+            margin-bottom:14px;
+        }
+
+        .catalogo-hero p{
+            max-width:580px;
+            color:rgba(255,255,255,.88);
+            font-size:1.05rem;
+            line-height:1.6;
+            margin-bottom:0;
+        }
+
+        .buscador-box{
+            max-width:620px;
+            margin:-32px auto 45px;
+            position:relative;
+            z-index:5;
+        }
+
+        .buscador-box .input-group{
+            background:white;
+            border-radius:999px;
+            overflow:hidden;
+            box-shadow:0 14px 35px rgba(17,24,39,.14);
+            border:1px solid rgba(17,24,39,.08);
+        }
+        
+        #buscarProducto::placeholder{
+            color:#8a8f99;
+        }
+
+        .product-card{
+            transition:.25s ease;
+        }
+
+        .product-card:hover{
+            transform:translateY(-5px);
+        }
+
+        .product-card .card{
+            border:0;
+            border-radius:22px;
+            background:white;
+            box-shadow:0 12px 28px rgba(17,24,39,.08);
+            transition:.25s ease;
+        }
+
+        .product-card:hover .card{
+            box-shadow:0 18px 40px rgba(17,24,39,.13);
+        }
+
+        .product-link-img{
+            display:block;
+            background:#f7f6f2;
+            overflow:hidden;
+        }
+
+        .product-img{
+            width:100%;
+            height:235px;
+            object-fit:cover;
+            transition:.35s ease;
+        }
+
+        .product-card:hover .product-img{
+            transform:scale(1.04);
+        }
+
+        .product-title{        
+    color:#111827;
+    font-weight:800;
+    margin-bottom:4px;
+        }
+
+        .product-category{        
+    color:#9b7615;
+    font-size:.82rem;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.8px;
+        }
+
+        .ver-detalle-text{        
+    color:#111827;
+    font-size:.9rem;
+    font-weight:700;
+    margin-top:12px;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+        }
+
+        @media(max-width:768px){        
+    .catalogo-hero{
+        min-height:230px;
+        padding:32px 24px;
+        border-radius:24px;
+        background-position:center right;
+    }
+
+    .catalogo-hero h1{
+        font-size:2rem;
+    }
+
+    .catalogo-hero p{
+        font-size:.95rem;
+    }
+
+    .buscador-box{
+        margin:-25px auto 35px;
+    }
+
+    .product-img{
+        height:180px;
+    }
+        }
+
     </style>
     
 </head>
 
-<body style="background: #f8f9fa; padding-top:75px;">
+<body style="background:#f3f1ec; padding-top:95px;">
 
 <!-- NAVBAR (copias el mismo que ya tienes) -->
 <nav class="navbar navbar-expand-lg navbar-dark fixed-top rounded-pill"
@@ -157,28 +310,37 @@
 
 <div class="container-fluid px-3 px-lg-4 mt-4">
 
-    <div class="text-center mb-5">
-        <h1 class="display-5 fw-bold mb-3 text-dark" 
-            style="font-family: 'Neuton', serif; letter-spacing: -0.03em;">
-            Todos los Productos
-        </h1>
-        <p class="lead text-muted" style="max-width: 720px; margin: 0 auto;">
-            Explora nuestro catálogo completo de sustancias químicas, 
-            artificios pirotécnicos y materiales especializados.
-        </p>
-    </div>
+    <section class="catalogo-hero mb-5">
 
-    <div class="mb-5">
-        <div class="mx-auto" style="max-width: 620px;">
-            <div class="input-group input-group-lg shadow-sm rounded-pill overflow-hidden border">
-                <span class="input-group-text bg-white border-0 ps-4">
-                    <i class="bi bi-search fs-4 text-muted"></i>
-                </span>
-                <input type="text" 
-                       id="buscarProducto"
-                       class="form-control border-0 py-3"
-                       placeholder="Buscar productos, sustancias o categorías...">
-            </div>
+        <div class="catalogo-hero-content">
+
+            <span class="catalogo-etiqueta">
+                Catálogo especializado
+            </span>
+
+            <h1>
+                Productos para la industria pirotécnica
+            </h1>
+
+            <p>
+                Explora sustancias químicas, artificios pirotécnicos y materiales especializados
+                disponibles para cotización.
+            </p>
+
+        </div>
+
+    </section>
+
+    <div class="buscador-box">
+        <div class="input-group input-group-lg">
+            <span class="input-group-text bg-white border-0 ps-4">
+                <i class="bi bi-search fs-4 text-muted"></i>
+            </span>
+
+            <input type="text"
+                   id="buscarProducto"
+                   class="form-control border-0 py-3"
+                   placeholder="Buscar productos o categorías...">
         </div>
     </div>
 
@@ -188,55 +350,45 @@
 
         <div class="col-6 col-md-4 producto-card">
 
-            <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden position-relative">
+            <div class="card h-100 overflow-hidden">
 
-         <!-- FAVORITO -->
-                <a href="#"
-                    class="favorito-btn position-absolute top-0 end-0 m-2 bg-white rounded-circle shadow-sm p-2"
-                    data-id="{{ producto.id }}"
-                    style="z-index:10;">
-
-                    {% if producto.id in favoritos_ids %}
-                        <i class="bi bi-heart-fill text-danger" id="heart-{{ producto.id }}"></i>
-                    {% else %}
-                        <i class="bi bi-heart text-danger" id="heart-{{ producto.id }}"></i>
-                    {% endif %}
-
-                </a>
-
-         <!-- IMAGEN / CARRUSEL -->
                 {% if producto.imagen_principal %}
 
-                <img src="{{ producto.imagen_principal.imagen.url }}"
-                    class="card-img-top"
-                    style="
-                        height:240px;
-                        object-fit:cover;
-                    ">
+                    <a href="{% url 'detalle_producto' producto.id %}"
+                       class="product-link-img">
+
+                        <img src="{{ producto.imagen_principal.imagen.url }}"
+                             class="product-img"
+                             alt="{{ producto.nombre }}">
+
+                    </a>
 
                 {% else %}
 
-                <div class="d-flex justify-content-center align-items-center bg-light"
-                    style="height:240px;">
-                    <i class="bi bi-image fs-1 text-secondary"></i>
-                </div>
+                    <a href="{% url 'detalle_producto' producto.id %}"
+                       class="product-link-img d-flex justify-content-center align-items-center"
+                       style="height:235px;">
+
+                        <i class="bi bi-image fs-1 text-secondary"></i>
+
+                    </a>
 
                 {% endif %}
 
-         <!-- CONTENIDO -->
-                <div class="card-body d-flex flex-column">
+                <div class="card-body">
 
-                    <h6 class="fw-bold mb-1 fs-6 fs-md-5">
+                    <h6 class="product-title">
                         {{ producto.nombre }}
                     </h6>
 
-                    <small class="text-muted d-block mb-2">
+                    <div class="product-category">
                         {{ producto.categoria.nombre }}
-                    </small>
+                    </div>
 
-            <!-- BOTÓN COTIZAR -->
-                    <a href="{% url 'detalle_producto' producto.id %}" class="btn btn-warning btn-sm w-100 rounded-3">
-                        <i class="bi bi-cart-plus"></i> Ver Producto 
+                    <a href="{% url 'detalle_producto' producto.id %}"
+                       class="ver-detalle-text text-decoration-none">
+                        Ver producto
+                        <i class="bi bi-arrow-right"></i>
                     </a>
 
                 </div>
@@ -339,34 +491,6 @@ document.getElementById('buscarProducto').addEventListener('keyup', function(){
 
 });
 
-</script>
-
-<script>
-document.querySelectorAll('.favorito-btn').forEach(btn => {
-
-    btn.addEventListener('click', function(e){
-        e.preventDefault();
-
-        const productoId = this.dataset.id;
-        const icon = document.getElementById('heart-' + productoId);
-
-        fetch(`/favorito/${productoId}/`)
-        .then(response => response.json())
-        .then(data => {
-
-            if(data.estado === "agregado"){
-                icon.classList.remove("bi-heart");
-                icon.classList.add("bi-heart-fill");
-            } else {
-                icon.classList.remove("bi-heart-fill");
-                icon.classList.add("bi-heart");
-            }
-
-        });
-
-    });
-
-});
 </script>
 
 </body>
