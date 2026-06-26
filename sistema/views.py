@@ -1155,10 +1155,18 @@ def detalle_producto(request, id):
 
     producto.imagen_principal = producto.imagenes.first()
 
+    favoritos_ids = Favorito.objects.filter(
+        usuario=request.user
+    ).values_list(
+        'producto_id',
+        flat=True
+    )
+
     return render(
         request,
         'sistema/detalle_producto.html',
         {
-            'producto': producto
+            'producto': producto,
+            'favoritos_ids': favoritos_ids
         }
     )

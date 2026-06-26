@@ -186,6 +186,18 @@
     }
 
     }
+    .favorito-btn{
+        width:50px;
+        height:50px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        transition:.25s;
+    }
+
+    .favorito-btn:hover{
+        transform:scale(1.1);
+    }
 
     </style>
 
@@ -316,7 +328,20 @@
 
                 <div class="galeria-producto">
 
-                    <div class="imagen-contenedor">
+                    <div class="imagen-contenedor position-relative">
+
+                        <a href="#"
+                           class="favorito-btn position-absolute top-0 end-0 m-3 bg-white rounded-circle shadow p-2"
+                           data-id="{{ producto.id }}"
+                           style="z-index:20;">
+
+                            {% if producto.id in favoritos_ids %}
+                                <i class="bi bi-heart-fill text-danger fs-4" id="heart-{{ producto.id }}"></i>
+                            {% else %}
+                                <i class="bi bi-heart text-danger fs-4" id="heart-{{ producto.id }}"></i>
+                            {% endif %}
+
+                        </a>
 
                         <img
                             id="imagenPrincipal"
@@ -511,6 +536,35 @@ function cambiarImagen(elemento){
 
 }
 
+</script>
+
+<script>
+document.querySelectorAll('.favorito-btn').forEach(btn => {
+
+    btn.addEventListener('click', function(e){
+
+        e.preventDefault();
+
+        const productoId = this.dataset.id;
+        const icon = document.getElementById('heart-' + productoId);
+
+        fetch(`/favorito/${productoId}/`)
+        .then(response => response.json())
+        .then(data => {
+
+            if(data.estado === "agregado"){
+                icon.classList.remove("bi-heart");
+                icon.classList.add("bi-heart-fill");
+            }else{
+                icon.classList.remove("bi-heart-fill");
+                icon.classList.add("bi-heart");
+            }
+
+        });
+
+    });
+
+});
 </script>
 
 
