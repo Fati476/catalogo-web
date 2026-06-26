@@ -44,6 +44,149 @@
         height:45px;
     }
 
+    .producto-principal{
+        width:100%;
+        max-height:550px;
+        object-fit:contain;
+        background:#fff;
+        padding:20px;
+        border-radius:20px;
+        transition:.3s;
+    }
+
+    @media (max-width:992px){
+
+        .producto-principal{
+
+            max-height:420px;
+            padding:15px;
+
+        }
+
+    }
+
+    @media (max-width:768px){
+
+        .producto-principal{
+
+            max-height:320px;
+            padding:10px;
+
+        }
+
+    }
+
+    .galeria-producto{
+
+        display:flex;
+        flex-direction:column;
+        gap:18px;
+
+    }
+
+    .imagen-contenedor{
+
+        background:white;
+        border-radius:22px;
+        padding:20px;
+        box-shadow:0 10px 30px rgba(0,0,0,.08);
+
+    }
+
+    .producto-principal{
+
+        width:100%;
+        height:500px;
+        object-fit:contain;
+        transition:.3s;
+
+    }
+
+    .miniaturas{
+
+        display:flex;
+        gap:12px;
+        overflow-x:auto;
+        padding-bottom:5px;
+
+    }
+
+    .miniaturas::-webkit-scrollbar{
+
+        height:6px;
+
+    }
+
+    .miniaturas::-webkit-scrollbar-thumb{
+
+        background:#c7c7c7;
+        border-radius:20px;
+
+    }
+
+    .miniatura{
+
+        width:90px;
+        height:90px;
+
+        object-fit:cover;
+
+        border-radius:15px;
+
+        cursor:pointer;
+
+        border:3px solid transparent;
+
+        background:white;
+
+        padding:5px;
+
+        flex-shrink:0;
+
+        transition:.25s;
+
+    }
+
+    .miniatura:hover{
+
+        transform:scale(1.05);
+
+    }
+
+    .miniatura.activa{
+
+        border-color:#ffc107;
+
+    }
+
+    @media(max-width:992px){
+
+    .producto-principal{
+
+    height:400px;
+
+    }
+
+    }
+
+    @media(max-width:768px){
+
+    .producto-principal{
+
+    height:300px;
+
+    }
+
+    .miniatura{
+
+    width:70px;
+
+    height:70px;
+
+    }
+
+    }
+
     </style>
 
     <link href="https://fonts.googleapis.com/css2?family=Arvo:wght@700&display=swap" rel="stylesheet">
@@ -171,22 +314,38 @@
 
             {% if producto.imagen_principal %}
 
-                <img
-                src="{{ producto.imagen_principal.imagen.url }}"
-                class="w-100 rounded-4 shadow"
-                style="
-                    height:600px;
-                    object-fit:contain;
-                    background:white;
-                    padding:25px;
-                ">
+                <div class="galeria-producto">
+
+                    <div class="imagen-contenedor">
+
+                        <img
+                            id="imagenPrincipal"
+                            src="{{ producto.imagen_principal.url }}"
+                            class="producto-principal shadow">
+
+                    </div>
+
+                    <div class="miniaturas">
+
+                        {% for imagen in producto.imagenes.all %}
+
+                            <img
+                                src="{{ imagen.imagen.url }}"
+                                class="miniatura {% if forloop.first %}activa{% endif %}"
+                                onclick="cambiarImagen(this)">
+
+                        {% endfor %}
+
+                    </div>
+
+                </div>
 
             {% else %}
 
                 <div class="bg-light rounded-4 d-flex justify-content-center align-items-center"
-                     style="height:500px">
+                style="height:350px">
 
-                    Sin imagen
+                Sin imagen
 
                 </div>
 
@@ -334,6 +493,25 @@
         </div>
     </div>
 </footer>
+
+<script>
+
+function cambiarImagen(elemento){
+
+    document.getElementById("imagenPrincipal").src = elemento.src;
+
+    document.querySelectorAll(".miniatura").forEach(img=>{
+
+        img.classList.remove("activa");
+
+    });
+
+    elemento.classList.add("activa");
+
+}
+
+</script>
+
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
