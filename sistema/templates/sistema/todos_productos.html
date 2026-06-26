@@ -52,17 +52,18 @@
 
         .catalogo-hero{
             position:relative;
-            min-height:300px;
+            min-height:310px;
             overflow:hidden;
             background:
-                linear-gradient(90deg, rgba(17,24,39,.96), rgba(17,24,39,.70), rgba(17,24,39,.30)),
+                linear-gradient(90deg, rgba(17,24,39,.97), rgba(17,24,39,.72), rgba(17,24,39,.25)),
                 url("{% static 'img/banner_productos.png' %}");
             background-size:cover;
             background-position:center;
             display:flex;
             align-items:center;
-            padding:55px 50px 95px;
-            margin:-5px -12px 0;
+            padding:75px 60px 105px;
+            padding-top:145px;
+            margin:0;
         }
 
         .catalogo-hero-content{
@@ -101,7 +102,7 @@
         .catalogo-hero-wave svg{
             display:block;
             width:100%;
-            height:85px;
+            height:70px;
         }
 
         .buscador-box{
@@ -179,16 +180,27 @@
             letter-spacing:.8px;
                 }
 
-        .ver-detalle-text{        
-            color:#111827;
-            font-size:.9rem;
-            font-weight:700;
-            margin-top:12px;
+        .ver-detalle-text{
+            margin-top:14px;
             display:inline-flex;
             align-items:center;
-            gap:6px;
-                }
+            justify-content:center;
+            gap:8px;
+            padding:9px 16px;
+            border-radius:999px;
+            background:#111827;
+            color:white;
+            font-size:.85rem;
+            font-weight:700;
+            text-decoration:none;
+            transition:.25s;
+        }
 
+        .ver-detalle-text:hover{
+            background:#9b7615;
+            color:white;
+            transform:translateY(-2px);
+        }
         @media(max-width:768px){
 
             .catalogo-hero{
@@ -219,7 +231,7 @@
             }
         }
 
-        .footer-wave{        
+        .footer-wave{
             line-height:0;
             margin-top:35px;
             margin-bottom:-2px;
@@ -236,18 +248,16 @@
             text-align:center;
         }
 
-        .ver-detalle-text{
-            justify-content:center;
-                    width:100%;
-            border-top:1px solid rgba(17,24,39,.08);
-            padding-top:12px;
+        .catalogo-wrapper{
+            width:100%;
+            overflow:hidden;
         }
 
     </style>
     
 </head>
 
-<body style="background:#f3f1ec; padding-top:95px;">
+<body style="background:#f3f1ec; padding-top:0;">
 
 <!-- NAVBAR (copias el mismo que ya tienes) -->
 <nav class="navbar navbar-expand-lg navbar-dark fixed-top rounded-pill"
@@ -348,7 +358,7 @@
     </div>
 </nav>
 
-<div class="container-fluid px-3 px-lg-4">
+<div class="catalogo-wrapper">
 
     <section class="catalogo-hero">
 
@@ -366,9 +376,9 @@
         </div>
 
         <div class="catalogo-hero-wave">
-            <svg viewBox="0 0 1440 320" preserveAspectRatio="none">
+            <svg viewBox="0 0 1440 140" preserveAspectRatio="none">
                 <path fill="#f3f1ec"
-                d="M0,192L80,176C160,160,320,128,480,138.7C640,149,800,203,960,208C1120,213,1280,171,1360,149.3L1440,128L1440,320L0,320Z">
+                d="M0,70 C240,110 480,30 720,70 C960,110 1200,50 1440,80 L1440,140 L0,140 Z">
                 </path>
             </svg>
         </div>
@@ -512,9 +522,9 @@
 </div>
 
 <div class="footer-wave">
-    <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+    <svg viewBox="0 0 1440 140" preserveAspectRatio="none">
         <path fill="#111827"
-        d="M0,64L120,58C240,52,480,40,720,42C960,44,1200,60,1320,66L1440,72L1440,120L0,120Z">
+        d="M0,70 C240,110 480,30 720,70 C960,110 1200,50 1440,80 L1440,140 L0,140 Z">
         </path>
     </svg>
 </div>
