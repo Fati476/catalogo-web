@@ -199,6 +199,58 @@
         transform:scale(1.1);
     }
 
+    /* Fuente Abril Fatface */
+    @import url('https://fonts.googleapis.com/css2?family=Abril+Fatface&display=swap');
+
+    .imagen-contenedor {
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+        transition: all 0.4s ease;
+    }
+
+    .imagen-contenedor:hover {
+        box-shadow: 0 25px 55px rgba(0, 0, 0, 0.18);
+        transform: translateY(-8px);
+    }
+
+    .producto-principal {
+        width: 100%;
+        height: 480px;
+        object-fit: contain;
+        transition: transform 0.5s ease;
+        background: #f8f9fa;
+        border-radius: 12px;
+    }
+
+    .imagen-contenedor:hover .producto-principal {
+        transform: scale(1.05);
+    }
+
+/* Responsive Imagen */
+    @media (max-width: 992px) {
+        .producto-principal { height: 420px; }
+    }
+
+    @media (max-width: 768px) {
+        .producto-principal { height: 340px; }
+        .imagen-contenedor { padding: 15px; }
+    }
+
+/* Miniaturas */
+    .minatura {
+        width: 85px;
+        height: 85px;
+        object-fit: cover;
+        border-radius: 15px;
+        cursor: pointer;
+        border: 3px solid transparent;
+        transition: all 0.3s ease;
+    }
+
+    .minatura:hover, .miniatura.activa {
+        border-color: #ffc107;
+        transform: scale(1.08);
+    }
+
     </style>
 
     <link href="https://fonts.googleapis.com/css2?family=Arvo:wght@700&display=swap" rel="stylesheet">
@@ -314,126 +366,104 @@
 
 </div> 
 
-<main style="flex:1; margin-top:110px;">
+<main style="flex:1; margin-top:110px; background:#f8f9fa;">
+<div class="container py-4 py-lg-5">
 
-<div class="container py-4">
+    <div class="row justify-content-center g-4 g-lg-5">
 
-    <div class="row justify-content-center align-items-start g-5">
-
-        <!-- Imagen -->
-
-        <div class="col-lg-6">
-
+        <!-- GALERÍA DE IMÁGENES -->
+        <div class="col-12 col-lg-6">
             {% if producto.imagen_principal %}
+            <div class="galeria-producto">
 
-                <div class="galeria-producto">
+                <div class="imagen-contenedor position-relative overflow-hidden rounded-4 shadow-lg bg-white p-3">
+                    
+                    <!-- Favorito -->
+                    <a href="#" class="favorito-btn position-absolute top-0 end-0 m-3 bg-white rounded-circle shadow p-2" 
+                       data-id="{{ producto.id }}" style="z-index:30;">
+                        {% if producto.id in favoritos_ids %}
+                            <i class="bi bi-heart-fill text-danger fs-4" id="heart-{{ producto.id }}"></i>
+                        {% else %}
+                            <i class="bi bi-heart text-danger fs-4" id="heart-{{ producto.id }}"></i>
+                        {% endif %}
+                    </a>
 
-                    <div class="imagen-contenedor position-relative">
-
-                        <a href="#"
-                           class="favorito-btn position-absolute top-0 end-0 m-3 bg-white rounded-circle shadow p-2"
-                           data-id="{{ producto.id }}"
-                           style="z-index:20;">
-
-                            {% if producto.id in favoritos_ids %}
-                                <i class="bi bi-heart-fill text-danger fs-4" id="heart-{{ producto.id }}"></i>
-                            {% else %}
-                                <i class="bi bi-heart text-danger fs-4" id="heart-{{ producto.id }}"></i>
-                            {% endif %}
-
-                        </a>
-
-                        <img
-                            id="imagenPrincipal"
-                            src="{{ producto.imagen_principal.imagen.url }}"
-                            class="producto-principal shadow"
-                            alt="{{ producto.nombre }}">
-
-                    </div>
-
-                    <div class="miniaturas">
-
-                        {% for imagen in producto.imagenes.all %}
-
-                            <img
-                                src="{{ imagen.imagen.url }}"
-                                class="miniatura {% if forloop.first %}activa{% endif %}"
-                                onclick="cambiarImagen(this)">
-
-                        {% endfor %}
-
-                    </div>
-
+                    <img id="imagenPrincipal"
+                         src="{{ producto.imagen_principal.imagen.url }}"
+                         class="producto-principal"
+                         alt="{{ producto.nombre }}">
                 </div>
 
+                <!-- Miniaturas -->
+                <div class="miniaturas mt-3">
+                    {% for imagen in producto.imagenes.all %}
+                        <img src="{{ imagen.imagen.url }}"
+                             class="miniatura {% if forloop.first %}activa{% endif %}"
+                             onclick="cambiarImagen(this)">
+                    {% endfor %}
+                </div>
+            </div>
             {% else %}
-
-                <div class="bg-light rounded-4 d-flex justify-content-center align-items-center"
-                style="height:350px">
-
-                Sin imagen
-
+                <div class="bg-light rounded-4 d-flex justify-content-center align-items-center" style="height:400px;">
+                    <i class="bi bi-image text-secondary fs-1"></i>
                 </div>
-
             {% endif %}
-
         </div>
 
-        <!-- Información -->
-
-        <div class="col-lg-5">
-
-            <div class="card border-0 shadow rounded-4 p-4 sticky-top"
-                 style="top:110px;">
+        <!-- INFORMACIÓN DEL PRODUCTO -->
+        <div class="col-12 col-lg-5">
+            <div class="card border-0 shadow-lg rounded-4 p-4 p-lg-5 sticky-top" style="top: 100px;">
 
                 <small class="text-warning fw-bold text-uppercase">
                     {{ producto.categoria.nombre }}
                 </small>
 
-                <h1 class="fw-bold mt-2 mb-3">
+                <h1 class="fw-bold mt-2 mb-3" 
+                    style="font-family: 'Abril Fatface', serif; font-size: 2.7rem; line-height: 1.05;">
                     {{ producto.nombre }}
                 </h1>
 
                 <div class="mb-4">
-
-                    <span class="badge bg-success fs-6 px-3 py-2">
-                        Disponible
-                    </span>
-
+                    <span class="badge bg-success fs-6 px-4 py-2">✓ Disponible</span>
                 </div>
 
-                <h5 class="fw-bold mb-3">
-                    Descripción
-                </h5>
+                <!-- Sujeto a Cotización -->
+                <div class="bg-light rounded-3 p-4 mb-4 border-start border-5 border-warning">
+                    <div class="d-flex align-items-center gap-3">
+                        <i class="bi bi-cash-coin fs-3 text-warning"></i>
+                        <div>
+                            <strong class="text-warning fs-5">Sujeto a Cotización</strong>
+                            <small class="text-muted d-block mt-1">
+                                El precio final depende de la cantidad y disponibilidad.
+                            </small>
+                        </div>
+                    </div>
+                </div>
 
-                <p class="text-secondary">
-
+                <h5 class="fw-bold mb-3">Descripción</h5>
+                <p class="text-secondary lh-lg">
                     {{ producto.descripcion }}
-
                 </p>
 
-                <hr>
+                <hr class="my-4">
 
-                <div class="d-grid">
-
-                    <a href="{% url 'agregar_cotizacion' producto.id %}"
-                       class="btn btn-warning btn-lg rounded-pill">
-
-                        <i class="bi bi-cart-plus"></i>
-
-                        Agregar a solicitud
-
+                <div class="d-grid gap-3">
+                    <a href="{% url 'agregar_cotizacion' producto.id %}" 
+                       class="btn btn-danger btn-lg rounded-pill py-3 fw-bold shadow">
+                        <i class="bi bi-cart-plus me-2"></i>
+                        Agregar a Solicitud de Cotización
                     </a>
-
+                    
+                    <a href="{% url 'todos_productos' %}" 
+                       class="btn btn-outline-secondary btn-lg rounded-pill py-3">
+                        ← Volver al Catálogo
+                    </a>
                 </div>
-
             </div>
-        
         </div>
+
     </div>
-
 </div>
-
 </main>
 
 <div class="footer-wave">
