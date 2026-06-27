@@ -497,7 +497,137 @@ href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.m
 
 {% include 'includes/footer.html' %}
 
+<script>
+function getCookie(name) {
+    let cookieValue = null;
 
+    if (document.cookie && document.cookie !== "") {
+        const cookies = document.cookie.split(";");
+
+        for (let cookie of cookies) {
+            cookie = cookie.trim();
+
+            if (cookie.substring(0, name.length + 1) === (name + "=")) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+
+    return cookieValue;
+}
+
+function actualizarResumenSolicitud(){
+
+    let totalProductos = 0;
+    let totalUnidades = 0;
+
+    document.querySelectorAll('.producto-check:checked').forEach(check => {
+
+        totalProductos++;
+
+        const id = check.value;
+        const cantidad = document.getElementById(`cantidad-${id}`);
+
+        if(cantidad){
+            totalUnidades += parseInt(cantidad.innerText) || 0;
+        }
+
+    });
+
+    const contadorProductos = document.getElementById('contador-productos');
+    const contadorUnidades = document.getElementById('contador-unidades');
+
+    if(contadorProductos){
+        contadorProductos.innerText = totalProductos;
+    }
+
+    if(contadorUnidades){
+        contadorUnidades.innerText = totalUnidades;
+    }
+}
+
+document.querySelectorAll('.producto-check').forEach(check => {
+    check.addEventListener('change', actualizarResumenSolicitud);
+});
+
+const botonEnviar = document.getElementById("btn-enviar");
+
+if (botonEnviar) {
+
+    botonEnviar.addEventListener("click", function () {
+
+        const seleccionados = [];
+
+        document.querySelectorAll('.producto-check:checked').forEach(check => {
+            seleccionados.push(check.value);
+        });
+
+        if(seleccionados.length === 0){
+
+            Swal.fire({
+                icon: "warning",
+                title: "Sin productos seleccionados",
+                text: "Selecciona al menos un producto para enviar la solicitud."
+            });
+
+            return;
+        }
+
+        Swal.fire({
+            title: "¿Enviar solicitud?",
+            text: "Después podrás consultar su estado en Cotizaciones.",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonText: "Enviar",
+            cancelButtonText: "Cancelar"
+        }).then((result) => {
+
+            if (result.isConfirmed) {
+
+                fetch("/solicitud/enviar/", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": getCookie("csrftoken")
+                    },
+                    body: JSON.stringify({
+                        detalles_ids: seleccionados
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+
+                    if (data.ok) {
+
+                        Swal.fire({
+                            icon: "success",
+                            title: "¡Solicitud enviada!",
+                            text: "Ahora podrás darle seguimiento desde Cotizaciones."
+                        }).then(() => {
+                            window.location.reload();
+                        });
+
+                    } else {
+
+                        Swal.fire({
+                            icon: "error",
+                            title: "No se pudo enviar",
+                            text: data.mensaje
+                        });
+
+                    }
+
+                });
+
+            }
+
+        });
+
+    });
+
+}
+</script>
 <script>
 
 document.querySelectorAll('.btn-aumentar').forEach(btn => {
@@ -645,91 +775,8 @@ document.querySelectorAll('.btn-eliminar').forEach(btn => {
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-<script>
-const botonEnviar = document.getElementById("btn-enviar");
 
-if (botonEnviar) {
 
-    botonEnviar.addEventListener("click", function () {
-
-        Swal.fire({
-            title: "¿Enviar solicitud?",
-            text: "Después podrás consultar su estado en Cotizaciones.",
-            icon: "question",
-            showCancelButton: true,
-            confirmButtonText: "Enviar",
-            cancelButtonText: "Cancelar"
-        }).then((result) => {
-
-            if (result.isConfirmed) {
-
-                fetch("/solicitud/enviar/")
-                    .then(response => response.json())
-                    .then(data => {
-
-                        if (data.ok) {
-
-                            Swal.fire({
-                                icon: "success",
-                                title: "¡Solicitud enviada!",
-                                text: "Ahora podrás darle seguimiento desde Cotizaciones."
-                            }).then(() => {
-
-                                window.location.reload();
-
-                            });
-
-                        } else {
-
-                            Swal.fire({
-                                icon: "error",
-                                title: "No se pudo enviar",
-                                text: data.mensaje
-                            });
-
-                        }
-
-                    });
-
-            }
-
-        });
-
-    });
-
-}
-</script>
-
-<script>
-function actualizarResumenSolicitud(){
-
-    let totalUnidades = 0;
-    let totalProductos = 0;
-
-    document.querySelectorAll('#lista-productos .card').forEach(card => {
-
-        totalProductos++;
-
-        const cantidad = card.querySelector('[id^="cantidad-"]');
-
-        if(cantidad){
-            totalUnidades += parseInt(cantidad.innerText) || 0;
-        }
-
-    });
-
-    const contadorProductos = document.getElementById('contador-productos');
-    const contadorUnidades = document.getElementById('contador-unidades');
-
-    if(contadorProductos){
-        contadorProductos.innerText = totalProductos;
-    }
-
-    if(contadorUnidades){
-        contadorUnidades.innerText = totalUnidades;
-    }
-}
-</script>
 
 </body>
 </html>

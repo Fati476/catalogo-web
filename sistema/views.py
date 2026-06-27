@@ -32,6 +32,8 @@ from django.contrib.admin.views.decorators import staff_member_required
 
 from django.shortcuts import get_object_or_404, render
 
+import json
+
 
 from django.http import HttpResponse
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
@@ -744,12 +746,31 @@ def enviar_solicitud(request):
             "mensaje": "No hay productos en la solicitud."
         })
 
-    # Marcar la solicitud como enviada
+    data = json.loads(request.body)
+    detalles_ids = data.get("detalles_ids", [])
+
+    if not detalles_ids:
+        return JsonResponse({
+            "ok": False,
+            "mensaje": "Debes seleccionar al menos un producto."
+        })
+
+    detalles_seleccionados = solicitud.detalles.filter(
+        id__in=detalles_ids
+    )
+
+    if not detalles_seleccionados.exists():
+        return JsonResponse({
+            "ok": False,
+            "mensaje": "No hay productos seleccionados válidos."
+        })
+
+    solicitud.detalles.exclude(
+        id__in=detalles_ids
+    ).delete()
+
     solicitud.enviada = True
-
-    # Asegurar que entre al administrador como "En revisión"
     solicitud.estado = "revision"
-
     solicitud.save()
 
     return JsonResponse({
