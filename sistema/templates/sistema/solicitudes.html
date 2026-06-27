@@ -12,6 +12,11 @@ href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.m
 
 
     <style>
+        .solicitudes-wrapper{
+            width:100%;
+            overflow:hidden;
+        }
+
         .solicitud-header{
             position:relative;
             min-height:310px;
@@ -25,7 +30,9 @@ href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.m
             align-items:center;
             padding:75px 60px 105px;
             padding-top:145px;
-            margin:-115px -12px 45px;
+            margin:-115px 0 0;
+            border-radius:0;
+            box-shadow:none;
         }
 
         .solicitud-header-content{
@@ -214,7 +221,7 @@ href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.m
 
 {% include 'includes/navbar.html' %}
 
-<div class="container-fluid px-3 px-lg-4 mt-4">
+<div class="solicitudes-wrapper">
 
     <div class="solicitud-header">
 
@@ -231,6 +238,7 @@ href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.m
         </div>
 
     </div>
+    <div class="container-fluid px-3 px-lg-4 mt-4">
 
     {% if solicitud %}
     <div id="lista-productos">
@@ -391,6 +399,7 @@ href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.m
         </div>
 
     {% endif %}
+    </div>
 
 </div>
 
