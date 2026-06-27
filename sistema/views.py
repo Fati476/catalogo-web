@@ -451,7 +451,9 @@ def cambiar_estado_usuario(request, id):
 @login_required
 def lista_solicitudes(request):
 
-    solicitudes = SolicitudCotizacion.objects.all().order_by("-fecha")
+    solicitudes = SolicitudCotizacion.objects.filter(
+        enviada=True
+    ).order_by("-fecha")
 
     pendientes = solicitudes.filter(
         estado="revision"
@@ -466,7 +468,6 @@ def lista_solicitudes(request):
     ).count()
 
     abrir_modal = request.session.pop("abrir_modal", None)
-
 
     return render(
         request,
@@ -732,13 +733,17 @@ def enviar_solicitud(request):
             "mensaje": "No hay productos en la solicitud."
         })
 
+    # Marcar la solicitud como enviada
     solicitud.enviada = True
+
+    # Asegurar que entre al administrador como "En revisión"
+    solicitud.estado = "revision"
+
     solicitud.save()
 
     return JsonResponse({
         "ok": True
     })
-
 
 @login_required
 def mis_cotizaciones(request):
