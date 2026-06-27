@@ -324,7 +324,6 @@ href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.m
                             type="checkbox"
                             class="form-check-input producto-check"
                             value="{{ detalle.id }}"
-                            checked
                         >
 
                     </div>
@@ -605,6 +604,7 @@ if (botonEnviar) {
                             title: "¡Solicitud enviada!",
                             text: "Ahora podrás darle seguimiento desde Cotizaciones."
                         }).then(() => {
+                            localStorage.removeItem(storageKey);
                             window.location.reload();
                         });
 
@@ -628,6 +628,46 @@ if (botonEnviar) {
 
 }
 </script>
+
+<script>
+const storageKey = "solicitud_seleccionados";
+
+function guardarSeleccion(){
+    const seleccionados = [];
+
+    document.querySelectorAll(".producto-check:checked").forEach(check => {
+        seleccionados.push(check.value);
+    });
+
+    localStorage.setItem(storageKey, JSON.stringify(seleccionados));
+}
+
+function cargarSeleccion(){
+    const guardados = JSON.parse(localStorage.getItem(storageKey));
+
+    if(guardados === null){
+        document.querySelectorAll(".producto-check").forEach(check => {
+            check.checked = true;
+        });
+    }else{
+        document.querySelectorAll(".producto-check").forEach(check => {
+            check.checked = guardados.includes(check.value);
+        });
+    }
+
+    actualizarResumenSolicitud();
+}
+
+document.querySelectorAll(".producto-check").forEach(check => {
+    check.addEventListener("change", function(){
+        guardarSeleccion();
+        actualizarResumenSolicitud();
+    });
+});
+
+cargarSeleccion();
+</script>
+
 <script>
 
 document.querySelectorAll('.btn-aumentar').forEach(btn => {
