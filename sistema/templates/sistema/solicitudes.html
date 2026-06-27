@@ -495,8 +495,14 @@ href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.m
 
 
 {% include 'includes/footer.html' %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
+const storageKey = "solicitud_seleccionados";
+
+/* ============================
+   CSRF
+============================ */
 function getCookie(name) {
     let cookieValue = null;
 
@@ -516,17 +522,19 @@ function getCookie(name) {
     return cookieValue;
 }
 
+/* ============================
+   Resumen
+============================ */
 function actualizarResumenSolicitud(){
 
     let totalProductos = 0;
     let totalUnidades = 0;
 
-    document.querySelectorAll('.producto-check:checked').forEach(check => {
+    document.querySelectorAll(".producto-check:checked").forEach(check=>{
 
         totalProductos++;
 
-        const id = check.value;
-        const cantidad = document.getElementById(`cantidad-${id}`);
+        const cantidad = document.getElementById(`cantidad-${check.value}`);
 
         if(cantidad){
             totalUnidades += parseInt(cantidad.innerText) || 0;
@@ -534,157 +542,81 @@ function actualizarResumenSolicitud(){
 
     });
 
-    const contadorProductos = document.getElementById('contador-productos');
-    const contadorUnidades = document.getElementById('contador-unidades');
+    const p = document.getElementById("contador-productos");
+    const u = document.getElementById("contador-unidades");
 
-    if(contadorProductos){
-        contadorProductos.innerText = totalProductos;
-    }
-
-    if(contadorUnidades){
-        contadorUnidades.innerText = totalUnidades;
-    }
+    if(p) p.innerText = totalProductos;
+    if(u) u.innerText = totalUnidades;
 }
 
-document.querySelectorAll('.producto-check').forEach(check => {
-    check.addEventListener('change', actualizarResumenSolicitud);
-});
-
-const botonEnviar = document.getElementById("btn-enviar");
-
-if (botonEnviar) {
-
-    botonEnviar.addEventListener("click", function () {
-
-        const seleccionados = [];
-
-        document.querySelectorAll('.producto-check:checked').forEach(check => {
-            seleccionados.push(check.value);
-        });
-
-        if(seleccionados.length === 0){
-
-            Swal.fire({
-                icon: "warning",
-                title: "Sin productos seleccionados",
-                text: "Selecciona al menos un producto para enviar la solicitud."
-            });
-
-            return;
-        }
-
-        Swal.fire({
-            title: "¿Enviar solicitud?",
-            text: "Después podrás consultar su estado en Cotizaciones.",
-            icon: "question",
-            showCancelButton: true,
-            confirmButtonText: "Enviar",
-            cancelButtonText: "Cancelar"
-        }).then((result) => {
-
-            if (result.isConfirmed) {
-
-                fetch("/solicitud/enviar/", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRFToken": getCookie("csrftoken")
-                    },
-                    body: JSON.stringify({
-                        detalles_ids: seleccionados
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-
-                    if (data.ok) {
-
-                        Swal.fire({
-                            icon: "success",
-                            title: "¡Solicitud enviada!",
-                            text: "Ahora podrás darle seguimiento desde Cotizaciones."
-                        }).then(() => {
-                            localStorage.removeItem(storageKey);
-                            window.location.reload();
-                        });
-
-                    } else {
-
-                        Swal.fire({
-                            icon: "error",
-                            title: "No se pudo enviar",
-                            text: data.mensaje
-                        });
-
-                    }
-
-                });
-
-            }
-
-        });
-
-    });
-
-}
-</script>
-
-<script>
-const storageKey = "solicitud_seleccionados";
-
+/* ============================
+   Guardar selección
+============================ */
 function guardarSeleccion(){
+
     const seleccionados = [];
 
-    document.querySelectorAll(".producto-check:checked").forEach(check => {
+    document.querySelectorAll(".producto-check:checked").forEach(check=>{
         seleccionados.push(check.value);
     });
 
     localStorage.setItem(storageKey, JSON.stringify(seleccionados));
 }
 
+/* ============================
+   Recuperar selección
+============================ */
 function cargarSeleccion(){
+
     const guardados = JSON.parse(localStorage.getItem(storageKey));
 
     if(guardados === null){
-        document.querySelectorAll(".producto-check").forEach(check => {
+
+        document.querySelectorAll(".producto-check").forEach(check=>{
             check.checked = true;
         });
+
     }else{
-        document.querySelectorAll(".producto-check").forEach(check => {
+
+        document.querySelectorAll(".producto-check").forEach(check=>{
             check.checked = guardados.includes(check.value);
         });
+
     }
 
     actualizarResumenSolicitud();
 }
 
-document.querySelectorAll(".producto-check").forEach(check => {
-    check.addEventListener("change", function(){
+/* ============================
+   Checkbox
+============================ */
+document.querySelectorAll(".producto-check").forEach(check=>{
+
+    check.addEventListener("change",()=>{
+
         guardarSeleccion();
         actualizarResumenSolicitud();
+
     });
+
 });
 
-cargarSeleccion();
-</script>
+/* ============================
+   Aumentar
+============================ */
+document.querySelectorAll(".btn-aumentar").forEach(btn=>{
 
-<script>
-
-document.querySelectorAll('.btn-aumentar').forEach(btn => {
-
-    btn.addEventListener('click', function(e){
+    btn.addEventListener("click",function(e){
 
         e.preventDefault();
 
-        const id = this.dataset.id;
+        const id=this.dataset.id;
 
         fetch(`/solicitud/aumentar/${id}/`)
-        .then(response => response.json())
-        .then(data => {
+        .then(r=>r.json())
+        .then(data=>{
 
-            document.getElementById(
-                `cantidad-${id}`
-            ).innerText = data.cantidad;
+            document.getElementById(`cantidad-${id}`).innerText=data.cantidad;
 
             actualizarResumenSolicitud();
 
@@ -694,21 +626,22 @@ document.querySelectorAll('.btn-aumentar').forEach(btn => {
 
 });
 
-document.querySelectorAll('.btn-disminuir').forEach(btn => {
+/* ============================
+   Disminuir
+============================ */
+document.querySelectorAll(".btn-disminuir").forEach(btn=>{
 
-    btn.addEventListener('click', function(e){
+    btn.addEventListener("click",function(e){
 
         e.preventDefault();
 
-        const id = this.dataset.id;
+        const id=this.dataset.id;
 
         fetch(`/solicitud/disminuir/${id}/`)
-        .then(response => response.json())
-        .then(data => {
+        .then(r=>r.json())
+        .then(data=>{
 
-            document.getElementById(
-                `cantidad-${id}`
-            ).innerText = data.cantidad;
+            document.getElementById(`cantidad-${id}`).innerText=data.cantidad;
 
             actualizarResumenSolicitud();
 
@@ -718,92 +651,51 @@ document.querySelectorAll('.btn-disminuir').forEach(btn => {
 
 });
 
-</script>
+/* ============================
+   Eliminar
+============================ */
+document.querySelectorAll(".btn-eliminar").forEach(btn=>{
 
-
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-<script>
-
-document.querySelectorAll('.btn-eliminar').forEach(btn => {
-
-    btn.addEventListener('click', function(e){
+    btn.addEventListener("click",function(e){
 
         e.preventDefault();
 
-        const id = this.dataset.id;
+        const id=this.dataset.id;
 
         Swal.fire({
-            title: '¿Eliminar producto?',
-            text: 'Se quitará de tu solicitud.',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Sí, eliminar',
-            cancelButtonText: 'Cancelar'
-        }).then((result) => {
+            title:"¿Eliminar producto?",
+            text:"Se quitará de tu solicitud.",
+            icon:"warning",
+            showCancelButton:true,
+            confirmButtonText:"Sí, eliminar",
+            cancelButtonText:"Cancelar"
 
-            if(result.isConfirmed){
+        }).then(result=>{
 
-                fetch(`/solicitud/eliminar/${id}/`)
-                .then(response => response.json())
-                .then(data => {
+            if(!result.isConfirmed) return;
 
-                    if(data.ok){
+            fetch(`/solicitud/eliminar/${id}/`)
+            .then(r=>r.json())
+            .then(data=>{
 
-                        document
-                            .getElementById(`detalle-${id}`)
-                            .remove();
-                            actualizarResumenSolicitud();
-                        const total =
-                            document.querySelectorAll(
-                                '#lista-productos .card'
-                            ).length;
+                if(data.ok){
 
-                        document.getElementById('contador-productos').innerText = total;
-                        const productos =
-                            document.querySelectorAll(
-                                '#lista-productos .card'
-                            );
+                    document.getElementById(`detalle-${id}`).remove();
 
-                        if(productos.length === 0){
+                    guardarSeleccion();
+                    actualizarResumenSolicitud();
 
-                            document.getElementById(
-                                'lista-productos'
-                            ).innerHTML = `
-                                <div class="card empty-solicitud">
-                                    <div class="card-body text-center py-5">
+                    if(document.querySelectorAll("#lista-productos .card").length===0){
 
-                                        <h4 class="mb-3">📦</h4>
+                        localStorage.removeItem(storageKey);
 
-                                        <h5>
-                                            No has agregado productos
-                                        </h5>
-
-                                        <p class="text-muted">
-                                            Explora el catálogo y agrega productos.
-                                        </p>
-
-                                        <a href="/productos/"
-                                           class="btn-ver-productos text-decoration-none">
-
-                                            Ver productos
-
-                                        </a>
-
-                                    </div>
-                                </div>
-                            `;
-
-                            document.getElementById(
-                                'resumen-solicitud'
-                            ).remove();
-                        }
+                        location.reload();
 
                     }
 
-                });
+                }
 
-            }
+            });
 
         });
 
@@ -811,6 +703,97 @@ document.querySelectorAll('.btn-eliminar').forEach(btn => {
 
 });
 
+/* ============================
+   Enviar solicitud
+============================ */
+const botonEnviar=document.getElementById("btn-enviar");
+
+if(botonEnviar){
+
+    botonEnviar.addEventListener("click",function(){
+
+        const seleccionados=[];
+
+        document.querySelectorAll(".producto-check:checked").forEach(check=>{
+            seleccionados.push(check.value);
+        });
+
+        if(seleccionados.length===0){
+
+            Swal.fire({
+                icon:"warning",
+                title:"Sin productos seleccionados",
+                text:"Selecciona al menos un producto."
+            });
+
+            return;
+        }
+
+        Swal.fire({
+            title:"¿Enviar solicitud?",
+            text:"Después podrás consultar su estado en Cotizaciones.",
+            icon:"question",
+            showCancelButton:true,
+            confirmButtonText:"Enviar",
+            cancelButtonText:"Cancelar"
+
+        }).then(result=>{
+
+            if(!result.isConfirmed) return;
+
+            fetch("/solicitud/enviar/",{
+
+                method:"POST",
+
+                headers:{
+                    "Content-Type":"application/json",
+                    "X-CSRFToken":getCookie("csrftoken")
+                },
+
+                body:JSON.stringify({
+                    detalles_ids:seleccionados
+                })
+
+            })
+
+            .then(r=>r.json())
+            .then(data=>{
+
+                if(data.ok){
+
+                    localStorage.removeItem(storageKey);
+
+                    Swal.fire({
+                        icon:"success",
+                        title:"¡Solicitud enviada!"
+                    }).then(()=>{
+
+                        location.reload();
+
+                    });
+
+                }else{
+
+                    Swal.fire({
+                        icon:"error",
+                        title:"Error",
+                        text:data.mensaje
+                    });
+
+                }
+
+            });
+
+        });
+
+    });
+
+}
+
+/* ============================
+   Iniciar página
+============================ */
+cargarSeleccion();
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
