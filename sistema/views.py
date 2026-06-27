@@ -656,11 +656,22 @@ def solicitudes(request):
         solicitud.delete()
         solicitud = None
 
+    total_productos = 0
+    total_unidades = 0
+
+    if solicitud:
+        total_productos = solicitud.detalles.count()
+        total_unidades = sum(
+            detalle.cantidad for detalle in solicitud.detalles.all()
+        )
+
     return render(
         request,
         'sistema/solicitudes.html',
         {
-            'solicitud': solicitud
+            'solicitud': solicitud,
+            'total_productos': total_productos,
+            'total_unidades': total_unidades,
         }
     )
 

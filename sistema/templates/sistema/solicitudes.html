@@ -224,6 +224,50 @@ href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.m
             height:70px;
         }
 
+        .resumen-grid{
+            display:grid;
+            grid-template-columns:repeat(3, 1fr);
+            gap:16px;
+            margin-bottom:22px;
+        }
+
+        .resumen-item{
+            background:#f3f1ec;
+            border-radius:20px;
+            padding:18px;
+            text-align:center;
+        }
+
+        .resumen-numero{
+            display:block;
+            font-family:'Arvo', serif;
+            font-size:2rem;
+            font-weight:800;
+            color:#111827;
+            line-height:1;
+        }
+
+        .resumen-label{
+            display:block;
+            margin-top:8px;
+            color:#9b7615;
+            font-weight:800;
+            font-size:.78rem;
+            text-transform:uppercase;
+            letter-spacing:.8px;
+        }
+
+        .resumen-fecha{
+            color:#6b7280;
+            font-size:.95rem;
+        }
+
+        @media(max-width:768px){
+            .resumen-grid{
+                grid-template-columns:1fr;
+            }
+        }
+
 
 
 
@@ -360,31 +404,63 @@ href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.m
     </div>
         <div id="resumen-solicitud" class="resumen-solicitud">
 
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+            <div class="d-flex flex-column flex-lg-row justify-content-between gap-4">
 
-                <div>
+                <div class="flex-grow-1">
 
-                    <h5 class="fw-bold mb-1">
-                        Productos seleccionados
+                    <h5 class="fw-bold mb-2">
+                        Resumen de la solicitud
                     </h5>
 
-                    <p id="contador-productos"
-                       class="text-muted mb-0">
-
-                        {{ solicitud.detalles.count }} producto(s)
-
+                    <p class="resumen-fecha mb-4">
+                        Creada el {{ solicitud.fecha|date:"d/m/Y" }}
                     </p>
+
+                    <div class="resumen-grid">
+
+                        <div class="resumen-item">
+                            <span id="contador-productos" class="resumen-numero">
+                                {{ total_productos }}
+                            </span>
+                            <span class="resumen-label">
+                                Productos
+                            </span>
+                        </div>
+
+                        <div class="resumen-item">
+                            <span id="contador-unidades" class="resumen-numero">
+                                {{ total_unidades }}
+                            </span>
+                            <span class="resumen-label">
+                                Unidades
+                            </span>
+                        </div>
+
+                        <div class="resumen-item">
+                            <span class="resumen-numero">
+                                1
+                            </span>
+                            <span class="resumen-label">
+                                Solicitud
+                            </span>
+                        </div>
+
+                    </div>
 
                 </div>
 
-                <button
-                    id="btn-enviar"
-                    class="btn-enviar-solicitud">
+                <div class="d-flex align-items-center justify-content-center">
 
-                    <i class="bi bi-send"></i>
-                    Enviar solicitud
+                    <button
+                        id="btn-enviar"
+                        class="btn-enviar-solicitud">
 
-                </button>
+                        <i class="bi bi-send"></i>
+                        Enviar solicitud
+
+                    </button>
+
+                </div>
 
             </div>
 
@@ -514,9 +590,7 @@ document.querySelectorAll('.btn-eliminar').forEach(btn => {
                                 '#lista-productos .card'
                             ).length;
 
-                        document.getElementById(
-                            'contador-productos'
-                        ).innerText = `${total} producto(s)`;
+                        document.getElementById('contador-productos').innerText = total;
                         const productos =
                             document.querySelectorAll(
                                 '#lista-productos .card'
