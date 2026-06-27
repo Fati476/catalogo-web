@@ -159,11 +159,11 @@
             object-fit:contain;
             background:white;
             border-radius:16px;
-            transition:.35s ease;
+            transition:transform .45s ease;
         }
 
         .product-card:hover .product-img{
-            transform:scale(1.04);
+            transform:scale(1.08);
         }
 
         .product-title{        
@@ -284,6 +284,48 @@
 
             font-size:1rem;
 
+        }
+
+        .product-card{
+            animation:fadeUp .45s ease both;
+        }
+
+        @keyframes fadeUp{
+            from{
+                opacity:0;
+                transform:translateY(18px);
+            }
+            to{
+                opacity:1;
+                transform:translateY(0);
+            }
+        }
+
+        .sin-resultados{
+            display:none;
+            max-width:520px;
+            margin:30px auto 0;
+            background:white;
+            border-radius:24px;
+            padding:30px 24px;
+            text-align:center;
+            box-shadow:0 12px 30px rgba(17,24,39,.10);
+        }
+
+        .sin-resultados i{
+            font-size:2.5rem;
+            color:#9b7615;
+        }
+
+        .sin-resultados h5{
+            color:#111827;
+            font-weight:800;
+            margin-top:12px;
+        }
+
+        .sin-resultados p{
+            color:#6b7280;
+            margin-bottom:0;
         }
 
 
@@ -428,7 +470,7 @@
             <input type="text"
                    id="buscarProducto"
                    class="form-control border-0 py-3"
-                   placeholder="Buscar productos o categorías...">
+                   placeholder="Buscar producto por nombre...">
         </div>
     </div>
     <div class="catalogo-info text-center mb-4">
@@ -475,7 +517,7 @@
 
                 <div class="card-body">
 
-                    <h6 class="product-title">
+                    <h6 class="product-title" data-nombre="{{ producto.nombre|lower }}">
                         {{ producto.nombre }}
                     </h6>
 
@@ -509,6 +551,12 @@
 
         {% endfor %}
 
+    </div>
+
+    <div id="sinResultados" class="sin-resultados">
+        <i class="bi bi-search"></i>
+        <h5>No se encontró ese producto</h5>
+        <p>Intenta escribir otro nombre de producto.</p>
     </div>
     {% if productos.has_other_pages %}
 
@@ -649,25 +697,34 @@
 
 
 <script>
-
 document.getElementById('buscarProducto').addEventListener('keyup', function(){
 
-    let texto = this.value.toLowerCase();
+    const texto = this.value.toLowerCase().trim();
+    let encontrados = 0;
 
     document.querySelectorAll('.producto-card').forEach(card => {
 
-        let nombre = card.innerText.toLowerCase();
+        const titulo = card.querySelector('.product-title');
+        const nombre = titulo.dataset.nombre;
 
         if(nombre.includes(texto)){
             card.style.display = '';
+            encontrados++;
         }else{
             card.style.display = 'none';
         }
 
     });
 
-});
+    const mensaje = document.getElementById('sinResultados');
 
+    if(encontrados === 0 && texto !== ''){
+        mensaje.style.display = 'block';
+    }else{
+        mensaje.style.display = 'none';
+    }
+
+});
 </script>
 
 </body>
