@@ -253,6 +253,40 @@
             overflow:hidden;
         }
 
+        .catalogo-info{
+            margin-top:-15px;
+            margin-bottom:35px;
+        }
+
+        .catalogo-total{
+
+            display:inline-flex;
+            align-items:center;
+            gap:8px;
+
+            padding:10px 22px;
+
+            background:white;
+
+            border-radius:50px;
+
+            color:#111827;
+
+            font-weight:700;
+
+            box-shadow:0 10px 25px rgba(17,24,39,.08);
+
+        }
+
+        .catalogo-total i{
+
+            color:#c79b2d;
+
+            font-size:1rem;
+
+        }
+
+
     </style>
     
 </head>
@@ -396,6 +430,16 @@
                    class="form-control border-0 py-3"
                    placeholder="Buscar productos o categorías...">
         </div>
+    </div>
+    <div class="catalogo-info text-center mb-4">
+
+        <span class="catalogo-total">
+            <i class="bi bi-box-seam-fill me-2"></i>
+
+            {{ total_productos }} productos disponibles
+
+        </span>
+
     </div>
 
     <div class="row g-3">

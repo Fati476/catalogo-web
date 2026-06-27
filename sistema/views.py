@@ -586,6 +586,8 @@ def todos_productos(request):
     for producto in productos_lista:
         producto.imagen_principal = producto.imagenes.first()
 
+    total_productos = productos_lista.count()
+
     paginator = Paginator(productos_lista, 12)
 
     page = request.GET.get('page')
@@ -604,6 +606,7 @@ def todos_productos(request):
         'sistema/todos_productos.html',
         {
             'productos': productos,
+            'total_productos': total_productos,
             'favoritos_ids': favoritos_ids
         }
     )
