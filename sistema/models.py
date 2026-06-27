@@ -136,11 +136,10 @@ class DetalleSolicitud(models.Model):
         on_delete=models.CASCADE
     )
 
-    cantidad = models.PositiveIntegerField(
-        default=1
-    )
+    cantidad = models.PositiveIntegerField(default=1)
 
-    # NUEVO CAMPO
+    seleccionado = models.BooleanField(default=True)
+
     precio_aplicado = models.DecimalField(
         max_digits=10,
         decimal_places=2,

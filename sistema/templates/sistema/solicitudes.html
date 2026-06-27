@@ -324,6 +324,7 @@ href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.m
                             type="checkbox"
                             class="form-check-input producto-check"
                             value="{{ detalle.id }}"
+                            {% if detalle.seleccionado %}checked{% endif %}
                         >
 
                     </div>
@@ -498,7 +499,7 @@ href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.m
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-const storageKey = "solicitud_seleccionados";
+
 
 /* ============================
    CSRF
@@ -552,40 +553,12 @@ function actualizarResumenSolicitud(){
 /* ============================
    Guardar selección
 ============================ */
-function guardarSeleccion(){
 
-    const seleccionados = [];
-
-    document.querySelectorAll(".producto-check:checked").forEach(check=>{
-        seleccionados.push(check.value);
-    });
-
-    localStorage.setItem(storageKey, JSON.stringify(seleccionados));
-}
 
 /* ============================
    Recuperar selección
 ============================ */
-function cargarSeleccion(){
 
-    const guardados = JSON.parse(localStorage.getItem(storageKey));
-
-    if(guardados === null){
-
-        document.querySelectorAll(".producto-check").forEach(check=>{
-            check.checked = true;
-        });
-
-    }else{
-
-        document.querySelectorAll(".producto-check").forEach(check=>{
-            check.checked = guardados.includes(check.value);
-        });
-
-    }
-
-    actualizarResumenSolicitud();
-}
 
 /* ============================
    Checkbox
@@ -594,13 +567,22 @@ document.querySelectorAll(".producto-check").forEach(check=>{
 
     check.addEventListener("change",()=>{
 
-        guardarSeleccion();
+        fetch(`/solicitud/seleccion/${check.value}/`, {
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json",
+                "X-CSRFToken":getCookie("csrftoken")
+            },
+            body:JSON.stringify({
+                seleccionado:check.checked
+            })
+        });
+
         actualizarResumenSolicitud();
 
     });
 
 });
-
 /* ============================
    Aumentar
 ============================ */
@@ -682,12 +664,12 @@ document.querySelectorAll(".btn-eliminar").forEach(btn=>{
 
                     document.getElementById(`detalle-${id}`).remove();
 
-                    guardarSeleccion();
+                    
                     actualizarResumenSolicitud();
 
                     if(document.querySelectorAll("#lista-productos .card").length===0){
 
-                        localStorage.removeItem(storageKey);
+                        
 
                         location.reload();
 
@@ -761,7 +743,7 @@ if(botonEnviar){
 
                 if(data.ok){
 
-                    localStorage.removeItem(storageKey);
+                   
 
                     Swal.fire({
                         icon:"success",
@@ -793,7 +775,8 @@ if(botonEnviar){
 /* ============================
    Iniciar página
 ============================ */
-cargarSeleccion();
+
+actualizarResumenSolicitud();
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

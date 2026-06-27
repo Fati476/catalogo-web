@@ -34,7 +34,7 @@ from django.shortcuts import get_object_or_404, render
 
 import json
 
-
+from django.views.decorators.http import require_POST
 from django.http import HttpResponse
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 from reportlab.lib import colors
@@ -740,33 +740,18 @@ def enviar_solicitud(request):
             "mensaje": "No existe una solicitud activa."
         })
 
-    if not solicitud.detalles.exists():
-        return JsonResponse({
-            "ok": False,
-            "mensaje": "No hay productos en la solicitud."
-        })
-
-    data = json.loads(request.body)
-    detalles_ids = data.get("detalles_ids", [])
-
-    if not detalles_ids:
-        return JsonResponse({
-            "ok": False,
-            "mensaje": "Debes seleccionar al menos un producto."
-        })
-
     detalles_seleccionados = solicitud.detalles.filter(
-        id__in=detalles_ids
+        seleccionado=True
     )
 
     if not detalles_seleccionados.exists():
         return JsonResponse({
             "ok": False,
-            "mensaje": "No hay productos seleccionados válidos."
+            "mensaje": "Debes seleccionar al menos un producto."
         })
 
-    solicitud.detalles.exclude(
-        id__in=detalles_ids
+    solicitud.detalles.filter(
+        seleccionado=False
     ).delete()
 
     solicitud.enviada = True
@@ -1210,3 +1195,25 @@ def detalle_producto(request, id):
             'favoritos_ids': favoritos_ids
         }
     )
+
+
+@login_required
+@require_POST
+def actualizar_seleccion_detalle(request, id):
+
+    detalle = get_object_or_404(
+        DetalleSolicitud,
+        id=id,
+        solicitud__usuario=request.user,
+        solicitud__enviada=False
+    )
+
+    data = json.loads(request.body)
+
+    detalle.seleccionado = data.get("seleccionado", True)
+    detalle.save()
+
+    return JsonResponse({
+        "ok": True,
+        "seleccionado": detalle.seleccionado
+    })

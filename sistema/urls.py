@@ -225,5 +225,11 @@ urlpatterns = [
         name='detalle_producto'
     ),
 
+    path(
+        'solicitud/seleccion/<int:id>/',
+        views.actualizar_seleccion_detalle,
+        name='actualizar_seleccion_detalle'
+    ),
+
 
 ]
