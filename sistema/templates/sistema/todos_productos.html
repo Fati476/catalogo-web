@@ -120,7 +120,7 @@
         }
 
         .product-card:hover{
-            transform:translateY(-5px);
+            transform:translateY(-8px);
         }
 
         .product-card .card{
@@ -128,17 +128,15 @@
             border-radius:22px;
             overflow:hidden;
 
-            transition:
-                transform .35s,
-                box-shadow .35s;
+            transition:transform .35s ease, box-shadow .35s ease;
         
             box-shadow:0 8px 25px rgba(0,0,0,.08);
         }
 
         .product-card:hover .card{
 
-            box-shadow:
-                0 20px 45px rgba(0,0,0,.18);
+            transform:translateY(-8px);
+            box-shadow:0 20px 45px rgba(0,0,0,.18);
 
         }
 
@@ -153,23 +151,15 @@
         }
 
         .product-img{
-
             width:100%;
             height:210px;
-
             object-fit:contain;
-
             background:white;
-        
-            transition:
-                transform .45s ease;
-
+            transition:transform .45s ease;
         }
 
         .product-card:hover .product-img{
-
             transform:scale(1.08);
-
         }
 
       
