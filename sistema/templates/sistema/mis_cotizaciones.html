@@ -746,8 +746,7 @@
                             </a>
 
                             <a href="{% url 'eliminar_solicitud_en_revision' solicitud.id %}"
-                                class="btn-eliminar-cotizacion mt-2"
-                                onclick="return confirm('¿Seguro que deseas eliminar esta solicitud?');">
+                               class="btn-eliminar-cotizacion mt-2 btn-eliminar-solicitud">
 
                                 <i class="bi bi-trash"></i>
                                 Eliminar solicitud
@@ -850,6 +849,41 @@
 {% include 'includes/footer.html' %}
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
 
+document.querySelectorAll(".btn-eliminar-solicitud").forEach(btn => {
+
+    btn.addEventListener("click", function(e){
+
+        e.preventDefault();
+
+        const url = this.href;
+
+        Swal.fire({
+
+            title: "¿Eliminar solicitud?",
+            text: "Esta acción eliminará completamente la solicitud.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#991b1b",
+            cancelButtonColor: "#6c757d",
+            confirmButtonText: "Sí, eliminar",
+            cancelButtonText: "Cancelar"
+
+        }).then((result)=>{
+
+            if(result.isConfirmed){
+
+                window.location.href = url;
+
+            }
+
+        });
+
+    });
+
+});
+
+</script>
 </body>
 </html>
