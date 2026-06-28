@@ -555,10 +555,22 @@ def agregar_cotizacion(request, producto_id):
         id=producto_id
     )
 
-    solicitud = SolicitudCotizacion.objects.filter(
-        usuario=request.user,
-        enviada=False
-    ).order_by("-id").first()
+    solicitud_id = request.session.get("solicitud_editando_id")
+
+    solicitud = None
+
+    if solicitud_id:
+        solicitud = SolicitudCotizacion.objects.filter(
+            id=solicitud_id,
+            usuario=request.user,
+            enviada=False
+        ).first()
+
+    if solicitud is None:
+        solicitud = SolicitudCotizacion.objects.filter(
+            usuario=request.user,
+            enviada=False
+        ).order_by("-id").first()
 
     if solicitud is None:
         solicitud = SolicitudCotizacion.objects.create(
@@ -566,6 +578,8 @@ def agregar_cotizacion(request, producto_id):
             enviada=False,
             estado="revision"
         )
+
+        request.session["solicitud_editando_id"] = solicitud.id
 
     detalle, creado = DetalleSolicitud.objects.get_or_create(
         solicitud=solicitud,
@@ -663,13 +677,26 @@ def favoritos(request):
 @login_required
 def solicitudes(request):
 
-    solicitud = SolicitudCotizacion.objects.filter(
-        usuario=request.user,
-        enviada=False
-    ).first()
+    solicitud_id = request.session.get("solicitud_editando_id")
+
+    solicitud = None
+
+    if solicitud_id:
+        solicitud = SolicitudCotizacion.objects.filter(
+            id=solicitud_id,
+            usuario=request.user,
+            enviada=False
+        ).first()
+
+    if solicitud is None:
+        solicitud = SolicitudCotizacion.objects.filter(
+            usuario=request.user,
+            enviada=False
+        ).order_by("-id").first()
 
     if solicitud and not solicitud.detalles.exists():
         solicitud.delete()
+        request.session.pop("solicitud_editando_id", None)
         solicitud = None
 
     total_productos = 0
@@ -743,10 +770,22 @@ def disminuir_cantidad(request, id):
 @login_required
 def enviar_solicitud(request):
 
-    solicitud = SolicitudCotizacion.objects.filter(
-        usuario=request.user,
-        enviada=False
-    ).first()
+    solicitud_id = request.session.get("solicitud_editando_id")
+
+    solicitud = None
+
+    if solicitud_id:
+        solicitud = SolicitudCotizacion.objects.filter(
+            id=solicitud_id,
+            usuario=request.user,
+            enviada=False
+        ).first()
+
+    if solicitud is None:
+        solicitud = SolicitudCotizacion.objects.filter(
+            usuario=request.user,
+            enviada=False
+        ).first()
 
     if solicitud is None:
         return JsonResponse({
@@ -771,6 +810,7 @@ def enviar_solicitud(request):
     solicitud.enviada = True
     solicitud.estado = "revision"
     solicitud.save()
+    request.session.pop("solicitud_editando_id", None)
 
     return JsonResponse({
         "ok": True
@@ -1264,6 +1304,8 @@ def editar_solicitud_en_revision(request, id):
 
     solicitud.enviada = False
     solicitud.save()
+
+    request.session["solicitud_editando_id"] = solicitud.id
 
     messages.success(
         request,
