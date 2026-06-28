@@ -785,7 +785,7 @@ def enviar_solicitud(request):
         solicitud = SolicitudCotizacion.objects.filter(
             usuario=request.user,
             enviada=False
-        ).first()
+        ).order_by("-id").first()
 
     if solicitud is None:
         return JsonResponse({
@@ -803,17 +803,46 @@ def enviar_solicitud(request):
             "mensaje": "Debes seleccionar al menos un producto."
         })
 
-    solicitud.detalles.filter(
+    detalles_no_seleccionados = solicitud.detalles.filter(
         seleccionado=False
-    ).delete()
+    )
 
-    solicitud.enviada = True
-    solicitud.estado = "revision"
-    solicitud.save()
+    if detalles_no_seleccionados.exists():
+
+        nueva_solicitud = SolicitudCotizacion.objects.create(
+            usuario=request.user,
+            enviada=True,
+            estado="revision"
+        )
+
+        for detalle in detalles_seleccionados:
+
+            DetalleSolicitud.objects.create(
+                solicitud=nueva_solicitud,
+                producto=detalle.producto,
+                cantidad=detalle.cantidad,
+                seleccionado=True
+            )
+
+        detalles_seleccionados.delete()
+
+        solicitud.detalles.update(
+            seleccionado=True
+        )
+
+    else:
+
+        solicitud.enviada = True
+        solicitud.estado = "revision"
+        solicitud.save()
+
+        nueva_solicitud = solicitud
+
     request.session.pop("solicitud_editando_id", None)
 
     return JsonResponse({
-        "ok": True
+        "ok": True,
+        "solicitud_id": nueva_solicitud.id
     })
 
 @login_required
