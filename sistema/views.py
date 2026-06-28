@@ -1235,3 +1235,25 @@ def actualizar_seleccion_detalle(request, id):
         "ok": True,
         "seleccionado": detalle.seleccionado
     })
+
+
+@login_required
+def editar_solicitud_en_revision(request, id):
+
+    solicitud = get_object_or_404(
+        SolicitudCotizacion,
+        id=id,
+        usuario=request.user,
+        enviada=True,
+        estado="revision"
+    )
+
+    solicitud.enviada = False
+    solicitud.save()
+
+    messages.success(
+        request,
+        "Tu solicitud volvió a edición. Puedes modificarla y enviarla nuevamente."
+    )
+
+    return redirect("solicitudes")

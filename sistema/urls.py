@@ -231,5 +231,11 @@ urlpatterns = [
         name='actualizar_seleccion_detalle'
     ),
 
+    path(
+        "cotizaciones/editar/<int:id>/",
+        views.editar_solicitud_en_revision,
+        name="editar_solicitud_en_revision"
+    ),
+
 
 ]

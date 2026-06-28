@@ -716,7 +716,17 @@
 
                             </div>
 
+                            <a href="{% url 'editar_solicitud_en_revision' solicitud.id %}"
+                               class="btn-descargar-pdf mt-3">
+
+                                <i class="bi bi-pencil-square"></i>
+                                Editar solicitud
+
+                            </a>
+
                         </div>
+
+                        
                         {% elif solicitud.estado == "cotizada" %}
 
                         <div class="estado-panel cotizada">
