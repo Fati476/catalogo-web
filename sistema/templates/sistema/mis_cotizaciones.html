@@ -619,120 +619,25 @@
                         </p>
                     </div>
 
-                        <div class="progreso-textos">
-
-                            <span>Enviada</span>
-
-                            {% if solicitud.estado == "rechazada" %}
-                                <span>Rechazada</span>
-                                <span>Finalizada</span>
-                            {% else %}
-                                <span>Revisión</span>
-                                <span>Cotizada</span>
-                            {% endif %}
-
-                        </div>
-
-                    </div>
-
                 </div>
 
                 <div>
                     {% if solicitud.estado == "revision" %}
-
-                    <div class="estado-panel revision">
-
-                        <i class="bi bi-hourglass-split"></i>
-
-                        <h6>
-                            Cotización en revisión
-                        </h6>
-
-                        <p>
-                            Nuestro equipo está revisando tu solicitud.
-                        </p>
-
-                        <div class="cotizacion-progreso mt-3">
-
-                            <div class="progreso-linea">
-
-                                <div class="progreso-punto activo">
-                                    <i class="bi bi-send-check"></i>
-                                </div>
-
-                                <div class="progreso-punto activo">
-                                    <i class="bi bi-hourglass-split"></i>
-                                </div>
-
-                                <div class="progreso-punto">
-                                    <i class="bi bi-file-earmark-check"></i>
-                                </div>
-
-                            </div>
-
-                            <div class="progreso-textos">
-
-                                <span>Enviada</span>
-                                <span>Revisión</span>
-                                <span>Cotizada</span>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
+                        <span class="estado-badge estado-revision">
+                            En revisión
+                        </span>
                     {% elif solicitud.estado == "cotizada" %}
-
-                    <div class="estado-panel cotizada">
-
-                        <i class="bi bi-check-circle-fill"></i>
-
-                        <h6>
-                            Cotización lista
-                        </h6>
-
-                        <p>
-                            Ya puedes descargar tu documento PDF.
-                        </p>
-
-                        <a href="{% url 'descargar_cotizacion_pdf' solicitud.id %}"
-                           class="btn-descargar-pdf mt-3">
-
-                            <i class="bi bi-file-earmark-pdf"></i>
-                            Descargar PDF
-
-                        </a>
-
-                    </div>
-
+                        <span class="estado-badge estado-cotizada">
+                            Cotizada
+                        </span>
                     {% elif solicitud.estado == "rechazada" %}
-
-                    <div class="estado-panel rechazada">
-
-                        <i class="bi bi-x-circle-fill"></i>
-
-                        <h6>
-                            Solicitud rechazada
-                        </h6>
-
-                        {% if solicitud.motivo_rechazo %}
-                            <p>
-                                {{ solicitud.motivo_rechazo }}
-                            </p>
-                        {% else %}
-                            <p>
-                                Esta solicitud no pudo ser cotizada.
-                            </p>
-                        {% endif %}
-
-                    </div>
-
+                        <span class="estado-badge estado-rechazada">
+                            Rechazada
+                        </span>
                     {% endif %}
                 </div>
 
             </div>
-
             <div class="cotizacion-card-body">
 
                 <div class="row g-4 align-items-stretch">
@@ -782,11 +687,36 @@
                             </h6>
 
                             <p>
-                                Nuestro equipo está preparando tu cotización.
+                                Nuestro equipo está revisando tu solicitud.
                             </p>
 
-                        </div>
+                            <div class="cotizacion-progreso mt-3">
 
+                                <div class="progreso-linea">
+
+                                    <div class="progreso-punto activo">
+                                        <i class="bi bi-send-check"></i>
+                                    </div>
+
+                                    <div class="progreso-punto activo">
+                                        <i class="bi bi-hourglass-split"></i>
+                                    </div>
+
+                                    <div class="progreso-punto">
+                                        <i class="bi bi-file-earmark-check"></i>
+                                    </div>
+
+                                </div>
+
+                                <div class="progreso-textos">
+                                    <span>Enviada</span>
+                                    <span>Revisión</span>
+                                    <span>Cotizada</span>
+                                </div>
+
+                            </div>
+
+                        </div>
                         {% elif solicitud.estado == "cotizada" %}
 
                         <div class="estado-panel cotizada">
