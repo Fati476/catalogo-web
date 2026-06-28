@@ -437,10 +437,10 @@
         }
 
         .cotizacion-progreso{
-            margin-top:22px;
-            padding:18px;
-            border-radius:22px;
-            background:#f3f1ec;
+            width:100%;
+            padding:12px;
+            border-radius:16px;
+            background:rgba(255,255,255,.45);
         }
 
         .progreso-linea{
@@ -448,16 +448,16 @@
             align-items:center;
             justify-content:space-between;
             position:relative;
-            margin-bottom:10px;
+            margin-bottom:8px;
         }
 
         .progreso-linea::before{
             content:"";
             position:absolute;
-            top:17px;
-            left:35px;
-            right:35px;
-            height:4px;
+            top:14px;
+            left:28px;
+           right:28px;
+            height:3px;
             background:#d8d3c8;
             border-radius:999px;
             z-index:1;
@@ -466,40 +466,31 @@
         .progreso-punto{
             position:relative;
             z-index:2;
-            width:38px;
-            height:38px;
+            width:30px;
+            height:30px;
             border-radius:50%;
             background:#d8d3c8;
             color:white;
             display:flex;
             align-items:center;
             justify-content:center;
-            font-weight:800;
+            font-size:.85rem;
         }
 
         .progreso-punto.activo{
             background:#111827;
         }
 
-        .progreso-punto.exito{
-            background:#166534;
-        }
-
-        .progreso-punto.error{
-            background:#991b1b;
-        }
-
         .progreso-textos{
             display:flex;
             justify-content:space-between;
-            gap:10px;
         }
 
         .progreso-textos span{
             width:33.33%;
             text-align:center;
             color:#6b7280;
-            font-size:.78rem;
+            font-size:.65rem;
             font-weight:800;
             text-transform:uppercase;
         }
@@ -628,41 +619,6 @@
                         </p>
                     </div>
 
-                    <div class="cotizacion-progreso">
-
-                        <div class="progreso-linea">
-
-                            <div class="progreso-punto activo">
-                                <i class="bi bi-send-check"></i>
-                            </div>
-
-                            {% if solicitud.estado == "revision" %}
-                                <div class="progreso-punto activo">
-                                    <i class="bi bi-hourglass-split"></i>
-                                </div>
-                                <div class="progreso-punto">
-                                    <i class="bi bi-file-earmark-check"></i>
-                                </div>
-
-                            {% elif solicitud.estado == "cotizada" %}
-                                <div class="progreso-punto exito">
-                                    <i class="bi bi-hourglass-split"></i>
-                                </div>
-                                <div class="progreso-punto exito">
-                                    <i class="bi bi-file-earmark-check"></i>
-                                </div>
-
-                            {% elif solicitud.estado == "rechazada" %}
-                                <div class="progreso-punto error">
-                                    <i class="bi bi-x-lg"></i>
-                                </div>
-                                <div class="progreso-punto error">
-                                    <i class="bi bi-x-circle"></i>
-                                </div>
-                            {% endif %}
-
-                        </div>
-
                         <div class="progreso-textos">
 
                             <span>Enviada</span>
@@ -683,17 +639,95 @@
 
                 <div>
                     {% if solicitud.estado == "revision" %}
-                        <span class="estado-badge estado-revision">
-                            En revisión
-                        </span>
+
+                    <div class="estado-panel revision">
+
+                        <i class="bi bi-hourglass-split"></i>
+
+                        <h6>
+                            Cotización en revisión
+                        </h6>
+
+                        <p>
+                            Nuestro equipo está revisando tu solicitud.
+                        </p>
+
+                        <div class="cotizacion-progreso mt-3">
+
+                            <div class="progreso-linea">
+
+                                <div class="progreso-punto activo">
+                                    <i class="bi bi-send-check"></i>
+                                </div>
+
+                                <div class="progreso-punto activo">
+                                    <i class="bi bi-hourglass-split"></i>
+                                </div>
+
+                                <div class="progreso-punto">
+                                    <i class="bi bi-file-earmark-check"></i>
+                                </div>
+
+                            </div>
+
+                            <div class="progreso-textos">
+
+                                <span>Enviada</span>
+                                <span>Revisión</span>
+                                <span>Cotizada</span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
                     {% elif solicitud.estado == "cotizada" %}
-                        <span class="estado-badge estado-cotizada">
-                            Cotizada
-                        </span>
+
+                    <div class="estado-panel cotizada">
+
+                        <i class="bi bi-check-circle-fill"></i>
+
+                        <h6>
+                            Cotización lista
+                        </h6>
+
+                        <p>
+                            Ya puedes descargar tu documento PDF.
+                        </p>
+
+                        <a href="{% url 'descargar_cotizacion_pdf' solicitud.id %}"
+                           class="btn-descargar-pdf mt-3">
+
+                            <i class="bi bi-file-earmark-pdf"></i>
+                            Descargar PDF
+
+                        </a>
+
+                    </div>
+
                     {% elif solicitud.estado == "rechazada" %}
-                        <span class="estado-badge estado-rechazada">
-                            Rechazada
-                        </span>
+
+                    <div class="estado-panel rechazada">
+
+                        <i class="bi bi-x-circle-fill"></i>
+
+                        <h6>
+                            Solicitud rechazada
+                        </h6>
+
+                        {% if solicitud.motivo_rechazo %}
+                            <p>
+                                {{ solicitud.motivo_rechazo }}
+                            </p>
+                        {% else %}
+                            <p>
+                                Esta solicitud no pudo ser cotizada.
+                            </p>
+                        {% endif %}
+
+                    </div>
+
                     {% endif %}
                 </div>
 
