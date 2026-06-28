@@ -237,5 +237,11 @@ urlpatterns = [
         name="editar_solicitud_en_revision"
     ),
 
+    path(
+        "cotizaciones/eliminar/<int:id>/",
+        views.eliminar_solicitud_en_revision,
+        name="eliminar_solicitud_en_revision"
+    ),
+
 
 ]

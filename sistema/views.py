@@ -1342,3 +1342,24 @@ def editar_solicitud_en_revision(request, id):
     )
 
     return redirect("solicitudes")
+
+
+@login_required
+def eliminar_solicitud_en_revision(request, id):
+
+    solicitud = get_object_or_404(
+        SolicitudCotizacion,
+        id=id,
+        usuario=request.user,
+        enviada=True,
+        estado="revision"
+    )
+
+    solicitud.delete()
+
+    messages.success(
+        request,
+        "La solicitud fue eliminada correctamente."
+    )
+
+    return redirect("mis_cotizaciones")

@@ -505,6 +505,27 @@
             }
         }
 
+        .btn-eliminar-cotizacion{
+            background:#fdecec;
+            color:#991b1b;
+            border-radius:14px;
+            padding:10px 18px;
+            font-size:.9rem;
+            font-weight:800;
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            gap:8px;
+            width:auto;
+            text-decoration:none;
+            transition:.25s;
+        }
+
+        .btn-eliminar-cotizacion:hover{
+            background:#991b1b;
+            color:white;
+        }
+
 
 
     </style>
@@ -721,6 +742,15 @@
 
                                 <i class="bi bi-pencil-square"></i>
                                 Editar solicitud
+
+                            </a>
+
+                            <a href="{% url 'eliminar_solicitud_en_revision' solicitud.id %}"
+                                class="btn-eliminar-cotizacion mt-2"
+                                onclick="return confirm('¿Seguro que deseas eliminar esta solicitud?');">
+
+                                <i class="bi bi-trash"></i>
+                                Eliminar solicitud
 
                             </a>
 
