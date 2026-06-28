@@ -436,6 +436,84 @@
             }
         }
 
+        .cotizacion-progreso{
+            margin-top:22px;
+            padding:18px;
+            border-radius:22px;
+            background:#f3f1ec;
+        }
+
+        .progreso-linea{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            position:relative;
+            margin-bottom:10px;
+        }
+
+        .progreso-linea::before{
+            content:"";
+            position:absolute;
+            top:17px;
+            left:35px;
+            right:35px;
+            height:4px;
+            background:#d8d3c8;
+            border-radius:999px;
+            z-index:1;
+        }
+
+        .progreso-punto{
+            position:relative;
+            z-index:2;
+            width:38px;
+            height:38px;
+            border-radius:50%;
+            background:#d8d3c8;
+            color:white;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-weight:800;
+        }
+
+        .progreso-punto.activo{
+            background:#111827;
+        }
+
+        .progreso-punto.exito{
+            background:#166534;
+        }
+
+        .progreso-punto.error{
+            background:#991b1b;
+        }
+
+        .progreso-textos{
+            display:flex;
+            justify-content:space-between;
+            gap:10px;
+        }
+
+        .progreso-textos span{
+            width:33.33%;
+            text-align:center;
+            color:#6b7280;
+            font-size:.78rem;
+            font-weight:800;
+            text-transform:uppercase;
+        }
+
+        @media(max-width:576px){
+            .cotizacion-progreso{
+                padding:15px 10px;
+            }
+
+            .progreso-textos span{
+                font-size:.68rem;
+            }
+        }
+
 
 
     </style>
@@ -548,6 +626,57 @@
                         <p class="cotizacion-date">
                             {{ solicitud.fecha|date:"d/m/Y" }} • {{ solicitud.fecha|time:"H:i" }}
                         </p>
+                    </div>
+
+                    <div class="cotizacion-progreso">
+
+                        <div class="progreso-linea">
+
+                            <div class="progreso-punto activo">
+                                <i class="bi bi-send-check"></i>
+                            </div>
+
+                            {% if solicitud.estado == "revision" %}
+                                <div class="progreso-punto activo">
+                                    <i class="bi bi-hourglass-split"></i>
+                                </div>
+                                <div class="progreso-punto">
+                                    <i class="bi bi-file-earmark-check"></i>
+                                </div>
+
+                            {% elif solicitud.estado == "cotizada" %}
+                                <div class="progreso-punto exito">
+                                    <i class="bi bi-hourglass-split"></i>
+                                </div>
+                                <div class="progreso-punto exito">
+                                    <i class="bi bi-file-earmark-check"></i>
+                                </div>
+
+                            {% elif solicitud.estado == "rechazada" %}
+                                <div class="progreso-punto error">
+                                    <i class="bi bi-x-lg"></i>
+                                </div>
+                                <div class="progreso-punto error">
+                                    <i class="bi bi-x-circle"></i>
+                                </div>
+                            {% endif %}
+
+                        </div>
+
+                        <div class="progreso-textos">
+
+                            <span>Enviada</span>
+
+                            {% if solicitud.estado == "rechazada" %}
+                                <span>Rechazada</span>
+                                <span>Finalizada</span>
+                            {% else %}
+                                <span>Revisión</span>
+                                <span>Cotizada</span>
+                            {% endif %}
+
+                        </div>
+
                     </div>
 
                 </div>
