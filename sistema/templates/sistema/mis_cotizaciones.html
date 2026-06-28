@@ -353,28 +353,87 @@
         }
 
         .estado-panel.cotizada{        
-    background:#e8f8ef;
-    color:#166534;
+            background:#e8f8ef;
+            color:#166534;
         }
 
         .estado-panel.rechazada{        
-    background:#fdecec;
-    color:#991b1b;
+            background:#fdecec;
+            color:#991b1b;
         }
 
         @media(max-width:768px){        
-    .cotizacion-card-header{
-        flex-direction:column;
-        padding:22px;
-    }
+            .cotizacion-card-header{
+                flex-direction:column;
+                padding:22px;
+            }
 
-    .cotizacion-card-body{
-        padding:22px;
-    }
+            .cotizacion-card-body{
+                padding:22px;
+            }
 
-    .estado-panel{
-        margin-top:18px;
-    }
+            .estado-panel{
+                margin-top:18px;
+            }
+        }
+
+        .cotizaciones-resumen{
+            background:white;
+            border-radius:28px;
+            padding:26px;
+            margin-bottom:28px;
+            box-shadow:0 14px 35px rgba(17,24,39,.10);
+            border-top:6px solid #111827;
+        }
+
+        .cotizaciones-resumen h5{
+            color:#111827;
+            font-weight:900;
+            margin-bottom:22px;
+        }
+
+        .resumen-cotizaciones-grid{
+            display:grid;
+            grid-template-columns:repeat(4, 1fr);
+            gap:18px;
+        }
+
+        .resumen-cotizacion-item{
+            background:#f3f1ec;
+            border-radius:22px;
+            padding:22px 16px;
+            text-align:center;
+        }
+
+        .resumen-cotizacion-numero{
+            display:block;
+            font-family:'Arvo', serif;
+            font-size:2rem;
+            font-weight:900;
+            color:#111827;
+            line-height:1;
+        }
+
+        .resumen-cotizacion-label{
+            display:block;
+            margin-top:10px;
+            color:#9b7615;
+            font-weight:900;
+            font-size:.78rem;
+            text-transform:uppercase;
+            letter-spacing:.8px;
+        }
+
+        @media(max-width:992px){
+            .resumen-cotizaciones-grid{
+                grid-template-columns:repeat(2, 1fr);
+            }
+        }
+
+        @media(max-width:576px){
+            .resumen-cotizaciones-grid{
+                grid-template-columns:1fr;
+            }
         }
 
 
@@ -417,6 +476,55 @@
     </div>
 
     <div class="container-fluid px-3 px-lg-4 mt-4">
+
+
+        <div class="cotizaciones-resumen">
+        
+            <h5>
+                Resumen de cotizaciones
+            </h5>
+
+            <div class="resumen-cotizaciones-grid">
+
+                <div class="resumen-cotizacion-item">
+                    <span class="resumen-cotizacion-numero">
+                        {{ total_cotizaciones }}
+                    </span>
+                    <span class="resumen-cotizacion-label">
+                        Totales
+                    </span>
+                </div>
+
+                <div class="resumen-cotizacion-item">
+                    <span class="resumen-cotizacion-numero">
+                        {{ total_revision }}
+                    </span>
+                    <span class="resumen-cotizacion-label">
+                        En revisión
+                    </span>
+                </div>
+
+                <div class="resumen-cotizacion-item">
+                    <span class="resumen-cotizacion-numero">
+                        {{ total_cotizadas }}
+                    </span>
+                    <span class="resumen-cotizacion-label">
+                        Cotizadas
+                    </span>
+                </div>
+
+                <div class="resumen-cotizacion-item">
+                    <span class="resumen-cotizacion-numero">
+                        {{ total_rechazadas }}
+                    </span>
+                    <span class="resumen-cotizacion-label">
+                        Rechazadas
+                    </span>
+                </div>
+
+            </div>
+
+        </div>
 
     {% if solicitudes %}
 

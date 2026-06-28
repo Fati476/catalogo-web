@@ -770,11 +770,29 @@ def mis_cotizaciones(request):
         enviada=True
     ).order_by("-fecha")
 
+    total_cotizaciones = solicitudes.count()
+
+    total_revision = solicitudes.filter(
+        estado="revision"
+    ).count()
+
+    total_cotizadas = solicitudes.filter(
+        estado="cotizada"
+    ).count()
+
+    total_rechazadas = solicitudes.filter(
+        estado="rechazada"
+    ).count()
+
     return render(
         request,
         "sistema/mis_cotizaciones.html",
         {
-            "solicitudes": solicitudes
+            "solicitudes": solicitudes,
+            "total_cotizaciones": total_cotizaciones,
+            "total_revision": total_revision,
+            "total_cotizadas": total_cotizadas,
+            "total_rechazadas": total_rechazadas,
         }
     )
 
