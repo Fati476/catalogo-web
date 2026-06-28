@@ -550,24 +550,38 @@ def toggle_favorito(request, producto_id):
 @login_required
 def agregar_cotizacion(request, producto_id):
 
-    producto = Producto.objects.get(id=producto_id)
+    producto = get_object_or_404(
+        Producto,
+        id=producto_id
+    )
 
-    solicitud, creada = SolicitudCotizacion.objects.get_or_create(
+    solicitud = SolicitudCotizacion.objects.filter(
         usuario=request.user,
         enviada=False
-    )
+    ).order_by("-id").first()
+
+    if solicitud is None:
+        solicitud = SolicitudCotizacion.objects.create(
+            usuario=request.user,
+            enviada=False,
+            estado="revision"
+        )
 
     detalle, creado = DetalleSolicitud.objects.get_or_create(
         solicitud=solicitud,
-        producto=producto
+        producto=producto,
+        defaults={
+            "cantidad": 1,
+            "seleccionado": True
+        }
     )
 
     if not creado:
         detalle.cantidad += 1
+        detalle.seleccionado = True
         detalle.save()
 
-    return redirect('solicitudes')
-
+    return redirect("solicitudes")
 
 def todas_categorias(request):
     categorias = Categoria.objects.all().order_by('nombre')
