@@ -1369,3 +1369,26 @@ def eliminar_solicitud_en_revision(request, id):
     )
 
     return redirect("mis_cotizaciones")
+
+@login_required
+def cancelar_edicion_solicitud(request, id):
+
+    solicitud = get_object_or_404(
+        SolicitudCotizacion,
+        id=id,
+        usuario=request.user,
+        enviada=False,
+        estado="revision"
+    )
+
+    solicitud.enviada = True
+    solicitud.save()
+
+    request.session.pop("solicitud_editando_id", None)
+
+    messages.info(
+        request,
+        "La edición fue cancelada. La cotización quedó en revisión."
+    )
+
+    return redirect("mis_cotizaciones")
