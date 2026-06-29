@@ -720,6 +720,7 @@ def solicitudes(request):
             'solicitud': solicitud,
             'total_productos': total_productos,
             'total_unidades': total_unidades,
+            'editando': solicitud_id is not None,
         }
     )
 
