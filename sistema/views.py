@@ -695,9 +695,14 @@ def solicitudes(request):
         ).order_by("-id").first()
 
     if solicitud and not solicitud.detalles.exists():
-        solicitud.delete()
-        request.session.pop("solicitud_editando_id", None)
-        solicitud = None
+
+        if request.session.get("solicitud_editando_id") == solicitud.id:
+            pass
+
+        else:
+            solicitud.delete()
+            request.session.pop("solicitud_editando_id", None)
+            solicitud = None
 
     total_productos = 0
     total_unidades = 0
