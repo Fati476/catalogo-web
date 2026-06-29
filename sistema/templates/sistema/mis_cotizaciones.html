@@ -706,7 +706,13 @@
 
                     <div>
                         <h5 class="cotizacion-main-title">
-                            Solicitud #{{ solicitud.id }}
+
+                            {% if solicitud.estado == "cotizada" %}
+                                Cotización #{{ solicitud.id }}
+                            {% else %}
+                                Solicitud #{{ solicitud.id }}
+                            {% endif %}
+
                         </h5>
 
                         <p class="cotizacion-date">
