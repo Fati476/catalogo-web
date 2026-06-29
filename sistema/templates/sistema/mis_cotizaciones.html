@@ -123,18 +123,63 @@
 
         .producto-lista{
             margin-top:14px;
-            border-radius:18px;
-            overflow:hidden;
-            border:1px solid rgba(17,24,39,.08);
+            display:flex;
+            flex-direction:column;
+            gap:12px;
         }
 
         .producto-item{
             display:flex;
+            align-items:center;
             justify-content:space-between;
-            gap:12px;
-            padding:12px 14px;
-            background:#fff;
-            border-bottom:1px solid rgba(17,24,39,.06);
+            gap:14px;
+            padding:14px;
+            background:white;
+            border:1px solid rgba(17,24,39,.08);
+            border-radius:18px;
+            box-shadow:0 8px 20px rgba(17,24,39,.05);
+        }
+
+        .producto-info-cotizacion{
+            display:flex;
+            align-items:center;
+            gap:14px;
+            min-width:0;
+        }
+        .producto-miniatura{
+            width:58px;
+            height:58px;
+            border-radius:16px;
+            background:#f3f1ec;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            overflow:hidden;
+            flex-shrink:0;
+            color:#9b7615;
+            font-size:1.4rem;
+        }
+
+        .producto-miniatura img{
+            width:100%;
+            height:100%;
+            object-fit:contain;
+            padding:6px;
+        }
+
+        .producto-info-cotizacion h6{
+            margin:0;
+            color:#111827;
+            font-weight:900;
+        }
+
+        .producto-info-cotizacion p{
+            margin:3px 0 0;
+            color:#9b7615;
+            font-size:.78rem;
+            font-weight:800;
+            text-transform:uppercase;
+            letter-spacing:.6px;
         }
 
         .producto-item:last-child{
@@ -145,11 +190,22 @@
             background:#111827;
             color:white;
             border-radius:999px;
-            padding:5px 10px;
-            font-size:.8rem;
-            font-weight:700;
+            padding:6px 11px;
+            font-size:.82rem;
+            font-weight:800;
+            flex-shrink:0;
         }
 
+        @media(max-width:576px){
+            .producto-item{
+                align-items:flex-start;
+            }
+
+            .producto-miniatura{
+                width:50px;
+                height:50px;
+            }
+        }
         .btn-descargar-pdf{
             background:#111827;
             color:white;
@@ -695,9 +751,30 @@
 
                             <div class="producto-item">
 
-                                <span>
-                                    {{ detalle.producto.nombre }}
-                                </span>
+                                <div class="producto-info-cotizacion">
+
+                                    div class="producto-miniatura">
+
+                                        {% if detalle.producto.imagenes.first %}
+                                            <img src="{{ detalle.producto.imagenes.first.imagen.url }}"
+                                                 alt="{{ detalle.producto.nombre }}">
+                                        {% else %}
+                                            <i class="bi bi-box-seam"></i>
+                                        {% endif %}
+
+                                    </div>
+
+                                    <div>
+                                        <h6>
+                                            {{ detalle.producto.nombre }}
+                                        </h6>
+
+                                        <p>
+                                            {{ detalle.producto.categoria.nombre }}
+                                        </p>
+                                    </div>
+
+                                </div>
 
                                 <span class="producto-cantidad">
                                     x{{ detalle.cantidad }}
