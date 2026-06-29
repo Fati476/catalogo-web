@@ -600,6 +600,55 @@
             flex-wrap:wrap;
         }
 
+        .buscador-cotizaciones{
+            max-width:720px;
+            margin:0 auto 28px;
+        }
+
+        .buscador-cotizaciones .input-group{
+            background:white;
+            border-radius:999px;
+            overflow:hidden;
+            box-shadow:0 14px 35px rgba(17,24,39,.10);
+            border:1px solid rgba(17,24,39,.08);
+        }
+
+        #buscarCotizacion:focus{
+            outline:none;
+            box-shadow:none;
+        }
+
+        #buscarCotizacion::placeholder{
+            color:#8a8f99;
+        }
+
+        .sin-cotizaciones{
+            display:none;
+            max-width:520px;
+            margin:20px auto 28px;
+            background:white;
+            border-radius:24px;
+            padding:28px 24px;
+            text-align:center;
+            box-shadow:0 12px 30px rgba(17,24,39,.10);
+        }
+
+        .sin-cotizaciones i{
+            font-size:2.3rem;
+            color:#9b7615;
+        }
+
+        .sin-cotizaciones h5{
+            color:#111827;
+            font-weight:900;
+            margin-top:10px;
+        }
+
+        .sin-cotizaciones p{
+            color:#6b7280;
+            margin-bottom:0;
+        }
+
 
 
     </style>
@@ -689,12 +738,43 @@
             </div>
 
         </div>
+        <div class="buscador-cotizaciones mb-4">
+
+            <div class="input-group input-group-lg">
+
+                <span class="input-group-text bg-white border-0 ps-4">
+                    <i class="bi bi-search fs-4 text-muted"></i>
+                </span>
+
+                <input type="text"
+                       id="buscarCotizacion"
+                       class="form-control border-0 py-3"
+                       placeholder="Buscar por número, estado o producto...">
+
+            </div>
+
+        </div>
+
+        <div id="sinCotizaciones" class="sin-cotizaciones">
+            <i class="bi bi-search"></i>
+            <h5>No se encontraron cotizaciones</h5>
+            <p>Intenta buscar por otro número, estado o producto.</p>
+        </div>
+        
 
     {% if solicitudes %}
 
         {% for solicitud in solicitudes %}
 
-        <div class="card cotizacion-card mb-4">
+        <div class="card cotizacion-card mb-4 cotizacion-item"
+            data-busqueda="
+               {{ solicitud.id }}
+               {{ solicitud.estado }}
+               {% for detalle in solicitud.detalles.all %}
+                   {{ detalle.producto.nombre }}
+                   {{ detalle.producto.categoria.nombre }}
+               {% endfor %}
+            ">
 
             <div class="cotizacion-card-header">
 
@@ -945,6 +1025,7 @@
         </div>
 
     {% endif %}
+    </div> 
 </div>
 
 {% include 'includes/footer.html' %}
@@ -986,5 +1067,42 @@ document.querySelectorAll(".btn-eliminar-solicitud").forEach(btn => {
 });
 
 </script>
+
+<script>
+const inputCotizacion = document.getElementById("buscarCotizacion");
+
+if(inputCotizacion){
+
+    inputCotizacion.addEventListener("keyup", function(){
+
+        const texto = this.value.toLowerCase().trim();
+        let encontrados = 0;
+
+        document.querySelectorAll(".cotizacion-item").forEach(card => {
+
+            const contenido = card.dataset.busqueda.toLowerCase();
+
+            if(contenido.includes(texto)){
+                card.style.display = "";
+                encontrados++;
+            }else{
+                card.style.display = "none";
+            }
+
+        });
+
+        const mensaje = document.getElementById("sinCotizaciones");
+
+        if(mensaje){
+            mensaje.style.display = encontrados === 0 && texto !== ""
+                ? "block"
+                : "none";
+        }
+
+    });
+
+}
+</script>
+
 </body>
 </html>
