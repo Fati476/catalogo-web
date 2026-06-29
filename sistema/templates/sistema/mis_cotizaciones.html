@@ -154,14 +154,15 @@
             background:#111827;
             color:white;
             border-radius:14px;
-            padding:10px 18px;
-            font-size:.9rem;
+            padding:9px 16px;
+            font-size:.86rem;
             font-weight:700;
             display:inline-flex;
             align-items:center;
             justify-content:center;
-            gap:8px;
+            gap:7px;
             width:auto;
+            min-width:185px;
             text-decoration:none;
             transition:.25s;
         }
@@ -509,14 +510,15 @@
             background:#fdecec;
             color:#991b1b;
             border-radius:14px;
-            padding:10px 18px;
-            font-size:.9rem;
+            padding:9px 16px;
+            font-size:.86rem;
             font-weight:800;
             display:inline-flex;
             align-items:center;
             justify-content:center;
-            gap:8px;
+            gap:7px;
             width:auto;
+            min-width:185px;
             text-decoration:none;
             transition:.25s;
         }
@@ -524,6 +526,13 @@
         .btn-eliminar-cotizacion:hover{
             background:#991b1b;
             color:white;
+        }
+        .acciones-cotizacion{
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            gap:10px;
+            margin-top:14px;
         }
 
 
@@ -737,21 +746,21 @@
 
                             </div>
 
-                            <a href="{% url 'editar_solicitud_en_revision' solicitud.id %}"
-                               class="btn-descargar-pdf mt-3">
+                            <div class="acciones-cotizacion">
 
-                                <i class="bi bi-pencil-square"></i>
-                                Editar solicitud
+                                <a href="{% url 'editar_solicitud_en_revision' solicitud.id %}"
+                                   class="btn-descargar-pdf">
+                                    <i class="bi bi-pencil-square"></i>
+                                    Editar solicitud
+                                </a>
 
-                            </a>
+                                <a href="{% url 'eliminar_solicitud_en_revision' solicitud.id %}"
+                                   class="btn-eliminar-cotizacion btn-eliminar-solicitud">
+                                    <i class="bi bi-trash"></i>
+                                    Eliminar solicitud
+                                </a>
 
-                            <a href="{% url 'eliminar_solicitud_en_revision' solicitud.id %}"
-                               class="btn-eliminar-cotizacion mt-2 btn-eliminar-solicitud">
-
-                                <i class="bi bi-trash"></i>
-                                Eliminar solicitud
-
-                            </a>
+                            </div>
 
                         </div>
 
