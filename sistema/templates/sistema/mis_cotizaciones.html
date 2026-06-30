@@ -767,9 +767,9 @@
         {% for solicitud in solicitudes %}
 
         <div class="card cotizacion-card mb-4 cotizacion-item"
-            data-busqueda="
-               {{ solicitud.id }}
-               {{ solicitud.estado }}
+            data-id="{{ solicitud.id }}"
+            data-estado="{{ solicitud.estado }}"
+            data-productos="
                {% for detalle in solicitud.detalles.all %}
                    {{ detalle.producto.nombre }}
                    {{ detalle.producto.categoria.nombre }}
@@ -1076,13 +1076,29 @@ if(inputCotizacion){
     inputCotizacion.addEventListener("keyup", function(){
 
         const texto = this.value.toLowerCase().trim();
+        const esNumero = /^[0-9]+$/.test(texto);
+
         let encontrados = 0;
 
         document.querySelectorAll(".cotizacion-item").forEach(card => {
 
-            const contenido = card.dataset.busqueda.toLowerCase();
+            const id = card.dataset.id.toLowerCase();
+            const estado = card.dataset.estado.toLowerCase();
+            const productos = card.dataset.productos.toLowerCase();
 
-            if(contenido.includes(texto)){
+            let coincide = false;
+
+            if(texto === ""){
+                coincide = true;
+            }else if(esNumero){
+                coincide = id === texto;
+            }else{
+                coincide =
+                    estado.includes(texto) ||
+                    productos.includes(texto);
+            }
+
+            if(coincide){
                 card.style.display = "";
                 encontrados++;
             }else{
@@ -1103,6 +1119,5 @@ if(inputCotizacion){
 
 }
 </script>
-
 </body>
 </html>
