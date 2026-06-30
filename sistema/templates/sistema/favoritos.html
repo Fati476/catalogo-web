@@ -271,12 +271,12 @@
 
                 </a>
 
-                {% if producto.imagenes.first %}
+                {% if producto.imagen_principal %}
 
                     <a href="{% url 'detalle_producto' producto.id %}"
                        class="product-link-img producto-img-box">
 
-                        <img src="{{ producto.imagenes.first.imagen.url }}"
+                        <img src="{{ producto.imagen_principal.imagen.url }}"
                              class="product-img"
                              alt="{{ producto.nombre }}">
 

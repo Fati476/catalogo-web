@@ -658,6 +658,9 @@ def favoritos(request):
         estado=True
     ).order_by('-id')
 
+    for producto in productos_lista:
+        producto.imagen_principal = producto.imagenes.first()
+
     paginator = Paginator(productos_lista, 12)
 
     page = request.GET.get('page')
