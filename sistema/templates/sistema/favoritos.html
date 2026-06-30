@@ -328,8 +328,15 @@
     <div class="favoritos-info text-center mb-4">
 
         <span class="favoritos-total">
+
             <i class="bi bi-heart-fill me-2"></i>
-            {{ productos.paginator.count }} producto(s) en favoritos
+
+            <span id="contadorFavoritos">
+                {{ productos.paginator.count }}
+            </span>
+
+            producto(s) en favoritos
+
         </span>
 
     </div>
@@ -500,6 +507,12 @@ document.querySelectorAll('.favorito-btn').forEach(btn => {
                     card.remove();
                 }
 
+                const contador = document.getElementById("contadorFavoritos");
+
+                if(contador){
+                    contador.textContent = document.querySelectorAll(".producto-card").length;
+                }
+
                 const restantes =
                     document.querySelectorAll('.producto-card').length;
 
@@ -512,6 +525,7 @@ document.querySelectorAll('.favorito-btn').forEach(btn => {
                             </div>
                         </div>
                     `;
+                    document.getElementById("contadorFavoritos").textContent = "0";
                     const paginacion = document.querySelector('.pagination');
                     if(paginacion){
                         paginacion.closest('nav').remove();
