@@ -369,7 +369,7 @@
 
         {% for producto in productos %}
 
-        <div class="col-6 col-md-4 col-xl-3 producto-card">
+        <div class="col-6 col-md-4 col-xl-3 product-card">
 
             <div class="card producto-card-inner h-100">
 
@@ -506,7 +506,7 @@ document.getElementById('buscarProducto').addEventListener('keyup', function(){
     const texto = this.value.toLowerCase().trim();
     let encontrados = 0;
 
-    document.querySelectorAll('.producto-card').forEach(card => {
+    document.querySelectorAll('.product-card').forEach(card => {
 
         const titulo = card.querySelector('.product-title');
         const nombre = titulo.dataset.nombre;
