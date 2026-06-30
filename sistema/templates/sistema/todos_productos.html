@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Todos los productos</title>
+    <title>Favoritos</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet"
@@ -218,12 +218,13 @@
             border-radius:22px;
             overflow:hidden;
             box-shadow:0 8px 25px rgba(0,0,0,.08);
-            transition:transform .35s ease, box-shadow .35s ease;
+            transition:.35s ease;
+            position:relative;
         }
 
         .product-card:hover .producto-card-inner{
-         transform:translateY(-10px);
-            box-shadow:0 22px 48px rgba(0,0,0,.22);
+            transform:translateY(-10px);
+            box-shadow:0 22px 48px rgba(0,0,0,.20);
         }
 
         .product-link-img{
@@ -235,10 +236,6 @@
             padding:14px;
         }
 
-        .producto-img-box{
-            overflow:hidden;
-        }
-
         .product-img{
             width:100%;
             height:210px;
@@ -248,7 +245,7 @@
         }
 
         .product-card:hover .product-img{
-            transform:scale(1.12);
+            transform:scale(1.10);
         }
 
         .product-title{
@@ -257,23 +254,6 @@
             color:#111827;
             font-weight:800;
             margin-bottom:10px;
-        }
-
-        .product-title::after{
-            content:"";
-            position:absolute;
-            left:50%;
-            bottom:-6px;
-            transform:translateX(-50%);
-            width:0;
-            height:3px;
-            border-radius:50px;
-            background:#c79b2d;
-            transition:width .35s ease;
-        }
-
-        .product-card:hover .product-title::after{
-            width:70%;
         }
 
         .product-category{
@@ -285,25 +265,45 @@
         }
 
         .ver-detalle-text{
-         margin-top:14px;
+            margin-top:12px;
             display:inline-flex;
             align-items:center;
             justify-content:center;
             gap:8px;
-            padding:9px 16px;
+            padding:8px 15px;
             border-radius:999px;
             background:#111827;
             color:white;
-            font-size:.85rem;
+            font-size:.82rem;
             font-weight:700;
             text-decoration:none;
-            transition:background .3s ease, color .3s ease, transform .3s ease;
+            transition:.25s;
         }
 
-        .product-card:hover .ver-detalle-text{
+        .ver-detalle-text:hover{
             background:#c79b2d;
             color:#111827;
-            transform:translateY(-2px);
+        }
+
+        .favorito-btn{
+            position:absolute;
+            top:14px;
+            right:14px;
+            z-index:10;
+            width:42px;
+            height:42px;
+            border-radius:50%;
+            background:white;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            box-shadow:0 8px 20px rgba(17,24,39,.16);
+            text-decoration:none;
+        }
+
+        .favorito-btn i{
+            color:#dc3545;
+            font-size:1.2rem;
         }
 
     </style>
@@ -372,6 +372,18 @@
         <div class="col-6 col-md-4 col-xl-3 product-card">
 
             <div class="card producto-card-inner h-100">
+
+                <a href="#"
+                   class="favorito-btn"
+                   data-id="{{ producto.id }}">
+
+                    {% if producto.id in favoritos_ids %}
+                        <i class="bi bi-heart-fill"></i>
+                    {% else %}
+                        <i class="bi bi-heart"></i>
+                    {% endif %}
+
+                </a>
 
                 {% if producto.imagen_principal %}
 
@@ -527,6 +539,38 @@ document.getElementById('buscarProducto').addEventListener('keyup', function(){
     }else{
         mensaje.style.display = 'none';
     }
+
+});
+</script>
+
+
+<script>
+document.querySelectorAll('.favorito-btn').forEach(btn => {
+
+    btn.addEventListener('click', function(e){
+
+        e.preventDefault();
+
+        const productoId = this.dataset.id;
+        const icono = this.querySelector('i');
+
+        fetch(`/favorito/${productoId}/`)
+        .then(response => response.json())
+        .then(data => {
+
+            if(data.estado === "agregado"){
+                icono.classList.remove("bi-heart");
+                icono.classList.add("bi-heart-fill");
+            }
+
+            if(data.estado === "eliminado"){
+                icono.classList.remove("bi-heart-fill");
+                icono.classList.add("bi-heart");
+            }
+
+        });
+
+    });
 
 });
 </script>
