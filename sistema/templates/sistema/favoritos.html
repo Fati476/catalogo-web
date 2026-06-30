@@ -593,8 +593,25 @@ document.querySelectorAll('.favorito-btn').forEach(btn => {
 
                     document.getElementById('contenedor-productos').innerHTML = `
                         <div class="col-12">
-                            <div class="alert alert-light text-center">
-                                No tienes productos en favoritos.
+                            <div class="favoritos-vacio">
+
+                                <div class="favoritos-vacio-icono">
+                                    <i class="bi bi-heartbreak"></i>
+                                </div>
+
+                                <h4>
+                                    Aún no tienes favoritos
+                                </h4>
+
+                                <p>
+                                    Guarda los productos que más te interesen para encontrarlos rápidamente más adelante.
+                                </p>
+
+                                <a href="/productos/" class="btn-explorar">
+                                    <i class="bi bi-box-seam"></i>
+                                    Explorar productos
+                                </a>
+
                             </div>
                         </div>
                     `;
