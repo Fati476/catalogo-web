@@ -488,12 +488,18 @@ def lista_solicitudes(request):
 
 def productos_por_categoria(request, id):
 
-    categoria = Categoria.objects.get(id=id)
+    categoria = get_object_or_404(
+        Categoria,
+        id=id
+    )
 
     productos_lista = Producto.objects.filter(
         categoria=categoria,
         estado=True
     ).order_by('-id')
+
+    for producto in productos_lista:
+        producto.imagen_principal = producto.imagenes.first()
 
     paginator = Paginator(productos_lista, 6)
 
