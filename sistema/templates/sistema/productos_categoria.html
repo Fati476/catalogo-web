@@ -94,6 +94,27 @@
             color:#8a8f99;
         }
 
+        .categoria-info{
+            margin-top:-5px;
+            margin-bottom:35px;
+        }
+
+        .categoria-total{
+            display:inline-flex;
+            align-items:center;
+            gap:8px;
+            padding:10px 22px;
+            background:white;
+            border-radius:50px;
+            color:#111827;
+            font-weight:700;
+            box-shadow:0 10px 25px rgba(17,24,39,.08);
+        }
+
+        .categoria-total i{
+            color:#c79b2d;
+        }
+
         .producto-card{
             animation:fadeUp .45s ease both;
         }
@@ -341,6 +362,18 @@
                    placeholder="Buscar producto en esta categoría...">
 
         </div>
+
+    </div>
+
+    <div class="categoria-info text-center mb-4">
+
+        <span class="categoria-total">
+
+            <i class="bi bi-box-seam-fill"></i>
+
+            {{ total_productos }} producto(s) en esta categoría
+    
+        </span>
 
     </div>
 

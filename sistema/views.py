@@ -486,12 +486,10 @@ def lista_solicitudes(request):
 
 #Clientes 
 
+@login_required
 def productos_por_categoria(request, id):
 
-    categoria = get_object_or_404(
-        Categoria,
-        id=id
-    )
+    categoria = Categoria.objects.get(id=id)
 
     productos_lista = Producto.objects.filter(
         categoria=categoria,
@@ -501,7 +499,7 @@ def productos_por_categoria(request, id):
     for producto in productos_lista:
         producto.imagen_principal = producto.imagenes.first()
 
-    paginator = Paginator(productos_lista, 8)
+    paginator = Paginator(productos_lista, 6)
 
     page_number = request.GET.get('page')
 
@@ -523,7 +521,8 @@ def productos_por_categoria(request, id):
         {
             'categoria': categoria,
             'productos': productos,
-            'favoritos_ids': favoritos_ids
+            'favoritos_ids': favoritos_ids,
+            'total_productos': productos_lista.count()
         }
     )
 
