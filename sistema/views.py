@@ -501,7 +501,7 @@ def productos_por_categoria(request, id):
     for producto in productos_lista:
         producto.imagen_principal = producto.imagenes.first()
 
-    paginator = Paginator(productos_lista, 6)
+    paginator = Paginator(productos_lista, 8)
 
     page_number = request.GET.get('page')
 
