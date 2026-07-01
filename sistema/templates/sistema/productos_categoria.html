@@ -213,6 +213,86 @@
             }
         }
 
+        .categoria-vacia{
+            max-width:700px;
+            margin:50px auto;
+            padding:55px 40px;
+            background:white;
+            border-radius:28px;
+            text-align:center;
+            box-shadow:0 18px 45px rgba(17,24,39,.10);
+        }
+
+        .categoria-vacia-icono{
+            width:90px;
+            height:90px;
+            margin:0 auto 22px;
+            border-radius:50%;
+            background:#f8f2df;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+        }
+
+        .categoria-vacia-icono i{
+            font-size:2.5rem;
+            color:#b68918;
+        }
+
+        .categoria-vacia h4{
+            font-weight:900;
+            color:#111827;
+            margin-bottom:14px;
+        }
+
+        .categoria-vacia p{
+            color:#6b7280;
+            max-width:500px;
+            margin:0 auto 28px;
+        }
+
+        .btn-categoria,
+        .btn-categoria-secundario{
+
+            display:inline-flex;
+            align-items:center;
+            gap:10px;
+            padding:12px 24px;
+            border-radius:999px;
+            text-decoration:none;
+            font-weight:700;
+            transition:.3s;
+
+        }
+
+        .btn-categoria{        
+
+            background:#111827;
+            color:white;
+
+        }
+
+        .btn-categoria:hover{        
+
+            background:#c79b2d;
+            color:#111827;
+
+        }
+
+        .btn-categoria-secundario{        
+
+            background:#f3f4f6;
+            color:#111827;
+
+        }
+
+        .btn-categoria-secundario:hover{        
+
+            background:#e5e7eb;
+            color:#111827;
+
+        }
+
     </style>
 </head>
 
@@ -336,9 +416,38 @@
             {% empty %}
 
             <div class="col-12">
-                <div class="alert alert-light text-center">
-                    No hay productos en esta categoría.
+
+                <div class="categoria-vacia">
+
+                    <div class="categoria-vacia-icono">
+                        <i class="bi bi-box-seam"></i>
+                    </div>
+
+                    <h4>
+                        No hay productos disponibles
+                    </h4>
+
+                    <p>
+                        Esta categoría aún no tiene productos disponibles.
+                        Puedes explorar otras categorías o volver al catálogo.
+                    </p>
+
+                    <div class="d-flex justify-content-center gap-3 flex-wrap">
+
+                        <a href="{% url 'todas_categorias' %}" class="btn-categoria">
+                            <i class="bi bi-grid"></i>
+                            Ver categorías
+                        </a>
+
+                        <a href="{% url 'todos_productos' %}" class="btn-categoria-secundario">
+                            <i class="bi bi-box"></i>
+                            Ver catálogo
+                        </a>
+
+                    </div>
+
                 </div>
+
             </div>
 
             {% endfor %}
