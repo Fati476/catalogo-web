@@ -12,51 +12,205 @@
 
     <style>
 
-        @media (max-width: 767px){
-
-            .card-body{
-                padding: .75rem;
-            }
-
-            .card-body h6{
-                font-size: .95rem !important;
-                line-height: 1.3;
-            }
-
-            .card-body p{
-                font-size: .80rem;
-            }
-
-            .card-body .btn{
-                font-size: .80rem;
-                padding: .5rem;
-            }
-
-            .carousel-item img{
-                height: 140px !important;
-            }
-
+        .categoria-wrapper{
+            width:100%;
+            overflow:hidden;
         }
 
-        @media (min-width:768px){
-
-            .carousel-item img{
-                height:220px !important;
-            }
-
+        .categoria-hero{
+            position:relative;
+            min-height:310px;
+            overflow:hidden;
+            background:
+                linear-gradient(90deg, rgba(17,24,39,.97), rgba(17,24,39,.72), rgba(17,24,39,.25)),
+                url("{% static 'img/banner_productos.png' %}");
+            background-size:cover;
+            background-position:center;
+            display:flex;
+            align-items:center;
+            padding:145px 60px 105px;
+            margin:0 0 35px;
         }
 
-        .footer-wave{
+        .categoria-hero-content{
+            max-width:680px;
+            color:white;
+            position:relative;
+            z-index:2;
+        }
+
+        .categoria-hero h1{
+            font-family:'Arvo', serif;
+            font-size:2.6rem;
+            margin-bottom:14px;
+            text-shadow:0 4px 22px rgba(0,0,0,.7);
+        }
+
+        .categoria-hero p{
+            max-width:620px;
+            color:rgba(255,255,255,.92);
+            font-size:1.08rem;
+            line-height:1.6;
+            margin-bottom:0;
+        }
+
+        .categoria-hero-wave{
+            position:absolute;
+            left:0;
+            right:0;
+            bottom:-1px;
+            line-height:0;
+            z-index:2;
+        }
+
+        .categoria-hero-wave svg{
+            display:block;
+            width:100%;
+            height:70px;
+        }
+
+        .buscador-box{
+            max-width:620px;
+            margin:-42px auto 35px;
+            position:relative;
+            z-index:5;
+            padding:0 14px;
+        }
+
+        .buscador-box .input-group{
+            background:white;
+            border-radius:999px;
+            overflow:hidden;
+            box-shadow:0 14px 35px rgba(17,24,39,.14);
+            border:1px solid rgba(17,24,39,.08);
+        }
+
+        #buscarProducto:focus{
+            outline:none;
+            box-shadow:none;
+        }
+
+        #buscarProducto::placeholder{
+            color:#8a8f99;
+        }
+
+        .producto-card{
+            animation:fadeUp .45s ease both;
+        }
+
+        .producto-card-inner{
+            border:none;
+            border-radius:22px;
+            overflow:hidden;
+            box-shadow:0 8px 25px rgba(0,0,0,.08);
+            transition:.35s ease;
+            position:relative;
+        }
+
+        .producto-card:hover .producto-card-inner{
+            transform:translateY(-10px);
+            box-shadow:0 22px 48px rgba(0,0,0,.20);
+        }
+
+        .product-link-img{
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            background:#ece8df;
+            overflow:hidden;
+            padding:14px;
+        }
+
+        .product-img{
+            width:100%;
+            height:210px;
+            object-fit:contain;
+            background:white;
+            transition:transform .45s ease;
+        }
+
+        .producto-card:hover .product-img{
+            transform:scale(1.10);
+        }
+
+        .product-title{
+            color:#111827;
+            font-weight:800;
+            margin-bottom:10px;
+        }
+
+        .product-category{
+            color:#9b7615;
+            font-size:.82rem;
+            font-weight:700;
+            text-transform:uppercase;
+            letter-spacing:.8px;
+        }
+
+        .ver-detalle-text{
+            margin-top:12px;
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            gap:8px;
+            padding:8px 15px;
+            border-radius:999px;
+            background:#111827;
+            color:white;
+            font-size:.82rem;
+            font-weight:700;
+            text-decoration:none;
+            transition:.25s;
+        }
+
+        .ver-detalle-text:hover{        
+            background:#c79b2d;
+            color:#111827;
+        }
+
+        .favorito-btn{        
+            position:absolute;
+            top:14px;
+            right:14px;
+            z-index:10;
+            width:42px;
+            height:42px;
+            border-radius:50%;
+            background:white;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            box-shadow:0 8px 20px rgba(17,24,39,.16);
+            text-decoration:none;
+        }
+
+        .favorito-btn i{        
+            color:#dc3545;
+            font-size:1.2rem;
+        }
+
+        .footer-wave{        
             line-height:0;
             margin-top:35px;
             margin-bottom:-2px;
             background:#f3f1ec;
         }
 
-        .footer-wave svg{
+        .footer-wave svg{        
             display:block;
             width:100%;
             height:70px;
+        }
+
+        @keyframes fadeUp{        
+            from{
+                opacity:0;
+                transform:translateY(18px);
+            }
+            to{
+                opacity:1;
+                transform:translateY(0);
+            }
         }
 
     </style>
@@ -67,171 +221,184 @@
 <!-- NAVBAR (copias el mismo que ya tienes) -->
 {% include 'includes/navbar.html' %}
 
-<div class="container-fluid px-3 px-lg-4 mt-4">
+<div class="categoria-wrapper">
 
-    <div class="bg-white shadow-sm rounded-4 p-4 mb-4">
+    <section class="categoria-hero">
 
-        <h3 class="fw-bold mb-1 fs-4 fs-md-3">
-            📂 {{ categoria.nombre }}
-        </h3>
+        <div class="categoria-hero-content">
 
-        <p class="text-muted mb-0">
-            Estás viendo todos los productos de esta categoría.
-        </p>
+            <h1>
+                {{ categoria.nombre }}
+            </h1>
 
-    </div>
+            <p>
+                Explora los productos disponibles dentro de esta categoría y consulta su información.
+            </p>
 
-    <div class="mb-4">
+        </div>
 
-        <div class="input-group shadow-sm rounded-pill overflow-hidden">
+        <div class="categoria-hero-wave">
+            <svg viewBox="0 0 1440 140" preserveAspectRatio="none">
+                <path fill="#f3f1ec"
+                d="M0,70 C240,110 480,30 720,70 C960,110 1200,50 1440,80 L1440,140 L0,140 Z">
+                </path>
+            </svg>
+        </div>
 
-            <span class="input-group-text bg-white border-0">
-                🔍
+    </section>
+
+    <div class="buscador-box">
+
+        <div class="input-group input-group-lg">
+
+            <span class="input-group-text bg-white border-0 ps-4">
+                <i class="bi bi-search fs-4 text-muted"></i>
             </span>
 
             <input type="text"
                    id="buscarProducto"
-                   class="form-control border-0"
-                   placeholder="Buscar productos...">
+                   class="form-control border-0 py-3"
+                   placeholder="Buscar producto en esta categoría...">
 
         </div>
 
     </div>
 
-    <div class="row g-3">
+    <div class="container-fluid px-3 px-lg-4">
 
-        {% for producto in productos %}
+        <div class="row g-3">
 
-        <div class="col-6 col-md-4 col-xl-3 producto-card">
+            {% for producto in productos %}
 
-            <div class="card producto-card-inner h-100">
+            <div class="col-6 col-md-4 col-xl-3 producto-card">
 
-                <a href="#"
-                   class="favorito-btn"
-                   data-id="{{ producto.id }}">
+                <div class="card producto-card-inner h-100">
 
-                    {% if producto.id in favoritos_ids %}
-                        <i class="bi bi-heart-fill"></i>
+                    <a href="#"
+                       class="favorito-btn"
+                       data-id="{{ producto.id }}">
+
+                        {% if producto.id in favoritos_ids %}
+                            <i class="bi bi-heart-fill"></i>
+                        {% else %}
+                            <i class="bi bi-heart"></i>
+                        {% endif %}
+
+                    </a>
+
+                    {% if producto.imagen_principal %}
+
+                        <a href="{% url 'detalle_producto' producto.id %}"
+                           class="product-link-img producto-img-box">
+
+                            <img src="{{ producto.imagen_principal.imagen.url }}"
+                                 class="product-img"
+                                 alt="{{ producto.nombre }}">
+
+                        </a>
+
                     {% else %}
-                        <i class="bi bi-heart"></i>
+
+                        <a href="{% url 'detalle_producto' producto.id %}"
+                           class="product-link-img d-flex justify-content-center align-items-center"
+                           style="height:235px;">
+
+                            <i class="bi bi-image fs-1 text-secondary"></i>
+
+                        </a>
+
                     {% endif %}
 
-                </a>
+                    <div class="card-body text-center">
 
-                {% if producto.imagen_principal %}
+                        <h6 class="product-title">
+                            {{ producto.nombre }}
+                        </h6>
 
-                    <a href="{% url 'detalle_producto' producto.id %}"
-                       class="product-link-img producto-img-box">
+                        <div class="product-category">
+                            {{ producto.categoria.nombre }}
+                        </div>
 
-                        <img src="{{ producto.imagen_principal.imagen.url }}"
-                             class="product-img"
-                             alt="{{ producto.nombre }}">
+                        <a href="{% url 'detalle_producto' producto.id %}"
+                           class="ver-detalle-text text-decoration-none">
 
-                    </a>
+                            <i class="bi bi-eye"></i>
+                            Ver producto
 
-                {% else %}
+                        </a>
 
-                    <a href="{% url 'detalle_producto' producto.id %}"
-                       class="product-link-img d-flex justify-content-center align-items-center"
-                       style="height:235px;">
-
-                        <i class="bi bi-image fs-1 text-secondary"></i>
-
-                    </a>
-
-                {% endif %}
-
-                <div class="card-body text-center">
-
-                    <h6 class="product-title">
-                        {{ producto.nombre }}
-                    </h6>
-
-                    <div class="product-category">
-                        {{ producto.categoria.nombre }}
                     </div>
-
-                    <a href="{% url 'detalle_producto' producto.id %}"
-                       class="ver-detalle-text text-decoration-none">
-
-                        <i class="bi bi-eye"></i>
-                        Ver producto
-
-                    </a>
 
                 </div>
 
             </div>
 
-        </div>
+            {% empty %}
 
-        {% empty %}
-
-        <div class="col-12">
-
-            <div class="alert alert-light text-center">
-
-                No hay productos en esta categoría.
-
+            <div class="col-12">
+                <div class="alert alert-light text-center">
+                    No hay productos en esta categoría.
                 </div>
-
-        </div>
-
-        {% endfor %}
-
-    </div>
-    {% if productos.has_other_pages %}
-
-    <nav class="mt-4">
-
-        <ul class="pagination justify-content-center">
-
-            {% if productos.has_previous %}
-            <li class="page-item">
-                <a class="page-link"
-                href="?page={{ productos.previous_page_number }}">
-                    Anterior
-                </a>
-            </li>
-            {% endif %}
-
-            {% for num in productos.paginator.page_range %}
-
-                {% if productos.number == num %}
-
-                    <li class="page-item active">
-                        <span class="page-link">
-                            {{ num }}
-                        </span>
-                    </li>
-
-                {% else %}
-
-                    <li class="page-item">
-                        <a class="page-link"
-                        href="?page={{ num }}">
-                            {{ num }}
-                        </a>
-                    </li>
-
-                {% endif %}
+            </div>
 
             {% endfor %}
 
-            {% if productos.has_next %}
-            <li class="page-item">
-                <a class="page-link"
-                href="?page={{ productos.next_page_number }}">
-                    Siguiente
-                </a>
-            </li>
-            {% endif %}
+        </div>
 
-        </ul>
+        {% if productos.has_other_pages %}
 
-    </nav>
+        <nav class="mt-4">
 
-    {% endif %}
+            <ul class="pagination justify-content-center">
+
+                {% if productos.has_previous %}
+                <li class="page-item">
+                    <a class="page-link"
+                    href="?page={{ productos.previous_page_number }}">
+                        Anterior
+                    </a>
+                </li>
+                {% endif %}
+
+                {% for num in productos.paginator.page_range %}
+
+                    {% if productos.number == num %}
+
+                        <li class="page-item active">
+                            <span class="page-link">
+                                {{ num }}
+                            </span>
+                        </li>
+
+                    {% else %}
+
+                        <li class="page-item">
+                            <a class="page-link"
+                            href="?page={{ num }}">
+                                {{ num }}
+                            </a>
+                        </li>
+
+                    {% endif %}
+
+                {% endfor %}
+
+                {% if productos.has_next %}
+                <li class="page-item">
+                    <a class="page-link"
+                    href="?page={{ productos.next_page_number }}">
+                        Siguiente
+                    </a>
+                </li>
+                {% endif %}
+
+            </ul>
+
+        </nav>
+
+        {% endif %}
+
+    </div>
 
 </div>
 
