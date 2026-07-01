@@ -248,7 +248,7 @@
                     <thead>
 
                         <tr>
-
+                            <th>Imagen</th>
                             <th>Nombre</th>
                             <th>Descripción</th>
                             <th>Productos</th>
@@ -263,6 +263,17 @@
                         {% for categoria in categorias %}
 
                         <tr class="fila-categoria">
+
+                            <td>
+                                {% if categoria.imagen %}
+                                    <img src="{{ categoria.imagen.url }}"
+                                         style="width:70px;height:55px;object-fit:contain;background:#f1f5f9;border-radius:12px;padding:6px;">
+                                {% else %}
+                                    <div style="width:70px;height:55px;background:#f1f5f9;border-radius:12px;display:flex;align-items:center;justify-content:center;">
+                                        <i class="bi bi-image text-muted"></i>
+                                    </div>
+                                {% endif %}
+                            </td>
 
                             <td class="nombre-categoria fw-semibold">
                                 {{ categoria.nombre }}
@@ -365,8 +376,8 @@
                 </div>
 
                 <form method="POST"
-                        action="{% url 'editar_categoria' categoria.id %}">
-
+                    action="{% url 'editar_categoria' categoria.id %}"
+                    enctype="multipart/form-data">
                     {% csrf_token %}
 
                     <div class="modal-body">
@@ -397,6 +408,25 @@
                             <textarea name="descripcion"
                                         rows="5"
                                         class="form-control p-3 rounded-4">{{ categoria.descripcion }}</textarea>
+
+                        </div>
+
+                        <div class="mb-4">
+
+                            <label class="fw-semibold">
+                                Imagen de la categoría
+                            </label>
+
+                            {% if categoria.imagen %}
+                                <div class="mb-2">
+                                    <img src="{{ categoria.imagen.url }}"
+                                         style="width:120px;height:90px;object-fit:contain;background:#f1f5f9;border-radius:14px;padding:8px;">
+                                </div>
+                            {% endif %}
+
+                            <input type="file"
+                                   name="imagen"
+                                   class="form-control p-3 rounded-4">
 
                         </div>
 
@@ -558,7 +588,8 @@
             </div>
 
             <form method="POST"
-                  action="{% url 'agregar_categoria' %}">
+               action="{% url 'agregar_categoria' %}"
+               enctype="multipart/form-data">
 
                 <div class="modal-body">
 
@@ -592,6 +623,18 @@
                                   rows="5"
                                   class="form-control p-3 rounded-4"
                                   placeholder="Descripción de la categoría"></textarea>
+
+                    </div>
+
+                    <div class="mb-4">
+
+                        <label class="fw-semibold mb-2">
+                            Imagen de la categoría
+                        </label>
+
+                        <input type="file"
+                                                   name="imagen"
+                               class="form-control p-3 rounded-4">
 
                     </div>
 
@@ -680,9 +723,6 @@ document.querySelectorAll('.btn-eliminar').forEach(btn => {
 
 </script>
 
-</body>
-
-
 <script>
 
 const buscadorCategoria =
@@ -718,4 +758,9 @@ buscadorCategoria.addEventListener('keyup', function(){
 });
 
 </script>
+
+</body>
+
+
+
 </html>

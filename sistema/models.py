@@ -7,9 +7,14 @@ class Categoria(models.Model):
     descripcion = models.TextField()
     destacada = models.BooleanField(default=False)
 
+    imagen = CloudinaryField(
+        "imagen",
+        null=True,
+        blank=True
+    )
+
     def __str__(self):
         return self.nombre
-
 
 class Producto(models.Model):
 
