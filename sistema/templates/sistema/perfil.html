@@ -729,10 +729,12 @@ body{
                 <div class="modal-perfil-body">
 
                     <div class="mb-3">
+
                         <label>Foto de perfil</label>
+
                         <div class="foto-preview-box text-center">
 
-                            <label class="foto-click-label">
+                            <div class="foto-click-label" id="abrirSelectorFoto">
 
                                 <div class="preview-wrapper">
 
@@ -741,6 +743,7 @@ body{
                                              src="{{ perfil.foto.url }}"
                                              class="modal-perfil-foto">
                                     {% else %}
+
                                         <div id="previewFotoDefault" class="modal-perfil-avatar">
                                             <i class="bi bi-person-fill"></i>
                                         </div>
@@ -748,6 +751,7 @@ body{
                                         <img id="previewFoto"
                                              src=""
                                              class="modal-perfil-foto d-none">
+
                                     {% endif %}
 
                                     <span class="camera-badge">
@@ -764,19 +768,20 @@ body{
 
                                 </div>
 
-                                <input type="file"
-                                       id="inputFoto"
-                                       name="foto"
-                                       accept="image/*"
-                                       hidden>
+                            </div>
 
-                            </label>
+                            <input type="file"
+                                   id="inputFoto"
+                                   name="foto"
+                                   accept="image/*"
+                                   hidden>
 
                             <p id="textoFoto" class="texto-foto mt-2">
                                 Usando foto actual
                             </p>
 
                         </div>
+
                     </div>
 
                     <div class="row g-3">
@@ -853,8 +858,19 @@ const previewFoto = document.getElementById("previewFoto");
 const previewDefault = document.getElementById("previewFotoDefault");
 const btnQuitarFoto = document.getElementById("btnQuitarFoto");
 const textoFoto = document.getElementById("textoFoto");
+const abrirSelectorFoto = document.getElementById("abrirSelectorFoto");
 
 const fotoOriginal = previewFoto ? previewFoto.getAttribute("src") : "";
+
+if(abrirSelectorFoto && inputFoto){
+
+    abrirSelectorFoto.addEventListener("click", function(){
+
+        inputFoto.click();
+
+    });
+
+}
 
 if(inputFoto){
 
@@ -893,7 +909,9 @@ if(inputFoto){
 
 if(btnQuitarFoto){
 
-    btnQuitarFoto.addEventListener("click", function(){
+    btnQuitarFoto.addEventListener("click", function(e){
+
+        e.stopPropagation();
 
         inputFoto.value = "";
 
