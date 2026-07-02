@@ -109,46 +109,40 @@
 
         .categoria-img-box{
             display:flex;
-            justify-content:center;
             align-items:center;
+            justify-content:center;
             background:#ece8df;
-            padding:18px;
-            height:240px;
+            overflow:hidden;
+            padding:14px;
         }
 
-/* Imagen e icono tendrán el mismo tamaño */
         .categoria-img,
         .categoria-placeholder{
-            width:180px;
-            height:180px;
+            width:100%;
+            height:210px;
+            background:white;
         }
 
         .categoria-img{
             object-fit:contain;
-            background:white;
             transition:transform .45s ease;
         }
 
         .categoria-placeholder{
-            background:white;
             display:flex;
-            justify-content:center;
             align-items:center;
-            border-radius:18px;
-        }
-
-        .categoria-placeholder i{
-            font-size:3rem;
+            justify-content:center;
             color:#c79b2d;
+            font-size:3rem;
         }
 
         .categoria-card:hover .categoria-img{
-            transform:scale(1.08);
+            transform:scale(1.10);
         }
 
         .categoria-card-body{
             text-align:center;
-            padding:22px 18px;
+            padding:18px 16px 22px;
         }
 
         .categoria-card-body h5{
@@ -163,15 +157,16 @@
             font-weight:700;
             text-transform:uppercase;
             letter-spacing:.8px;
-            margin-bottom:18px;
+            margin-bottom:12px;
         }
 
         .categoria-btn{
+            margin-top:12px;
             display:inline-flex;
             align-items:center;
             justify-content:center;
             gap:8px;
-            padding:8px 18px;
+            padding:8px 15px;
             border-radius:999px;
             background:#111827;
             color:white;
@@ -377,30 +372,26 @@
                         <div class="categoria-img-box">
 
                             {% if categoria.imagen %}
-
                                 <img src="{{ categoria.imagen.url }}"
-                                     alt="{{ categoria.nombre }}"
-                                     class="categoria-img">
-
+                                    alt="{{ categoria.nombre }}"
+                                    class="categoria-img">
                             {% else %}
-
                                 <div class="categoria-placeholder">
                                     <i class="bi bi-grid-fill"></i>
                                 </div>
-
                             {% endif %}
 
                         </div>
 
-                        <div class="categoria-card-body text-center">
+                        <div class="categoria-card-body">
 
-                            <h5 class="categoria-title">
+                            <h5>
                                 {{ categoria.nombre }}
                             </h5>
 
-                            <div class="categoria-description">
+                            <p>
                                 {{ categoria.descripcion|truncatechars:45 }}
-                            </div>
+                            </p>
 
                             <span class="categoria-btn">
                                 <i class="bi bi-eye"></i>
