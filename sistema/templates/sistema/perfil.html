@@ -420,6 +420,37 @@ body{
     font-weight:700;
 }
 
+.foto-click-label{
+    cursor:pointer;
+    display:inline-block;
+}
+
+.camera-badge{
+    position:absolute;
+    right:6px;
+    bottom:6px;
+    width:36px;
+    height:36px;
+    border-radius:50%;
+    background:#111827;
+    color:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    box-shadow:0 8px 20px rgba(0,0,0,.25);
+    transition:.25s;
+}
+
+.foto-click-label:hover .camera-badge{
+    background:#c79b2d;
+    color:#111827;
+    transform:scale(1.08);
+}
+
+.btn-seleccionar-foto{
+    display:none;
+}
+
 </style>
 </head>
 
@@ -727,16 +758,43 @@ body{
 
                             </div>
 
-                            <label class="btn-seleccionar-foto mt-3">
+                            <label class="foto-click-label">
 
-                                <i class="bi bi-camera"></i>
-                                Seleccionar imagen
+                                <div class="preview-wrapper">
+
+                                    {% if perfil.foto %}
+                                        <img id="previewFoto"
+                                             src="{{ perfil.foto.url }}"
+                                             class="modal-perfil-foto">
+                                    {% else %}
+                                        <div id="previewFotoDefault" class="modal-perfil-avatar">
+                                            <i class="bi bi-person-fill"></i>
+                                        </div>
+
+                                        <img id="previewFoto"
+                                             src=""
+                                             class="modal-perfil-foto d-none">
+                                    {% endif %}
+
+                                    <span class="camera-badge">
+                                        <i class="bi bi-camera-fill"></i>
+                                    </span>
+
+                                    <button type="button"
+                                            id="btnQuitarFoto"
+                                            class="btn-quitar-foto d-none">
+
+                                        <i class="bi bi-x-lg"></i>
+
+                                    </button>
+
+                                </div>
 
                                 <input type="file"
-                                    id="inputFoto"
-                                    name="foto"
-                                    accept="image/*"
-                                    hidden>
+                                       id="inputFoto"
+                                       name="foto"
+                                       accept="image/*"
+                                       hidden>
 
                             </label>
 
