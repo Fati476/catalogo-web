@@ -274,6 +274,116 @@ body{
     text-decoration:none;
     margin-top:6px;
 }
+
+.perfil-form-card{
+    background:white;
+    border-radius:28px;
+    padding:32px;
+    box-shadow:0 16px 40px rgba(17,24,39,.10);
+}
+
+.perfil-form-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:20px;
+    margin-bottom:28px;
+    padding-bottom:20px;
+    border-bottom:1px solid rgba(17,24,39,.08);
+}
+
+.perfil-form-header h4{
+    color:#111827;
+    font-weight:900;
+    margin-bottom:4px;
+}
+
+.perfil-form-header p{
+    color:#6b7280;
+    margin-bottom:0;
+}
+
+.perfil-form-header i{
+    font-size:2rem;
+    color:#c79b2d;
+}
+
+.foto-editor{
+    background:#f3f1ec;
+    border-radius:24px;
+    padding:28px;
+    text-align:center;
+    height:100%;
+}
+
+.foto-preview,
+.foto-preview-empty{
+    width:150px;
+    height:150px;
+    border-radius:50%;
+    margin:auto;
+    object-fit:cover;
+    background:white;
+    border:6px solid white;
+    box-shadow:0 14px 35px rgba(17,24,39,.18);
+}
+
+.foto-preview-empty{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#111827;
+    font-size:3.2rem;
+}
+
+.btn-cambiar-foto{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    background:#111827;
+    color:white;
+    border-radius:999px;
+    padding:10px 20px;
+    font-weight:800;
+    cursor:pointer;
+}
+
+.btn-cambiar-foto:hover{
+    background:#c79b2d;
+    color:#111827;
+}
+
+.perfil-form-card label{
+    color:#111827;
+    font-weight:800;
+    margin-bottom:8px;
+}
+
+.perfil-input{
+    border:1px solid rgba(17,24,39,.10);
+    border-radius:18px;
+    padding:14px 16px;
+    background:#f9fafb;
+}
+
+.perfil-input:focus{
+    border-color:#c79b2d;
+    box-shadow:0 0 0 4px rgba(199,155,45,.18);
+}
+
+.btn-guardar-perfil{
+    background:#111827;
+    color:white;
+    border:0;
+    border-radius:999px;
+    padding:12px 26px;
+    font-weight:900;
+}
+
+.btn-guardar-perfil:hover{
+    background:#c79b2d;
+    color:#111827;
+}
 </style>
 </head>
 
@@ -344,12 +454,10 @@ body{
                     </div>
 
                     <div>
-                        <button class="btn-editar-perfil"
-                                data-bs-toggle="modal"
-                                data-bs-target="#modalEditarPerfil">
+                        <a href="#editarPerfil" class="btn-editar-perfil text-decoration-none">
                             <i class="bi bi-pencil-square"></i>
                             Editar perfil
-                        </button>
+                        </a>
                     </div>
 
                 </div>
@@ -409,6 +517,123 @@ body{
             </div>
 
         </div>
+
+    </div>
+
+    <div class="perfil-form-card mb-5" id="editarPerfil">
+
+        <div class="perfil-form-header">
+
+            <div>
+                <h4>
+                    Editar información
+                </h4>
+
+                <p>
+                    Actualiza tus datos personales y de contacto.
+                </p>
+            </div>
+
+            <i class="bi bi-person-gear"></i>
+
+        </div>
+
+        <form method="POST" enctype="multipart/form-data">
+
+            {% csrf_token %}
+
+            <div class="row g-4">
+
+                <div class="col-12 col-lg-4">
+
+                    <div class="foto-editor">
+
+                        {% if perfil.foto %}
+                            <img src="{{ perfil.foto.url }}"
+                                 class="foto-preview"
+                                 alt="Foto de perfil">
+                        {% else %}
+                            <div class="foto-preview-empty">
+                                <i class="bi bi-person-fill"></i>
+                            </div>
+                        {% endif %}
+
+                        <label class="btn-cambiar-foto mt-3">
+                            <i class="bi bi-camera"></i>
+                            Cambiar foto
+
+                            <input type="file"
+                                   name="foto"
+                                   hidden>
+                        </label>
+
+                    </div>
+
+                </div>
+
+                <div class="col-12 col-lg-8">
+
+                    <div class="row g-3">
+
+                        <div class="col-12">
+                            <label>Nombre</label>
+                            <input type="text"
+                                   name="first_name"
+                                   class="form-control perfil-input"
+                                   value="{% if request.user.first_name %}{{ request.user.first_name }}{% else %}{{ request.user.username }}{% endif %}">
+                        </div>
+
+                        <div class="col-12">
+                            <label>Correo</label>
+                            <input type="email"
+                                   name="email"
+                                   class="form-control perfil-input"
+                                   value="{{ request.user.email }}">
+                        </div>
+
+                        <div class="col-12 col-md-4">
+                            <label>Teléfono</label>
+                            <input type="text"
+                                   name="telefono"
+                                   maxlength="10"
+                                   class="form-control perfil-input"
+                                   value="{{ perfil.telefono }}">
+                        </div>
+
+                        <div class="col-12 col-md-4">
+                            <label>Municipio</label>
+                            <input type="text"
+                                   name="municipio"
+                                   class="form-control perfil-input"
+                                   value="{{ perfil.municipio }}">
+                        </div>
+
+                        <div class="col-12 col-md-4">
+                            <label>Estado</label>
+                            <input type="text"
+                                   name="estado"
+                                   class="form-control perfil-input"
+                                   value="{{ perfil.estado }}">
+                        </div>
+
+                    </div>
+
+                    <div class="text-end mt-4">
+
+                        <button type="submit" class="btn-guardar-perfil">
+
+                            <i class="bi bi-check-circle"></i>
+                            Guardar cambios
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </form>
 
     </div>
 
@@ -524,81 +749,6 @@ body{
 
 </div>
 
-<div class="modal fade" id="modalEditarPerfil" tabindex="-1">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content border-0 rounded-4 shadow">
-
-            <form method="POST" enctype="multipart/form-data">
-
-                {% csrf_token %}
-
-                <div class="modal-header">
-                    <h5 class="fw-bold mb-0">Editar perfil</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-
-                <div class="modal-body">
-
-                    <div class="mb-3">
-                        <label class="fw-semibold mb-2">Foto de perfil</label>
-                        <input type="file" name="foto" class="form-control rounded-4 p-3">
-                    </div>
-
-                    <div class="row g-3">
-
-                        <div class="col-12">
-                            <label class="fw-semibold mb-2">Nombre</label>
-
-                            <input type="text"
-                                   name="first_name"
-                                   class="form-control rounded-4 p-3"
-                                   value="{% if request.user.first_name %}{{ request.user.first_name }}{% else %}{{ request.user.username }}{% endif %}">
-                        </div>
-
-                        <div class="col-12">
-                            <label class="fw-semibold mb-2">Correo</label>
-                            <input type="email" name="email" class="form-control rounded-4 p-3"
-                                   value="{{ request.user.email }}">
-                        </div>
-
-                        <div class="col-12 col-md-4">
-                            <label class="fw-semibold mb-2">Teléfono</label>
-                            <input type="text" name="telefono" maxlength="10" class="form-control rounded-4 p-3"
-                                   value="{{ perfil.telefono }}">
-                        </div>
-
-                        <div class="col-12 col-md-4">
-                            <label class="fw-semibold mb-2">Municipio</label>
-                            <input type="text" name="municipio" class="form-control rounded-4 p-3"
-                                   value="{{ perfil.municipio }}">
-                        </div>
-
-                        <div class="col-12 col-md-4">
-                            <label class="fw-semibold mb-2">Estado</label>
-                            <input type="text" name="estado" class="form-control rounded-4 p-3"
-                                   value="{{ perfil.estado }}">
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">
-                        Cancelar
-                    </button>
-
-                    <button type="submit" class="btn btn-dark rounded-pill px-4">
-                        <i class="bi bi-check-circle"></i>
-                        Guardar cambios
-                    </button>
-                </div>
-
-            </form>
-
-        </div>
-    </div>
-</div>
 
 {% include 'includes/footer.html' %}
 
