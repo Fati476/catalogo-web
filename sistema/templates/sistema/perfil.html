@@ -464,7 +464,17 @@ body{
 
     box-shadow:0 20px 45px rgba(17,24,39,.18);
 
-    animation:slideToast .45s ease;
+    animation:
+      slideToast .45s ease,
+      fadeToast .5s ease 2.5s forwards;
+}
+@keyframes fadeToast{
+
+    to{
+        opacity:0;
+        transform:translateX(100px);
+    }
+
 }
 
 .toast-icon{
@@ -1021,5 +1031,26 @@ if(btnQuitarFoto){
 
 }
 </script>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function(){
+
+    const toast = document.querySelector(".toast-custom");
+
+    if(toast){
+
+        setTimeout(function(){
+
+            toast.remove();
+
+        },3000);
+
+    }
+
+});
+
+</script>
+
 </body>
 </html>
