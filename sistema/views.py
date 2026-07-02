@@ -299,7 +299,7 @@ def agregar_categoria(request):
 
     if request.method == 'POST':
 
-        form = CategoriaForm(request.POST)
+        form = CategoriaForm(request.POST, request.FILES)
 
         if form.is_valid():
 
@@ -313,14 +313,15 @@ def agregar_categoria(request):
             return redirect('lista_categorias')
 
     else:
-
         form = CategoriaForm()
 
-    return render(request,
-                  'admin/categorias/agregar.html',
-                  {
-                      'form': form
-                  })
+    return render(
+        request,
+        'admin/categorias/agregar.html',
+        {
+            'form': form
+        }
+    )
 
 
 @login_required
@@ -330,16 +331,20 @@ def editar_categoria(request, id):
 
     if request.method == 'POST':
 
-        categoria.nombre = request.POST.get('nombre')
-        categoria.descripcion = request.POST.get('descripcion')
-        categoria.destacada = request.POST.get('destacada') == 'on'
-
-        categoria.save()
-
-        messages.success(
-            request,
-            'Categoría actualizada correctamente.'
+        form = CategoriaForm(
+            request.POST,
+            request.FILES,
+            instance=categoria
         )
+
+        if form.is_valid():
+
+            form.save()
+
+            messages.success(
+                request,
+                'Categoría actualizada correctamente.'
+            )
 
     return redirect('lista_categorias')
 
