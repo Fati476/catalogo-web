@@ -96,100 +96,88 @@
         .categoria-card{
             height:100%;
             background:white;
-            border-radius:26px;
+            border-radius:22px;
             overflow:hidden;
-            box-shadow:0 10px 28px rgba(17,24,39,.08);
+            box-shadow:0 8px 25px rgba(0,0,0,.08);
             transition:.35s ease;
         }
 
         .categoria-card:hover{
             transform:translateY(-10px);
-            box-shadow:0 24px 55px rgba(17,24,39,.16);
+            box-shadow:0 22px 48px rgba(0,0,0,.20);
         }
 
         .categoria-img-box{
-            height:150px;
-            background:white;
             display:flex;
-            align-items:center;
             justify-content:center;
-            padding-top:22px;
+            align-items:center;
+            background:#ece8df;
+            padding:18px;
+            height:240px;
         }
 
-        /* Ambos tendrán exactamente el mismo tamaño */
+/* Imagen e icono tendrán el mismo tamaño */
         .categoria-img,
         .categoria-placeholder{
-            width:120px;
-            height:120px;
-            border-radius:50%;
-           box-shadow:0 12px 30px rgba(17,24,39,.18);
+            width:180px;
+            height:180px;
         }
 
-/* Imagen */
         .categoria-img{
-            object-fit:cover;
+            object-fit:contain;
             background:white;
-            border:3px solid white;
-            padding:0;
-            display:block;
+            transition:transform .45s ease;
         }
 
-/* Icono cuando no hay imagen */
         .categoria-placeholder{
             background:white;
             display:flex;
             justify-content:center;
             align-items:center;
+            border-radius:18px;
         }
 
         .categoria-placeholder i{
-            font-size:2.4rem;
+            font-size:3rem;
             color:#c79b2d;
         }
 
-/* Hover */
         .categoria-card:hover .categoria-img{
-            transform:scale(1.08) rotate(3deg);
+            transform:scale(1.08);
         }
 
         .categoria-card-body{
-            padding:22px;
+            text-align:center;
+            padding:22px 18px;
         }
 
         .categoria-card-body h5{
             color:#111827;
-            font-weight:900;
+            font-weight:800;
             margin-bottom:10px;
         }
 
         .categoria-card-body p{
-            color:#6b7280;
-            font-size:.92rem;
-            line-height:1.55;
-            min-height:45px;
-            margin-bottom:18px;
-        }
-
-        .categoria-badge{
-            background:#fff3cd;
             color:#9b7615;
-            border-radius:999px;
-            padding:6px 12px;
-            font-size:.72rem;
-            font-weight:800;
-            white-space:nowrap;
+            font-size:.82rem;
+            font-weight:700;
+            text-transform:uppercase;
+            letter-spacing:.8px;
+            margin-bottom:18px;
         }
 
         .categoria-btn{
             display:inline-flex;
             align-items:center;
+            justify-content:center;
             gap:8px;
-            padding:9px 16px;
+            padding:8px 18px;
             border-radius:999px;
             background:#111827;
             color:white;
-            font-size:.84rem;
-            font-weight:800;
+            font-size:.82rem;
+            font-weight:700;
+            text-decoration:none;
             transition:.25s;
         }
 
@@ -197,6 +185,7 @@
             background:#c79b2d;
             color:#111827;
         }
+
 
         .categorias-vacio{
             max-width:650px;
@@ -403,25 +392,15 @@
 
                         </div>
 
-                        <div class="categoria-card-body">
+                        <div class="categoria-card-body text-center">
 
-                            <div class="d-flex justify-content-between align-items-start gap-2">
+                            <h5 class="categoria-title">
+                                {{ categoria.nombre }}
+                            </h5>
 
-                                <h5>
-                                    {{ categoria.nombre }}
-                                </h5>
-
-                                {% if categoria.destacada %}
-                                    <span class="categoria-badge">
-                                        Destacada
-                                    </span>
-                                {% endif %}
-
+                            <div class="categoria-description">
+                                {{ categoria.descripcion|truncatechars:45 }}
                             </div>
-
-                            <p>
-                                {{ categoria.descripcion|truncatechars:95 }}
-                            </p>
 
                             <span class="categoria-btn">
                                 <i class="bi bi-eye"></i>
