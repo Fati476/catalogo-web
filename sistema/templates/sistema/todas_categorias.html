@@ -100,40 +100,33 @@
             overflow:hidden;
             box-shadow:0 10px 28px rgba(17,24,39,.08);
             transition:.35s ease;
-        }
-
-        .categoria-card:hover{
-            transform:translateY(-10px);
-            box-shadow:0 24px 55px rgba(17,24,39,.16);
+            display:flex;
+            flex-direction:column;
         }
 
         .categoria-img-box{
-            height:150px;
+            height:135px;
             background:white;
             display:flex;
             align-items:center;
             justify-content:center;
-            padding-top:22px;
+            padding:20px 0 5px;
         }
 
         .categoria-img{
-            width:120px;
-            height:120px;
+            width:105px;
+            height:105px;
             border-radius:50%;
             object-fit:cover;
             background:white;
-            padding:6px;
-            border:6px solid white;
+            padding:5px;
+            border:5px solid white;
             box-shadow:0 12px 30px rgba(17,24,39,.18);
         }
 
-        .categoria-card:hover .categoria-img{        
-            transform:scale(1.08) rotate(3deg);
-        }
-
         .categoria-placeholder{
-            width:140px;
-            height:140px;
+            width:105px;
+            height:105px;
             border-radius:50%;
             background:white;
             display:flex;
@@ -142,42 +135,27 @@
             box-shadow:0 15px 35px rgba(0,0,0,.12);
         }
 
-        .categoria-placeholder i{
-            font-size:3rem;
-            color:#c79b2d;
-        }
-
         .categoria-card-body{
-            padding:22px;
-        }
-
-        .categoria-card-body h5{
-            color:#111827;
-            font-weight:900;
-            margin-bottom:10px;
+            padding:18px 22px 22px;
+            display:flex;
+            flex-direction:column;
+            flex-grow:1;
         }
 
         .categoria-card-body p{
             color:#6b7280;
             font-size:.92rem;
             line-height:1.55;
-            min-height:45px;
             margin-bottom:18px;
-        }
-
-        .categoria-badge{
-            background:#fff3cd;
-            color:#9b7615;
-            border-radius:999px;
-            padding:6px 12px;
-            font-size:.72rem;
-            font-weight:800;
-            white-space:nowrap;
+            min-height:0;
         }
 
         .categoria-btn{
+            margin-top:auto;
             display:inline-flex;
             align-items:center;
+            justify-content:center;
+            width:max-content;
             gap:8px;
             padding:9px 16px;
             border-radius:999px;
