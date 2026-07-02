@@ -1416,6 +1416,20 @@ def perfil(request):
         usuario=request.user
     )
 
+    total_favoritos = Favorito.objects.filter(
+        usuario=request.user
+    ).count()
+
+    total_solicitudes = SolicitudCotizacion.objects.filter(
+        usuario=request.user,
+        enviada=True
+    ).count()
+
+    total_cotizaciones = SolicitudCotizacion.objects.filter(
+        usuario=request.user,
+        estado="cotizada"
+    ).count()
+
     if request.method == "POST":
 
         request.user.first_name = request.POST.get("first_name")
@@ -1439,6 +1453,9 @@ def perfil(request):
         request,
         "sistema/perfil.html",
         {
-            "perfil": perfil
+            "perfil": perfil,
+            "total_favoritos": total_favoritos,
+            "total_solicitudes": total_solicitudes,
+            "total_cotizaciones": total_cotizaciones,
         }
     )
