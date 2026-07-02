@@ -65,16 +65,36 @@ class ProductoImagen(models.Model):
 
     def __str__(self):
         return self.producto.nombre
-    
+
 
 class Perfil(models.Model):
 
-    usuario = models.OneToOneField(User, on_delete=models.CASCADE)
+    usuario = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE
+    )
 
-    municipio = models.CharField(max_length=100)
+    telefono = models.CharField(
+        max_length=10,
+        blank=True,
+        null=True
+    )
 
-    estado = models.CharField(max_length=100)
-    telefono = models.CharField(max_length=10, null=True, blank=True)
+    municipio = models.CharField(
+        max_length=100,
+        blank=True
+    )
+
+    estado = models.CharField(
+        max_length=100,
+        blank=True
+    )
+
+    foto = CloudinaryField(
+        "foto",
+        blank=True,
+        null=True
+    )
 
     def __str__(self):
         return self.usuario.username

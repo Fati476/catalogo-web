@@ -34,6 +34,8 @@ from django.shortcuts import get_object_or_404, render
 
 import json
 
+from .models import Perfil
+
 from django.views.decorators.http import require_POST
 from django.http import HttpResponse
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
@@ -1405,3 +1407,38 @@ def cancelar_edicion_solicitud(request, id):
     )
 
     return redirect("mis_cotizaciones")
+
+
+@login_required
+def perfil(request):
+
+    perfil, creado = Perfil.objects.get_or_create(
+        usuario=request.user
+    )
+
+    if request.method == "POST":
+
+        request.user.first_name = request.POST.get("first_name")
+        request.user.last_name = request.POST.get("last_name")
+        request.user.email = request.POST.get("email")
+        request.user.save()
+
+        perfil.telefono = request.POST.get("telefono")
+        perfil.municipio = request.POST.get("municipio")
+        perfil.estado = request.POST.get("estado")
+
+        if request.FILES.get("foto"):
+            perfil.foto = request.FILES.get("foto")
+
+        perfil.save()
+
+        messages.success(request, "Perfil actualizado correctamente.")
+        return redirect("perfil")
+
+    return render(
+        request,
+        "sistema/perfil.html",
+        {
+            "perfil": perfil
+        }
+    )

@@ -249,5 +249,7 @@ urlpatterns = [
         name="cancelar_edicion_solicitud"
     ),
 
+    path('perfil/', views.perfil, name='perfil'),
+
 
 ]
