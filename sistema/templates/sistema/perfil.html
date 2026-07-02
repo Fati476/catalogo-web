@@ -546,10 +546,13 @@ body{
 
                     <div class="row g-3">
 
-                        <div class="col-12 col-md-6">
+                        <div class="col-12">
                             <label class="fw-semibold mb-2">Nombre</label>
-                            <input type="text" name="first_name" class="form-control rounded-4 p-3"
-                                   value="{{ request.user.first_name }}">
+
+                            <input type="text"
+                                   name="first_name"
+                                   class="form-control rounded-4 p-3"
+                                   value="{% if request.user.first_name %}{{ request.user.first_name }}{% else %}{{ request.user.username }}{% endif %}">
                         </div>
 
                         <div class="col-12 col-md-6">
