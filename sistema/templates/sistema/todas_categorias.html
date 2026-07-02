@@ -387,9 +387,11 @@
                                     alt="{{ categoria.nombre }}"
                                     class="categoria-img">
                             {% else %}
-                                <div class="categoria-placeholder">
-                                    <i class="bi bi-image"></i>
-                                </div>
+
+                            <img src="{% static 'img/sin_imagen_categoria.JPG' %}"
+                                 alt="Sin imagen"
+                                 class="categoria-img">
+
                             {% endif %}
 
                         </div>
