@@ -371,6 +371,55 @@ body{
     color:#111827;
 }
 
+.preview-wrapper{
+    position:relative;
+    display:inline-block;
+}
+
+.btn-quitar-foto{
+    position:absolute;
+    top:4px;
+    right:4px;
+    width:34px;
+    height:34px;
+    border:0;
+    border-radius:50%;
+    background:#dc3545;
+    color:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    box-shadow:0 8px 20px rgba(0,0,0,.25);
+    transition:.25s;
+}
+
+.btn-quitar-foto:hover{
+    transform:scale(1.1);
+}
+
+.btn-seleccionar-foto{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    background:#111827;
+    color:white;
+    border-radius:999px;
+    padding:10px 20px;
+    font-weight:800;
+    cursor:pointer;
+}
+
+.btn-seleccionar-foto:hover{
+    background:#c79b2d;
+    color:#111827;
+}
+
+.texto-foto{
+    color:#6b7280;
+    font-size:.85rem;
+    font-weight:700;
+}
+
 </style>
 </head>
 
@@ -650,7 +699,52 @@ body{
 
                     <div class="mb-3">
                         <label>Foto de perfil</label>
-                        <input type="file" name="foto" class="form-control">
+                        <div class="foto-preview-box text-center">
+
+                            <div class="preview-wrapper">
+
+                                {% if perfil.foto %}
+                                    <img id="previewFoto"
+                                        src="{{ perfil.foto.url }}"
+                                        class="modal-perfil-foto">
+                                {% else %}
+                                    <div id="previewFotoDefault" class="modal-perfil-avatar">
+                                        <i class="bi bi-person-fill"></i>
+                                    </div>
+
+                                    <img id="previewFoto"
+                                        src=""
+                                        class="modal-perfil-foto d-none">
+                                {% endif %}
+
+                                <button type="button"
+                                        id="btnQuitarFoto"
+                                        class="btn-quitar-foto d-none">
+
+                                    <i class="bi bi-x-lg"></i>
+
+                                </button>
+
+                            </div>
+
+                            <label class="btn-seleccionar-foto mt-3">
+
+                                <i class="bi bi-camera"></i>
+                                Seleccionar imagen
+
+                                <input type="file"
+                                    id="inputFoto"
+                                    name="foto"
+                                    accept="image/*"
+                                    hidden>
+
+                            </label>
+
+                            <p id="textoFoto" class="texto-foto mt-2">
+                                Usando foto actual
+                            </p>
+
+                        </div>
                     </div>
 
                     <div class="row g-3">
@@ -721,6 +815,81 @@ body{
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const inputFoto = document.getElementById("inputFoto");
+const previewFoto = document.getElementById("previewFoto");
+const previewDefault = document.getElementById("previewFotoDefault");
+const btnQuitarFoto = document.getElementById("btnQuitarFoto");
+const textoFoto = document.getElementById("textoFoto");
 
+const fotoOriginal = previewFoto ? previewFoto.getAttribute("src") : "";
+
+if(inputFoto){
+
+    inputFoto.addEventListener("change", function(){
+
+        const archivo = this.files[0];
+
+        if(archivo){
+
+            const reader = new FileReader();
+
+            reader.onload = function(e){
+
+                if(previewDefault){
+                    previewDefault.classList.add("d-none");
+                }
+
+                previewFoto.src = e.target.result;
+                previewFoto.classList.remove("d-none");
+
+                btnQuitarFoto.classList.remove("d-none");
+
+                if(textoFoto){
+                    textoFoto.textContent = "Nueva imagen seleccionada";
+                }
+
+            }
+
+            reader.readAsDataURL(archivo);
+
+        }
+
+    });
+
+}
+
+if(btnQuitarFoto){
+
+    btnQuitarFoto.addEventListener("click", function(){
+
+        inputFoto.value = "";
+
+        if(fotoOriginal){
+
+            previewFoto.src = fotoOriginal;
+            previewFoto.classList.remove("d-none");
+
+        }else{
+
+            previewFoto.src = "";
+            previewFoto.classList.add("d-none");
+
+            if(previewDefault){
+                previewDefault.classList.remove("d-none");
+            }
+
+        }
+
+        btnQuitarFoto.classList.add("d-none");
+
+        if(textoFoto){
+            textoFoto.textContent = "Usando foto actual";
+        }
+
+    });
+
+}
+</script>
 </body>
 </html>
