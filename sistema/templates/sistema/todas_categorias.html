@@ -11,263 +11,364 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <style>
-        .category-card{
-            background:rgba(255,255,255,.8);
-            backdrop-filter:blur(12px);
-
-            border:none;
-            border-radius:25px;
-
-            transition:.35s;
+        .categorias-wrapper{
+            width:100%;
+            overflow:hidden;
         }
 
-        .category-card:hover{
-            transform:translateY(-10px);
-            box-shadow:0 20px 40px rgba(0,0,0,.12);
+        .categorias-hero{
+            position:relative;
+            min-height:310px;
+            overflow:hidden;
+            background:
+                linear-gradient(90deg, rgba(17,24,39,.97), rgba(17,24,39,.72), rgba(17,24,39,.25)),
+                url("{% static 'img/banner_productos.png' %}");
+            background-size:cover;
+            background-position:center;
+            display:flex;
+            align-items:center;
+            padding:145px 60px 105px;
+            margin:0 0 35px;
         }
 
-        .category-icon{
-            font-size:3rem;
-            color:#FFC107;
-            margin-bottom:15px;
+        .categorias-hero-content{
+            max-width:680px;
+            color:white;
+            position:relative;
+            z-index:2;
         }
 
-        .page-header{
+        .categorias-hero h1{
+            font-family:'Arvo', serif;
+            font-size:2.6rem;
+            margin-bottom:14px;
+            text-shadow:0 4px 22px rgba(0,0,0,.7);
+        }
+
+        .categorias-hero p{
+            max-width:620px;
+            color:rgba(255,255,255,.92);
+            font-size:1.08rem;
+            line-height:1.6;
+            margin-bottom:0;
+        }
+
+        .categorias-hero-wave{
+            position:absolute;
+            left:0;
+            right:0;
+            bottom:-1px;
+            line-height:0;
+            z-index:2;
+        }
+
+        .categorias-hero-wave svg{
+            display:block;
+            width:100%;
+            height:70px;
+        }
+
+        .categorias-info{
+            margin-top:-12px;
+            margin-bottom:35px;
+        }
+
+        .categorias-total{
+            display:inline-flex;
+            align-items:center;
+            gap:9px;
+            padding:10px 22px;
             background:white;
-            padding:30px;
-            border-radius:20px;
-            margin-bottom:30px;
-            box-shadow:0 4px 15px rgba(0,0,0,.05);
+            border-radius:50px;
+            color:#111827;
+            font-weight:800;
+            box-shadow:0 10px 25px rgba(17,24,39,.08);
         }
 
-        .navbar{
-            border-bottom:1px solid #eee;
+        .categorias-total i{
+            color:#c79b2d;
         }
 
-        @media(max-width:768px){
-
-            .page-header{
-                padding:20px;
-            }
-
-            .category-card{
-                min-height:140px;
-            }
-
-            .category-icon{
-                font-size:2rem;
-                margin-bottom:10px;
-            }
-
-            .category-card h5{
-                font-size:1rem;
-            }
-
+        .categoria-link{
+            text-decoration:none;
         }
 
-        .category-card{
-            animation:fadeUp .8s ease;
+        .categoria-card{
+            height:100%;
+            background:white;
+            border-radius:26px;
+            overflow:hidden;
+            box-shadow:0 10px 28px rgba(17,24,39,.08);
+            transition:.35s ease;
         }
 
-        @keyframes fadeUp{
-            from{
-                opacity:0;
-                transform:translateY(40px);
-            }
-        
-            to{
-                opacity:1;
-                transform:translateY(0);
-            }
+        .categoria-card:hover{
+            transform:translateY(-10px);
+            box-shadow:0 24px 55px rgba(17,24,39,.16);
+        }
+
+        .categoria-img-box{
+            height:190px;
+            background:#ece8df;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            padding:18px;
+            overflow:hidden;
         }
 
         .categoria-img{
-            width:110px;
-            height:90px;
+            width:100%;
+            height:100%;
             object-fit:contain;
             background:white;
             border-radius:18px;
             padding:10px;
-            box-shadow:0 10px 25px rgba(0,0,0,.10);
-            transition:.35s;
+            transition:.45s ease;
         }
 
-        .category-card:hover .categoria-img{
-            transform:scale(1.06);
+        .categoria-card:hover .categoria-img{
+            transform:scale(1.08);
+        }
+
+        .categoria-placeholder{
+            width:105px;
+            height:105px;
+            border-radius:24px;
+            background:white;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            color:#c79b2d;
+            font-size:2.5rem;
+            box-shadow:0 10px 25px rgba(17,24,39,.10);
+        }
+
+        .categoria-card-body{
+            padding:22px;
+        }
+
+        .categoria-card-body h5{
+            color:#111827;
+            font-weight:900;
+            margin-bottom:10px;
+        }
+
+        .categoria-card-body p{
+            color:#6b7280;
+            font-size:.92rem;
+            line-height:1.55;
+            min-height:45px;
+            margin-bottom:18px;
+        }
+
+        .categoria-badge{
+            background:#fff3cd;
+            color:#9b7615;
+            border-radius:999px;
+            padding:6px 12px;
+            font-size:.72rem;
+            font-weight:800;
+            white-space:nowrap;
+        }
+
+        .categoria-btn{
+            display:inline-flex;
+            align-items:center;
+            gap:8px;
+            padding:9px 16px;
+            border-radius:999px;
+            background:#111827;
+            color:white;
+            font-size:.84rem;
+            font-weight:800;
+            transition:.25s;
+        }
+
+        .categoria-card:hover .categoria-btn{
+            background:#c79b2d;
+            color:#111827;
+        }
+
+        .categorias-vacio{
+            max-width:650px;
+            margin:50px auto;
+            padding:50px 35px;
+            background:white;
+            border-radius:28px;
+            text-align:center;
+            box-shadow:0 16px 40px rgba(17,24,39,.10);
+        }
+
+        .categorias-vacio i{
+            font-size:3rem;
+            color:#c79b2d;
+        }
+
+        .categorias-vacio h4{
+            color:#111827;
+            font-weight:900;
+            margin-top:14px;
+        }
+
+        .categorias-vacio p{
+            color:#6b7280;
+        }
+
+        @media(max-width:768px){
+            .categorias-hero{
+                min-height:260px;
+                padding:110px 24px 85px;
+            }
+
+            .categorias-hero h1{
+                font-size:2rem;
+            }
+
+            .categoria-img-box{
+                height:155px;
+            }
+        }
+
+
+        .footer-wave{
+            line-height:0;
+            margin-top:25px;
+            margin-bottom:-2px;
+            background:#f3f1ec;
+        }
+
+        .footer-wave svg{
+            display:block;
+            width:100%;
+            height:90px;
         }
     </style>
 </head>
 
-<body style="background:#fffdf8; padding-top:100px;">
+<body style="background:#f3f1ec; padding-top:0;">
 
 <!-- NAVBAR -->
-<nav class="navbar navbar-expand-lg navbar-dark fixed-top rounded-pill"
-        style="
-           top:15px;
-           left:20px;
-           right:20px;
-           background:rgba(15,15,15,.55);
-           backdrop-filter:blur(15px);
-           box-shadow:0 10px 30px rgba(0,0,0,.25);
-        ">
-    <div class="container-fluid px-3">
+{% include 'includes/navbar.html' %}
 
-        <a class="navbar-brand fw-bold d-flex align-items-center" href="{% url 'todas_categorias' %}">
-                <img src="{% static 'img/imagen.png' %}"
-                     height="55"
-                     class="me-2">
+<div class="categorias-wrapper">
 
-                <div>
-                    <div class="text-warning fw-bold">
-                        Cooperativa
-                    </div>
-                    <small class="text-white">
-                        Pirotécnica
-                    </small>
-                </div>
-        </a>
+    <section class="categorias-hero">
 
-        <!-- Botón hamburguesa -->
-        <button
-            class="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#menuNav"
-            aria-controls="menuNav"
-            aria-expanded="false"
-            aria-label="Toggle navigation">
+        <div class="categorias-hero-content">
 
-            <span class="navbar-toggler-icon"></span>
+            <h1>
+                Categorías
+            </h1>
 
-        </button>
-
-        <!-- Menú -->
-        <div class="collapse navbar-collapse" id="menuNav">
-
-            <ul class="navbar-nav ms-auto text-center gap-lg-3 mt-2 mt-lg-0">
-
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'inicio' %}">🏠 Inicio</a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'todas_categorias' %}">
-                        📂 Categorías
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'todos_productos' %}">
-                        🏭 Productos
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'solicitudes' %}">
-                        📋 Solicitudes
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        📋 Cotizaciones
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'favoritos' %}">
-                        ❤️ Favoritos
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        👤 Perfil
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link text-danger" href="{% url 'login' %}">
-                        🚪 Cerrar sesión
-                    </a>
-                </li>
-
-            </ul>
+            <p>
+                Explora las categorías disponibles y encuentra los productos que necesitas para tu solicitud de cotización.
+            </p>
 
         </div>
 
-    </div>
-</nav>
-
-<div class="container-fluid px-3 px-lg-4 mt-4">
-
-    <section class="text-center mb-5">
-
-        <h1 class="display-5 fw-bold">
-            📂 Categorías
-        </h1>
-
-        <p class="text-muted mb-3">
-            Explora todas las categorías disponibles del catálogo
-        </p>
-
-        <span class="badge bg-primary">
-            {{ categorias|length }} categorías registradas
-        </span>
+        <div class="categorias-hero-wave">
+            <svg viewBox="0 0 1440 140" preserveAspectRatio="none">
+                <path fill="#f3f1ec"
+                d="M0,70 C240,110 480,30 720,70 C960,110 1200,50 1440,80 L1440,140 L0,140 Z">
+                </path>
+            </svg>
+        </div>
 
     </section>
 
-    <div class="row g-4">
+    <div class="categorias-info text-center mb-4">
 
-        {% for categoria in categorias %}
+        <span class="categorias-total">
+            <i class="bi bi-grid-fill"></i>
+            {{ categorias|length }} categoría(s) registradas
+        </span>
 
-        <div class="col-6 col-md-4">
+    </div>
 
-            <a href="{% url 'productos_categoria' categoria.id %}"
-               class="text-decoration-none">
+    <div class="container-fluid px-3 px-lg-4">
 
-                <div class="category-card shadow-sm">
+        <div class="row g-4">
 
-                    <div class="category-icon">
+            {% for categoria in categorias %}
 
-                        {% if categoria.imagen %}
+            <div class="col-12 col-md-6 col-xl-4">
 
-                            <img src="{{ categoria.imagen.url }}"
-                                 alt="{{ categoria.nombre }}"
-                                 class="categoria-img">
-                    
-                        {% else %}
+                <a href="{% url 'productos_categoria' categoria.id %}"
+                   class="categoria-link">
 
-                            <div class="rounded-circle bg-warning-subtle
-                                        d-flex align-items-center justify-content-center categoria-img-placeholder">
+                    <div class="categoria-card">
 
-                                <i class="bi bi-grid-fill"></i>
+                        <div class="categoria-img-box">
+
+                            {% if categoria.imagen %}
+
+                                <img src="{{ categoria.imagen.url }}"
+                                     alt="{{ categoria.nombre }}"
+                                     class="categoria-img">
+
+                            {% else %}
+
+                                <div class="categoria-placeholder">
+                                    <i class="bi bi-grid-fill"></i>
+                                </div>
+
+                            {% endif %}
+
+                        </div>
+
+                        <div class="categoria-card-body">
+
+                            <div class="d-flex justify-content-between align-items-start gap-2">
+
+                                <h5>
+                                    {{ categoria.nombre }}
+                                </h5>
+
+                                {% if categoria.destacada %}
+                                    <span class="categoria-badge">
+                                        Destacada
+                                    </span>
+                                {% endif %}
 
                             </div>
 
-                        {% endif %}
+                            <p>
+                                {{ categoria.descripcion|truncatechars:95 }}
+                            </p>
+
+                            <span class="categoria-btn">
+                                Ver productos
+                                <i class="bi bi-arrow-right"></i>
+                            </span>
+
+                        </div>
 
                     </div>
 
-                    <h5 class="fw-bold text-primary mb-1">
-                        {{ categoria.nombre }}
-                    </h5>
+                </a>
 
-                    <small class="text-muted">
-                        Ver productos
-                    </small>
+            </div>
 
+            {% empty %}
+
+            <div class="col-12">
+                <div class="categorias-vacio">
+                    <i class="bi bi-grid"></i>
+                    <h4>No hay categorías disponibles</h4>
+                    <p>Cuando se registren categorías aparecerán en esta sección.</p>
                 </div>
+            </div>
 
-            </a>
+            {% endfor %}
 
         </div>
-
-        {% endfor %}
 
     </div>
 
 </div>
+
+{% include 'includes/footer.html' %}
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
