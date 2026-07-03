@@ -298,37 +298,56 @@
     }
 
     .user-initials{
-        width:42px;
-        height:42px;
+        width:34px;
+        height:34px;
         border-radius:50%;
-        background:#ffffff;
+        background:linear-gradient(135deg,#ffc107,#f59e0b);
         color:#111827;
-        font-weight:800;
+        font-weight:900;
         display:inline-flex;
         align-items:center;
         justify-content:center;
-        font-size:1rem;
-        letter-spacing:.5px;
+        font-size:.9rem;
+        letter-spacing:.4px;
+        box-shadow:0 4px 12px rgba(255,193,7,.35);
     }
 
     .nav-welcome{
-        background:rgba(255,193,7,.95);
-        color:#111827 !important;
+        background:rgba(255,255,255,.08);
+        color:#f8fafc !important;
+        border:1px solid rgba(255,193,7,.45);
         border-radius:999px;
-        padding:10px 18px !important;
-        font-weight:800 !important;
+        padding:7px 14px !important;
+        font-size:.88rem;
+        font-weight:700 !important;
+        animation: welcomeIn .8s ease both;
     }
 
-    @media(max-width:991px){
-        .user-initials{
-            margin:auto;
-        }
+    .nav-welcome i{
+        color:#ffc107;
+    }
 
-        .nav-welcome{
-            display:inline-flex;
-            justify-content:center;
-            margin:8px auto;
+    @keyframes welcomeIn{
+        from{
+            opacity:0;
+            transform:translateY(-12px) scale(.96);
         }
+        to{
+            opacity:1;
+            transform:translateY(0) scale(1);
+        }
+    }
+
+    .navbar{
+        min-height:72px;
+    }
+
+    .navbar .nav-link{
+        font-size:.92rem;
+    }
+
+    .navbar-brand img{
+        height:46px !important;
     }
 
     </style>
@@ -447,7 +466,7 @@
 
                         <ul class="dropdown-menu dropdown-menu-end shadow">
                             <li class="px-3 py-2 text-center">
-            <                    strong>
+                                <strong>
                                     {{ request.user.first_name|default:request.user.username }}
                                     {{ request.user.last_name }}
                                 </strong>
