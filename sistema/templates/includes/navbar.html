@@ -1,101 +1,143 @@
 {% load static %}
 
 <nav class="navbar navbar-expand-lg navbar-dark fixed-top rounded-pill navbar-catalogo">
+
     <div class="container-fluid px-3">
 
-        <a class="navbar-brand fw-bold d-flex align-items-center" href="{% url 'inicio' %}">
+        <!-- Logo -->
+        <a class="navbar-brand fw-bold d-flex align-items-center"
+           href="{% url 'inicio' %}">
+
             <img src="{% static 'img/imagen.png' %}"
-                 height="55"
+                 height="46"
                  class="me-2">
 
             <div>
                 <div class="text-warning fw-bold">
                     Cooperativa
                 </div>
+
                 <small class="text-white">
                     Pirotécnica
                 </small>
             </div>
+
         </a>
 
+        <!-- Bienvenida SOLO en Inicio -->
+        {% if request.resolver_match.url_name == 'inicio' %}
+        <span class="nav-welcome d-none d-lg-inline-flex align-items-center gap-2 ms-3">
+            <i class="bi bi-info-circle-fill"></i>
+            Bienvenido,
+            {{ request.user.first_name|default:request.user.username }}
+        </span>
+        {% endif %}
+
         <!-- Botón hamburguesa -->
-        <button
-            class="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#menuNav"
-            aria-controls="menuNav"
-            aria-expanded="false"
-            aria-label="Toggle navigation">
+        <button class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#menuNav">
 
             <span class="navbar-toggler-icon"></span>
 
         </button>
 
         <!-- Menú -->
-        <div class="collapse navbar-collapse" id="menuNav">
+        <div class="collapse navbar-collapse"
+             id="menuNav">
 
-            <ul class="navbar-nav ms-auto text-center gap-lg-3 mt-2 mt-lg-0">
+            <ul class="navbar-nav ms-auto text-center gap-lg-3 mt-3 mt-lg-0">
 
                 <li class="nav-item">
+
                     <a class="nav-link {% if request.resolver_match.url_name == 'inicio' %}active{% endif %}"
                        href="{% url 'inicio' %}">
+
                         🏠 Inicio
+
                     </a>
+
                 </li>
 
                 <li class="nav-item">
+
                     <a class="nav-link {% if request.resolver_match.url_name == 'todas_categorias' %}active{% endif %}"
                        href="{% url 'todas_categorias' %}">
+
                         📂 Categorías
+
                     </a>
+
                 </li>
 
                 <li class="nav-item">
+
                     <a class="nav-link {% if request.resolver_match.url_name == 'todos_productos' %}active{% endif %}"
                        href="{% url 'todos_productos' %}">
+
                         🏭 Productos
+
                     </a>
+
                 </li>
 
                 <li class="nav-item">
+
                     <a class="nav-link {% if request.resolver_match.url_name == 'solicitudes' %}active{% endif %}"
                        href="{% url 'solicitudes' %}">
+
                         📋 Solicitudes
+
                     </a>
+
                 </li>
 
                 <li class="nav-item">
+
                     <a class="nav-link {% if request.resolver_match.url_name == 'mis_cotizaciones' %}active{% endif %}"
                        href="{% url 'mis_cotizaciones' %}">
-                        📋 Cotizaciones
+
+                        📄 Cotizaciones
+
                     </a>
+
                 </li>
 
                 <li class="nav-item">
+
                     <a class="nav-link {% if request.resolver_match.url_name == 'favoritos' %}active{% endif %}"
                        href="{% url 'favoritos' %}">
+
                         ❤️ Favoritos
+
                     </a>
+
                 </li>
 
-    <!-- Usuario -->
+                <!-- Usuario -->
+
                 <li class="nav-item dropdown">
 
                     <a class="nav-link dropdown-toggle d-flex align-items-center justify-content-center gap-2"
                        href="#"
                        role="button"
-                       data-bs-toggle="dropdown"
-                       aria-expanded="false">
+                       data-bs-toggle="dropdown">
 
                         {% if request.user.perfil.foto %}
+
                             <img src="{{ request.user.perfil.foto.url }}"
                                  class="user-initials">
+
                         {% else %}
+
                             <span class="user-initials">
+
                                 {{ request.user.first_name|first|default:request.user.username|first|upper }}
                                 {{ request.user.last_name|first|upper }}
+
                             </span>
+
                         {% endif %}
 
                     </a>
@@ -105,32 +147,56 @@
                         <li class="dropdown-user-head">
 
                             {% if request.user.perfil.foto %}
+
                                 <img src="{{ request.user.perfil.foto.url }}"
                                      class="user-initials"
-                                     style="width:50px;height:50px;">
+                                     style="width:52px;height:52px;">
+
                             {% endif %}
 
-                            <strong class="dropdown-user-name">
-                                {{ request.user.first_name|default:request.user.username }}
-                                {{ request.user.last_name }}
-                            </strong>
+                            <div>
+
+                                <div class="dropdown-user-name">
+
+                                    {{ request.user.first_name|default:request.user.username }}
+                                    {{ request.user.last_name }}
+
+                                </div>
+
+                                <small class="text-secondary">
+
+                                    {{ request.user.email }}
+
+                                </small>
+
+                            </div>
 
                         </li>
 
-                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
 
                         <li>
+
                             <a class="dropdown-item"
                                href="{% url 'perfil' %}">
+
                                 👤 Mi perfil
+
                             </a>
+
                         </li>
 
                         <li>
+
                             <a class="dropdown-item text-danger"
                                href="{% url 'login' %}">
+
                                 🚪 Cerrar sesión
+
                             </a>
+
                         </li>
 
                     </ul>
@@ -142,4 +208,5 @@
         </div>
 
     </div>
+
 </nav>
