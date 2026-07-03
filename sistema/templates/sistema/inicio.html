@@ -377,6 +377,19 @@
             border-radius:32px;
         }
     }
+
+    @media(max-width:991px){
+        .nav-welcome{
+            width:max-content;
+            margin:14px auto 8px !important;
+        }
+    }
+
+    .dropdown-user-name{
+        color:#ffffff;
+        font-size:1.15rem;
+        font-weight:700;
+    }
     </style>
 
     <link href="https://fonts.googleapis.com/css2?family=Arvo:wght@700&display=swap" rel="stylesheet">
@@ -433,7 +446,7 @@
 
             </button>
 
-            <span class="nav-welcome d-none d-lg-inline-flex align-items-center gap-2 ms-3">
+            <span class="nav-welcome d-inline-flex align-items-center gap-2 ms-lg-3 mx-auto order-lg-0 order-3">
                 <i class="bi bi-info-circle-fill"></i>
                 Bienvenido, {{ request.user.first_name|default:request.user.username }}
             </span>
@@ -503,7 +516,7 @@
                                         style="width:46px; height:46px;">
                                 {% endif %}
 
-                                <strong>
+                                <strong class="dropdown-user-name">
                                     {{ request.user.first_name|default:request.user.username }}
                                     {{ request.user.last_name }}
                                 </strong>
