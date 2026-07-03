@@ -393,8 +393,17 @@
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'perfil' %}">
-                            👤 Perfil
+                        <a class="nav-link d-flex align-items-center justify-content-center gap-2"
+                           href="{% url 'perfil' %}">
+        
+                            <span class="rounded-circle bg-warning text-dark fw-bold d-inline-flex align-items-center justify-content-center"
+                                  style="width:32px; height:32px;">
+                                {{ request.user.first_name|first|default:request.user.username|first|upper }}
+                            </span>
+
+                            <span>
+                                Bienvenido, {{ request.user.first_name|default:request.user.username }}
+                            </span>
                         </a>
                     </li>
 
