@@ -1,0 +1,19 @@
+.navbar .nav-link{
+    color:#ececec !important;
+    font-weight:600;
+    font-size:.92rem;
+    padding:8px 14px !important;
+    border-radius:999px;
+    transition:.30s;
+}
+
+.navbar .nav-link:hover{
+    color:#ffc107 !important;
+    background:rgba(255,193,7,.08);
+}
+
+.navbar .nav-link.active{
+    color:#ffc107 !important;
+    background:rgba(255,193,7,.10);
+    font-weight:700;
+}

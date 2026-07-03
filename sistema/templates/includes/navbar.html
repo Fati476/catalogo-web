@@ -46,49 +46,103 @@
             <ul class="navbar-nav ms-auto text-center gap-lg-3 mt-2 mt-lg-0">
 
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'inicio' %}">🏠 Inicio</a>
+                    <a class="nav-link {% if request.resolver_match.url_name == 'inicio' %}active{% endif %}"
+                       href="{% url 'inicio' %}">
+                        🏠 Inicio
+                    </a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'todas_categorias' %}">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'todas_categorias' %}active{% endif %}"
+                       href="{% url 'todas_categorias' %}">
                         📂 Categorías
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'todos_productos' %}">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'todos_productos' %}active{% endif %}"
+                       href="{% url 'todos_productos' %}">
                         🏭 Productos
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'solicitudes' %}">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'solicitudes' %}active{% endif %}"
+                       href="{% url 'solicitudes' %}">
                         📋 Solicitudes
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'mis_cotizaciones' %}">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'mis_cotizaciones' %}active{% endif %}"
+                       href="{% url 'mis_cotizaciones' %}">
                         📋 Cotizaciones
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'favoritos' %}">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'favoritos' %}active{% endif %}"
+                       href="{% url 'favoritos' %}">
                         ❤️ Favoritos
                     </a>
                 </li>
 
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'perfil' %}">
-                        👤 Perfil
-                    </a>
-                </li>
+    <!-- Usuario -->
+                <li class="nav-item dropdown">
 
-                <li class="nav-item">
-                    <a class="nav-link text-danger" href="{% url 'login' %}">
-                        🚪 Cerrar sesión
+                    <a class="nav-link dropdown-toggle d-flex align-items-center justify-content-center gap-2"
+                       href="#"
+                       role="button"
+                       data-bs-toggle="dropdown"
+                       aria-expanded="false">
+
+                        {% if request.user.perfil.foto %}
+                            <img src="{{ request.user.perfil.foto.url }}"
+                                 class="user-initials">
+                        {% else %}
+                            <span class="user-initials">
+                                {{ request.user.first_name|first|default:request.user.username|first|upper }}
+                                {{ request.user.last_name|first|upper }}
+                            </span>
+                        {% endif %}
+
                     </a>
+
+                    <ul class="dropdown-menu dropdown-menu-end shadow">
+
+                        <li class="dropdown-user-head">
+
+                            {% if request.user.perfil.foto %}
+                                <img src="{{ request.user.perfil.foto.url }}"
+                                     class="user-initials"
+                                     style="width:50px;height:50px;">
+                            {% endif %}
+
+                            <strong class="dropdown-user-name">
+                                {{ request.user.first_name|default:request.user.username }}
+                                {{ request.user.last_name }}
+                            </strong>
+
+                        </li>
+
+                        <li><hr class="dropdown-divider"></li>
+
+                        <li>
+                            <a class="dropdown-item"
+                               href="{% url 'perfil' %}">
+                                👤 Mi perfil
+                            </a>
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item text-danger"
+                               href="{% url 'login' %}">
+                                🚪 Cerrar sesión
+                            </a>
+                        </li>
+
+                    </ul>
+
                 </li>
 
             </ul>
