@@ -331,70 +331,50 @@
         background:rgba(15,15,15,.55) !important;
         backdrop-filter:blur(15px);
         -webkit-backdrop-filter:blur(15px);
-
-        border:1px solid rgba(255,255,255,.08);
-
-        border-radius:18px;
-
+        border:1px solid rgba(255,255,255,.10);
+        border-radius:28px;
         box-shadow:0 10px 30px rgba(0,0,0,.25);
-    
+        padding:12px;
+        min-width:280px;
         overflow:hidden;
+        animation:menuFade .25s ease;
+        transform-origin:top right;
     }
 
-    .dropdown-menu strong{
-        color:white;
+    .dropdown-menu li:first-child{
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        gap:12px;
+        padding:14px 18px !important;
+    }
+
+    .dropdown-menu li:first-child img{
+        margin-bottom:0 !important;
     }
 
     .dropdown-item{
-        color:#f8fafc;
-        border-radius:10px;
-        padding:10px 14px;
-        transition:.25s;
+        color:#f8fafc !important;
+        border-radius:999px;
+        padding:11px 18px;
+        font-weight:600;
     }
 
     .dropdown-item:hover{
-        background:rgba(255,255,255,.08);
-        color:#ffc107;
+        background:rgba(255,193,7,.12);
+        color:#ffc107 !important;
     }
-
 
     .dropdown-divider{
-        border-color:rgba(255,255,255,.10);
-    }
-
-    @keyframes welcomeIn{
-        from{
-            opacity:0;
-            transform:translateY(-12px) scale(.96);
-        }
-        to{
-            opacity:1;
-            transform:translateY(0) scale(1);
-        }
-    }
-
-    .navbar{
-        min-height:64px;
-    }
-
-    .navbar .nav-link{
-        font-size:.88rem;
-    }
-
-    .navbar-brand img{
-        height:42px !important;
+        border-color:rgba(255,255,255,.12);
     }
 
     @media(max-width:991px){
-        .nav-welcome{
-            display:inline-flex !important;
-            margin:12px auto;
-        }
-
         .dropdown-menu{
-            width:90%;
-            margin:10px auto;
-            text-align:center;
+            width:82%;
+            min-width:0;
+            margin:12px auto;
+            border-radius:32px;
         }
     }
     </style>
@@ -516,7 +496,7 @@
                         </a>
 
                         <ul class="dropdown-menu dropdown-menu-end shadow">
-                            <li class="px-3 py-2 text-center">
+                            <li class="dropdown-user-head">
                                 {% if request.user.perfil.foto %}
                                     <img src="{{ request.user.perfil.foto.url }}"
                                         class="user-initials mb-2"
