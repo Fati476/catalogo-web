@@ -73,26 +73,31 @@ body{
 
 .logo-login{
     display:block;
-    width:120px;          /* antes 190px */
-    height:120px;
+    width:95px;
+    height:95px;
     object-fit:cover;
-    border-radius:50%;    /* circular */
+    border-radius:50%;
     margin:0 auto 18px;
     background:white;
-    padding:8px;
-    box-shadow:0 12px 28px rgba(0,0,0,.30);
+    padding:6px;
+    box-shadow:0 10px 24px rgba(0,0,0,.28);
 }
 
 .titulo{
     text-align:center;
     font-weight:900;
-    margin-bottom:8px;
+    margin-bottom:6px;
+    font-size:2rem;
+}
+.titulo span{
+    color:#ffc107;
 }
 
 .subtitulo{
     text-align:center;
-    color:rgba(255,255,255,.78);
-    margin-bottom:28px;
+    color:rgba(255,255,255,.72);
+    margin-bottom:26px;
+    font-size:.95rem;
 }
 
 .input-group{
@@ -142,16 +147,17 @@ body{
     border:0;
     border-radius:999px;
     padding:13px;
-    background:linear-gradient(135deg,#ffc107,#d4af37);
+    background:rgba(255,193,7,.90);
     color:#111827;
     font-weight:900;
     transition:.3s;
-    box-shadow:0 12px 28px rgba(255,193,7,.25);
+    box-shadow:0 10px 22px rgba(255,193,7,.18);
 }
 
 .btn-login:hover{
-    transform:translateY(-3px);
-    box-shadow:0 18px 36px rgba(255,193,7,.35);
+    transform:translateY(-2px);
+    background:#ffc107;
+    box-shadow:0 14px 28px rgba(255,193,7,.26);
 }
 
 .links{
@@ -160,13 +166,13 @@ body{
 }
 
 .links a{
-    color:#ffc107;
+    color:rgba(255,255,255,.82);
     text-decoration:none;
     font-weight:700;
 }
 
 .links a:hover{
-    text-decoration:underline;
+    color:#ffc107;
 }
 
 .mensaje{
@@ -191,7 +197,8 @@ body{
     }
 
     .logo-login{
-        width:165px;
+        width:88px;
+        height:88px;
     }
 }
 </style>
@@ -214,11 +221,11 @@ body{
              class="logo-login">
 
         <h2 class="titulo">
-            Bienvenido
+            Iniciar <span>sesión</span>
         </h2>
 
         <p class="subtitulo">
-            Inicia sesión para continuar
+            Accede al Catálogo Web de la Cooperativa Pirotécnica
         </p>
 
         {% if form.errors %}
