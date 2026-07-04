@@ -1145,8 +1145,8 @@ def descargar_cotizacion_pdf(request, id):
 
     pdf.drawString(
         40,
-        height - 175,
-        f"No. {solicitud.id}"
+        height-175,
+        f"Folio: COT-{solicitud.id:04d}"
     )
 
     nombre = solicitud.usuario.get_full_name() or solicitud.usuario.email
