@@ -149,17 +149,18 @@ body{
     border:0;
     border-radius:999px;
     padding:13px;
-    background:rgba(255,193,7,.90);
+    background:#C9A227;
     color:#111827;
     font-weight:900;
-    transition:.3s;
-    box-shadow:0 10px 22px rgba(212,175,55,.22);
+    transition:all .30s ease;
+    box-shadow:0 10px 22px rgba(201,162,39,.20);
 }
 
 .btn-login:hover{
+    background:#B8860B;
+    color:#111827;
     transform:translateY(-2px);
-    background:#C9A227;
-    box-shadow:0 14px 28px rgba(212,175,55,.28);
+    box-shadow:0 16px 30px rgba(184,134,11,.28);
 }
 
 .links{
@@ -227,7 +228,7 @@ body{
         </h2>
 
         <p class="subtitulo">
-            Accede al Catálogo Web de la Cooperativa Pirotécnica
+            Accede al catálogo de productos y cotizaciones.
         </p>
 
         {% if form.errors %}
