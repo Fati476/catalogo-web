@@ -49,6 +49,14 @@ import os
 
 from .utils import enviar_correo
 
+from django.contrib.auth.models import User
+from django.contrib.auth.tokens import default_token_generator
+from django.contrib.auth.forms import SetPasswordForm
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes
+from django.urls import reverse
+from .email_utils import enviar_correo_recuperacion
+
 @login_required
 def inicio(request):
 
@@ -1499,3 +1507,76 @@ def perfil(request):
             "total_cotizaciones": total_cotizaciones,
         }
     )
+
+
+def password_reset_custom(request):
+
+    if request.method == "POST":
+        email = request.POST.get("email")
+
+        usuario = User.objects.filter(
+            email__iexact=email,
+            is_active=True
+        ).first()
+
+        if usuario:
+            uid = urlsafe_base64_encode(force_bytes(usuario.pk))
+            token = default_token_generator.make_token(usuario)
+
+            reset_url = request.build_absolute_uri(
+                reverse(
+                    "password_reset_confirm",
+                    kwargs={
+                        "uidb64": uid,
+                        "token": token
+                    }
+                )
+            )
+
+            enviar_correo_recuperacion(usuario, reset_url)
+
+        return redirect("password_reset_done")
+
+    return render(request, "registration/password_reset_form.html")
+
+
+def password_reset_done_custom(request):
+
+    return render(request, "registration/password_reset_done.html")
+
+
+def password_reset_confirm_custom(request, uidb64, token):
+
+    try:
+        uid = urlsafe_base64_decode(uidb64).decode()
+        usuario = User.objects.get(pk=uid)
+
+    except Exception:
+        usuario = None
+
+    if usuario is not None and default_token_generator.check_token(usuario, token):
+
+        if request.method == "POST":
+
+            form = SetPasswordForm(usuario, request.POST)
+
+            if form.is_valid():
+                form.save()
+                return redirect("password_reset_complete")
+
+        else:
+            form = SetPasswordForm(usuario)
+
+        return render(request, "registration/password_reset_confirm.html", {
+            "form": form,
+            "validlink": True
+        })
+
+    return render(request, "registration/password_reset_confirm.html", {
+        "validlink": False
+    })
+
+
+def password_reset_complete_custom(request):
+
+    return render(request, "registration/password_reset_complete.html")

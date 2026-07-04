@@ -235,3 +235,59 @@ def enviar_bienvenida(usuario):
 
     sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
     sg.send(mensaje)
+
+
+def enviar_correo_recuperacion(usuario, reset_url):
+
+    mensaje = Mail(
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to_emails=usuario.email,
+        subject="Restablecer contraseña - Catálogo Web",
+        html_content=f"""
+        <div style="font-family:Arial,sans-serif; max-width:650px; margin:auto; border-radius:18px; overflow:hidden; border:1px solid #e5e7eb;">
+
+            <div style="background:#111827; padding:30px; text-align:center;">
+                <h1 style="color:#D4AF37; margin:0;">
+                    Cooperativa Pirotécnica
+                </h1>
+
+                <p style="color:white; margin-top:8px;">
+                    Catálogo Web
+                </p>
+            </div>
+
+            <div style="padding:35px;">
+                <h2 style="color:#111827;">
+                    Hola {usuario.first_name or usuario.email}
+                </h2>
+
+                <p style="font-size:16px; color:#4b5563; line-height:1.7;">
+                    Recibimos una solicitud para restablecer la contraseña de tu cuenta.
+                </p>
+
+                <p style="font-size:16px; color:#4b5563; line-height:1.7;">
+                    Haz clic en el siguiente botón para crear una nueva contraseña:
+                </p>
+
+                <div style="text-align:center; margin:30px 0;">
+                    <a href="{reset_url}"
+                       style="background:#C9A227; color:#111827; padding:14px 26px; border-radius:999px; text-decoration:none; font-weight:bold;">
+                        Restablecer contraseña
+                    </a>
+                </div>
+
+                <p style="color:#6b7280; font-size:14px;">
+                    Si no solicitaste este cambio, puedes ignorar este correo.
+                </p>
+            </div>
+
+            <div style="background:#111827; color:white; text-align:center; padding:18px;">
+                © Cooperativa Pirotécnica
+            </div>
+
+        </div>
+        """
+    )
+
+    sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
+    sg.send(mensaje)

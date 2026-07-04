@@ -11,6 +11,30 @@ urlpatterns = [
         name='login'
     ),
 
+    path(
+        'accounts/password_reset/',
+        views.password_reset_custom,
+        name='password_reset'
+    ),
+
+    path(
+        'accounts/password_reset/done/',
+        views.password_reset_done_custom,
+        name='password_reset_done'
+    ),
+
+    path(
+        'accounts/reset/<uidb64>/<token>/',
+        views.password_reset_confirm_custom,
+        name='password_reset_confirm'
+    ),
+
+    path(
+        'accounts/reset/done/',
+        views.password_reset_complete_custom,
+        name='password_reset_complete'
+    ),
+
     path('registro/', views.registro, name='registro'),
 
     path(
