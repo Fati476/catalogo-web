@@ -86,7 +86,14 @@ def registro(request):
 
         if form.is_valid():
 
-            usuario = form.save()
+            usuario = form.save(commit=False)
+
+            usuario.username = form.cleaned_data['email']
+            usuario.email = form.cleaned_data['email']
+            usuario.first_name = form.cleaned_data['first_name']
+            usuario.last_name = form.cleaned_data['last_name']
+
+            usuario.save()
 
             municipio = request.POST.get('municipio')
             estado = request.POST.get('estado')

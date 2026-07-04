@@ -6,28 +6,31 @@ import re
 
 class RegistroForm(UserCreationForm):
 
+    first_name = forms.CharField(max_length=150)
+    last_name = forms.CharField(max_length=150)
     email = forms.EmailField()
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'password1', 'password2']
+        fields = [
+            'first_name',
+            'last_name',
+            'email',
+            'password1',
+            'password2'
+        ]
 
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
 
-    def clean_username(self):
-
-        username = self.cleaned_data.get('username')
-
-        if User.objects.filter(username=username).exists():
-
+        if User.objects.filter(email=email).exists():
             raise forms.ValidationError(
-                "Ese nombre de usuario ya existe."
+                "Ese correo ya está registrado."
             )
 
-        return username
-
+        return email
 
     def clean_password1(self):
-
         password = self.cleaned_data.get('password1')
 
         if len(password) < 8:
