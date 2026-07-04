@@ -1062,15 +1062,9 @@ def descargar_cotizacion_pdf(request, id):
 
     width, height = letter
 
-    negro = colors.HexColor("#111827")
-    dorado = colors.HexColor("#C9A227")
-    gris = colors.HexColor("#6B7280")
-    gris_claro = colors.HexColor("#F8F9FA")
-    borde = colors.HexColor("#E5E7EB")
-
-    # =====================================================
+    # ==========================
     # LOGO
-    # =====================================================
+    # ==========================
 
     logo_path = os.path.join(
         settings.BASE_DIR,
@@ -1080,405 +1074,258 @@ def descargar_cotizacion_pdf(request, id):
     )
 
     if os.path.exists(logo_path):
-
         pdf.drawImage(
             logo_path,
-            45,
-            height - 105,
-            width=78,
-            height=78,
-            preserveAspectRatio=True,
-            mask='auto'
+            30,
+            height - 100,
+            width=90,
+            height=90,
+            mask="auto",
+            preserveAspectRatio=True
         )
 
-    # =====================================================
-    # EMPRESA
-    # =====================================================
-
-    pdf.setFillColor(negro)
+    # ==========================
+    # ENCABEZADO
+    # ==========================
 
     pdf.setFont("Helvetica-Bold", 17)
 
-    pdf.drawString(
-        145,
-        height - 48,
-        "Comercializadora Cooperativa"
-    )
-
-    pdf.setFont("Helvetica-Bold", 11)
-
-    pdf.drawString(
-        145,
-        height - 67,
-        "de Sustancias Químicas para uso del"
-    )
-
-    pdf.drawString(
-        145,
-        height - 82,
-        "Artesano Pirotécnico S.A. de C.V."
-    )
-
-    pdf.setFillColor(gris)
-
-    pdf.setFont("Helvetica",9)
-
-    pdf.drawString(
-        145,
-        height - 100,
-        "Venta de sustancias químicas • Artificios pirotécnicos"
-    )
-
-    # =====================================================
-    # LINEA DORADA
-    # =====================================================
-
-    pdf.setStrokeColor(dorado)
-
-    pdf.setLineWidth(2)
-
-    pdf.line(
-        40,
-        height-122,
-        width-40,
-        height-122
-    )
-
-    # =====================================================
-    # TITULO
-    # =====================================================
-
-    y = height - 165
-
-    pdf.setFillColor(negro)
-
-    pdf.setFont(
-        "Helvetica-Bold",
-        24
-    )
-
-    pdf.drawString(
-        40,
-        y,
-        "COTIZACIÓN"
-    )
-
-    pdf.setFillColor(dorado)
-
-    pdf.roundRect(
-        width-180,
-        y-6,
-        140,
-        28,
-        12,
-        fill=1,
-        stroke=0
-    )
-
-    pdf.setFillColor(colors.white)
-
-    pdf.setFont(
-        "Helvetica-Bold",
-        11
+    pdf.drawCentredString(
+        width / 2 + 40,
+        height - 45,
+        "Comercializadora Cooperativa de Sustancias Químicas"
     )
 
     pdf.drawCentredString(
-        width-110,
-        y+2,
-        f"FOLIO #{solicitud.id}"
+        width / 2 + 40,
+        height - 65,
+        "para uso del Artesano Pirotécnico, S.A. de C.V."
     )
 
-    # =====================================================
-    # DATOS CLIENTE
-    # =====================================================
+    pdf.setFont("Helvetica", 10)
 
-    y -= 50
-
-    nombre = (
-        solicitud.usuario.get_full_name()
-        or
-        solicitud.usuario.email
+    pdf.drawCentredString(
+        width / 2 + 40,
+        height - 82,
+        "Venta de Sustancias Químicas para la Pirotecnia,"
     )
 
-    pdf.setFillColor(negro)
+    pdf.drawCentredString(
+        width / 2 + 40,
+        height - 95,
+        "Venta de Artificios Pirotécnicos y Transporte Especializado"
+    )
 
-    pdf.setFont(
-        "Helvetica-Bold",
-        10
+    # línea roja
+    pdf.setStrokeColor(colors.HexColor("#C9A227"))
+    pdf.setLineWidth(2)
+
+    pdf.line(
+        30,
+        height - 105,
+        width - 30,
+        height - 105
+    )
+
+    # ==========================
+    # TITULO
+    # ==========================
+
+    pdf.setFillColorRGB(0, 0, 0)
+
+    pdf.setFont("Helvetica-Bold", 18)
+
+    pdf.drawCentredString(
+        width / 2,
+        height - 145,
+        "COTIZACIÓN"
+    )
+
+    pdf.setFont("Helvetica", 11)
+
+    pdf.drawString(
+        40,
+        height - 175,
+        f"No. {solicitud.id}"
+    )
+
+    nombre = solicitud.usuario.get_full_name() or solicitud.usuario.email
+
+    pdf.drawString(
+        40,
+        height - 195,
+        f"Cliente: {nombre}"
     )
 
     pdf.drawString(
         40,
-        y,
-        "Cliente:"
+        height - 215,
+        f"Fecha: {solicitud.fecha.strftime('%d/%m/%Y')}"
     )
 
-    pdf.drawString(
-        40,
-        y-18,
-        "Correo:"
-    )
-
-    pdf.drawString(
-        40,
-        y-36,
-        "Fecha:"
-    )
-
-    pdf.setFillColor(gris)
-
-    pdf.setFont(
-        "Helvetica",
-        10
-    )
-
-    pdf.drawString(
-        95,
-        y,
-        nombre
-    )
-
-    pdf.drawString(
-        95,
-        y-18,
-        solicitud.usuario.email
-    )
-
-    pdf.drawString(
-        95,
-        y-36,
-        solicitud.fecha.strftime("%d/%m/%Y")
-    )
-
-    # =====================================================
+    # ==========================
     # TABLA
-    # =====================================================
+    # ==========================
 
-    y -= 75
+    y = height - 255
 
-    pdf.setFillColor(gris_claro)
+    pdf.setFillColor(colors.HexColor("#F3F4F6"))
 
-    pdf.roundRect(
+    pdf.rect(
         35,
         y,
         540,
-        28,
-        8,
-        fill=1,
-        stroke=0
+        22,
+        fill=1
     )
 
-    pdf.setStrokeColor(borde)
+    pdf.setFillColorRGB(0, 0, 0)
 
-    pdf.roundRect(
-        35,
-        y,
-        540,
-        28,
-        8,
-        fill=0,
-        stroke=1
-    )
+    pdf.setFont("Helvetica-Bold", 10)
 
-    pdf.setFillColor(negro)
-
-    pdf.setFont(
-        "Helvetica-Bold",
-        10
-    )
-
-    pdf.drawString(50, y+9, "Producto")
-    pdf.drawString(310, y+9, "Cantidad")
-    pdf.drawString(395, y+9, "Precio")
-    pdf.drawString(485, y+9, "Subtotal")
-
-    y -= 24
-
-    total = 0
-
-    pdf.setFont(
-        "Helvetica",
-        10
-    )
-
-    for index, detalle in enumerate(solicitud.detalles.all()):
-
-        precio = float(detalle.precio_aplicado or 0)
-        subtotal = precio * detalle.cantidad
-        total += subtotal
-
-        if index % 2 == 0:
-            pdf.setFillColor(colors.white)
-        else:
-            pdf.setFillColor(gris_claro)
-
-        pdf.roundRect(
-            35,
-            y - 4,
-            540,
-            24,
-            6,
-            fill=1,
-            stroke=0
-        )
-
-        pdf.setFillColor(negro)
-
-        pdf.drawString(
-            50,
-            y + 4,
-            detalle.producto.nombre[:42]
-        )
-
-        pdf.drawCentredString(
-            335,
-            y + 4,
-            str(detalle.cantidad)
-        )
-
-        pdf.drawRightString(
-            445,
-            y + 4,
-            f"${precio:,.2f}"
-        )
-
-        pdf.drawRightString(
-            560,
-            y + 4,
-            f"${subtotal:,.2f}"
-        )
-
-        y -= 26
-
-        if y < 155:
-            pdf.showPage()
-            y = height - 80
-
-    # =====================================================
-    # TOTAL
-    # =====================================================
+    pdf.drawString(45, y + 7, "Producto")
+    pdf.drawString(315, y + 7, "Cantidad")
+    pdf.drawString(395, y + 7, "Precio")
+    pdf.drawString(485, y + 7, "Subtotal")
 
     y -= 20
 
-    pdf.setFillColor(dorado)
+    total = 0
 
-    pdf.roundRect(
-        360,
-        y - 12,
-        215,
-        42,
-        14,
-        fill=1,
-        stroke=0
+    pdf.setFont("Helvetica", 10)
+
+    for detalle in solicitud.detalles.all():
+
+        precio = float(detalle.precio_aplicado or 0)
+
+        subtotal = precio * detalle.cantidad
+
+        total += subtotal
+
+        pdf.drawString(
+            45,
+            y,
+            detalle.producto.nombre[:45]
+        )
+
+        pdf.drawString(
+            330,
+            y,
+            str(detalle.cantidad)
+        )
+
+        pdf.drawString(
+            395,
+            y,
+            f"${precio:,.2f}"
+        )
+
+        pdf.drawString(
+            485,
+            y,
+            f"${subtotal:,.2f}"
+        )
+
+        y -= 18
+
+    # ==========================
+    # TOTAL
+    # ==========================
+
+    y -= 20
+
+    pdf.setStrokeColor(colors.HexColor("#C9A227"))
+
+    pdf.line(
+        390,
+        y + 15,
+        560,
+        y + 15
     )
 
-    pdf.setFillColor(colors.white)
-
-    pdf.setFont(
-        "Helvetica-Bold",
-        14
-    )
+    pdf.setFont("Helvetica-Bold",15)
 
     pdf.drawRightString(
-        558,
-        y + 3,
+        560,
+        y,
         f"TOTAL: ${total:,.2f}"
     )
 
-    # =====================================================
+    # ==========================
     # OBSERVACIONES
-    # =====================================================
+    # ==========================
 
-    y -= 70
+    y -= 45
 
-    pdf.setFillColor(negro)
-
-    pdf.setFont(
-        "Helvetica-Bold",
-        12
-    )
-
+    pdf.setFont("Helvetica-Bold", 11)
     pdf.drawString(
         40,
         y,
         "Observaciones"
     )
 
-    pdf.setFillColor(gris)
+    y -= 20
 
-    pdf.setFont(
-        "Helvetica",
-        9
-    )
+    pdf.setFont("Helvetica", 10)
 
     pdf.drawString(
         40,
-        y - 20,
+        y,
         "• Cotización válida por 15 días naturales."
     )
 
+    y -= 18
+
     pdf.drawString(
         40,
-        y - 36,
+        y,
         "• Precios sujetos a cambios sin previo aviso."
     )
 
+    y -= 18
+
     pdf.drawString(
         40,
-        y - 52,
-        "• Para continuar con el proceso, comunícate con la cooperativa."
+        y,
+        "• Gracias por confiar en Cooperativa Pirotécnica."
     )
 
-    # =====================================================
-    # PIE DE PÁGINA
-    # =====================================================
+    # ==========================
+    # PIE
+    # ==========================
 
-    pdf.setStrokeColor(dorado)
-
-    pdf.setLineWidth(1.5)
+    pdf.setStrokeColor(colors.HexColor("#C9A227"))
 
     pdf.line(
-        40,
-        72,
-        width - 40,
-        72
+        30,
+        65,
+        width - 30,
+        65
     )
 
-    pdf.setFillColor(negro)
+    pdf.setFont("Helvetica", 8)
 
-    pdf.setFont(
-        "Helvetica-Bold",
-        8
+    pdf.drawString(
+        30,
+        48,
+        "San Mateo Tlalchichilpan, Almoloya de Juárez, Edo. de México"
     )
 
     pdf.drawString(
-        40,
-        52,
-        "Comercializadora Cooperativa de Sustancias Químicas para uso del Artesano Pirotécnico, S.A. de C.V."
-    )
-
-    pdf.setFillColor(gris)
-
-    pdf.setFont(
-        "Helvetica",
-        8
-    )
-
-    pdf.drawString(
-        40,
-        38,
-        "San Mateo Tlalchichilpan, Almoloya de Juárez, Estado de México, C.P. 50904"
+        30,
+        34,
+        "C.P. 50900"
     )
 
     pdf.drawRightString(
-        width - 40,
-        38,
+        width - 30,
+        48,
         "Tel. 725 136 07 31"
     )
 
     pdf.drawRightString(
-        width - 40,
-        24,
+        width - 30,
+        34,
         "comer_coop_2013@live.com.mx"
     )
 
