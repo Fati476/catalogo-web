@@ -54,3 +54,25 @@ class RegistroForm(UserCreationForm):
             )
 
         return password
+    
+
+from django.contrib.auth.forms import SetPasswordForm
+
+class CustomSetPasswordForm(SetPasswordForm):
+
+    def clean_new_password1(self):
+        password = self.cleaned_data.get("new_password1")
+
+        if len(password) < 8:
+            raise forms.ValidationError("La contraseña debe tener mínimo 8 caracteres.")
+
+        if not re.search(r"[A-Z]", password):
+            raise forms.ValidationError("La contraseña debe contener al menos una mayúscula.")
+
+        if not re.search(r"[0-9]", password):
+            raise forms.ValidationError("La contraseña debe contener al menos un número.")
+
+        if not re.search(r"[\W_]", password):
+            raise forms.ValidationError("La contraseña debe contener un carácter especial.")
+
+        return password

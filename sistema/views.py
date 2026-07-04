@@ -51,7 +51,7 @@ from .utils import enviar_correo
 
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
-from django.contrib.auth.forms import SetPasswordForm
+from .forms import CustomSetPasswordForm
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
 from django.urls import reverse
@@ -1558,14 +1558,14 @@ def password_reset_confirm_custom(request, uidb64, token):
 
         if request.method == "POST":
 
-            form = SetPasswordForm(usuario, request.POST)
+            form = CustomSetPasswordForm(usuario, request.POST)
 
             if form.is_valid():
                 form.save()
                 return redirect("password_reset_complete")
 
         else:
-            form = SetPasswordForm(usuario)
+            form = CustomSetPasswordForm(usuario)
 
         return render(request, "registration/password_reset_confirm.html", {
             "form": form,
