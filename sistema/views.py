@@ -47,6 +47,8 @@ from reportlab.pdfgen import canvas
 from django.conf import settings
 import os
 
+from .utils import enviar_correo
+
 @login_required
 def inicio(request):
 
@@ -77,6 +79,8 @@ def inicio(request):
         }
     )
 
+
+from .email_utils import enviar_bienvenida
 
 def registro(request):
 
@@ -109,7 +113,17 @@ def registro(request):
             grupo = Group.objects.get(name='Cliente')
             usuario.groups.add(grupo)
 
-            return redirect('/accounts/login/')
+
+            # Correo de bienvenida
+            enviar_bienvenida(usuario)
+
+            # Mensaje para mostrar en login
+            messages.success(
+                request,
+                "¡Registro exitoso! Ya puedes iniciar sesión con tu correo electrónico."
+            )
+
+            return redirect('login')
 
     else:
 
