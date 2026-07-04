@@ -300,10 +300,11 @@ body{
                 </span>
 
                 <input type="text"
-                       name="first_name"
-                       class="form-control"
-                       placeholder="Ejemplo: Juan Carlos"
-                       required>
+                    id="first_name"
+                    name="first_name"
+                    class="form-control"
+                    placeholder="Ejemplo: Juan Carlos"
+                    required>
             </div>
         </div>
 
@@ -316,10 +317,11 @@ body{
                 </span>
 
                 <input type="text"
-                       name="last_name"
-                       class="form-control"
-                       placeholder="Ejemplo: Martínez López"
-                       required>
+                    id="last_name"
+                    name="last_name"
+                    class="form-control"
+                    placeholder="Ejemplo: Martínez López"
+                    required>
             </div>
         </div>
 
@@ -333,6 +335,7 @@ body{
                 </span>
 
                 <input type="email"
+                       id="email"
                        name="email"
                        class="form-control"
                        placeholder="correo@gmail.com"
@@ -353,6 +356,7 @@ body{
                 </span>
 
                 <input type="text"
+                       id="telefono"
                        name="telefono"
                        class="form-control"
                        placeholder="Ingrese su número"
@@ -376,6 +380,7 @@ body{
                 </span>
 
                 <input type="text"
+                       id="municipio"
                        name="municipio"
                        class="form-control"
                        placeholder="Ejemplo: Toluca, Metepec..."
@@ -391,9 +396,10 @@ body{
                     <i class="bi bi-map"></i>
                 </span>
 
-                <select name="estado"
-                        class="form-select"
-                        required>
+                <select id="estado"
+                    name="estado"
+                    class="form-select"
+                    required>
                     <option value="">Seleccione un estado</option>
                     <option>Estado de México</option>
                     <option>Ciudad de México</option>
@@ -524,8 +530,8 @@ function mostrarPassword(id, elemento){
 
 
 <script>
-
 const passwordInput = document.getElementById("password1");
+const password2 = document.getElementById("password2");
 const btnRegistro = document.getElementById("btnRegistro");
 
 const caracteres = document.getElementById("caracteres");
@@ -533,14 +539,16 @@ const mayuscula = document.getElementById("mayuscula");
 const numero = document.getElementById("numero");
 const especial = document.getElementById("especial");
 
-passwordInput.addEventListener("input", function(){
+function validarFormulario(){
 
     const password = passwordInput.value;
+    const confirmacion = password2.value;
 
     const tiene8 = password.length >= 8;
     const tieneMayuscula = /[A-Z]/.test(password);
     const tieneNumero = /[0-9]/.test(password);
     const tieneEspecial = /[\W_]/.test(password);
+    const coinciden = password === confirmacion && confirmacion.length > 0;
 
     caracteres.innerHTML = tiene8
         ? "✅ Mínimo 8 caracteres"
@@ -558,12 +566,32 @@ passwordInput.addEventListener("input", function(){
         ? "✅ Un carácter especial"
         : "❌ Un carácter especial";
 
-    btnRegistro.disabled = !(tiene8 && tieneMayuscula && tieneNumero && tieneEspecial);
+    const formularioCompleto =
+        document.getElementById("first_name").value.trim() !== "" &&
+        document.getElementById("last_name").value.trim() !== "" &&
+        document.getElementById("email").value.trim() !== "" &&
+        document.getElementById("telefono").value.trim().length === 10 &&
+        document.getElementById("municipio").value.trim() !== "" &&
+        document.getElementById("estado").value !== "" &&
+        coinciden;
 
+    btnRegistro.disabled = !(
+        formularioCompleto &&
+        tiene8 &&
+        tieneMayuscula &&
+        tieneNumero &&
+        tieneEspecial
+    );
+}
+
+document.querySelectorAll("input, select").forEach(campo => {
+    campo.addEventListener("input", validarFormulario);
+    campo.addEventListener("change", validarFormulario);
 });
 
+// Validar al cargar la página
+validarFormulario();
 </script>
-
 
 <script>
 
