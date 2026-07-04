@@ -1,243 +1,332 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
 
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Registro</title>
+<title>Registro</title>
 
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-    <!-- Fuente -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-    <style>
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
 
-        *{
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+body{
+    font-family:'Inter', sans-serif;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:24px;
+    overflow-x:hidden;
+}
 
-        body{
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg,#667eea,#764ba2);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
+.bg-video{
+    position:fixed;
+    inset:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    z-index:-3;
+}
 
-        .card-registro{
-            width: 100%;
-            max-width: 520px;
-            background: rgba(255,255,255,0.15);
-            backdrop-filter: blur(15px);
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
-            animation: aparecer 0.5s ease;
-        }
+.video-overlay{
+    position:fixed;
+    inset:0;
+    background:linear-gradient(135deg, rgba(0,0,0,.84), rgba(15,15,15,.58), rgba(0,0,0,.84));
+    z-index:-2;
+}
 
-        @keyframes aparecer{
+.card-registro{
+    width:100%;
+    max-width:560px;
+    background:rgba(15,15,15,.62);
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:30px;
+    padding:34px;
+    color:white;
+    box-shadow:0 18px 50px rgba(0,0,0,.45);
+    animation:aparecer .65s ease;
+}
 
-            from{
-                opacity: 0;
-                transform: translateY(20px);
-            }
+@keyframes aparecer{
+    from{
+        opacity:0;
+        transform:translateY(25px) scale(.97);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0) scale(1);
+    }
+}
 
-            to{
-                opacity: 1;
-                transform: translateY(0);
-            }
+.logo-registro{
+    display:block;
+    width:90px;
+    height:90px;
+    object-fit:cover;
+    border-radius:50%;
+    margin:0 auto 16px;
+    background:white;
+    padding:6px;
+    box-shadow:0 10px 24px rgba(0,0,0,.28);
+}
 
-        }
+.titulo{
+    text-align:center;
+    font-weight:900;
+    color:white;
+    margin-bottom:8px;
+    font-size:2rem;
+}
 
-        .logo{
-            width: 85px;
-            height: 85px;
-            background: #2563EB;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: auto;
-            margin-bottom: 20px;
-        }
+.titulo span{
+    color:#C9A227;
+}
 
-        .logo i{
-            color: white;
-            font-size: 36px;
-        }
+.subtitulo{
+    text-align:center;
+    color:rgba(255,255,255,.72);
+    margin-bottom:28px;
+    font-size:.95rem;
+}
 
-        .titulo{
-            text-align: center;
-            font-weight: 700;
-            color: white;
-            margin-bottom: 8px;
-        }
+.form-label{
+    font-weight:700;
+    color:white;
+    margin-bottom:8px;
+}
 
-        .subtitulo{
-            text-align: center;
-            color: rgba(255,255,255,0.8);
-            margin-bottom: 30px;
-            font-size: 14px;
-        }
+.input-group{
+    margin-bottom:6px;
+}
 
-        .form-label{
-            font-weight: 600;
-            color: white;
-        }
+.input-group-text{
+    background:rgba(255,255,255,.08);
+    color:#C9A227;
+    border:1px solid rgba(255,255,255,.12);
+    border-right:0;
+    border-radius:16px 0 0 16px;
+}
 
-        .form-control,
-        .form-select{
-            border-radius: 12px;
-            padding: 12px;
-            transition: 0.3s;
-            background: rgba(255,255,255,0.9);
-            border: none;
-        }
+.form-control,
+.form-select{
+    background:rgba(255,255,255,.08);
+    color:white;
+    border:1px solid rgba(255,255,255,.12);
+    border-left:0;
+    padding:12px 14px;
+    border-radius:0 16px 16px 0;
+}
 
-        .form-control:focus,
-        .form-select:focus{
-            box-shadow: 0 0 0 0.15rem rgba(255,255,255,0.25);
-        }
+.form-control::placeholder{
+    color:rgba(255,255,255,.55);
+}
 
-        .input-group-text{
-            background: #F8FAFC;
-            border: none;
-        }
+.form-control:focus,
+.form-select:focus{
+    background:rgba(255,255,255,.12);
+    color:white;
+    border-color:rgba(201,162,39,.60);
+    box-shadow:none;
+}
 
-        .btn-registro{
-            background: white;
-            color: #5a67d8;
-            border: none;
-            border-radius: 12px;
-            padding: 12px;
-            font-weight: 600;
-            transition: 0.3s;
-        }
+.form-select option{
+    color:#111827;
+}
 
-        .btn-registro:hover{
-            background: #f1f1f1;
-            transform: translateY(-1px);
-        }
+.form-help{
+    display:block;
+    margin-top:7px;
+    color:rgba(255,255,255,.68);
+    font-size:.82rem;
+    font-weight:500;
+}
 
-        .btn-registro:disabled{
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
+.toggle-password{
+    cursor:pointer;
+    border-left:1px solid rgba(255,255,255,.12);
+    border-radius:0 16px 16px 0;
+}
 
-        .extra-links{
-            text-align: center;
-            margin-top: 20px;
-        }
+.input-password{
+    border-radius:0 !important;
+}
 
-        .extra-links a{
-            text-decoration: none;
-            color: white;
-            font-weight: 500;
-        }
+.password-rules{
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.10);
+    border-radius:18px;
+    padding:14px 16px;
+    margin-top:12px;
+}
 
-        .extra-links a:hover{
-            text-decoration: underline;
-            color: #f1f1f1;
-        }
+.password-rules small{
+    color:rgba(255,255,255,.78);
+    font-weight:600;
+}
 
-        .accesibilidad{
-            margin-top: 20px;
-            background: rgba(255,255,255,0.2);
-            padding: 14px;
-            border-radius: 14px;
-            font-size: 13px;
-            color: white;
-        }
+.btn-registro{
+    width:100%;
+    border:0;
+    border-radius:999px;
+    padding:13px;
+    background:#C9A227;
+    color:#111827;
+    font-weight:900;
+    transition:all .30s ease;
+    box-shadow:0 10px 22px rgba(201,162,39,.20);
+}
 
-        .accesibilidad i{
-            color: white;
-            margin-right: 5px;
-        }
+.btn-registro:hover{
+    background:#B8860B;
+    color:#111827;
+    transform:translateY(-2px);
+    box-shadow:0 16px 30px rgba(184,134,11,.28);
+}
 
-        .toggle-password{
-            cursor: pointer;
-            background: #F8FAFC;
-        }
+.btn-registro:disabled{
+    opacity:.45;
+    cursor:not-allowed;
+    transform:none;
+}
 
-        .toggle-password:hover{
-            background: #E2E8F0;
-        }
+.extra-links{
+    text-align:center;
+    margin-top:24px;
+}
 
-        @media(max-width: 576px){
+.extra-links p{
+    color:rgba(255,255,255,.62);
+}
 
-            .card-registro{
-                padding: 30px 22px;
-            }
+.extra-links a{
+    text-decoration:none;
+    color:rgba(255,255,255,.88);
+    font-weight:800;
+}
 
-        }
+.extra-links a:hover{
+    color:#C9A227;
+}
 
-    </style>
+.alert-danger{
+    background:rgba(220,53,69,.20);
+    border:1px solid rgba(220,53,69,.35);
+    color:white;
+    border-radius:16px;
+    font-weight:700;
+}
+
+@media(max-width:576px){
+    body{
+        padding:16px;
+        align-items:flex-start;
+    }
+
+    .card-registro{
+        padding:28px 22px;
+        border-radius:26px;
+        margin-top:18px;
+    }
+
+    .logo-registro{
+        width:82px;
+        height:82px;
+    }
+
+    .titulo{
+        font-size:1.75rem;
+    }
+}
+</style>
 
 </head>
 
 <body>
 
+<video autoplay muted loop playsinline class="bg-video">
+    <source src="{% static 'videos/Video.mp4' %}" type="video/mp4">
+</video>
+
+<div class="video-overlay"></div>
+
 <div class="card-registro">
 
-    <div class="logo">
-
-        <i class="bi bi-person-plus-fill"></i>
-
-    </div>
+    <img src="{% static 'img/imagen.png' %}"
+         alt="Cooperativa Pirotécnica"
+         class="logo-registro">
 
     <h2 class="titulo">
-        Crear Cuenta
+        Crear <span>cuenta</span>
     </h2>
 
     <p class="subtitulo">
-        Regístrate para solicitar cotizaciones y acceder al catálogo web
+        Regístrate para solicitar cotizaciones y consultar productos.
     </p>
 
     {% if form.errors %}
-
-    <div class="alert alert-danger">
-
-        {% for field in form %}
-
-            {% for error in field.errors %}
-
-                <p class="mb-1">
-                    {{ error }}
-                </p>
-
+        <div class="alert alert-danger">
+            {% for field in form %}
+                {% for error in field.errors %}
+                    <p class="mb-1">{{ error }}</p>
+                {% endfor %}
             {% endfor %}
-
-        {% endfor %}
-
-    </div>
-
+        </div>
     {% endif %}
 
     <form method="POST">
-
         {% csrf_token %}
 
-        <!-- Usuario -->
-
         <div class="mb-3">
-
-            <label class="form-label">
-                Usuario
-            </label>
+            <label class="form-label">Nombre(s)</label>
 
             <div class="input-group">
+                <span class="input-group-text">
+                    <i class="bi bi-person-badge"></i>
+                </span>
 
+                <input type="text"
+                       name="first_name"
+                       class="form-control"
+                       placeholder="Ejemplo: Ismael"
+                       required>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Apellidos</label>
+
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="bi bi-person-lines-fill"></i>
+                </span>
+
+                <input type="text"
+                       name="last_name"
+                       class="form-control"
+                       placeholder="Ejemplo: Martínez López"
+                       required>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Usuario</label>
+
+            <div class="input-group">
                 <span class="input-group-text">
                     <i class="bi bi-person"></i>
                 </span>
@@ -245,23 +334,15 @@
                 <input type="text"
                        name="username"
                        class="form-control"
-                       placeholder="Ingrese su usuario"
+                       placeholder="Crea un nombre de usuario"
                        required>
-
             </div>
-
         </div>
 
-        <!-- Correo -->
-
         <div class="mb-3">
-
-            <label class="form-label">
-                Correo electrónico
-            </label>
+            <label class="form-label">Correo electrónico</label>
 
             <div class="input-group">
-
                 <span class="input-group-text">
                     <i class="bi bi-envelope"></i>
                 </span>
@@ -271,52 +352,40 @@
                        class="form-control"
                        placeholder="correo@gmail.com"
                        required>
-
             </div>
 
+            <small class="form-help">
+                Usa un correo existente, ahí recibirás tus cotizaciones y avisos del sistema.
+            </small>
         </div>
-
-        <!-- Teléfono -->
-
-    <div class="mb-3">
-
-        <label class="form-label">
-            Número de teléfono
-        </label>
-
-        <div class="input-group">
-
-            <span class="input-group-text">
-                <i class="bi bi-telephone"></i>
-            </span>
-
-            <input type="text"
-                   name="telefono"
-                   class="form-control"
-                   placeholder="Ingrese su número"
-                   maxlength="10"
-                   pattern="[0-9]{10}"
-                   oninput="this.value = this.value.replace(/[^0-9]/g, '')"
-                   required>
-
-        </div>
-
-        <small class="text-white">
-            Solo números y 10 dígitos.
-        </small>
-
-    </div>
-
-        <!-- Municipio -->
 
         <div class="mb-3">
-
-            <label class="form-label">
-                Municipio / Ciudad
-            </label>
+            <label class="form-label">Número de teléfono</label>
 
             <div class="input-group">
+                <span class="input-group-text">
+                    <i class="bi bi-telephone"></i>
+                </span>
 
+                <input type="text"
+                       name="telefono"
+                       class="form-control"
+                       placeholder="Ingrese su número"
+                       maxlength="10"
+                       pattern="[0-9]{10}"
+                       oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                       required>
+            </div>
+
+            <small class="form-help">
+                Solo números y 10 dígitos.
+            </small>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Municipio / Ciudad</label>
+
+            <div class="input-group">
                 <span class="input-group-text">
                     <i class="bi bi-geo-alt"></i>
                 </span>
@@ -326,21 +395,13 @@
                        class="form-control"
                        placeholder="Ejemplo: Toluca, Metepec..."
                        required>
-
             </div>
-
         </div>
 
-        <!-- Estado -->
-
         <div class="mb-3">
-
-            <label class="form-label">
-                Estado
-            </label>
+            <label class="form-label">Estado</label>
 
             <div class="input-group">
-
                 <span class="input-group-text">
                     <i class="bi bi-map"></i>
                 </span>
@@ -348,11 +409,7 @@
                 <select name="estado"
                         class="form-select"
                         required>
-
-                    <option value="">
-                        Seleccione un estado
-                    </option>
-
+                    <option value="">Seleccione un estado</option>
                     <option>Estado de México</option>
                     <option>Ciudad de México</option>
                     <option>Jalisco</option>
@@ -362,23 +419,14 @@
                     <option>Hidalgo</option>
                     <option>Morelos</option>
                     <option>Otro</option>
-
                 </select>
-
             </div>
-
         </div>
 
-        <!-- Contraseña -->
-
         <div class="mb-3">
-
-            <label class="form-label">
-                Contraseña
-            </label>
+            <label class="form-label">Contraseña</label>
 
             <div class="input-group">
-
                 <span class="input-group-text">
                     <i class="bi bi-lock"></i>
                 </span>
@@ -386,51 +434,39 @@
                 <input type="password"
                        name="password1"
                        id="password1"
-                       class="form-control"
+                       class="form-control input-password"
                        placeholder="Ingrese contraseña"
                        required>
 
                 <span class="input-group-text toggle-password"
                       onclick="mostrarPassword('password1', this)">
-
                     <i class="bi bi-eye"></i>
-
                 </span>
-
             </div>
 
-            <div class="mt-3">
-
-                <small id="caracteres" class="text-white d-block">
+            <div class="password-rules">
+                <small id="caracteres" class="d-block">
                     ❌ Mínimo 8 caracteres
                 </small>
 
-                <small id="mayuscula" class="text-white d-block">
+                <small id="mayuscula" class="d-block">
                     ❌ Una letra mayúscula
                 </small>
 
-                <small id="numero" class="text-white d-block">
+                <small id="numero" class="d-block">
                     ❌ Un número
                 </small>
 
-                <small id="especial" class="text-white d-block">
+                <small id="especial" class="d-block">
                     ❌ Un carácter especial
                 </small>
-
             </div>
-
         </div>
 
-        <!-- Confirmar contraseña -->
-
         <div class="mb-4">
-
-            <label class="form-label">
-                Confirmar contraseña
-            </label>
+            <label class="form-label">Confirmar contraseña</label>
 
             <div class="input-group">
-
                 <span class="input-group-text">
                     <i class="bi bi-shield-lock"></i>
                 </span>
@@ -438,144 +474,124 @@
                 <input type="password"
                        name="password2"
                        id="password2"
-                       class="form-control"
+                       class="form-control input-password"
                        placeholder="Repita contraseña"
                        required>
 
                 <span class="input-group-text toggle-password"
                       onclick="mostrarPassword('password2', this)">
-
                     <i class="bi bi-eye"></i>
-
                 </span>
-
             </div>
-
         </div>
 
         <button type="submit"
                 id="btnRegistro"
-                class="btn btn-registro w-100"
+                class="btn btn-registro"
                 disabled>
-
-            <i class="bi bi-check-circle"></i>
+            <i class="bi bi-check-circle me-1"></i>
             Registrarse
-
         </button>
 
     </form>
 
     <div class="extra-links">
-
-        <p class="mt-3">
-
+        <p class="mt-3 mb-2">
             ¿Ya tienes cuenta?
-
             <a href="{% url 'login' %}">
                 Iniciar sesión
             </a>
-
         </p>
 
         <a href="{% url 'password_reset' %}">
             ¿Olvidaste tu contraseña?
         </a>
-
-    </div>
-
-    <div class="accesibilidad">
-
-        <p class="mb-1">
-
-            <i class="bi bi-universal-access"></i>
-
-            Diseño inclusivo y adaptable para todos los usuarios.
-
-        </p>
-
-        <p class="mb-0">
-
-            Compatible con dispositivos móviles y lectura accesible.
-
-        </p>
-
     </div>
 
 </div>
 
 <script>
 
-    function mostrarPassword(id, elemento){
+function mostrarPassword(id, elemento){
 
-        let input = document.getElementById(id);
-        let icono = elemento.querySelector("i");
+    const input = document.getElementById(id);
+    const icono = elemento.querySelector("i");
 
-        if(input.type === "password"){
+    if(input.type === "password"){
 
-            input.type = "text";
+        input.type = "text";
 
-            icono.classList.remove("bi-eye");
-            icono.classList.add("bi-eye-slash");
+        icono.classList.remove("bi-eye");
+        icono.classList.add("bi-eye-slash");
 
-        }else{
+    }else{
 
-            input.type = "password";
+        input.type = "password";
 
-            icono.classList.remove("bi-eye-slash");
-            icono.classList.add("bi-eye");
-
-        }
+        icono.classList.remove("bi-eye-slash");
+        icono.classList.add("bi-eye");
 
     }
 
+}
+
 </script>
+
 
 <script>
 
-    const passwordInput = document.getElementById("password1");
-    const btnRegistro = document.getElementById("btnRegistro");
+const passwordInput = document.getElementById("password1");
+const btnRegistro = document.getElementById("btnRegistro");
 
-    const caracteres = document.getElementById("caracteres");
-    const mayuscula = document.getElementById("mayuscula");
-    const numero = document.getElementById("numero");
-    const especial = document.getElementById("especial");
+const caracteres = document.getElementById("caracteres");
+const mayuscula = document.getElementById("mayuscula");
+const numero = document.getElementById("numero");
+const especial = document.getElementById("especial");
 
-    passwordInput.addEventListener("input", function(){
+passwordInput.addEventListener("input", function(){
 
-        let password = passwordInput.value;
+    const password = passwordInput.value;
 
-        let tiene8 = password.length >= 8;
-        let tieneMayuscula = /[A-Z]/.test(password);
-        let tieneNumero = /[0-9]/.test(password);
-        let tieneEspecial = /[\W_]/.test(password);
+    const tiene8 = password.length >= 8;
+    const tieneMayuscula = /[A-Z]/.test(password);
+    const tieneNumero = /[0-9]/.test(password);
+    const tieneEspecial = /[\W_]/.test(password);
 
-        caracteres.innerHTML = tiene8
-            ? "✅ Mínimo 8 caracteres"
-            : "❌ Mínimo 8 caracteres";
+    caracteres.innerHTML = tiene8
+        ? "✅ Mínimo 8 caracteres"
+        : "❌ Mínimo 8 caracteres";
 
-        mayuscula.innerHTML = tieneMayuscula
-            ? "✅ Una letra mayúscula"
-            : "❌ Una letra mayúscula";
+    mayuscula.innerHTML = tieneMayuscula
+        ? "✅ Una letra mayúscula"
+        : "❌ Una letra mayúscula";
 
-        numero.innerHTML = tieneNumero
-            ? "✅ Un número"
-            : "❌ Un número";
+    numero.innerHTML = tieneNumero
+        ? "✅ Un número"
+        : "❌ Un número";
 
-        especial.innerHTML = tieneEspecial
-            ? "✅ Un carácter especial"
-            : "❌ Un carácter especial";
+    especial.innerHTML = tieneEspecial
+        ? "✅ Un carácter especial"
+        : "❌ Un carácter especial";
 
-        if(tiene8 && tieneMayuscula && tieneNumero && tieneEspecial){
+    btnRegistro.disabled = !(tiene8 && tieneMayuscula && tieneNumero && tieneEspecial);
 
-            btnRegistro.disabled = false;
+});
 
-        }else{
+</script>
 
-            btnRegistro.disabled = true;
 
-        }
+<script>
 
-    });
+// Animación del botón al enviar
+
+document.querySelector("form").addEventListener("submit", function(){
+
+    btnRegistro.disabled = true;
+
+    btnRegistro.innerHTML =
+        '<span class="spinner-border spinner-border-sm me-2"></span>Creando cuenta...';
+
+});
 
 </script>
 
