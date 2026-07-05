@@ -163,13 +163,15 @@ def panel_admin(request):
 
     total_productos = Producto.objects.count()
     total_categorias = Categoria.objects.count()
+    total_solicitudes = SolicitudCotizacion.objects.count()
+    total_usuarios = User.objects.count()
 
-    return render(request,
-                  'admin/panel_admin.html',
-                  {
-                      'total_productos': total_productos,
-                      'total_categorias': total_categorias
-                  })
+    return render(request, 'admin/panel_admin.html', {
+        'total_productos': total_productos,
+        'total_categorias': total_categorias,
+        'total_solicitudes': total_solicitudes,
+        'total_usuarios': total_usuarios,
+    })
 
 from django.core.paginator import Paginator
 
