@@ -10,7 +10,6 @@
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
 <style>
@@ -25,34 +24,33 @@ body{
     background:#f3f1ec;
     color:#111827;
     min-height:100vh;
-    padding-top:105px;
+    padding-top:95px;
 }
 
 /* NAVBAR */
 
-.admin-navbar{
+.navbar-admin{
     position:fixed;
-    top:18px;
-    left:24px;
-    right:24px;
+    top:15px;
+    left:20px;
+    right:20px;
     z-index:9999;
-    background:rgba(17,24,39,.92);
+    background:rgba(17,24,39,.90);
     backdrop-filter:blur(16px);
     -webkit-backdrop-filter:blur(16px);
-    border:1px solid rgba(255,255,255,.10);
     border-radius:999px;
-    padding:10px 18px;
-    box-shadow:0 14px 35px rgba(0,0,0,.25);
+    padding:8px 18px;
+    box-shadow:0 12px 35px rgba(0,0,0,.25);
 }
 
-.admin-logo{
+.navbar-brand-admin{
     display:flex;
     align-items:center;
     gap:12px;
     text-decoration:none;
 }
 
-.admin-logo img{
+.navbar-brand-admin img{
     width:48px;
     height:48px;
     object-fit:cover;
@@ -61,37 +59,30 @@ body{
     padding:4px;
 }
 
-.admin-logo-title{
+.brand-title{
     color:#C9A227;
     font-weight:900;
     line-height:1.1;
 }
 
-.admin-logo-subtitle{
+.brand-subtitle{
     color:white;
-    font-size:.78rem;
+    font-size:.8rem;
     font-weight:700;
 }
 
-.admin-nav-link{
-    color:rgba(255,255,255,.82) !important;
+.navbar-admin .nav-link{
+    color:rgba(255,255,255,.86) !important;
     font-weight:800;
-    border-radius:999px;
     padding:9px 15px !important;
+    border-radius:999px;
     transition:.25s;
 }
 
-.admin-nav-link:hover,
-.admin-nav-link.active{
+.navbar-admin .nav-link:hover,
+.navbar-admin .nav-link.active{
     color:#C9A227 !important;
     background:rgba(201,162,39,.12);
-}
-
-.admin-user-btn{
-    border:0;
-    background:transparent;
-    color:white;
-    font-weight:800;
 }
 
 .admin-avatar{
@@ -100,183 +91,286 @@ body{
     border-radius:50%;
     background:#C9A227;
     color:#111827;
-    display:inline-flex;
+    display:flex;
     align-items:center;
     justify-content:center;
     font-weight:900;
 }
 
+.user-btn{
+    border:none;
+    background:transparent;
+    color:white;
+    font-weight:800;
+}
+
 .dropdown-menu{
     border:0;
-    border-radius:20px;
+    border-radius:22px;
     padding:12px;
-    box-shadow:0 16px 40px rgba(17,24,39,.18);
+    box-shadow:0 18px 45px rgba(17,24,39,.18);
 }
 
 .dropdown-item{
     border-radius:999px;
-    font-weight:700;
     padding:10px 16px;
+    font-weight:700;
 }
 
-/* CONTENIDO */
+/* HERO */
 
-.admin-wrapper{
-    width:min(1180px, calc(100% - 36px));
-    margin:0 auto;
-}
-
-.hero-admin{
+.admin-hero{
+    position:relative;
+    min-height:430px;
+    overflow:hidden;
     background:
-        linear-gradient(135deg, rgba(17,24,39,.96), rgba(17,24,39,.82)),
+        linear-gradient(90deg, rgba(17,24,39,.97), rgba(17,24,39,.76), rgba(17,24,39,.28)),
         url("{% static 'img/banner_productos.png' %}");
     background-size:cover;
     background-position:center;
-    border-radius:34px;
-    padding:42px;
+    display:flex;
+    align-items:center;
+    padding:80px 60px 100px;
+    margin-top:-95px;
+}
+
+.admin-hero-content{
+    max-width:720px;
     color:white;
-    box-shadow:0 18px 45px rgba(17,24,39,.18);
-    position:relative;
-    overflow:hidden;
-}
-
-.hero-admin::after{
-    content:"";
-    position:absolute;
-    width:260px;
-    height:260px;
-    border-radius:50%;
-    background:rgba(201,162,39,.18);
-    right:-90px;
-    top:-90px;
-}
-
-.hero-content{
     position:relative;
     z-index:2;
+    padding-top:105px;
 }
 
 .hero-badge{
     display:inline-flex;
     align-items:center;
     gap:8px;
-    background:rgba(201,162,39,.14);
-    border:1px solid rgba(201,162,39,.35);
-    color:#E7C766;
     padding:8px 16px;
     border-radius:999px;
+    background:rgba(201,162,39,.14);
+    border:1px solid rgba(201,162,39,.40);
+    color:#E7C766;
     font-weight:900;
-    font-size:.85rem;
+    font-size:.86rem;
     margin-bottom:18px;
 }
 
-.hero-admin h1{
-    font-size:2.4rem;
+.admin-hero h1{
+    font-size:3rem;
     font-weight:900;
-    margin-bottom:10px;
+    line-height:1.08;
+    margin-bottom:16px;
+    text-shadow:0 5px 25px rgba(0,0,0,.45);
 }
 
-.hero-admin p{
-    color:rgba(255,255,255,.78);
-    font-size:1rem;
+.admin-hero h1 span{
+    color:#C9A227;
+}
+
+.admin-hero p{
     max-width:640px;
+    color:rgba(255,255,255,.86);
+    font-size:1.05rem;
+    line-height:1.7;
+    margin-bottom:28px;
+}
+
+.hero-actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:14px;
+}
+
+.btn-gold{
+    border:0;
+    background:#C9A227;
+    color:#111827;
+    font-weight:900;
+    border-radius:999px;
+    padding:12px 24px;
+    text-decoration:none;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    transition:.25s;
+}
+
+.btn-gold:hover{
+    background:#B8860B;
+    color:#111827;
+    transform:translateY(-2px);
+}
+
+.btn-light-line{
+    border:1px solid rgba(255,255,255,.28);
+    color:white;
+    font-weight:800;
+    border-radius:999px;
+    padding:12px 24px;
+    text-decoration:none;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    transition:.25s;
+}
+
+.btn-light-line:hover{
+    background:rgba(255,255,255,.10);
+    color:#C9A227;
+}
+
+/* WAVE */
+
+.hero-wave{
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:-1px;
+    line-height:0;
+}
+
+.hero-wave svg{
+    width:100%;
+    height:75px;
+    display:block;
+}
+
+/* CONTENT */
+
+.admin-content{
+    width:min(1180px, calc(100% - 36px));
+    margin:35px auto 70px;
+}
+
+.section-title{
+    margin-bottom:24px;
+}
+
+.section-title h2{
+    font-weight:900;
+    margin-bottom:6px;
+}
+
+.section-title p{
+    color:#6B7280;
     margin:0;
 }
 
-.modulos-grid{
-    margin-top:32px;
+/* MÓDULOS PREMIUM */
+
+.module-list{
+    display:grid;
+    grid-template-columns:repeat(2, 1fr);
+    gap:20px;
 }
 
-.modulo-card{
+.module-item{
     background:white;
-    border:1px solid rgba(17,24,39,.08);
     border-radius:28px;
-    padding:28px;
-    height:100%;
-    text-decoration:none;
-    display:block;
-    color:#111827;
+    padding:24px;
+    border:1px solid rgba(17,24,39,.08);
     box-shadow:0 12px 30px rgba(17,24,39,.08);
-    transition:.30s;
-    position:relative;
-    overflow:hidden;
+    text-decoration:none;
+    color:#111827;
+    display:flex;
+    align-items:center;
+    gap:20px;
+    transition:.28s;
 }
 
-.modulo-card:hover{
-    transform:translateY(-8px);
+.module-item:hover{
+    transform:translateY(-6px);
     box-shadow:0 20px 45px rgba(17,24,39,.14);
     color:#111827;
 }
 
-.modulo-icon{
-    width:64px;
-    height:64px;
+.module-icon{
+    width:62px;
+    height:62px;
     border-radius:20px;
-    background:rgba(201,162,39,.15);
+    background:rgba(201,162,39,.14);
     color:#C9A227;
     display:flex;
     align-items:center;
     justify-content:center;
-    font-size:1.9rem;
-    margin-bottom:22px;
+    font-size:1.8rem;
+    flex-shrink:0;
 }
 
-.modulo-card h3{
-    font-size:1.25rem;
+.module-info{
+    flex:1;
+}
+
+.module-info h3{
+    font-size:1.1rem;
     font-weight:900;
-    margin-bottom:8px;
+    margin-bottom:5px;
 }
 
-.modulo-card p{
+.module-info p{
     color:#6B7280;
-    font-size:.93rem;
-    margin-bottom:24px;
+    margin:0;
+    font-size:.92rem;
 }
 
-.modulo-action{
-    display:inline-flex;
-    align-items:center;
-    gap:8px;
-    color:#111827;
-    font-weight:900;
-}
-
-.modulo-action i{
+.module-arrow{
+    width:38px;
+    height:38px;
+    border-radius:50%;
+    background:#f3f1ec;
     color:#C9A227;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:1.2rem;
+    flex-shrink:0;
 }
 
 @media(max-width:991px){
-    body{
-        padding-top:95px;
-    }
-
-    .admin-navbar{
+    .navbar-admin{
         border-radius:28px;
     }
 
-    .admin-logo img{
-        width:42px;
-        height:42px;
+    .admin-hero{
+        padding:70px 28px 90px;
     }
 
-    .hero-admin{
-        padding:32px 24px;
+    .admin-hero h1{
+        font-size:2.25rem;
     }
 
-    .hero-admin h1{
-        font-size:1.9rem;
+    .module-list{
+        grid-template-columns:1fr;
     }
 }
 
 @media(max-width:576px){
-    .admin-navbar{
+    body{
+        padding-top:88px;
+    }
+
+    .navbar-admin{
         left:12px;
         right:12px;
         top:12px;
     }
 
-    .admin-wrapper{
-        width:calc(100% - 24px);
+    .admin-hero{
+        padding:70px 22px 85px;
+    }
+
+    .admin-hero h1{
+        font-size:1.9rem;
+    }
+
+    .module-item{
+        padding:20px;
+        align-items:flex-start;
+    }
+
+    .module-arrow{
+        display:none;
     }
 }
 </style>
@@ -284,25 +378,25 @@ body{
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg admin-navbar">
+<nav class="navbar navbar-expand-lg navbar-dark navbar-admin">
 
     <div class="container-fluid">
 
-        <a class="admin-logo" href="{% url 'panel_admin' %}">
+        <a class="navbar-brand-admin" href="{% url 'panel_admin' %}">
             <img src="{% static 'img/imagen.png' %}" alt="Logo">
 
             <div>
-                <div class="admin-logo-title">
+                <div class="brand-title">
                     Panel Admin
                 </div>
 
-                <div class="admin-logo-subtitle">
+                <div class="brand-subtitle">
                     Cooperativa Pirotécnica
                 </div>
             </div>
         </a>
 
-        <button class="navbar-toggler bg-light"
+        <button class="navbar-toggler"
                 type="button"
                 data-bs-toggle="collapse"
                 data-bs-target="#menuAdmin"
@@ -316,55 +410,49 @@ body{
 
         <div class="collapse navbar-collapse" id="menuAdmin">
 
-            <ul class="navbar-nav mx-auto text-center gap-lg-2 mt-3 mt-lg-0">
+            <ul class="navbar-nav ms-auto text-center gap-lg-2 mt-3 mt-lg-0">
 
                 <li class="nav-item">
-                    <a class="nav-link admin-nav-link active"
-                       href="{% url 'panel_admin' %}">
+                    <a class="nav-link active" href="{% url 'panel_admin' %}">
                         Inicio
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link admin-nav-link"
-                       href="{% url 'dashboard' %}">
+                    <a class="nav-link" href="{% url 'dashboard' %}">
                         Dashboard
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link admin-nav-link"
-                       href="{% url 'lista_productos' %}">
+                    <a class="nav-link" href="{% url 'lista_productos' %}">
                         Productos
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link admin-nav-link"
-                       href="{% url 'lista_categorias' %}">
+                    <a class="nav-link" href="{% url 'lista_categorias' %}">
                         Categorías
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link admin-nav-link"
-                       href="{% url 'lista_solicitudes' %}">
+                    <a class="nav-link" href="{% url 'lista_solicitudes' %}">
                         Cotizaciones
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link admin-nav-link"
-                       href="{% url 'lista_usuarios' %}">
+                    <a class="nav-link" href="{% url 'lista_usuarios' %}">
                         Usuarios
                     </a>
                 </li>
 
             </ul>
 
-            <div class="dropdown text-center mt-3 mt-lg-0">
+            <div class="dropdown ms-lg-3 text-center mt-3 mt-lg-0">
 
-                <button class="admin-user-btn d-inline-flex align-items-center gap-2"
+                <button class="user-btn d-inline-flex align-items-center gap-2"
                         type="button"
                         data-bs-toggle="dropdown"
                         aria-expanded="false">
@@ -389,21 +477,17 @@ body{
                         </span>
                     </li>
 
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
+                    <li><hr class="dropdown-divider"></li>
 
                     <li>
-                        <a class="dropdown-item"
-                           href="{% url 'inicio' %}">
-                            <i class="bi bi-house me-2"></i>
+                        <a class="dropdown-item" href="{% url 'inicio' %}">
+                            <i class="bi bi-shop-window me-2"></i>
                             Ver catálogo
                         </a>
                     </li>
 
                     <li>
-                        <form method="POST"
-                              action="/accounts/logout/">
+                        <form method="POST" action="/accounts/logout/">
                             {% csrf_token %}
 
                             <button type="submit"
@@ -424,143 +508,195 @@ body{
 
 </nav>
 
-<main class="admin-wrapper">
+<section class="admin-hero">
 
-    <section class="hero-admin">
+    <div class="admin-hero-content">
 
-        <div class="hero-content">
+        <div class="hero-badge">
+            <i class="bi bi-shield-check"></i>
+            Administración del sistema
+        </div>
 
-            <div class="hero-badge">
-                <i class="bi bi-shield-lock-fill"></i>
-                Administración del sistema
-            </div>
+        <h1>
+            Bienvenido, <span>{{ request.user.first_name|default:request.user.username }}</span>
+        </h1>
 
-            <h1>
-                Bienvenido, {{ request.user.first_name|default:request.user.username }}
-            </h1>
+        <p>
+            Gestiona el catálogo web, productos, categorías, usuarios y solicitudes de cotización desde un solo lugar.
+        </p>
 
-            <p>
-                Gestiona productos, categorías, usuarios y solicitudes de cotización desde un solo lugar.
-            </p>
+        <div class="hero-actions">
+
+            <a href="{% url 'dashboard' %}" class="btn-gold">
+                <i class="bi bi-speedometer2"></i>
+                Ver dashboard
+            </a>
+
+            <a href="{% url 'inicio' %}" class="btn-light-line">
+                <i class="bi bi-shop-window"></i>
+                Ver catálogo
+            </a>
 
         </div>
 
-    </section>
-    <section class="modulos-grid">
+    </div>
 
-        <div class="row g-4">
+    <div class="hero-wave">
+        <svg viewBox="0 0 1440 320" preserveAspectRatio="none">
+            <path fill="#f3f1ec"
+                  d="M0,160L80,170.7C160,181,320,203,480,202.7C640,203,800,181,960,170.7C1120,160,1280,160,1360,165.3L1440,171L1440,320L0,320Z">
+            </path>
+        </svg>
+    </div>
 
-            <div class="col-md-6 col-lg-4">
-                <a href="{% url 'dashboard' %}" class="modulo-card">
-                    <div class="modulo-icon">
-                        <i class="bi bi-speedometer2"></i>
-                    </div>
+</section>
 
-                    <h3>Dashboard</h3>
+<main class="admin-content">
 
-                    <p>
-                        Consulta estadísticas generales del catálogo y actividad del sistema.
-                    </p>
+    <div class="section-title">
+        <h2>
+            Módulos administrativos
+        </h2>
 
-                    <span class="modulo-action">
-                        Abrir módulo <i class="bi bi-arrow-right"></i>
-                    </span>
-                </a>
+        <p>
+            Accede rápidamente a las herramientas principales del sistema.
+        </p>
+    </div>
+    <div class="module-list">
+
+        <a href="{% url 'dashboard' %}" class="module-item">
+
+            <div class="module-icon">
+                <i class="bi bi-speedometer2"></i>
             </div>
 
-            <div class="col-md-6 col-lg-4">
-                <a href="{% url 'lista_productos' %}" class="modulo-card">
-                    <div class="modulo-icon">
-                        <i class="bi bi-box-seam"></i>
-                    </div>
+            <div class="module-info">
 
-                    <h3>Productos</h3>
+                <h3>Dashboard</h3>
 
-                    <p>
-                        Agrega, edita, activa o desactiva productos del catálogo.
-                    </p>
+                <p>
+                    Consulta estadísticas generales y el comportamiento del sistema.
+                </p>
 
-                    <span class="modulo-action">
-                        Administrar <i class="bi bi-arrow-right"></i>
-                    </span>
-                </a>
             </div>
 
-            <div class="col-md-6 col-lg-4">
-                <a href="{% url 'lista_categorias' %}" class="modulo-card">
-                    <div class="modulo-icon">
-                        <i class="bi bi-tags-fill"></i>
-                    </div>
-
-                    <h3>Categorías</h3>
-
-                    <p>
-                        Organiza los productos por categorías y controla las destacadas.
-                    </p>
-
-                    <span class="modulo-action">
-                        Administrar <i class="bi bi-arrow-right"></i>
-                    </span>
-                </a>
+            <div class="module-arrow">
+                <i class="bi bi-arrow-right"></i>
             </div>
 
-            <div class="col-md-6 col-lg-4">
-                <a href="{% url 'lista_solicitudes' %}" class="modulo-card">
-                    <div class="modulo-icon">
-                        <i class="bi bi-file-earmark-text"></i>
-                    </div>
+        </a>
 
-                    <h3>Cotizaciones</h3>
+        <a href="{% url 'lista_productos' %}" class="module-item">
 
-                    <p>
-                        Revisa solicitudes, genera cotizaciones PDF y notifica al cliente.
-                    </p>
-
-                    <span class="modulo-action">
-                        Revisar <i class="bi bi-arrow-right"></i>
-                    </span>
-                </a>
+            <div class="module-icon">
+                <i class="bi bi-box-seam"></i>
             </div>
 
-            <div class="col-md-6 col-lg-4">
-                <a href="{% url 'lista_usuarios' %}" class="modulo-card">
-                    <div class="modulo-icon">
-                        <i class="bi bi-people-fill"></i>
-                    </div>
+            <div class="module-info">
 
-                    <h3>Usuarios</h3>
+                <h3>Productos</h3>
 
-                    <p>
-                        Administra clientes registrados y controla el acceso al sistema.
-                    </p>
+                <p>
+                    Agrega, modifica y administra los productos del catálogo.
+                </p>
 
-                    <span class="modulo-action">
-                        Administrar <i class="bi bi-arrow-right"></i>
-                    </span>
-                </a>
             </div>
 
-            <div class="col-md-6 col-lg-4">
-                <a href="{% url 'inicio' %}" class="modulo-card">
-                    <div class="modulo-icon">
-                        <i class="bi bi-shop-window"></i>
-                    </div>
-
-                    <h3>Ver catálogo</h3>
-
-                    <p>
-                        Regresa al catálogo web para visualizar la experiencia del cliente.
-                    </p>
-
-                    <span class="modulo-action">
-                        Ir al catálogo <i class="bi bi-arrow-right"></i>
-                    </span>
-                </a>
+            <div class="module-arrow">
+                <i class="bi bi-arrow-right"></i>
             </div>
 
-        </div>
+        </a>
 
-    </section>
+        <a href="{% url 'lista_categorias' %}" class="module-item">
+
+            <div class="module-icon">
+                <i class="bi bi-tags"></i>
+            </div>
+
+            <div class="module-info">
+
+                <h3>Categorías</h3>
+
+                <p>
+                    Organiza el catálogo mediante categorías y controla las destacadas.
+                </p>
+
+            </div>
+
+            <div class="module-arrow">
+                <i class="bi bi-arrow-right"></i>
+            </div>
+
+        </a>
+
+        <a href="{% url 'lista_solicitudes' %}" class="module-item">
+
+            <div class="module-icon">
+                <i class="bi bi-file-earmark-text"></i>
+            </div>
+
+            <div class="module-info">
+
+                <h3>Cotizaciones</h3>
+
+                <p>
+                    Atiende solicitudes, genera cotizaciones PDF y responde a los clientes.
+                </p>
+    
+            </div>
+
+            <div class="module-arrow">
+                <i class="bi bi-arrow-right"></i>
+            </div>
+
+        </a>
+
+        <a href="{% url 'lista_usuarios' %}" class="module-item">
+
+            <div class="module-icon">
+                <i class="bi bi-people"></i>
+            </div>
+
+            <div class="module-info">
+
+                <h3>Usuarios</h3>
+
+                <p>
+                    Gestiona los usuarios registrados y controla el acceso al sistema.
+                </p>
+
+            </div>
+
+            <div class="module-arrow">
+                <i class="bi bi-arrow-right"></i>
+            </div>
+
+        </a>
+
+        <a href="{% url 'inicio' %}" class="module-item">
+
+            <div class="module-icon">
+                <i class="bi bi-shop"></i>
+            </div>
+
+            <div class="module-info">
+
+                <h3>Ver catálogo</h3>
+
+                <p>
+                    Abre el catálogo público para visualizar la experiencia del cliente.
+                </p>
+
+            </div>
+
+            <div class="module-arrow">
+                <i class="bi bi-arrow-right"></i>
+            </div>
+
+        </a>
+
+    </div>
 
 </main>
 
