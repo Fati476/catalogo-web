@@ -1,335 +1,392 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
 
-    <meta charset="UTF-8">
-
-    <title>Inicio Admin</title>
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1">
-
-    <!-- Bootstrap -->
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-          rel="stylesheet">
-
-    <!-- Icons -->
-
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
-    <!-- Fuente -->
-
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-          rel="stylesheet">
-
-    <style>
-
-        *{
-            font-family:'Poppins', sans-serif;
-        }
-
-        body{
-
-            background:#F1F5F9;
-
-        }
-
-        /* NAVBAR */
-
-        .navbar-custom{
-
-            background:white;
-
-            padding:18px 40px;
-
-            box-shadow:0 5px 20px rgba(0,0,0,0.05);
-
-        }
-
-        .logo{
-
-            font-size:26px;
-            font-weight:700;
-
-            color:#2563EB;
-
-        }
-
-        .nav-link{
-
-            color:#334155 !important;
-
-            font-weight:500;
-
-            margin-left:15px;
-
-            transition:.3s;
-
-        }
-
-        .nav-link:hover{
-
-            color:#2563EB !important;
-
-        }
-
-        .perfil{
-
-            font-size:32px;
-
-            color:#2563EB;
-
-        }
-
-        /* CONTENIDO */
-
-        .contenido{
-
-            padding:50px;
-
-        }
-
-        .titulo{
-
-            font-size:40px;
-
-            font-weight:700;
-
-            color:#0F172A;
-
-        }
-
-        .subtitulo{
-
-            color:#64748B;
-
-            margin-bottom:40px;
-
-        }
-
-        /* CARDS */
-
-        .card-modulo{
-
-            background:white;
-
-            border:none;
-
-            border-radius:28px;
-
-            padding:35px;
-
-            box-shadow:0 10px 25px rgba(0,0,0,0.05);
-
-            transition:.3s;
-
-            height:100%;
-
-        }
-
-        .card-modulo:hover{
-
-            transform:translateY(-8px);
-
-        }
-
-        .icono{
-
-            width:85px;
-            height:85px;
-
-            border-radius:22px;
-
-            display:flex;
-
-            justify-content:center;
-            align-items:center;
-
-            font-size:38px;
-
-            margin-bottom:25px;
-
-        }
-
-        .azul{
-
-            background:#DBEAFE;
-            color:#2563EB;
-
-        }
-
-        .verde{
-
-            background:#DCFCE7;
-            color:#16A34A;
-
-        }
-
-        .rojo{
-
-            background:#FEE2E2;
-            color:#DC2626;
-
-        }
-
-        .amarillo{
-
-            background:#FEF3C7;
-            color:#D97706;
-
-        }
-
-        .btn-custom{
-
-            border:none;
-
-            border-radius:14px;
-
-            padding:12px 25px;
-
-            font-weight:600;
-
-        }
-
-        .card-modulo h3{
-
-            font-weight:700;
-
-            color:#0F172A;
-
-        }
-
-        .card-modulo p{
-
-            color:#64748B;
-
-        }
-
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Panel Administrativo</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:'Inter', sans-serif;
+    background:#f3f1ec;
+    color:#111827;
+    min-height:100vh;
+    padding-top:105px;
+}
+
+/* NAVBAR */
+
+.admin-navbar{
+    position:fixed;
+    top:18px;
+    left:24px;
+    right:24px;
+    z-index:9999;
+    background:rgba(17,24,39,.92);
+    backdrop-filter:blur(16px);
+    -webkit-backdrop-filter:blur(16px);
+    border:1px solid rgba(255,255,255,.10);
+    border-radius:999px;
+    padding:10px 18px;
+    box-shadow:0 14px 35px rgba(0,0,0,.25);
+}
+
+.admin-logo{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    text-decoration:none;
+}
+
+.admin-logo img{
+    width:48px;
+    height:48px;
+    object-fit:cover;
+    border-radius:50%;
+    background:white;
+    padding:4px;
+}
+
+.admin-logo-title{
+    color:#C9A227;
+    font-weight:900;
+    line-height:1.1;
+}
+
+.admin-logo-subtitle{
+    color:white;
+    font-size:.78rem;
+    font-weight:700;
+}
+
+.admin-nav-link{
+    color:rgba(255,255,255,.82) !important;
+    font-weight:800;
+    border-radius:999px;
+    padding:9px 15px !important;
+    transition:.25s;
+}
+
+.admin-nav-link:hover,
+.admin-nav-link.active{
+    color:#C9A227 !important;
+    background:rgba(201,162,39,.12);
+}
+
+.admin-user-btn{
+    border:0;
+    background:transparent;
+    color:white;
+    font-weight:800;
+}
+
+.admin-avatar{
+    width:38px;
+    height:38px;
+    border-radius:50%;
+    background:#C9A227;
+    color:#111827;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:900;
+}
+
+.dropdown-menu{
+    border:0;
+    border-radius:20px;
+    padding:12px;
+    box-shadow:0 16px 40px rgba(17,24,39,.18);
+}
+
+.dropdown-item{
+    border-radius:999px;
+    font-weight:700;
+    padding:10px 16px;
+}
+
+/* CONTENIDO */
+
+.admin-wrapper{
+    width:min(1180px, calc(100% - 36px));
+    margin:0 auto;
+}
+
+.hero-admin{
+    background:
+        linear-gradient(135deg, rgba(17,24,39,.96), rgba(17,24,39,.82)),
+        url("{% static 'img/banner_productos.png' %}");
+    background-size:cover;
+    background-position:center;
+    border-radius:34px;
+    padding:42px;
+    color:white;
+    box-shadow:0 18px 45px rgba(17,24,39,.18);
+    position:relative;
+    overflow:hidden;
+}
+
+.hero-admin::after{
+    content:"";
+    position:absolute;
+    width:260px;
+    height:260px;
+    border-radius:50%;
+    background:rgba(201,162,39,.18);
+    right:-90px;
+    top:-90px;
+}
+
+.hero-content{
+    position:relative;
+    z-index:2;
+}
+
+.hero-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    background:rgba(201,162,39,.14);
+    border:1px solid rgba(201,162,39,.35);
+    color:#E7C766;
+    padding:8px 16px;
+    border-radius:999px;
+    font-weight:900;
+    font-size:.85rem;
+    margin-bottom:18px;
+}
+
+.hero-admin h1{
+    font-size:2.4rem;
+    font-weight:900;
+    margin-bottom:10px;
+}
+
+.hero-admin p{
+    color:rgba(255,255,255,.78);
+    font-size:1rem;
+    max-width:640px;
+    margin:0;
+}
+
+.modulos-grid{
+    margin-top:32px;
+}
+
+.modulo-card{
+    background:white;
+    border:1px solid rgba(17,24,39,.08);
+    border-radius:28px;
+    padding:28px;
+    height:100%;
+    text-decoration:none;
+    display:block;
+    color:#111827;
+    box-shadow:0 12px 30px rgba(17,24,39,.08);
+    transition:.30s;
+    position:relative;
+    overflow:hidden;
+}
+
+.modulo-card:hover{
+    transform:translateY(-8px);
+    box-shadow:0 20px 45px rgba(17,24,39,.14);
+    color:#111827;
+}
+
+.modulo-icon{
+    width:64px;
+    height:64px;
+    border-radius:20px;
+    background:rgba(201,162,39,.15);
+    color:#C9A227;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:1.9rem;
+    margin-bottom:22px;
+}
+
+.modulo-card h3{
+    font-size:1.25rem;
+    font-weight:900;
+    margin-bottom:8px;
+}
+
+.modulo-card p{
+    color:#6B7280;
+    font-size:.93rem;
+    margin-bottom:24px;
+}
+
+.modulo-action{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    color:#111827;
+    font-weight:900;
+}
+
+.modulo-action i{
+    color:#C9A227;
+}
+
+@media(max-width:991px){
+    body{
+        padding-top:95px;
+    }
+
+    .admin-navbar{
+        border-radius:28px;
+    }
+
+    .admin-logo img{
+        width:42px;
+        height:42px;
+    }
+
+    .hero-admin{
+        padding:32px 24px;
+    }
+
+    .hero-admin h1{
+        font-size:1.9rem;
+    }
+}
+
+@media(max-width:576px){
+    .admin-navbar{
+        left:12px;
+        right:12px;
+        top:12px;
+    }
+
+    .admin-wrapper{
+        width:calc(100% - 24px);
+    }
+}
+</style>
 
 </head>
-
 <body>
 
-<!-- NAVBAR -->
-
-<nav class="navbar navbar-expand-lg navbar-custom">
+<nav class="navbar navbar-expand-lg admin-navbar">
 
     <div class="container-fluid">
 
-        <a class="navbar-brand logo"
-           href="#">
+        <a class="admin-logo" href="{% url 'panel_admin' %}">
+            <img src="{% static 'img/imagen.png' %}" alt="Logo">
 
-            Catálogo Admin
+            <div>
+                <div class="admin-logo-title">
+                    Panel Admin
+                </div>
 
+                <div class="admin-logo-subtitle">
+                    Cooperativa Pirotécnica
+                </div>
+            </div>
         </a>
 
-        <button class="navbar-toggler"
+        <button class="navbar-toggler bg-light"
                 type="button"
                 data-bs-toggle="collapse"
-                data-bs-target="#menu">
+                data-bs-target="#menuAdmin"
+                aria-controls="menuAdmin"
+                aria-expanded="false"
+                aria-label="Abrir menú">
 
             <span class="navbar-toggler-icon"></span>
 
         </button>
 
-        <div class="collapse navbar-collapse"
-             id="menu">
+        <div class="collapse navbar-collapse" id="menuAdmin">
 
-            <ul class="navbar-nav mx-auto">
+            <ul class="navbar-nav mx-auto text-center gap-lg-2 mt-3 mt-lg-0">
 
                 <li class="nav-item">
-
-                    <a class="nav-link"
+                    <a class="nav-link admin-nav-link active"
                        href="{% url 'panel_admin' %}">
-
                         Inicio
-
                     </a>
-
                 </li>
 
                 <li class="nav-item">
-
-                    <a class="nav-link" href="{% url 'dashboard' %}">
-
+                    <a class="nav-link admin-nav-link"
+                       href="{% url 'dashboard' %}">
                         Dashboard
-
                     </a>
-
                 </li>
 
                 <li class="nav-item">
-
-                    <a class="nav-link"
+                    <a class="nav-link admin-nav-link"
                        href="{% url 'lista_productos' %}">
-
                         Productos
-
                     </a>
-
                 </li>
 
                 <li class="nav-item">
-
-                    <a class="nav-link"
+                    <a class="nav-link admin-nav-link"
                        href="{% url 'lista_categorias' %}">
-
                         Categorías
-
                     </a>
-
                 </li>
 
                 <li class="nav-item">
-
-                    <a class="nav-link"
+                    <a class="nav-link admin-nav-link"
                        href="{% url 'lista_solicitudes' %}">
-
                         Cotizaciones
-
                     </a>
-
                 </li>
 
                 <li class="nav-item">
-
-                    <a class="nav-link"
-                       href="{% url 'lista_usuarios' %}"">
-
+                    <a class="nav-link admin-nav-link"
+                       href="{% url 'lista_usuarios' %}">
                         Usuarios
-
                     </a>
-
                 </li>
 
             </ul>
 
-            <div class="dropdown">
+            <div class="dropdown text-center mt-3 mt-lg-0">
 
-                <button class="btn d-flex align-items-center gap-3"
+                <button class="admin-user-btn d-inline-flex align-items-center gap-2"
                         type="button"
                         data-bs-toggle="dropdown"
-                        style="border:none; background:none;">
+                        aria-expanded="false">
 
-                    <i class="bi bi-bell fs-5"></i>
+                    <span class="admin-avatar">
+                        {{ request.user.first_name|first|default:request.user.username|first|upper }}
+                    </span>
 
-                    <i class="bi bi-person-circle perfil"></i>
+                    <span class="d-none d-lg-inline">
+                        {{ request.user.first_name|default:request.user.username }}
+                    </span>
+
+                    <i class="bi bi-chevron-down"></i>
 
                 </button>
 
-                <ul class="dropdown-menu dropdown-menu-end shadow border-0 p-2">
+                <ul class="dropdown-menu dropdown-menu-end">
 
                     <li>
-
                         <span class="dropdown-item-text fw-bold">
-
-                            {{ request.user.username }}
-
+                            {{ request.user.get_full_name|default:request.user.username }}
                         </span>
-
                     </li>
 
                     <li>
@@ -337,22 +394,24 @@
                     </li>
 
                     <li>
+                        <a class="dropdown-item"
+                           href="{% url 'inicio' %}">
+                            <i class="bi bi-house me-2"></i>
+                            Ver catálogo
+                        </a>
+                    </li>
 
+                    <li>
                         <form method="POST"
                               action="/accounts/logout/">
-
                             {% csrf_token %}
 
                             <button type="submit"
                                     class="dropdown-item text-danger">
-
-                                <i class="bi bi-box-arrow-right"></i>
+                                <i class="bi bi-box-arrow-right me-2"></i>
                                 Cerrar sesión
-
                             </button>
-
                         </form>
-
                     </li>
 
                 </ul>
@@ -365,145 +424,145 @@
 
 </nav>
 
-<!-- CONTENIDO -->
+<main class="admin-wrapper">
 
-<div class="contenido">
+    <section class="hero-admin">
 
-    <h1 class="titulo">
-        Bienvenida, {{ request.user.username }}
-    </h1>
+        <div class="hero-content">
 
-    <p class="subtitulo">
-        Administra todo el catálogo desde aquí
-    </p>
+            <div class="hero-badge">
+                <i class="bi bi-shield-lock-fill"></i>
+                Administración del sistema
+            </div>
 
-    <div class="row g-4">
+            <h1>
+                Bienvenido, {{ request.user.first_name|default:request.user.username }}
+            </h1>
 
-        <!-- PRODUCTOS -->
+            <p>
+                Gestiona productos, categorías, usuarios y solicitudes de cotización desde un solo lugar.
+            </p>
 
-        <div class="col-md-6 col-lg-3">
+        </div>
 
-            <div class="card-modulo">
+    </section>
+    <section class="modulos-grid">
 
-                <div class="icono azul">
+        <div class="row g-4">
 
-                    <i class="bi bi-box-seam"></i>
+            <div class="col-md-6 col-lg-4">
+                <a href="{% url 'dashboard' %}" class="modulo-card">
+                    <div class="modulo-icon">
+                        <i class="bi bi-speedometer2"></i>
+                    </div>
 
-                </div>
+                    <h3>Dashboard</h3>
 
-                <h3>
-                    Productos
-                </h3>
+                    <p>
+                        Consulta estadísticas generales del catálogo y actividad del sistema.
+                    </p>
 
-                <p>
-                    Administra los productos del catálogo
-                </p>
-
-                <a href="{% url 'lista_productos' %}"
-                   class="btn btn-primary btn-custom">
-
-                    Entrar
-
+                    <span class="modulo-action">
+                        Abrir módulo <i class="bi bi-arrow-right"></i>
+                    </span>
                 </a>
-
             </div>
 
-        </div>
+            <div class="col-md-6 col-lg-4">
+                <a href="{% url 'lista_productos' %}" class="modulo-card">
+                    <div class="modulo-icon">
+                        <i class="bi bi-box-seam"></i>
+                    </div>
 
-        <!-- CATEGORIAS -->
+                    <h3>Productos</h3>
 
-        <div class="col-md-6 col-lg-3">
+                    <p>
+                        Agrega, edita, activa o desactiva productos del catálogo.
+                    </p>
 
-            <div class="card-modulo">
-
-                <div class="icono verde">
-
-                    <i class="bi bi-tags-fill"></i>
-
-                </div>
-
-                <h3>
-                    Categorías
-                </h3>
-
-                <p>
-                    Gestiona las categorías del sistema
-                </p>
-
-                <a href="{% url 'lista_categorias' %}"
-                   class="btn btn-success btn-custom">
-
-                    Entrar
-
+                    <span class="modulo-action">
+                        Administrar <i class="bi bi-arrow-right"></i>
+                    </span>
                 </a>
+            </div>
 
+            <div class="col-md-6 col-lg-4">
+                <a href="{% url 'lista_categorias' %}" class="modulo-card">
+                    <div class="modulo-icon">
+                        <i class="bi bi-tags-fill"></i>
+                    </div>
+
+                    <h3>Categorías</h3>
+
+                    <p>
+                        Organiza los productos por categorías y controla las destacadas.
+                    </p>
+
+                    <span class="modulo-action">
+                        Administrar <i class="bi bi-arrow-right"></i>
+                    </span>
+                </a>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+                <a href="{% url 'lista_solicitudes' %}" class="modulo-card">
+                    <div class="modulo-icon">
+                        <i class="bi bi-file-earmark-text"></i>
+                    </div>
+
+                    <h3>Cotizaciones</h3>
+
+                    <p>
+                        Revisa solicitudes, genera cotizaciones PDF y notifica al cliente.
+                    </p>
+
+                    <span class="modulo-action">
+                        Revisar <i class="bi bi-arrow-right"></i>
+                    </span>
+                </a>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+                <a href="{% url 'lista_usuarios' %}" class="modulo-card">
+                    <div class="modulo-icon">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+
+                    <h3>Usuarios</h3>
+
+                    <p>
+                        Administra clientes registrados y controla el acceso al sistema.
+                    </p>
+
+                    <span class="modulo-action">
+                        Administrar <i class="bi bi-arrow-right"></i>
+                    </span>
+                </a>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+                <a href="{% url 'inicio' %}" class="modulo-card">
+                    <div class="modulo-icon">
+                        <i class="bi bi-shop-window"></i>
+                    </div>
+
+                    <h3>Ver catálogo</h3>
+
+                    <p>
+                        Regresa al catálogo web para visualizar la experiencia del cliente.
+                    </p>
+
+                    <span class="modulo-action">
+                        Ir al catálogo <i class="bi bi-arrow-right"></i>
+                    </span>
+                </a>
             </div>
 
         </div>
 
-        <!-- COTIZACIONES -->
+    </section>
 
-        <div class="col-md-6 col-lg-3">
-
-            <div class="card-modulo">
-
-                <div class="icono rojo">
-
-                    <i class="bi bi-file-earmark-text"></i>
-
-                </div>
-
-                <h3>
-                    Cotizaciones
-                </h3>
-
-                <p>
-                    Visualiza solicitudes de clientes
-                </p>
-
-                <button class="btn btn-danger btn-custom">
-
-                    Próximamente
-
-                </button>
-
-            </div>
-
-        </div>
-
-        <!-- USUARIOS -->
-
-        <div class="col-md-6 col-lg-3">
-
-            <div class="card-modulo">
-
-                <div class="icono amarillo">
-
-                    <i class="bi bi-people-fill"></i>
-
-                </div>
-
-                <h3>
-                    Usuarios
-                </h3>
-
-                <p>
-                    Administra usuarios registrados
-                </p>
-
-                <button class="btn btn-warning btn-custom">
-
-                    Próximamente
-
-                </button>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
+</main>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
