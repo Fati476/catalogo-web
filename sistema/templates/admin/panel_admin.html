@@ -314,8 +314,7 @@ body{
     align-items:center;
     gap:16px;
     box-shadow:0 18px 45px rgba(0,0,0,.25);
-    animation:statReveal .8s ease both,
-              statFloat 5s ease-in-out infinite;
+    animation:statReveal .7s ease both;
 }
 
 .stat-card:nth-child(1){animation-delay:.05s;}
@@ -373,18 +372,6 @@ body{
     to{
         opacity:1;
         transform:translateY(0) scale(1);
-    }
-
-}
-
-@keyframes statFloat{
-
-    0%,100%{
-        transform:translateY(0);
-    }
-
-    50%{
-        transform:translateY(-6px);
     }
 
 }
