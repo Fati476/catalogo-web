@@ -378,23 +378,6 @@ body{
         </div>
 
         <div class="mb-3">
-            <label class="form-label">Municipio / Ciudad</label>
-
-            <div class="input-group">
-                <span class="input-group-text">
-                    <i class="bi bi-geo-alt"></i>
-                </span>
-
-                <input type="text"
-                       id="municipio"
-                       name="municipio"
-                       class="form-control"
-                       placeholder="Ejemplo: Toluca, Metepec..."
-                       required>
-            </div>
-        </div>
-
-        <div class="mb-3">
             <label class="form-label">Estado</label>
 
             <div class="input-group">
@@ -403,19 +386,28 @@ body{
                 </span>
 
                 <select id="estado"
-                    name="estado"
-                    class="form-select"
-                    required>
+                        name="estado"
+                        class="form-select"
+                        required>
                     <option value="">Seleccione un estado</option>
-                    <option>Estado de México</option>
-                    <option>Ciudad de México</option>
-                    <option>Jalisco</option>
-                    <option>Puebla</option>
-                    <option>Nuevo León</option>
-                    <option>Querétaro</option>
-                    <option>Hidalgo</option>
-                    <option>Morelos</option>
-                    <option>Otro</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Municipio / Ciudad</label>
+
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="bi bi-geo-alt"></i>
+                </span>
+
+                <select id="municipio"
+                        name="municipio"
+                        class="form-select"
+                        required
+                        disabled>
+                    <option value="">Primero selecciona un estado</option>
                 </select>
             </div>
         </div>
@@ -534,6 +526,52 @@ function mostrarPassword(id, elemento){
 
 </script>
 
+<script>
+const estadoSelect = document.getElementById("estado");
+const municipioSelect = document.getElementById("municipio");
+
+let municipiosData = {};
+
+fetch("{% static 'json/municipios.json' %}")
+    .then(response => response.json())
+    .then(data => {
+        municipiosData = data;
+
+        Object.keys(municipiosData).forEach(estado => {
+            const option = document.createElement("option");
+            option.value = estado;
+            option.textContent = estado;
+            estadoSelect.appendChild(option);
+        });
+    });
+
+estadoSelect.addEventListener("change", function(){
+
+    const estado = this.value;
+    const municipios = municipiosData[estado] || [];
+
+    municipioSelect.innerHTML = "";
+
+    if(municipios.length === 0){
+        municipioSelect.disabled = true;
+        municipioSelect.innerHTML = '<option value="">Primero selecciona un estado</option>';
+        validarFormulario();
+        return;
+    }
+
+    municipioSelect.disabled = false;
+    municipioSelect.innerHTML = '<option value="">Seleccione un municipio</option>';
+
+    municipios.forEach(municipio => {
+        const option = document.createElement("option");
+        option.value = municipio;
+        option.textContent = municipio;
+        municipioSelect.appendChild(option);
+    });
+
+    validarFormulario();
+});
+</script>
 
 <script>
 const passwordInput = document.getElementById("password1");
@@ -577,7 +615,7 @@ function validarFormulario(){
         document.getElementById("last_name").value.trim() !== "" &&
         document.getElementById("email").value.trim() !== "" &&
         document.getElementById("telefono").value.trim().length === 10 &&
-        document.getElementById("municipio").value.trim() !== "" &&
+        document.getElementById("municipio").value !== "" &&
         document.getElementById("estado").value !== "" &&
         coinciden;
 
