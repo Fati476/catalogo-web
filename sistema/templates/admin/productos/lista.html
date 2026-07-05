@@ -1,307 +1,51 @@
-
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
 
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Productos</title>
+<title>Productos | Panel Admin</title>
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-          rel="stylesheet">
+<link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-          rel="stylesheet">
-
-    <style>
-
-        *{
-            font-family:'Poppins', sans-serif;
-        }
-
-        body{
-            background:#F1F5F9;
-        }
-
-        .navbar-custom{
-            background:white;
-            padding:18px 40px;
-            box-shadow:0 5px 20px rgba(0,0,0,0.05);
-        }
-
-        .logo{
-            font-size:26px;
-            font-weight:700;
-            color:#2563EB;
-        }
-
-        .contenido{
-            padding:50px;
-        }
-
-        .titulo{
-            font-size:38px;
-            font-weight:700;
-            color:#0F172A;
-        }
-
-        .subtitulo{
-            color:#64748B;
-        }
-
-        .producto-card{
-            background:white;
-            border:none;
-            border-radius:28px;
-            overflow:hidden;
-            box-shadow:0 10px 25px rgba(0,0,0,0.05);
-            transition:.3s;
-            height:100%;
-        }
-
-        .producto-card:hover{
-            transform:translateY(-8px);
-        }
-
-        .producto-img{
-            width:100%;
-            height:280px;
-            object-fit:cover;
-            background:#F8FAFC;
-        }
-
-        .producto-body{
-            padding:25px;
-        }
-
-        .producto-titulo{
-            font-size:22px;
-            font-weight:700;
-            color:#0F172A;
-        }
-
-        .producto-descripcion{
-            color:#64748B;
-            margin:15px 0;
-        }
-
-        .precio{
-            font-size:26px;
-            font-weight:700;
-            color:#16A34A;
-        }
-
-        .badge-categoria{
-            background:#DBEAFE;
-            color:#2563EB;
-            padding:10px 15px;
-            border-radius:14px;
-            font-size:13px;
-        }
-
-        .acciones{
-            margin-top:25px;
-            display:flex;
-            gap:10px;
-        }
-
-        .btn-custom{
-            border:none;
-            border-radius:14px;
-            padding:12px 18px;
-            font-weight:600;
-        }
-
-        .sin-imagen{
-            width:100%;
-            height:280px;
-            background:#CBD5E1;
-            display:flex;
-            justify-content:center;
-            align-items:center;
-            font-size:70px;
-            color:white;
-        }
-
-    </style>
+<link rel="stylesheet"
+      href="{% static 'css/admin.css' %}">
 
 </head>
 
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-custom">
+{% include 'admin/components/navbar_admin.html' %}
 
-    <div class="container-fluid">
+<main class="admin-page">
 
-        <a class="navbar-brand logo"
-           href="#">
-
-            Catálogo Admin
-
-        </a>
-
-        <button class="navbar-toggler"
-                type="button"
-                data-bs-toggle="collapse"
-                data-bs-target="#menu">
-
-            <span class="navbar-toggler-icon"></span>
-
-        </button>
-
-        <div class="collapse navbar-collapse"
-             id="menu">
-
-            <ul class="navbar-nav mx-auto">
-
-                <li class="nav-item">
-
-                    <a class="nav-link"
-                       href="{% url 'panel_admin' %}">
-
-                        Inicio
-
-                    </a>
-
-                </li>
-
-                <li class="nav-item">
-
-                    <a class="nav-link" href="{% url 'dashboard' %}">
-
-                        Dashboard
-
-                    </a>
-
-                </li>
-
-                <li class="nav-item">
-
-                    <a class="nav-link"
-                       href="{% url 'lista_productos' %}">
-
-                        Productos
-
-                    </a>
-
-                </li>
-
-                <li class="nav-item">
-
-                    <a class="nav-link"
-                       href="{% url 'lista_categorias' %}">
-
-                        Categorías
-
-                    </a>
-
-                </li>
-
-                <li class="nav-item">
-
-                    <a class="nav-link"
-                       href="{% url 'lista_solicitudes' %}">
-
-                        Cotizaciones
-
-                    </a>
-
-                </li>
-
-                <li class="nav-item">
-
-                    <a class="nav-link"
-                       href="{% url 'lista_usuarios' %}">
-
-                        Usuarios
-
-                    </a>
-
-                </li>
-
-            </ul>
-
-            <div class="dropdown">
-
-                <button class="btn d-flex align-items-center gap-3"
-                        type="button"
-                        data-bs-toggle="dropdown"
-                        style="border:none; background:none;">
-
-                    <i class="bi bi-bell fs-5"></i>
-
-                    <i class="bi bi-person-circle perfil"></i>
-
-                </button>
-
-                <ul class="dropdown-menu dropdown-menu-end shadow border-0 p-2">
-
-                    <li>
-
-                        <span class="dropdown-item-text fw-bold">
-
-                            {{ request.user.username }}
-
-                        </span>
-
-                    </li>
-
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
-
-                    <li>
-
-                        <form method="POST"
-                              action="/accounts/logout/">
-
-                            {% csrf_token %}
-
-                            <button type="submit"
-                                    class="dropdown-item text-danger">
-
-                                <i class="bi bi-box-arrow-right"></i>
-                                Cerrar sesión
-
-                            </button>
-
-                        </form>
-
-                    </li>
-
-                </ul>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</nav>
-
-<div class="contenido">
-
-    <div class="d-flex justify-content-between align-items-center mb-5">
+    <section class="admin-page-header">
 
         <div>
 
-            <h1 class="titulo">
+            <span class="admin-page-badge">
+                <i class="bi bi-box-seam"></i>
+                Gestión de productos
+            </span>
+
+            <h1>
                 Productos
             </h1>
 
-            <p class="subtitulo">
-                Administra todos los productos del catálogo
+            <p>
+                Administra los productos del catálogo, sus precios, imágenes, estado y categoría.
             </p>
 
         </div>
 
-        <button class="btn btn-primary btn-custom"
+        <button class="btn-admin-primary"
                 data-bs-toggle="offcanvas"
                 data-bs-target="#agregarProducto">
 
@@ -310,577 +54,203 @@
 
         </button>
 
-    </div>
+    </section>
+        <section class="admin-toolbar">
 
-    <!-- BUSCADOR -->
+        <div class="admin-search">
 
-    <div class="mb-5">
-
-        <div class="input-group shadow-sm">
-
-            <span class="input-group-text bg-white border-0">
-
-                <i class="bi bi-search"></i>
-
-            </span>
+            <i class="bi bi-search"></i>
 
             <input type="text"
                    id="buscador"
-                   class="form-control border-0 p-3"
                    placeholder="Buscar producto...">
 
         </div>
 
-        <div class="mt-3">
+        <div class="admin-filters">
 
-            <select id="filtroCategoria"
-                    class="form-select">
-
-                <option value="">
-                    Todas las categorías
-                </option>
+            <select id="filtroCategoria">
+                <option value="">Todas las categorías</option>
 
                 {% for categoria in categorias %}
-
-                <option value="{{ categoria.nombre|lower }}">
-                    {{ categoria.nombre }}
-                </option>
-
+                    <option value="{{ categoria.nombre|lower }}">
+                        {{ categoria.nombre }}
+                    </option>
                 {% endfor %}
+            </select>
 
+            <select id="ordenarProductos">
+                <option value="">Ordenar productos</option>
+                <option value="az">Nombre A-Z</option>
+                <option value="za">Nombre Z-A</option>
+                <option value="precio_menor">Precio menor a mayor</option>
+                <option value="precio_mayor">Precio mayor a menor</option>
             </select>
 
         </div>
 
+    </section>
 
-        <div class="mt-3">
-
-            <select id="ordenarProductos"
-                    class="form-select">
-
-                <option value="">
-                    Ordenar productos
-                </option>
-
-                <option value="az">
-                    Nombre A-Z
-                </option>
-
-                <option value="za">
-                    Nombre Z-A
-                </option>
-
-                <option value="precio_menor">
-                    Precio menor a mayor
-                </option>
-
-                <option value="precio_mayor">
-                    Precio mayor a menor
-                </option>
-
-            </select>
-
-        </div>
-
-    </div>
-
-    <!-- PRODUCTOS -->
-
-    <div class="row g-4">
+    <section class="admin-products-grid">
 
         {% for producto in productos %}
 
-        <div class="col-md-6 col-lg-4 producto-item"
-            data-categoria="{{ producto.categoria.nombre|lower }}"
-            data-nombre="{{ producto.nombre|lower }}"
-            data-precio="{{ producto.precio_san_mateo|default:0 }}">
+        <article class="admin-product-card producto-item"
+                 data-categoria="{{ producto.categoria.nombre|lower }}"
+                 data-nombre="{{ producto.nombre|lower }}"
+                 data-precio="{{ producto.precio_san_mateo|default:0 }}">
 
-            <div class="producto-card">
-
-                <!-- CARRUSEL -->
+            <div class="admin-product-image">
 
                 {% if producto.imagenes.count > 0 %}
-
-                <div id="carousel{{ producto.id }}"
-                     class="carousel slide"
-                     data-bs-ride="carousel">
-
-                    <div class="carousel-inner">
-
-                        {% for imagen in producto.imagenes.all %}
-
-                        <div class="carousel-item {% if forloop.first %}active{% endif %}">
-
-                            <img src="{{ imagen.imagen.url }}"
-                                 class="producto-img">
-
-                        </div>
-
-                        {% endfor %}
-
-                    </div>
-
-                    {% if producto.imagenes.count > 1 %}
-
-                    <button class="carousel-control-prev"
-                            type="button"
-                            data-bs-target="#carousel{{ producto.id }}"
-                            data-bs-slide="prev">
-
-                        <span class="carousel-control-prev-icon"></span>
-
-                    </button>
-
-                    <button class="carousel-control-next"
-                            type="button"
-                            data-bs-target="#carousel{{ producto.id }}"
-                            data-bs-slide="next">
-
-                        <span class="carousel-control-next-icon"></span>
-
-                    </button>
-
-                    {% endif %}
-
-                </div>
-
+                    <img src="{{ producto.imagenes.first.imagen.url }}"
+                         alt="{{ producto.nombre }}">
                 {% else %}
-
-                <div class="sin-imagen">
-
-                    <i class="bi bi-image"></i>
-
-                </div>
-
+                    <div class="admin-no-image">
+                        <i class="bi bi-image"></i>
+                    </div>
                 {% endif %}
 
-                <!-- BODY -->
-
-                <div class="producto-body">
-
-                    <span class="badge-categoria">
-
-                        {{ producto.categoria.nombre }}
-
-                    </span>
+                <div class="admin-product-badges">
 
                     {% if producto.estado %}
-                        <span class="badge bg-success ms-2">
-                            Activo
-                        </span>
+                        <span class="badge-admin success">Activo</span>
                     {% else %}
-                        <span class="badge bg-danger ms-2">
-                            Inactivo
-                        </span>
+                        <span class="badge-admin danger">Inactivo</span>
                     {% endif %}
 
                     {% if producto.destacado %}
-                        <span class="badge bg-warning text-dark ms-2">
-                            ⭐ Destacado
-                        </span>
+                        <span class="badge-admin gold">Destacado</span>
                     {% endif %}
-
-                    <h3 class="producto-titulo mt-3">
-
-                        {{ producto.nombre }}
-
-                    </h3>
-
-                    <p class="producto-descripcion">
-
-                        {{ producto.descripcion|truncatechars:90 }}
-
-                    </p>
-
-                    <div class="acciones">
-
-                        <!-- EDITAR -->
-
-                        <button class="btn btn-primary btn-custom"
-                                data-bs-toggle="offcanvas"
-                                data-bs-target="#editarProducto{{ producto.id }}">
-
-                            <i class="bi bi-pencil-square"></i>
-                            Editar
-
-                        </button>
-
-                        <!-- ELIMINAR -->
-
-                        <a href="{% url 'eliminar_producto' producto.id %}"
-                           class="btn btn-danger btn-custom btn-eliminar">
-                           
-
-                            <i class="bi bi-trash"></i>
-                            Eliminar
-
-                        </a>
-
-                    </div>
 
                 </div>
 
             </div>
 
-        </div>
+            <div class="admin-product-body">
+
+                <span class="admin-category">
+                    {{ producto.categoria.nombre }}
+                </span>
+
+                <h3>
+                    {{ producto.nombre }}
+                </h3>
+
+                <p>
+                    {{ producto.descripcion|truncatechars:90 }}
+                </p>
+
+                <div class="admin-price-row">
+                    <span>
+                        San Mateo
+                        <strong>${{ producto.precio_san_mateo|default:"0.00" }}</strong>
+                    </span>
+
+                    <span>
+                        Fuera
+                        <strong>${{ producto.precio_fuera|default:"0.00" }}</strong>
+                    </span>
+                </div>
+
+                <div class="admin-product-actions">
+
+                    <button class="btn-admin-outline"
+                            data-bs-toggle="offcanvas"
+                            data-bs-target="#editarProducto{{ producto.id }}">
+                        <i class="bi bi-pencil-square"></i>
+                        Editar
+                    </button>
+
+                    <a href="{% url 'eliminar_producto' producto.id %}"
+                       class="btn-admin-danger btn-eliminar">
+                        <i class="bi bi-trash"></i>
+                    </a>
+
+                </div>
+
+            </div>
+
+        </article>
 
         {% empty %}
 
-        <div class="text-center mt-5">
-
-            <h4 class="text-muted">
-                No hay productos registrados
-            </h4>
-
+        <div class="admin-empty">
+            <i class="bi bi-box"></i>
+            <h4>No hay productos registrados</h4>
+            <p>Agrega tu primer producto para comenzar.</p>
         </div>
 
         {% endfor %}
 
-    </div>
+    </section>
+        <nav class="admin-pagination-wrap">
 
-</div>
+        <ul class="pagination justify-content-center">
 
-</div>
+            {% if productos.has_previous %}
 
-<nav class="mt-5">
+                <li class="page-item">
+                    <a class="page-link"
+                       href="?page={{ productos.previous_page_number }}">
+                        Anterior
+                    </a>
+                </li>
 
-    <ul class="pagination justify-content-center">
+            {% endif %}
 
-        {% if productos.has_previous %}
+            {% for num in productos.paginator.page_range %}
 
-        <li class="page-item">
-            <a class="page-link"
-               href="?page={{ productos.previous_page_number }}">
-                Anterior
-            </a>
-        </li>
+                <li class="page-item {% if productos.number == num %}active{% endif %}">
+                    <a class="page-link"
+                       href="?page={{ num }}">
+                        {{ num }}
+                    </a>
+                </li>
 
-        {% endif %}
+            {% endfor %}
 
-        {% for num in productos.paginator.page_range %}
+            {% if productos.has_next %}
 
-        <li class="page-item {% if productos.number == num %}active{% endif %}">
-            <a class="page-link"
-               href="?page={{ num }}">
-                {{ num }}
-            </a>
-        </li>
+                <li class="page-item">
+                    <a class="page-link"
+                       href="?page={{ productos.next_page_number }}">
+                        Siguiente
+                    </a>
+                </li>
 
-        {% endfor %}
+            {% endif %}
 
-        {% if productos.has_next %}
+        </ul>
 
-        <li class="page-item">
-            <a class="page-link"
-               href="?page={{ productos.next_page_number }}">
-                Siguiente
-            </a>
-        </li>
+    </nav>
 
-        {% endif %}
-
-    </ul>
-
-</nav>
-
-<!-- OFFCANVAS -->
-
-{% for producto in productos %}
-
-<div class="offcanvas offcanvas-end"
+</main>
+<div class="offcanvas offcanvas-end admin-offcanvas"
      tabindex="-1"
-     id="editarProducto{{ producto.id }}"
-     style="width:700px;">
+     id="agregarProducto">
 
-    <div class="offcanvas-header border-bottom">
+    <div class="offcanvas-header admin-offcanvas-header">
 
         <div>
+            <span class="admin-page-badge">
+                <i class="bi bi-plus-circle"></i>
+                Nuevo producto
+            </span>
 
-            <h3 class="fw-bold mb-0">
+            <h3>Agregar producto</h3>
 
-                Editar producto
-
-            </h3>
-
-            <small class="text-muted">
-
-                {{ producto.nombre }}
-
-            </small>
-
+            <p>Registra un nuevo producto para el catálogo.</p>
         </div>
 
         <button type="button"
                 class="btn-close"
                 data-bs-dismiss="offcanvas">
-
         </button>
 
     </div>
 
-    <div class="offcanvas-body">
-
-        <form method="POST"
-              action="{% url 'editar_producto' producto.id %}"
-              enctype="multipart/form-data">
-
-            {% csrf_token %}
-
-            <div class="mb-4">
-
-                <label class="fw-semibold mb-2">
-
-                    Nombre
-
-                </label>
-
-                <input type="text"
-                       name="nombre"
-                       value="{{ producto.nombre }}"
-                       class="form-control p-3 rounded-4">
-
-            </div>
-
-            
-
-            <div class="mb-4">
-
-                <label class="fw-semibold mb-2">
-
-                    Descripción
-
-                </label>
-
-                <textarea name="descripcion"
-                          class="form-control p-3 rounded-4"
-                          rows="4">{{ producto.descripcion }}</textarea>
-
-            </div>
-
-            <div class="row mb-4">
-
-                <div class="col-md-6">
-
-                    <label class="fw-semibold mb-2">
-                        Precio San Mateo
-                    </label>
-
-                    <input
-                        type="number"
-                        name="precio_san_mateo"
-                        class="form-control p-3 rounded-4"
-                        step="0.01"
-                        min="0"
-                        value="{{ producto.precio_san_mateo }}">
-
-                </div>
-
-                <div class="col-md-6">
-
-                    <label class="fw-semibold mb-2">
-                        Precio Fuera
-                    </label>
-
-                    <input
-                        type="number"
-                        name="precio_fuera"
-                        class="form-control p-3 rounded-4"
-                        step="0.01"
-                        min="0"
-                        value="{{ producto.precio_fuera }}">
-
-                </div>
-
-            </div>
-
-            <div class="mb-4">
-
-                <label class="fw-semibold mb-2">
-
-                    Categoría
-
-                </label>
-
-                <select name="categoria"
-                        class="form-select p-3 rounded-4">
-
-                    {% for categoria in categorias %}
-
-                    <option value="{{ categoria.id }}"
-                        {% if producto.categoria.id == categoria.id %}
-                            selected
-                        {% endif %}>
-
-                        {{ categoria.nombre }}
-
-                    </option>
-
-                    {% endfor %}
-
-                </select>
-
-            </div>
-
-            <div class="mb-4">
-
-                <label class="fw-semibold mb-2">
-                    Estado
-                </label>
-
-                <select name="estado"
-                        class="form-select p-3 rounded-4">
-
-                    <option value="True"
-                            {% if producto.estado %}selected{% endif %}>
-                        Activo
-                    </option>
-
-                    <option value="False"
-                            {% if not producto.estado %}selected{% endif %}>
-                        Inactivo
-                    </option>
-
-                </select>
-
-            </div>
-
-            <div class="mb-4">
-
-                <label class="fw-semibold mb-2">
-
-                    Destacado
-
-                </label>
-
-                <select name="destacado"
-                        class="form-select p-3 rounded-4">
-
-                    <option value="True"
-                            {% if producto.destacado %}selected{% endif %}>
-                        Sí
-                    </option>
-
-                    <option value="False"
-                            {% if not producto.destacado %}selected{% endif %}>
-                        No
-                    </option>
-
-                </select>
-
-            </div>
-        
-            
-
-            <hr class="my-4">
-
-            <h5 class="fw-bold mb-4">
-
-                Imágenes actuales
-
-            </h5>
-
-            <div class="row">
-
-                {% for imagen in producto.imagenes.all %}
-
-                <div class="col-6 mb-4">
-
-                    <div class="position-relative">
-
-                        <img src="{{ imagen.imagen.url }}"
-                             class="img-fluid rounded-4 shadow-sm"
-                             style="
-                                height:180px;
-                                width:100%;
-                                object-fit:cover;
-                             ">
-
-                        <a href="{% url 'eliminar_imagen' imagen.id %}"
-                           class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2 rounded-circle">
-
-                            <i class="bi bi-x-lg"></i>
-
-                        </a>
-
-                    </div>
-
-                </div>
-
-                {% endfor %}
-
-            </div>
-
-            <hr class="my-4">
-
-            <h5 class="fw-bold mb-4">
-
-                Agregar imágenes
-
-            </h5>
-
-            <input type="file"            
-       id="imagenesEditar"
-       multiple
-                class="form-control rounded-4 p-3 mb-4">
-
-            <div class="row"
-                id="previewEditar">
-            </div>
-
-            <input type="file"
-                id="imagenesFinalEditar"
-                name="imagen"
-                multiple
-                hidden>
-
-            <button type="submit"
-                    class="btn btn-primary w-100 rounded-pill py-3 fw-semibold">
-
-                <i class="bi bi-check-circle"></i>
-                Guardar cambios
-
-            </button>
-
-        </form>
-
-    </div>
-
-</div>
-
-{% endfor %}
-
-<div class="offcanvas offcanvas-end"
-     tabindex="-1"
-     id="agregarProducto"
-     style="width:700px;">
-
-    <div class="offcanvas-header border-bottom">
-
-        <div>
-
-            <h3 class="fw-bold mb-0">
-
-                Agregar producto
-
-            </h3>
-
-            <small class="text-muted">
-
-                Registrar nuevo producto
-
-            </small>
-
-        </div>
-
-        <button type="button"
-                class="btn-close"
-                data-bs-dismiss="offcanvas">
-
-        </button>
-
-    </div>
-
-    <div class="offcanvas-body">
+    <div class="offcanvas-body admin-offcanvas-body">
 
         <form method="POST"
               action="{% url 'agregar_producto' %}"
@@ -888,159 +258,109 @@
 
             {% csrf_token %}
 
-            <div class="mb-4">
-
-                <label class="fw-semibold mb-2">
-
-                    Nombre
-
-                </label>
+            <div class="form-admin-group">
+                <label>Nombre</label>
 
                 <input type="text"
                        name="nombre"
-                       class="form-control p-3 rounded-4">
-
+                       class="form-control"
+                       placeholder="Nombre del producto"
+                       required>
             </div>
 
-            
-
-            <div class="mb-4">
-
-                <label class="fw-semibold mb-2">
-
-                    Descripción
-
-                </label>
+            <div class="form-admin-group">
+                <label>Descripción</label>
 
                 <textarea name="descripcion"
-                          class="form-control p-3 rounded-4"
-                          rows="4"></textarea>
-
+                          class="form-control"
+                          rows="4"
+                          placeholder="Descripción del producto"
+                          required></textarea>
             </div>
 
-            <div class="row mb-4">
+            <div class="row">
 
                 <div class="col-md-6">
+                    <div class="form-admin-group">
+                        <label>Precio San Mateo</label>
 
-                    <label class="fw-semibold mb-2">
-                        Precio San Mateo
-                    </label>
-
-                    <input
-                        type="number"
-                        name="precio_san_mateo"
-                        class="form-control p-3 rounded-4"
-                        step="0.01"
-                        min="0">
-
+                        <input type="number"
+                               name="precio_san_mateo"
+                               class="form-control"
+                               step="0.01"
+                               min="0"
+                               placeholder="0.00">
+                    </div>
                 </div>
 
                 <div class="col-md-6">
+                    <div class="form-admin-group">
+                        <label>Precio Fuera</label>
 
-                    <label class="fw-semibold mb-2">
-                        Precio Fuera
-                    </label>
-
-                    <input
-                        type="number"
-                        name="precio_fuera"
-                        class="form-control p-3 rounded-4"
-                        step="0.01"
-                        min="0">
-
+                        <input type="number"
+                               name="precio_fuera"
+                               class="form-control"
+                               step="0.01"
+                               min="0"
+                               placeholder="0.00">
+                    </div>
                 </div>
 
             </div>
 
-            <div class="mb-4">
-
-                <label class="fw-semibold mb-2">
-
-                    Categoría
-
-                </label>
+            <div class="form-admin-group">
+                <label>Categoría</label>
 
                 <select name="categoria"
-                        class="form-select p-3 rounded-4">
-
+                        class="form-select"
+                        required>
                     {% for categoria in categorias %}
-
-                    <option value="{{ categoria.id }}">
-
-                        {{ categoria.nombre }}
-
-                    </option>
-
+                        <option value="{{ categoria.id }}">
+                            {{ categoria.nombre }}
+                        </option>
                     {% endfor %}
-
                 </select>
+            </div>
+
+            <div class="row">
+
+                <div class="col-md-6">
+                    <div class="form-admin-group">
+                        <label>Estado</label>
+
+                        <select name="estado"
+                                class="form-select">
+                            <option value="True" selected>Activo</option>
+                            <option value="False">Inactivo</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-admin-group">
+                        <label>Destacado</label>
+
+                        <select name="destacado"
+                                class="form-select">
+                            <option value="False" selected>No</option>
+                            <option value="True">Sí</option>
+                        </select>
+                    </div>
+                </div>
 
             </div>
 
-            <div class="mb-4">
-
-                <label class="fw-semibold mb-2">
-                    Estado
-                </label>
-
-                <select name="estado"
-                        class="form-select p-3 rounded-4">
-
-                    <option value="True" selected>
-                        Activo
-                    </option>
-
-                    <option value="False">
-                        Inactivo
-                    </option>
-
-                </select>
-
-            </div>
-
-            <div class="mb-4">
-
-                <label class="fw-semibold mb-2">
-
-                    Destacado
-
-                </label>
-
-                <select name="destacado"
-                        class="form-select p-3 rounded-4">
-
-                    <option value="False" selected>
-                        No
-                    </option>
-
-                    <option value="True">
-                        Sí
-                    </option>
-
-                </select>
-
-            </div>
-
-            <hr class="my-4">
-
-            <h5 class="fw-bold mb-4">
-
-                Agregar imágenes
-
-            </h5>
-
-            <div class="mb-4">
+            <div class="form-admin-group">
+                <label>Imágenes</label>
 
                 <input type="file"
                        id="imagenesNueva"
                        multiple
-                       class="form-control rounded-4 p-3">
-
+                       class="form-control">
             </div>
 
             <div class="row"
                  id="previewNueva">
-            
             </div>
 
             <input type="file"
@@ -1050,11 +370,211 @@
                    hidden>
 
             <button type="submit"
-                    class="btn btn-success w-100 rounded-pill py-3 fw-semibold">
-
+                    class="btn-admin-primary w-100 justify-content-center mt-3">
                 <i class="bi bi-check-circle"></i>
                 Guardar producto
+            </button>
 
+        </form>
+
+    </div>
+
+</div>
+{% for producto in productos %}
+
+<div class="offcanvas offcanvas-end admin-offcanvas"
+     tabindex="-1"
+     id="editarProducto{{ producto.id }}">
+
+    <div class="offcanvas-header admin-offcanvas-header">
+
+        <div>
+            <span class="admin-page-badge">
+                <i class="bi bi-pencil-square"></i>
+                Editar producto
+            </span>
+
+            <h3>{{ producto.nombre }}</h3>
+
+            <p>Actualiza la información del producto.</p>
+        </div>
+
+        <button type="button"
+                class="btn-close"
+                data-bs-dismiss="offcanvas">
+        </button>
+
+    </div>
+
+    <div class="offcanvas-body admin-offcanvas-body">
+
+        <form method="POST"
+              action="{% url 'editar_producto' producto.id %}"
+              enctype="multipart/form-data">
+
+            {% csrf_token %}
+
+            <div class="form-admin-group">
+                <label>Nombre</label>
+
+                <input type="text"
+                       name="nombre"
+                       value="{{ producto.nombre }}"
+                       class="form-control"
+                       required>
+            </div>
+
+            <div class="form-admin-group">
+                <label>Descripción</label>
+
+                <textarea name="descripcion"
+                          class="form-control"
+                          rows="4"
+                          required>{{ producto.descripcion }}</textarea>
+            </div>
+
+            <div class="row">
+
+                <div class="col-md-6">
+                    <div class="form-admin-group">
+                        <label>Precio San Mateo</label>
+
+                        <input type="number"
+                               name="precio_san_mateo"
+                               value="{{ producto.precio_san_mateo }}"
+                               class="form-control"
+                               step="0.01"
+                               min="0">
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-admin-group">
+                        <label>Precio Fuera</label>
+
+                        <input type="number"
+                               name="precio_fuera"
+                               value="{{ producto.precio_fuera }}"
+                               class="form-control"
+                               step="0.01"
+                               min="0">
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="form-admin-group">
+                <label>Categoría</label>
+
+                <select name="categoria"
+                        class="form-select"
+                        required>
+                    {% for categoria in categorias %}
+                        <option value="{{ categoria.id }}"
+                            {% if producto.categoria.id == categoria.id %}selected{% endif %}>
+                            {{ categoria.nombre }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="row">
+
+                <div class="col-md-6">
+                    <div class="form-admin-group">
+                        <label>Estado</label>
+
+                        <select name="estado"
+                                class="form-select">
+                            <option value="True" {% if producto.estado %}selected{% endif %}>
+                                Activo
+                            </option>
+
+                            <option value="False" {% if not producto.estado %}selected{% endif %}>
+                                Inactivo
+                            </option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-admin-group">
+                        <label>Destacado</label>
+
+                        <select name="destacado"
+                                class="form-select">
+                            <option value="False" {% if not producto.destacado %}selected{% endif %}>
+                                No
+                            </option>
+
+                            <option value="True" {% if producto.destacado %}selected{% endif %}>
+                                Sí
+                            </option>
+                        </select>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="admin-images-section">
+
+                <h5>Imágenes actuales</h5>
+
+                <div class="row">
+
+                    {% for imagen in producto.imagenes.all %}
+
+                    <div class="col-6 mb-3">
+                        <div class="admin-current-image">
+
+                            <img src="{{ imagen.imagen.url }}"
+                                 alt="Imagen del producto">
+
+                            <a href="{% url 'eliminar_imagen' imagen.id %}"
+                               class="btn-remove-image">
+                                <i class="bi bi-x-lg"></i>
+                            </a>
+
+                        </div>
+                    </div>
+
+                    {% empty %}
+
+                    <p class="text-muted">
+                        Este producto aún no tiene imágenes.
+                    </p>
+
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+            <div class="form-admin-group">
+                <label>Agregar nuevas imágenes</label>
+
+                <input type="file"
+                       id="imagenesEditar{{ producto.id }}"
+                       class="form-control input-editar-imagenes"
+                       data-preview="previewEditar{{ producto.id }}"
+                       data-final="imagenesFinalEditar{{ producto.id }}"
+                       multiple>
+            </div>
+
+            <div class="row"
+                 id="previewEditar{{ producto.id }}">
+            </div>
+
+            <input type="file"
+                   id="imagenesFinalEditar{{ producto.id }}"
+                   name="imagen"
+                   multiple
+                   hidden>
+
+            <button type="submit"
+                    class="btn-admin-primary w-100 justify-content-center mt-3">
+                <i class="bi bi-check-circle"></i>
+                Guardar cambios
             </button>
 
         </form>
@@ -1063,406 +583,172 @@
 
 </div>
 
+{% endfor %}
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-<script>
-
-const buscador =
-document.getElementById('buscador');
-
-const filtroCategoria =
-document.getElementById('filtroCategoria');
-
-const ordenarProductos =
-document.getElementById('ordenarProductos');
-
-function filtrarProductos(){
-
-    const texto =
-    buscador.value.toLowerCase();
-
-    const categoria =
-    filtroCategoria.value.toLowerCase();
-
-    const productos =
-    document.querySelectorAll('.producto-item');
-
-    productos.forEach(producto => {
-
-        const contenido =
-        producto.textContent.toLowerCase();
-
-        const categoriaProducto =
-        producto.dataset.categoria;
-
-        const coincideTexto =
-        contenido.includes(texto);
-
-        const coincideCategoria =
-        categoria === "" ||
-        categoriaProducto === categoria;
-
-        if(
-            coincideTexto &&
-            coincideCategoria
-        ){
-
-            producto.style.display =
-            'block';
-
-        }else{
-
-            producto.style.display =
-            'none';
-
-        }
-
-    });
-
-}
-
-
-function ordenarLista(){
-
-    const contenedor =
-    document.querySelector('.row.g-4');
-
-    const productos =
-    Array.from(
-        document.querySelectorAll('.producto-item')
-    );
-
-    const criterio =
-    ordenarProductos.value;
-
-    productos.sort((a,b)=>{
-
-        if(criterio === "az"){
-
-            return a.dataset.nombre.localeCompare(
-                b.dataset.nombre
-            );
-
-        }
-
-        if(criterio === "za"){
-
-            return b.dataset.nombre.localeCompare(
-                a.dataset.nombre
-            );
-
-        }
-
-        if(criterio === "precio_menor"){
-
-            return parseFloat(a.dataset.precio) -
-                   parseFloat(b.dataset.precio);
-
-        }
-
-        if(criterio === "precio_mayor"){
-
-            return parseFloat(b.dataset.precio) -
-                   parseFloat(a.dataset.precio);
-
-        }
-
-        return 0;
-
-    });
-
-    productos.forEach(producto => {
-
-        contenedor.appendChild(producto);
-
-    });
-
-}
-
-buscador.addEventListener(
-    'keyup',
-    filtrarProductos
-);
-
-filtroCategoria.addEventListener(
-    'change',
-    filtrarProductos
-);
-
-ordenarProductos.addEventListener(
-    'change',
-    ordenarLista
-);
-
-
-
-</script>
-<script>
-
-window.addEventListener('load', function(){
-
-    const params = new URLSearchParams(window.location.search);
-
-    const editar = params.get('editar');
-
-    if(editar){
-
-        const offcanvasElement = document.getElementById(
-            `editarProducto${editar}`
-        );
-
-        if(offcanvasElement){
-
-            const bsOffcanvas = new bootstrap.Offcanvas(offcanvasElement);
-
-            bsOffcanvas.show();
-
-        }
-
-    }
-
-});
-
-</script>
-
-<script>
-
-let imagenesSeleccionadas = [];
-
-const inputImagenes =
-document.getElementById('imagenesNueva');
-
-const preview =
-document.getElementById('previewNueva');
-
-const inputFinal =
-document.getElementById('imagenesFinal');
-
-inputImagenes.addEventListener('change', function(){
-
-    const archivos = Array.from(this.files);
-
-    archivos.forEach(archivo => {
-
-        imagenesSeleccionadas.push(archivo);
-
-    });
-
-    renderizarImagenes();
-
-    this.value = "";
-
-});
-
-function renderizarImagenes(){
-
-    preview.innerHTML = "";
-
-    const dataTransfer = new DataTransfer();
-
-    imagenesSeleccionadas.forEach((archivo,index)=>{
-
-        dataTransfer.items.add(archivo);
-
-        const reader = new FileReader();
-
-        reader.onload = function(e){
-
-            const div =
-            document.createElement('div');
-
-            div.className =
-            'col-md-4 mb-4';
-
-            div.innerHTML = `
-
-                <div class="position-relative">
-
-                    <img src="${e.target.result}"
-                         class="img-fluid rounded-4 shadow-sm"
-                         style="
-                            height:180px;
-                            width:100%;
-                            object-fit:cover;
-                         ">
-
-                    <button type="button"
-                            class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2 rounded-circle"
-                            onclick="eliminarImagen(${index})">
-
-                        <i class="bi bi-x-lg"></i>
-
-                    </button>
-
-                </div>
-
-            `;
-
-            preview.appendChild(div);
-
-        }
-
-        reader.readAsDataURL(archivo);
-
-    });
-
-    inputFinal.files =
-    dataTransfer.files;
-
-}
-
-function eliminarImagen(index){
-
-    imagenesSeleccionadas.splice(index,1);
-
-    renderizarImagenes();
-
-}
-
-</script>
-
-
-<script>
-
-let imagenesEditar = [];
-
-const inputEditar =
-document.getElementById('imagenesEditar');
-
-const previewEditar =
-document.getElementById('previewEditar');
-
-const finalEditar =
-document.getElementById('imagenesFinalEditar');
-
-if(inputEditar){
-
-    inputEditar.addEventListener('change', function(){
-
-        const archivos = Array.from(this.files);
-
-        archivos.forEach(archivo => {
-
-            imagenesEditar.push(archivo);
-
-        });
-
-        renderizarEditar();
-
-        this.value = "";
-
-    });
-
-}
-
-function renderizarEditar(){
-
-    previewEditar.innerHTML = "";
-
-    const dataTransfer = new DataTransfer();
-
-    imagenesEditar.forEach((archivo,index)=>{
-
-        dataTransfer.items.add(archivo);
-
-        const reader = new FileReader();
-
-        reader.onload = function(e){
-
-            const div =
-            document.createElement('div');
-
-            div.className =
-            'col-md-4 mb-4';
-
-            div.innerHTML = `
-
-                <div class="position-relative">
-
-                    <img src="${e.target.result}"
-                         class="img-fluid rounded-4 shadow-sm"
-                         style="
-                            height:180px;
-                            width:100%;
-                            object-fit:cover;
-                         ">
-
-                    <button type="button"
-                            class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2 rounded-circle"
-                            onclick="eliminarEditar(${index})">
-
-                        <i class="bi bi-x-lg"></i>
-
-                    </button>
-
-                </div>
-
-            `;
-
-            previewEditar.appendChild(div);
-
-        }
-
-        reader.readAsDataURL(archivo);
-
-    });
-
-    finalEditar.files =
-    dataTransfer.files;
-
-}
-
-function eliminarEditar(index){
-
-    imagenesEditar.splice(index,1);
-
-    renderizarEditar();
-
-}
-
-</script>
-
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
+const buscador = document.getElementById("buscador");
+const filtroCategoria = document.getElementById("filtroCategoria");
+const ordenarProductos = document.getElementById("ordenarProductos");
 
-document.querySelectorAll('.btn-eliminar').forEach(boton => {
+function filtrarProductos(){
+    const texto = buscador.value.toLowerCase();
+    const categoria = filtroCategoria.value.toLowerCase();
+    const productos = document.querySelectorAll(".producto-item");
 
-    boton.addEventListener('click', function(e){
+    productos.forEach(producto => {
+        const nombre = producto.dataset.nombre;
+        const categoriaProducto = producto.dataset.categoria;
+        const contenido = producto.textContent.toLowerCase();
 
+        const coincideTexto = nombre.includes(texto) || contenido.includes(texto);
+        const coincideCategoria = categoria === "" || categoriaProducto === categoria;
+
+        producto.style.display = coincideTexto && coincideCategoria ? "block" : "none";
+    });
+}
+
+function ordenarLista(){
+    const contenedor = document.querySelector(".admin-products-grid");
+    const productos = Array.from(document.querySelectorAll(".producto-item"));
+    const criterio = ordenarProductos.value;
+
+    productos.sort((a,b) => {
+        if(criterio === "az") return a.dataset.nombre.localeCompare(b.dataset.nombre);
+        if(criterio === "za") return b.dataset.nombre.localeCompare(a.dataset.nombre);
+        if(criterio === "precio_menor") return parseFloat(a.dataset.precio) - parseFloat(b.dataset.precio);
+        if(criterio === "precio_mayor") return parseFloat(b.dataset.precio) - parseFloat(a.dataset.precio);
+        return 0;
+    });
+
+    productos.forEach(producto => contenedor.appendChild(producto));
+}
+
+buscador.addEventListener("input", filtrarProductos);
+filtroCategoria.addEventListener("change", filtrarProductos);
+ordenarProductos.addEventListener("change", ordenarLista);
+</script>
+
+<script>
+function configurarPreview(inputId, previewId, finalId){
+    const input = document.getElementById(inputId);
+    const preview = document.getElementById(previewId);
+    const inputFinal = document.getElementById(finalId);
+
+    if(!input || !preview || !inputFinal) return;
+
+    let imagenes = [];
+
+    input.addEventListener("change", function(){
+        const archivos = Array.from(this.files);
+
+        archivos.forEach(archivo => {
+            imagenes.push(archivo);
+        });
+
+        renderizar();
+        this.value = "";
+    });
+
+    function renderizar(){
+        preview.innerHTML = "";
+
+        const dataTransfer = new DataTransfer();
+
+        imagenes.forEach((archivo,index) => {
+            dataTransfer.items.add(archivo);
+
+            const reader = new FileReader();
+
+            reader.onload = function(e){
+                const div = document.createElement("div");
+                div.className = "col-md-4 mb-3";
+
+                div.innerHTML = `
+                    <div class="admin-current-image">
+                        <img src="${e.target.result}" alt="Vista previa">
+
+                        <button type="button"
+                                class="btn-remove-image"
+                                data-index="${index}">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    </div>
+                `;
+
+                preview.appendChild(div);
+            };
+
+            reader.readAsDataURL(archivo);
+        });
+
+        inputFinal.files = dataTransfer.files;
+    }
+
+    preview.addEventListener("click", function(e){
+        const boton = e.target.closest(".btn-remove-image");
+
+        if(!boton) return;
+
+        const index = parseInt(boton.dataset.index);
+
+        imagenes.splice(index, 1);
+
+        renderizar();
+    });
+}
+
+configurarPreview("imagenesNueva", "previewNueva", "imagenesFinal");
+
+document.querySelectorAll(".input-editar-imagenes").forEach(input => {
+    configurarPreview(
+        input.id,
+        input.dataset.preview,
+        input.dataset.final
+    );
+});
+</script>
+
+<script>
+document.querySelectorAll(".btn-eliminar").forEach(boton => {
+    boton.addEventListener("click", function(e){
         e.preventDefault();
 
         const url = this.href;
 
         Swal.fire({
-
-            title: '¿Eliminar producto?',
-            text: 'Esta acción no se puede deshacer',
-            icon: 'warning',
-
+            title: "¿Eliminar producto?",
+            text: "Esta acción no se puede deshacer.",
+            icon: "warning",
             showCancelButton: true,
-
-            confirmButtonColor: '#dc3545',
-            cancelButtonColor: '#6c757d',
-
-            confirmButtonText: 'Sí, eliminar',
-            cancelButtonText: 'Cancelar'
-
+            confirmButtonColor: "#DC2626",
+            cancelButtonColor: "#6B7280",
+            confirmButtonText: "Sí, eliminar",
+            cancelButtonText: "Cancelar"
         }).then((result) => {
-
             if(result.isConfirmed){
-
                 window.location.href = url;
-
             }
-
         });
-
     });
-
 });
-
 </script>
 
+<script>
+window.addEventListener("load", function(){
+    const params = new URLSearchParams(window.location.search);
+    const editar = params.get("editar");
+
+    if(editar){
+        const offcanvasElement = document.getElementById(`editarProducto${editar}`);
+
+        if(offcanvasElement){
+            const bsOffcanvas = new bootstrap.Offcanvas(offcanvasElement);
+            bsOffcanvas.show();
+        }
+    }
+});
+</script>
 </body>
 </html>
