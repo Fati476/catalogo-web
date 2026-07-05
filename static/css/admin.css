@@ -7,16 +7,26 @@ body{
 }
 
 .navbar-admin{
+    position:fixed;
     top:15px;
     left:20px;
     right:20px;
     z-index:9999;
-    background:rgba(17,24,39,.92);
-    backdrop-filter:blur(16px);
-    -webkit-backdrop-filter:blur(16px);
+
+    background:rgba(15,23,42,.68);
+
+    backdrop-filter:blur(22px);
+    -webkit-backdrop-filter:blur(22px);
+
+    border:1px solid rgba(255,255,255,.08);
+
     border-radius:999px;
-    padding:8px 18px;
-    box-shadow:0 12px 35px rgba(0,0,0,.25);
+
+    padding:8px 20px;
+
+    box-shadow:
+        0 10px 35px rgba(0,0,0,.18),
+        inset 0 1px 0 rgba(255,255,255,.05);
 }
 
 .navbar-brand-admin{
@@ -65,8 +75,9 @@ body{
 }
 
 .btn-admin-user{
-    border:0;
-    background:rgba(255,255,255,.06);
+    background:rgba(255,255,255,.04);
+
+    border:1px solid rgba(255,255,255,.08);
     color:white;
     border-radius:999px;
     padding:6px 12px 6px 6px;
@@ -113,10 +124,11 @@ body{
 }
 
 .dropdown-admin{
-    background:rgba(17,24,39,.96);
-    backdrop-filter:blur(16px);
+    background:rgba(15,23,42,.82);
+    backdrop-filter:blur(24px);
+    
     -webkit-backdrop-filter:blur(16px);
-    border:1px solid rgba(255,255,255,.10);
+    border:1px solid rgba(255,255,255,.08);
     border-radius:24px;
     padding:14px;
     min-width:240px;
