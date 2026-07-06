@@ -394,6 +394,73 @@
     min-height:52px;
 }
 
+
+.admin-product-carousel{
+    height:175px;
+    position:relative;
+    overflow:hidden;
+    background:#e5e7eb;
+}
+
+.admin-product-carousel .carousel-inner,
+.admin-product-carousel .carousel-item{
+    height:100%;
+}
+
+.admin-product-carousel img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.admin-product-carousel .carousel-control-prev,
+.admin-product-carousel .carousel-control-next{
+    width:34px;
+    height:34px;
+    top:50%;
+    transform:translateY(-50%);
+    background:rgba(17,24,39,.75);
+    border-radius:50%;
+    opacity:1;
+}
+
+.admin-product-carousel .carousel-control-prev{
+    left:10px;
+}
+
+.admin-product-carousel .carousel-control-next{
+    right:10px;
+}
+
+.admin-product-carousel .carousel-control-prev-icon,
+.admin-product-carousel .carousel-control-next-icon{
+    width:16px;
+    height:16px;
+}
+
+.admin-product-body{
+    text-align:center;
+}
+
+.admin-category{
+    margin-left:auto;
+    margin-right:auto;
+}
+
+.admin-product-body h3{
+    text-align:center;
+    font-size:1.15rem;
+}
+
+.admin-product-body p{
+    text-align:center;
+    min-height:34px;
+}
+
+.admin-price-box{
+    text-align:left;
+}
+
 </style>
 </head>
 
@@ -475,31 +542,48 @@
         <article class="admin-product-card producto-item"
                  data-categoria="{{ producto.categoria.nombre|lower }}"
                  data-nombre="{{ producto.nombre|lower }}"
-                 data-precio="{{ producto.precio_san_mateo|default:0 }}">
+                 data-precio="{{ producto.precio|default:0 }}">
 
-            <div class="admin-product-image">
+            <div id="carouselProducto{{ producto.id }}" class="carousel slide admin-product-carousel">
 
-                {% if producto.imagenes.count > 0 %}
-                    <img src="{{ producto.imagenes.first.imagen.url }}"
-                         alt="{{ producto.nombre }}">
-                {% else %}
-                    <div class="admin-no-image">
-                        <i class="bi bi-image"></i>
-                    </div>
+                <div class="carousel-inner">
+
+                    {% for imagen in producto.imagenes.all %}
+                        <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                            <img src="{{ imagen.imagen.url }}" alt="{{ producto.nombre }}">
+                        </div>
+                    {% empty %}
+                        <div class="carousel-item active">
+                            <div class="admin-no-image">
+                                <i class="bi bi-image"></i>
+                            </div>
+                        </div>
+                    {% endfor %}
+
+                </div>
+
+                {% if producto.imagenes.count > 1 %}
+                    <button class="carousel-control-prev"
+                            type="button"
+                            data-bs-target="#carouselProducto{{ producto.id }}"
+                            data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon"></span>
+                    </button>
+
+                    <button class="carousel-control-next"
+                            type="button"
+                            data-bs-target="#carouselProducto{{ producto.id }}"
+                            data-bs-slide="next">
+                        <span class="carousel-control-next-icon"></span>
+                    </button>
                 {% endif %}
 
                 <div class="admin-product-badges">
-
                     {% if producto.estado %}
                         <span class="badge-admin success">Activo</span>
                     {% else %}
                         <span class="badge-admin danger">Inactivo</span>
                     {% endif %}
-
-                    {% if producto.destacado %}
-                        <span class="badge-admin gold">Destacado</span>
-                    {% endif %}
-
                 </div>
 
             </div>
