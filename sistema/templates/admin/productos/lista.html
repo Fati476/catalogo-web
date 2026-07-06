@@ -228,33 +228,45 @@
 }
 
 .admin-price-row{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:8px;
-    margin:14px 0;
+    display:none;
 }
 
-.admin-price-row span{
+.admin-price-box{
+    margin:18px 0;
+    background:linear-gradient(135deg, #F9FAFB, #FFFFFF);
+    border:1px solid rgba(17,24,39,.08);
+    border-radius:18px;
+    padding:13px 15px;
     display:flex;
-    flex-direction:column;
-    justify-content:center;
-    min-height:56px;
-    background:#F9FAFB;
-    border:1px solid rgba(17,24,39,.06);
-    border-radius:14px;
-    padding:8px 10px;
-    font-size:.72rem;
-    font-weight:700;
-    color:#6B7280;
-    line-height:1.1;
+    align-items:center;
+    justify-content:space-between;
 }
 
-.admin-price-row strong{
+.admin-price-box span{
     display:block;
-    margin-top:3px;
-    font-size:.88rem;
+    color:#6B7280;
+    font-size:.75rem;
     font-weight:800;
+    margin-bottom:3px;
+}
+
+.admin-price-box strong{
+    display:block;
     color:#111827;
+    font-size:1.05rem;
+    font-weight:900;
+}
+
+.admin-price-box i{
+    width:38px;
+    height:38px;
+    border-radius:50%;
+    background:rgba(201,162,39,.15);
+    color:#C9A227;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:1.1rem;
 }
 
 .admin-product-actions{
@@ -506,11 +518,13 @@
                     {{ producto.descripcion|truncatechars:90 }}
                 </p>
 
-                <div class="admin-price-row one-price">
-                    <span>
-                        Precio base
+                <div class="admin-price-box">
+                    <div>
+                        <span>Precio base</span>
                         <strong>${{ producto.precio|default:"0.00" }}</strong>
-                    </span>
+                    </div>
+
+                    <i class="bi bi-cash-coin"></i>
                 </div>
 
                 <div class="admin-product-actions">
