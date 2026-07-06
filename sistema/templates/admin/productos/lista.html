@@ -23,36 +23,43 @@
 }
 
 .admin-products-hero{
-    min-height:520px;
-    padding:155px 6% 70px;
-    color:white;
-    display:flex;
-    align-items:center;
+    position:relative;
+    min-height:390px;
+    overflow:hidden;
     background:
-        linear-gradient(90deg, rgba(8,15,31,.95), rgba(8,15,31,.78), rgba(8,15,31,.35)),
+        linear-gradient(90deg, rgba(17,24,39,.97), rgba(17,24,39,.76), rgba(17,24,39,.28)),
         url("{% static 'img/banner_productos.png' %}");
     background-size:cover;
     background-position:center;
-    background-repeat:no-repeat;
+    display:flex;
+    align-items:center;
+    padding:65px 60px 80px;
+    margin-top:-95px;
     border-radius:0 0 34px 34px;
-    overflow:hidden;
 }
 
 .admin-products-hero > div{
-    width:min(1500px, 100%);
+    max-width:720px;
+    color:white;
+    position:relative;
+    z-index:2;
+    padding-top:105px;
 }
+
 
 .admin-products-hero h1{
-    font-size:4rem;
+    font-size:3rem;
     font-weight:900;
-    margin:0 0 18px;
+    line-height:1.08;
+    margin-bottom:16px;
+    text-shadow:0 5px 25px rgba(0,0,0,.45);
 }
-
 .admin-products-hero p{
-    color:rgba(255,255,255,.85);
-    font-size:1.2rem;
-    max-width:780px;
-    margin:0 0 28px;
+    max-width:640px;
+    color:rgba(255,255,255,.72);
+    font-size:1.05rem;
+    line-height:1.7;
+    margin-bottom:28px;
 }
 
 .admin-toolbar,
@@ -289,15 +296,23 @@
 }
 
 .admin-products-hero .btn-admin-primary{
+    border:0;
     background:#C9A227;
     color:#111827;
-    border-radius:999px;
-    padding:13px 24px;
     font-weight:900;
+    border-radius:999px;
+    padding:12px 24px;
     text-decoration:none;
     display:inline-flex;
     align-items:center;
     gap:8px;
+    transition:.25s;
+}
+
+.admin-products-hero .btn-admin-primary:hover{
+    background:#B8860B;
+    color:#111827;
+    transform:translateY(-2px);
 }
 </style>
 </head>
