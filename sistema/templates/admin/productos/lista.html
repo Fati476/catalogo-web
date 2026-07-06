@@ -232,6 +232,7 @@
     grid-template-columns:1fr 1fr;
     gap:8px;
     margin:14px 0;
+    align-items:stretch;
 }
 
 .admin-price-row span{
@@ -344,6 +345,25 @@
     .admin-product-image{
         height:190px;
     }
+}
+
+
+.admin-price-row span{
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    min-height:64px;
+}
+
+.admin-price-row strong{
+    display:block;
+    margin-top:4px;
+    font-size:1rem;
+    line-height:1.1;
+}
+
+.admin-price-row span{
+    line-height:1.15;
 }
 
 </style>

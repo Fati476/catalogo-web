@@ -184,7 +184,7 @@ def lista_productos(request):
     for producto in productos:
         producto.imagen_principal = producto.imagenes.first()
 
-    paginator = Paginator(productos, 6)
+    paginator = Paginator(productos, 12)
 
     page = request.GET.get('page')
     productos = paginator.get_page(page)
