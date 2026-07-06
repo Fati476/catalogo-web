@@ -313,18 +313,19 @@
 
 
 
-
-.hero-wave{
+.hero-wave-productos{
     position:absolute;
     left:0;
     right:0;
     bottom:-1px;
+    z-index:4;
     line-height:0;
+    pointer-events:none;
 }
 
-.hero-wave svg{
+.hero-wave-productos svg{
     width:100%;
-    height:55px;
+    height:75px;
     display:block;
 }
 
@@ -355,6 +356,14 @@
                 <i class="bi bi-plus-circle"></i>
                 Nuevo producto
             </a>
+        </div>
+
+        <div class="hero-wave-productos">
+            <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+                <path fill="#f3f1ec"
+                      d="M0,75 C260,115 480,118 720,96 C960,74 1180,66 1440,92 L1440,120 L0,120 Z">
+                </path>
+            </svg>
         </div>
 
     </section>
