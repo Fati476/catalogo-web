@@ -232,21 +232,29 @@
     grid-template-columns:1fr 1fr;
     gap:8px;
     margin:14px 0;
-    align-items:stretch;
 }
 
 .admin-price-row span{
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    min-height:56px;
     background:#F9FAFB;
     border:1px solid rgba(17,24,39,.06);
-    border-radius:15px;
-    padding:9px 10px;
+    border-radius:14px;
+    padding:8px 10px;
     font-size:.72rem;
+    font-weight:700;
     color:#6B7280;
-    font-weight:800;
+    line-height:1.1;
 }
 
 .admin-price-row strong{
-    font-size:.9rem;
+    display:block;
+    margin-top:3px;
+    font-size:.88rem;
+    font-weight:800;
+    color:#111827;
 }
 
 .admin-product-actions{
