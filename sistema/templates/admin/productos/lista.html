@@ -26,32 +26,28 @@
 
 <main class="admin-page">
 
-    <section class="admin-page-header">
+    <section class="admin-products-hero">
 
         <div>
-
             <span class="admin-page-badge">
                 <i class="bi bi-box-seam"></i>
                 Gestión de productos
             </span>
 
-            <h1>
-                Productos
-            </h1>
+            <h1>Productos</h1>
 
             <p>
                 Administra los productos del catálogo, sus precios, imágenes, estado y categoría.
             </p>
 
+            <a href="{% url 'agregar_producto' %}" class="btn-admin-primary">
+                <i class="bi bi-plus-circle"></i>
+                Nuevo producto
+            </a>
         </div>
 
-        <a href="{% url 'agregar_producto' %}" class="btn-admin-primary">
-            <i class="bi bi-plus-circle"></i>
-            Nuevo producto
-        </a>
-
     </section>
-        <section class="admin-toolbar">
+    <section class="admin-toolbar">
 
         <div class="admin-search">
 
