@@ -24,7 +24,7 @@
 
 .admin-products-hero{
     position:relative;
-    min-height:350px;
+    min-height:430px;
     overflow:hidden;
     background:
         linear-gradient(90deg, rgba(17,24,39,.97), rgba(17,24,39,.76), rgba(17,24,39,.28)),
@@ -34,17 +34,17 @@
     display:flex;
     align-items:center;
     padding:0;
-    margin-top:-95px;
+    margin-top:-70px;
 }
 
-.admin-products-hero > div{
+.admin-products-hero > .hero-content-productos{
     width:min(1350px, calc(100% - 120px));
-    margin:auto;
+    margin:0 auto;
     color:white;
     position:relative;
     z-index:2;
-    padding-top:35px;
-    padding-bottom:60px;
+    padding-top:120px;
+    padding-bottom:95px;
 }
 
 .admin-products-hero h1{
@@ -339,7 +339,7 @@
 
     <section class="admin-products-hero">
 
-        <div>
+        <div class="hero-content-productos">
             <span class="admin-page-badge">
                 <i class="bi bi-box-seam"></i>
                 Gestión de productos
@@ -355,15 +355,6 @@
                 <i class="bi bi-plus-circle"></i>
                 Nuevo producto
             </a>
-        </div>
-
-        <div class="hero-wave">
-            <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
-                <path
-                    fill="#f3f1ec"
-                    d="M0,96L180,88C360,80,720,72,1080,78C1260,81,1350,86,1440,90L1440,120L0,120Z">
-                </path>
-            </svg>
         </div>
 
     </section>
