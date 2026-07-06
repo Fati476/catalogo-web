@@ -374,6 +374,14 @@
     line-height:1.15;
 }
 
+.admin-price-row.one-price{
+    grid-template-columns:1fr;
+}
+
+.admin-price-row.one-price span{
+    min-height:52px;
+}
+
 </style>
 </head>
 
@@ -498,15 +506,10 @@
                     {{ producto.descripcion|truncatechars:90 }}
                 </p>
 
-                <div class="admin-price-row">
+                <div class="admin-price-row one-price">
                     <span>
-                        San Mateo
-                        <strong>${{ producto.precio_san_mateo|default:"0.00" }}</strong>
-                    </span>
-
-                    <span>
-                        Fuera
-                        <strong>${{ producto.precio_fuera|default:"0.00" }}</strong>
+                        Precio base
+                        <strong>${{ producto.precio|default:"0.00" }}</strong>
                     </span>
                 </div>
 

@@ -62,8 +62,7 @@ def inicio(request):
 
 
     productos_destacados = Producto.objects.filter(
-        estado=True,
-        destacado=True
+        estado=True
     ).order_by('-id')[:6]
 
     categorias_destacadas = Categoria.objects.filter(

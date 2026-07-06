@@ -11,11 +11,9 @@ class ProductoForm(forms.ModelForm):
         fields = [
             'nombre',
             'descripcion',
-            'precio_san_mateo',
-            'precio_fuera',
+            'precio',
             'categoria',
-            'estado',
-            'destacado'
+            'estado'
         ]
 
         widgets = {
@@ -28,14 +26,11 @@ class ProductoForm(forms.ModelForm):
                 'class': 'form-control'
             }),
 
-            'precio_san_mateo': forms.NumberInput(attrs={
+            'precio': forms.NumberInput(attrs={
                 'class': 'form-control',
-                'step': '0.01'
-            }),
-
-            'precio_fuera': forms.NumberInput(attrs={
-                'class': 'form-control',
-                'step': '0.01'
+                'step': '0.01',
+                'min': '0',
+                'placeholder': '0.00'
             }),
 
             'categoria': forms.Select(attrs={
@@ -43,10 +38,6 @@ class ProductoForm(forms.ModelForm):
             }),
 
             'estado': forms.Select(attrs={
-                'class': 'form-select'
-            }),
-
-            'destacado': forms.Select(attrs={
                 'class': 'form-select'
             }),
 
