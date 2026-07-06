@@ -33,19 +33,19 @@
     background-position:center;
     display:flex;
     align-items:center;
-    padding:65px 60px 80px;
+    padding:0;
     margin-top:-95px;
-    border-radius:0 0 34px 34px;
 }
 
 .admin-products-hero > div{
-    max-width:720px;
+    width:min(1350px, calc(100% - 120px));
+    margin:auto;
     color:white;
     position:relative;
     z-index:2;
-    padding-top:105px;
+    padding-top:45px;
+    padding-bottom:60px;
 }
-
 
 .admin-products-hero h1{
     font-size:3rem;
@@ -54,12 +54,25 @@
     margin-bottom:16px;
     text-shadow:0 5px 25px rgba(0,0,0,.45);
 }
+
 .admin-products-hero p{
     max-width:640px;
     color:rgba(255,255,255,.72);
     font-size:1.05rem;
     line-height:1.7;
     margin-bottom:28px;
+}
+
+.admin-products-hero::after{
+    content:"";
+    position:absolute;
+    left:-5%;
+    right:-5%;
+    bottom:-55px;
+    height:95px;
+    background:#f3f1ec;
+    border-radius:50% 50% 0 0 / 100% 100% 0 0;
+    z-index:3;
 }
 
 .admin-toolbar,
@@ -77,26 +90,20 @@
 
 @media(max-width:768px){
     .admin-products-hero{
-        min-height:430px;
-        padding:135px 24px 55px;
-        border-radius:0 0 28px 28px;
+        min-height:390px;
+        margin-top:-80px;
+    }
+
+    .admin-products-hero > div{
+        width:calc(100% - 48px);
+        padding-top:90px;
+        padding-bottom:70px;
     }
 
     .admin-products-hero h1{
-        font-size:2.8rem;
-    }
-
-    .admin-products-hero p{
-        font-size:1rem;
-    }
-
-    .admin-toolbar,
-    .admin-products-grid,
-    .admin-pagination-wrap{
-        width:calc(100% - 24px);
+        font-size:2.6rem;
     }
 }
-
 .admin-toolbar{
     display:grid;
     grid-template-columns:1.5fr 1fr;
