@@ -136,8 +136,40 @@
 
 .admin-products-grid{
     display:grid;
-    grid-template-columns:repeat(3, minmax(0, 1fr));
+    grid-template-columns:repeat(4, minmax(0, 1fr));
     gap:22px;
+}
+
+@media (max-width:1400px){
+    .admin-products-grid{
+        grid-template-columns:repeat(3,1fr);
+    }
+}
+
+/* Tablet */
+@media (max-width:992px){
+    .admin-products-grid{
+        grid-template-columns:repeat(2,1fr);
+    }
+}
+
+/* Teléfono */
+@media (max-width:768px){
+    .admin-products-grid{
+        grid-template-columns:repeat(2,1fr);
+        gap:16px;
+    }
+
+    .admin-product-image{
+        height:150px;
+    }
+}
+
+/* Teléfonos muy pequeños */
+@media (max-width:480px){
+    .admin-products-grid{
+        grid-template-columns:1fr;
+    }
 }
 
 .admin-product-card{
