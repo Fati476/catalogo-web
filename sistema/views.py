@@ -287,12 +287,11 @@ def editar_producto(request, id):
 def eliminar_imagen(request, id):
 
     imagen = ProductoImagen.objects.get(id=id)
-
     producto_id = imagen.producto.id
 
     imagen.delete()
 
-    return redirect(f'/panel/productos/?editar={producto_id}')
+    return redirect('editar_producto', id=producto_id)
 
 
 @login_required
