@@ -480,6 +480,38 @@
     text-align:left;
 }
 
+.admin-product-carousel{
+    background:#f3f4f6;
+    border-bottom:1px solid rgba(17,24,39,.08);
+}
+
+.admin-product-carousel::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:
+        linear-gradient(to bottom,
+            rgba(17,24,39,.10),
+            rgba(17,24,39,.02) 45%,
+            rgba(17,24,39,.08)
+        );
+    pointer-events:none;
+    z-index:1;
+}
+
+.admin-product-carousel img{
+    position:relative;
+    z-index:0;
+}
+
+.admin-product-badges,
+.admin-product-carousel .carousel-control-prev,
+.admin-product-carousel .carousel-control-next{
+    z-index:3;
+}
+.admin-product-body{
+    border-top:1px solid rgba(17,24,39,.06);
+}
 </style>
 </head>
 
