@@ -264,6 +264,47 @@ textarea.form-control{
 .upload-box{
     margin-top:0;
 }
+
+.section-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:26px;
+}
+
+.section-header small{
+    display:block;
+    color:#C9A227;
+    font-size:.72rem;
+    font-weight:900;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    margin-bottom:4px;
+}
+
+.section-header h4{
+    margin:0;
+    font-size:1.45rem;
+    font-weight:900;
+    color:#111827;
+}
+
+.section-icon{
+    width:56px;
+    height:56px;
+    border-radius:18px;
+    background:rgba(201,162,39,.12);
+    border:1px solid rgba(201,162,39,.25);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.section-icon i{
+    font-size:1.45rem;
+    color:#C9A227;
+}
+
 </style>
 </head>
 
@@ -293,7 +334,18 @@ textarea.form-control{
     {% csrf_token %}
 
     <section class="form-glass-panel">
-    <h4 class="form-title">Información del producto</h4>
+    <div class="section-header">
+
+        <div>
+            <small>DATOS GENERALES</small>
+            <h4>Información del producto</h4>
+        </div>
+    
+        <div class="section-icon">
+            <i class="bi bi-box-seam"></i>
+        </div>
+
+    </div>
 
     <div class="row">
         <div class="col-md-7 mb-4">
@@ -319,6 +371,18 @@ textarea.form-control{
     </section>
 
     <section class="form-glass-panel">
+    <div class="section-header">
+
+        <div>
+            <small>GALERÍA</small>
+            <h4>Imágenes del producto</h4>
+        </div>
+
+        <div class="section-icon">
+            <i class="bi bi-images"></i>
+       </div>
+
+    </div>
     <div class="upload-box">
         <i class="bi bi-images"></i>
         <strong>Agregar imágenes del producto</strong>
