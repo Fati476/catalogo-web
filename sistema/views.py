@@ -263,26 +263,21 @@ def editar_producto(request, id):
                     imagen=imagen
                 )
 
-            return redirect('editar_producto', id=producto.id)
+            return redirect('lista_productos')
 
         else:
-            print(form.errors)
+            print("ERRORES DEL FORM:", form.errors)
 
     else:
-
         form = ProductoForm(instance=producto)
 
     imagenes = ProductoImagen.objects.filter(producto=producto)
 
-    return render(
-        request,
-        'admin/productos/editar.html',
-        {
-            'form': form,
-            'producto': producto,
-            'imagenes': imagenes
-        }
-    )
+    return render(request, 'admin/productos/editar.html', {
+        'form': form,
+        'producto': producto,
+        'imagenes': imagenes
+    })
 
 
 @login_required
