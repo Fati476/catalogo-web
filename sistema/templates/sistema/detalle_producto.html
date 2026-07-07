@@ -336,6 +336,46 @@
         }
     }
 
+    .product-no-image{
+       width:100%;
+        height:235px;
+        background:linear-gradient(135deg,#faf8f3,#ece8df);
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        justify-content:center;
+        padding:20px;
+    }
+
+    .product-no-image-icon{
+        width:82px;
+        height:82px;
+        border-radius:22px;
+        background:white;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        box-shadow:0 10px 25px rgba(17,24,39,.10);
+        margin-bottom:16px;
+    }
+
+    .product-no-image-icon i{
+        font-size:2.4rem;
+        color:#C9A227;
+    }
+
+    .product-no-image span{
+        font-size:.95rem;
+        font-weight:800;
+        color:#111827;
+    }
+
+    .product-no-image small{
+        color:#6B7280;
+        font-weight:600;
+        margin-top:4px;
+    }
+
     
 
     </style>
@@ -358,47 +398,86 @@
 
         <!-- === LADO IZQUIERDO - Imagen === -->
         <div class="col-lg-6">
+
             {% if producto.imagen_principal %}
-                <div class="galeria-producto">
 
-                    <!-- Barra superior + Favorito -->
-                    <div class="galeria-top">
-                        <div class="detalle-linea"></div>
-                        <a href="#" class="favorito-btn" data-id="{{ producto.id }}">
-                            {% if producto.id in favoritos_ids %}
-                                <i class="bi bi-heart-fill text-danger fs-3"
-                                   id="heart-{{ producto.id }}"></i>
-                            {% else %}
-                                <i class="bi bi-heart text-danger fs-3"
-                            id="heart-{{ producto.id }}"></i>
-                            {% endif %}
-                        </a>
-                    </div>
+            <div class="galeria-producto">
 
-                    <!-- Imagen Grande con Lupa -->
-                    <div class="imagen-contenedor position-relative overflow-hidden"
-                        style="cursor: crosshair;" id="imageContainer">
+                <div class="galeria-top">
 
-                        <img id="imagenPrincipal"
-                            src="{{ producto.imagen_principal.imagen.url }}"
-                            class="producto-principal"
-                            alt="{{ producto.nombre }}">
+                    <div class="detalle-linea"></div>
 
-                        <!-- Lupa más pequeña -->
-                        <div id="magnifier" class="magnifier"></div>
-                    </div>
+                    <a href="#" class="favorito-btn" data-id="{{ producto.id }}">
+                        {% if producto.id in favoritos_ids %}
+                            <i class="bi bi-heart-fill text-danger fs-3"
+                               id="heart-{{ producto.id }}"></i>
+                        {% else %}
+                            <i class="bi bi-heart text-danger fs-3"
+                               id="heart-{{ producto.id }}"></i>
+                        {% endif %}
+                    </a>
 
-
-                    <!-- Miniaturas -->
-                    <div class="miniaturas">
-                        {% for imagen in producto.imagenes.all %}
-                            <img src="{{ imagen.imagen.url }}" 
-                                 class="miniatura rounded-3 {% if forloop.first %}activa border border-warning{% endif %}"
-                                 onclick="cambiarImagen(this)">
-                        {% endfor %}
-                    </div>
                 </div>
+
+                <div class="imagen-contenedor position-relative overflow-hidden"
+                     id="imageContainer"
+                     style="cursor:crosshair;">
+
+                    <img id="imagenPrincipal"
+                         src="{{ producto.imagen_principal.imagen.url }}"
+                         class="producto-principal"
+                         alt="{{ producto.nombre }}">
+
+                    <div id="magnifier" class="magnifier"></div>
+
+                </div>
+
+                <div class="miniaturas">
+
+                    {% for imagen in producto.imagenes.all %}
+
+                        <img src="{{ imagen.imagen.url }}"
+                             class="miniatura rounded-3 {% if forloop.first %}activa border border-warning{% endif %}"
+                             onclick="cambiarImagen(this)">
+
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+            {% else %}
+
+            <div class="galeria-producto">
+
+                <div class="galeria-top">
+
+                    <div class="detalle-linea"></div>
+
+                </div>
+
+                <div class="imagen-contenedor d-flex justify-content-center align-items-center">
+
+                    <div class="product-no-image">
+
+                        <div class="product-no-image-icon">
+
+                            <i class="bi bi-image"></i>
+
+                        </div>
+
+                        <span>Sin imagen</span>
+
+                        <small>Este producto aún no tiene fotografías.</small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
             {% endif %}
+
         </div>
 
         <!-- === LADO DERECHO - Información === -->

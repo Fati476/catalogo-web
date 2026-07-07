@@ -307,6 +307,46 @@
             font-size:1.2rem;
         }
 
+        .product-no-image{
+            width:100%;
+            height:235px;
+            background:linear-gradient(135deg,#faf8f3,#ece8df);
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            justify-content:center;
+            padding:20px;
+        }
+
+        .product-no-image-icon{
+            width:82px;
+            height:82px;
+            border-radius:22px;
+            background:white;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            box-shadow:0 10px 25px rgba(17,24,39,.10);
+            margin-bottom:16px;
+        }
+
+        .product-no-image-icon i{
+            font-size:2.4rem;
+            color:#C9A227;
+        }
+
+        .product-no-image span{
+            font-size:.95rem;
+            font-weight:800;
+            color:#111827;
+        }
+
+        .product-no-image small{
+            color:#6B7280;
+            font-weight:600;
+            margin-top:4px;
+        }
+
     </style>
     
 </head>
@@ -400,10 +440,19 @@
                 {% else %}
 
                     <a href="{% url 'detalle_producto' producto.id %}"
-                       class="product-link-img d-flex justify-content-center align-items-center"
-                       style="height:235px;">
+                       class="product-link-img">
 
-                        <i class="bi bi-image fs-1 text-secondary"></i>
+                        <div class="product-no-image">
+
+                            <div class="product-no-image-icon">
+                                <i class="bi bi-image"></i>
+                            </div>
+
+                            <span>Sin imagen</span>
+
+                            <small>Imagen no disponible</small>
+
+                        </div>
 
                     </a>
 
