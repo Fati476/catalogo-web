@@ -285,6 +285,121 @@ label{
     border:1px solid rgba(17,24,39,.08);
 }
 
+
+.hero-back-btn{
+
+    display:inline-flex;
+    align-items:center;
+    justify-content:space-between;
+
+    gap:22px;
+
+    width:320px;
+    max-width:100%;
+
+    padding:8px 8px 8px 24px;
+
+    border-radius:999px;
+
+    text-decoration:none;
+
+    color:white;
+
+    border:2px solid rgba(201,162,39,.45);
+
+    background:rgba(17,24,39,.45);
+
+    backdrop-filter:blur(10px);
+
+    transition:.30s;
+
+    margin-bottom:34px;
+
+}
+
+.hero-back-btn:hover{
+
+    color:white;
+
+    transform:translateY(-3px);
+
+    border-color:#C9A227;
+
+    box-shadow:0 12px 35px rgba(201,162,39,.25);
+
+}
+
+.hero-back-btn span{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    font-weight:800;
+
+    font-size:1.05rem;
+
+}
+
+.hero-back-icon{
+
+    width:52px;
+
+    height:52px;
+
+    border-radius:50%;
+
+    background:#C9A227;
+
+    color:#111827;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    font-size:1.35rem;
+
+    box-shadow:
+        0 8px 20px rgba(201,162,39,.45),
+        inset 0 1px 2px rgba(255,255,255,.45);
+
+}
+
+.hero-back-btn:hover .hero-back-icon{
+
+    transform:rotate(-10deg) scale(1.08);
+
+    transition:.30s;
+
+}
+
+@media(max-width:768px){
+
+    .hero-back-btn{
+
+        width:100%;
+
+        padding:8px 8px 8px 18px;
+
+        margin-bottom:26px;
+
+    }
+
+    .hero-back-icon{
+
+        width:46px;
+        height:46px;
+
+        font-size:1.1rem;
+
+    }
+
+}
+
 </style>
 </head>
 
@@ -295,10 +410,18 @@ label{
     <section class="product-form-hero">
 
         <div class="product-form-hero-content">
-            <span class="admin-page-badge">
-                <i class="bi bi-plus-circle"></i>
-                Nuevo producto
-            </span>
+            <a href="{% url 'lista_productos' %}" class="hero-back-btn">
+
+                <span>
+                    <i class="bi bi-arrow-left"></i>
+                    Volver a productos
+                </span>
+            
+                <div class="hero-back-icon">
+                    <i class="bi bi-box-seam"></i>
+                </div>
+
+            </a>
 
             <h1>Agregar producto</h1>
 
@@ -317,13 +440,7 @@ label{
 
     </section>
 
-    <section class="product-form-page">
-
-        <a href="{% url 'lista_productos' %}" class="back-link">
-            <i class="bi bi-arrow-left"></i>
-            Volver a productos
-        </a>
-    
+    <section class="product-form-page">    
 
         <form method="POST"
             enctype="multipart/form-data"
