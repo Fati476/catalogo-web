@@ -414,26 +414,51 @@ textarea.form-control{
 <script>
 const input = document.getElementById('imagenInput');
 const previewContainer = document.getElementById('preview-container');
+
 let archivosSeleccionados = [];
 
 input.addEventListener('change', function(){
-    archivosSeleccionados = Array.from(this.files);
+
+    const nuevosArchivos = Array.from(this.files);
+
+    archivosSeleccionados.push(...nuevosArchivos);
+
+    actualizarInput();
     mostrarPreview();
+
+    this.value = "";
+
 });
 
+function actualizarInput(){
+
+    const dataTransfer = new DataTransfer();
+
+    archivosSeleccionados.forEach(archivo => {
+        dataTransfer.items.add(archivo);
+    });
+
+    input.files = dataTransfer.files;
+
+}
+
 function mostrarPreview(){
+
     previewContainer.innerHTML = '';
 
     archivosSeleccionados.forEach((archivo, index) => {
+
         const reader = new FileReader();
 
         reader.onload = function(e){
+
             const col = document.createElement('div');
-            col.classList.add('col-6','col-md-3','mb-4');
+            col.classList.add('col-6', 'col-md-3', 'mb-4');
 
             col.innerHTML = `
                 <div class="preview-card">
-                    <img src="${e.target.result}">
+                    <img src="${e.target.result}" alt="Vista previa">
+
                     <button type="button" onclick="eliminarImagen(${index})">
                         <i class="bi bi-x-lg"></i>
                     </button>
@@ -441,15 +466,22 @@ function mostrarPreview(){
             `;
 
             previewContainer.appendChild(col);
+
         };
 
         reader.readAsDataURL(archivo);
+
     });
+
 }
 
 function eliminarImagen(index){
-    archivosSeleccionados.splice(index,1);
+
+    archivosSeleccionados.splice(index, 1);
+
+    actualizarInput();
     mostrarPreview();
+
 }
 </script>
 
