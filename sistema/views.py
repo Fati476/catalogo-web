@@ -246,13 +246,14 @@ def editar_producto(request, id):
 
         form = ProductoForm(
             request.POST,
-            request.FILES,
             instance=producto
         )
 
         if form.is_valid():
 
-            producto = form.save()
+            producto = form.save(commit=False)
+            producto.estado = True
+            producto.save()
 
             imagenes = request.FILES.getlist('imagen')
 
@@ -262,12 +263,13 @@ def editar_producto(request, id):
                     imagen=imagen
                 )
 
-            return redirect('lista_productos')
+            return redirect('editar_producto', id=producto.id)
 
         else:
             print(form.errors)
 
     else:
+
         form = ProductoForm(instance=producto)
 
     imagenes = ProductoImagen.objects.filter(producto=producto)
