@@ -8,72 +8,47 @@
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 
 <style>
-*{
-    box-sizing:border-box;
-    font-family:'Montserrat', sans-serif;
-}
+*{box-sizing:border-box;font-family:'Montserrat',sans-serif}
+body{margin:0;background:#f3f1ec;color:#111827}
 
-body{
-    margin:0;
-    background:#f3f1ec;
-    color:#111827;
-}
-
-/* HERO */
-
-.product-form-hero{
+.form-hero{
     position:relative;
     min-height:350px;
     overflow:hidden;
-    background:
-        linear-gradient(90deg, rgba(17,24,39,.97), rgba(17,24,39,.76), rgba(17,24,39,.28)),
-        url("{% static 'img/banner_productos.png' %}");
+    background:linear-gradient(90deg,rgba(17,24,39,.97),rgba(17,24,39,.76),rgba(17,24,39,.28)),url("{% static 'img/banner_productos.png' %}");
     background-size:cover;
     background-position:center;
+    padding:65px 60px 80px;
+    margin-top:-95px;
     display:flex;
     align-items:center;
-    padding:45px 70px 70px;
-    margin-top:-95px;
 }
 
-.product-form-hero-content{
+.form-hero-content{
     max-width:720px;
     color:white;
+    padding-top:45px;
     position:relative;
     z-index:2;
-    padding-top:35px;
 }
 
 .hero-back-btn{
     display:inline-flex;
     align-items:center;
     justify-content:space-between;
-    width:255px;
-    max-width:100%;
+    width:250px;
     padding:6px 6px 6px 18px;
     border-radius:999px;
-    text-decoration:none;
     color:white;
+    text-decoration:none;
     border:2px solid rgba(201,162,39,.45);
     background:rgba(17,24,39,.45);
     backdrop-filter:blur(10px);
-    transition:.30s;
-    margin-bottom:28px;
-}
-
-.hero-back-btn:hover{
-    color:white;
-    transform:translateY(-3px);
-    border-color:#C9A227;
-    box-shadow:0 12px 35px rgba(201,162,39,.25);
-}
-
-.hero-back-btn span{
+    margin-bottom:26px;
     font-weight:900;
-    font-size:.95rem;
 }
 
 .hero-back-icon{
@@ -85,66 +60,55 @@ body{
     display:flex;
     align-items:center;
     justify-content:center;
-    font-size:1rem;
-    box-shadow:0 8px 20px rgba(201,162,39,.45);
 }
 
-.product-form-hero h1{
+.form-hero h1{
     font-size:3rem;
     font-weight:900;
-    line-height:1.08;
-    margin-bottom:16px;
+    margin-bottom:14px;
     text-shadow:0 5px 25px rgba(0,0,0,.45);
 }
 
-.product-form-hero p{
+.form-hero p{
     max-width:640px;
     color:rgba(255,255,255,.72);
     font-size:1.05rem;
     line-height:1.7;
-    margin-bottom:0;
 }
 
-.hero-wave-productos{
+.hero-wave{
     position:absolute;
     left:0;
     right:0;
     bottom:-1px;
-    z-index:4;
     line-height:0;
-    pointer-events:none;
 }
 
-.hero-wave-productos svg{
+.hero-wave svg{
     width:100%;
     height:55px;
     display:block;
 }
 
-/* FORMULARIO */
-
-.product-form-page{
-    width:min(1180px, calc(100% - 36px));
-    margin:28px auto 70px;
+.form-page{
+    width:min(1180px,calc(100% - 36px));
+    margin:32px auto 70px;
 }
 
-.product-create-form{
+.product-form{
     background:transparent;
-    border:0;
-    box-shadow:none;
-    padding:0;
 }
 
-.product-create-form h4{
-    font-size:1.65rem;
+.form-title{
+    font-size:1.7rem;
     font-weight:900;
-    margin-bottom:26px;
+    margin-bottom:28px;
 }
 
-.product-create-form h4::after{
+.form-title::after{
     content:"";
     display:block;
-    width:48px;
+    width:52px;
     height:3px;
     background:#C9A227;
     border-radius:999px;
@@ -157,57 +121,51 @@ label{
     gap:8px;
     font-size:.88rem;
     font-weight:900;
-    color:#111827;
     margin-bottom:10px;
 }
 
-label i{
-    color:#C9A227;
-    font-size:1rem;
-}
+label i{color:#C9A227}
 
-.form-control,
-.form-select{
-    min-height:48px;
-    background:rgba(255,255,255,.74);
-    border:1px solid rgba(17,24,39,.18);
-    border-radius:12px;
+.form-control,.form-select{
+    min-height:50px;
+    background:rgba(255,255,255,.78);
+    border:1px solid rgba(17,24,39,.16);
+    border-radius:14px;
     padding:12px 16px;
     font-weight:700;
     box-shadow:0 8px 24px rgba(17,24,39,.04);
 }
 
-.form-control:focus,
-.form-select:focus{
+textarea.form-control{
+    min-height:125px;
+    resize:vertical;
+}
+
+.form-control:focus,.form-select:focus{
     border-color:#C9A227;
     box-shadow:0 0 0 .18rem rgba(201,162,39,.16);
 }
 
-textarea.form-control{
-    min-height:115px;
-    resize:vertical;
-}
-
 .upload-box{
-    margin-top:22px;
+    margin-top:24px;
     border:1.5px dashed rgba(201,162,39,.75);
     background:rgba(201,162,39,.05);
-    border-radius:18px;
-    padding:24px;
+    border-radius:20px;
+    padding:28px;
     text-align:center;
 }
 
 .upload-box i{
-    width:42px;
-    height:42px;
+    width:46px;
+    height:46px;
     border-radius:14px;
-    background:rgba(201,162,39,.14);
+    background:rgba(201,162,39,.15);
     color:#C9A227;
     display:flex;
     align-items:center;
     justify-content:center;
-    margin:0 auto 10px;
-    font-size:1.35rem;
+    margin:0 auto 12px;
+    font-size:1.45rem;
 }
 
 .upload-box strong{
@@ -246,16 +204,13 @@ textarea.form-control{
     border:0;
     background:#DC2626;
     color:white;
-    display:flex;
-    align-items:center;
-    justify-content:center;
 }
 
 .form-actions{
     display:flex;
     gap:14px;
+    margin-top:30px;
     flex-wrap:wrap;
-    margin-top:28px;
 }
 
 .btn-save{
@@ -264,7 +219,7 @@ textarea.form-control{
     color:#111827;
     font-weight:900;
     border-radius:999px;
-    padding:12px 26px;
+    padding:13px 28px;
 }
 
 .btn-cancel{
@@ -273,190 +228,106 @@ textarea.form-control{
     text-decoration:none;
     font-weight:900;
     border-radius:999px;
-    padding:12px 26px;
+    padding:13px 28px;
 }
 
-.btn-cancel:hover{
-    color:white;
-}
-
-/* RESPONSIVE */
+.btn-cancel:hover{color:white}
 
 @media(max-width:768px){
-    .product-form-hero{
+    .form-hero{
         min-height:430px;
-        padding:35px 24px 70px;
+        padding:35px 24px 75px;
         margin-top:-80px;
         align-items:flex-start;
     }
 
-    .product-form-hero-content{
-        padding-top:100px;
-    }
-
-    .product-form-hero h1{
-        font-size:2.45rem;
-    }
-
-    .product-form-hero p{
-        font-size:1rem;
-        max-width:310px;
-    }
-
-    .hero-back-btn{
-        width:235px;
-        margin-bottom:24px;
-    }
-
-    .hero-wave-productos svg{
-        height:38px;
-    }
-
-    .product-form-page{
-        width:calc(100% - 24px);
-        margin:26px auto 50px;
-    }
-
-    .form-actions{
-        flex-direction:column;
-    }
-
-    .btn-save,
-    .btn-cancel{
-        width:100%;
-        text-align:center;
-    }
+    .form-hero-content{padding-top:100px}
+    .form-hero h1{font-size:2.45rem}
+    .form-hero p{font-size:1rem;max-width:310px}
+    .hero-wave svg{height:38px}
+    .form-page{width:calc(100% - 24px);margin:28px auto 50px}
+    .form-actions{flex-direction:column}
+    .btn-save,.btn-cancel{width:100%;text-align:center}
 }
 </style>
 </head>
 
 <body>
 
-<main>
+<section class="form-hero">
+    <div class="form-hero-content">
+        <a href="{% url 'lista_productos' %}" class="hero-back-btn">
+            <span>Volver a productos</span>
+            <div class="hero-back-icon"><i class="bi bi-box-seam"></i></div>
+        </a>
 
-    <section class="product-form-hero">
+        <h1>Agregar producto</h1>
+        <p>Registra la información básica del producto, su precio base, categoría e imágenes.</p>
+    </div>
 
-        <div class="product-form-hero-content">
+    <div class="hero-wave">
+        <svg viewBox="0 0 1440 80" preserveAspectRatio="none">
+            <path fill="#f3f1ec" d="M0,58 C260,78 470,80 720,65 C960,50 1180,48 1440,62 L1440,80 L0,80 Z"></path>
+        </svg>
+    </div>
+</section>
 
-            <a href="{% url 'lista_productos' %}" class="hero-back-btn">
-                <span>Volver a productos</span>
+<main class="form-page">
 
-                <div class="hero-back-icon">
-                    <i class="bi bi-box-seam"></i>
-                </div>
-            </a>
+<form method="POST" enctype="multipart/form-data" class="product-form">
+    {% csrf_token %}
 
-            <h1>Agregar producto</h1>
+    <h4 class="form-title">Información del producto</h4>
 
-            <p>
-                Registra la información básica del producto, su precio base, categoría e imágenes.
-            </p>
-
+    <div class="row">
+        <div class="col-md-7 mb-4">
+            <label><i class="bi bi-tag"></i> Nombre del producto</label>
+            {{ form.nombre }}
         </div>
 
-        <div class="hero-wave-productos">
-            <svg viewBox="0 0 1440 80" preserveAspectRatio="none">
-                <path fill="#f3f1ec"
-                      d="M0,58 C260,78 470,80 720,65 C960,50 1180,48 1440,62 L1440,80 L0,80 Z">
-                </path>
-            </svg>
+        <div class="col-md-5 mb-4">
+            <label><i class="bi bi-coin"></i> Precio base</label>
+            {{ form.precio }}
         </div>
+    </div>
 
-    </section>
+    <div class="mb-4">
+        <label><i class="bi bi-card-text"></i> Descripción</label>
+        {{ form.descripcion }}
+    </div>
 
-    <section class="product-form-page">
+    <div class="mb-4">
+        <label><i class="bi bi-folder"></i> Categoría</label>
+        {{ form.categoria }}
+    </div>
 
-        <form method="POST"
-              enctype="multipart/form-data"
-              class="product-create-form">
+    <div class="upload-box">
+        <i class="bi bi-images"></i>
+        <strong>Agregar imágenes del producto</strong>
+        <p>Selecciona una o varias imágenes para mostrar en el catálogo.</p>
 
-            {% csrf_token %}
+        <input type="file" name="imagen" id="imagenInput" multiple class="form-control">
+    </div>
 
-            <h4>Información del producto</h4>
+    <div class="row mt-4" id="preview-container"></div>
 
-            <div class="row">
+    <div class="form-actions">
+        <button type="submit" class="btn-save">
+            <i class="bi bi-check-circle"></i>
+            Guardar producto
+        </button>
 
-                <div class="col-md-7 mb-4">
-                    <label>
-                        <i class="bi bi-tag"></i>
-                        Nombre del producto
-                    </label>
-
-                    {{ form.nombre }}
-                </div>
-
-                <div class="col-md-5 mb-4">
-                    <label>
-                        <i class="bi bi-coin"></i>
-                        Precio base
-                    </label>
-
-                    {{ form.precio }}
-                </div>
-
-            </div>
-
-            <div class="mb-4">
-                <label>
-                    <i class="bi bi-card-text"></i>
-                    Descripción
-                </label>
-
-                {{ form.descripcion }}
-            </div>
-
-            <div class="mb-4">
-                <label>
-                    <i class="bi bi-folder"></i>
-                    Categoría
-                </label>
-
-                {{ form.categoria }}
-            </div>
-
-            <div class="upload-box">
-
-                <i class="bi bi-images"></i>
-
-                <strong>Agregar imágenes del producto</strong>
-
-                <p>
-                    Selecciona una o varias imágenes para mostrar en el catálogo.
-                </p>
-
-                <input type="file"
-                       name="imagen"
-                       id="imagenInput"
-                       multiple
-                       class="form-control">
-
-            </div>
-
-            <div class="row mt-4" id="preview-container"></div>
-
-            <div class="form-actions">
-
-                <button type="submit" class="btn-save">
-                    <i class="bi bi-check-circle"></i>
-                    Guardar producto
-                </button>
-
-                <a href="{% url 'lista_productos' %}" class="btn-cancel">
-                    Cancelar
-                </a>
-
-            </div>
-
-        </form>
-
-    </section>
+        <a href="{% url 'lista_productos' %}" class="btn-cancel">
+            Cancelar
+        </a>
+    </div>
+</form>
 
 </main>
 
 <script>
 const input = document.getElementById('imagenInput');
 const previewContainer = document.getElementById('preview-container');
-
 let archivosSeleccionados = [];
 
 input.addEventListener('change', function(){
@@ -472,7 +343,7 @@ function mostrarPreview(){
 
         reader.onload = function(e){
             const col = document.createElement('div');
-            col.classList.add('col-6', 'col-md-3', 'mb-4');
+            col.classList.add('col-6','col-md-3','mb-4');
 
             col.innerHTML = `
                 <div class="preview-card">
@@ -491,7 +362,7 @@ function mostrarPreview(){
 }
 
 function eliminarImagen(index){
-    archivosSeleccionados.splice(index, 1);
+    archivosSeleccionados.splice(index,1);
     mostrarPreview();
 }
 </script>
