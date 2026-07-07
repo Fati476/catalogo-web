@@ -76,19 +76,53 @@
 }
 
 @media(max-width:768px){
+
     .admin-products-hero{
-        min-height:350px;
+        min-height:520px;
+        padding:0 26px 95px;
         margin-top:-80px;
+        align-items:flex-start;
+        background-position:center top;
     }
 
-    .admin-products-hero > div{
-        width:calc(100% - 48px);
-        padding-top:90px;
-        padding-bottom:70px;
+    .admin-products-hero > .hero-content-productos{
+        width:100%;
+        max-width:none;
+        padding-top:145px;
+    }
+
+    .admin-page-badge{
+        font-size:.78rem;
+        margin-bottom:10px;
     }
 
     .admin-products-hero h1{
-        font-size:2.6rem;
+        font-size:2.7rem;
+        margin-bottom:14px;
+    }
+
+    .admin-products-hero p{
+        font-size:1rem;
+        line-height:1.55;
+        max-width:290px;
+        margin-bottom:26px;
+    }
+
+    .admin-products-hero .btn-admin-primary{
+        padding:12px 22px;
+        font-size:.95rem;
+    }
+
+    .hero-wave-productos{
+        bottom:-2px;
+    }
+
+    .hero-wave-productos svg{
+        height:38px;
+    }
+
+    .admin-toolbar{
+        margin-top:24px;
     }
 }
 .admin-toolbar{
@@ -491,9 +525,9 @@
         </div>
 
         <div class="hero-wave-productos">
-            <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+            <svg viewBox="0 0 1440 80" preserveAspectRatio="none">
                 <path fill="#f3f1ec"
-                      d="M0,75 C260,115 480,118 720,96 C960,74 1180,66 1440,92 L1440,120 L0,120 Z">
+                      d="M0,58 C260,78 470,80 720,65 C960,50 1180,48 1440,62 L1440,80 L0,80 Z">
                 </path>
             </svg>
         </div>
