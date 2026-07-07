@@ -1,425 +1,566 @@
-
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
-
-    <meta charset="UTF-8">
-
-    <title>Editar producto</title>
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1">
-
-    <!-- Bootstrap -->
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-          rel="stylesheet">
-
-    <!-- Icons -->
-
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
-    <!-- Fuente -->
-
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-          rel="stylesheet">
-
-    <style>
-
-        *{
-            font-family:'Poppins', sans-serif;
-        }
-
-        body{
-
-            background:#EEF2F7;
-
-        }
-
-        .contenedor{
-
-            max-width:1200px;
-
-            margin:auto;
-
-            padding:40px 20px;
-
-        }
-
-        .card-form{
-
-            background:white;
-
-            border:none;
-
-            border-radius:32px;
-
-            padding:50px;
-
-            box-shadow:0 15px 40px rgba(0,0,0,0.06);
-
-        }
-
-        h1{
-
-            font-weight:700;
-
-            color:#0F172A;
-
-        }
-
-        label{
-
-            font-weight:600;
-
-            margin-bottom:8px;
-
-            color:#334155;
-
-        }
-
-        input,
-        textarea,
-        select{
-
-            border-radius:18px !important;
-
-            padding:14px !important;
-
-            border:1px solid #E2E8F0 !important;
-
-        }
-
-        input:focus,
-        textarea:focus,
-        select:focus{
-
-            box-shadow:none !important;
-
-            border:1px solid #2563EB !important;
-
-        }
-
-        .btn-custom{
-
-            border:none;
-
-            border-radius:16px;
-
-            padding:14px 22px;
-
-            font-weight:600;
-
-        }
-
-        .imagen-card{
-
-            border-radius:22px;
-
-            overflow:hidden;
-
-            background:white;
-
-            box-shadow:0 10px 25px rgba(0,0,0,0.06);
-
-            position:relative;
-
-        }
-
-        .imagen-card img{
-
-            width:100%;
-
-            height:220px;
-
-            object-fit:cover;
-
-        }
-
-        .btn-eliminar{
-
-            position:absolute;
-
-            top:10px;
-
-            right:10px;
-
-            width:38px;
-
-            height:38px;
-
-            border-radius:50%;
-
-            display:flex;
-
-            justify-content:center;
-
-            align-items:center;
-
-        }
-
-        .preview-card{
-
-            border-radius:20px;
-
-            overflow:hidden;
-
-            box-shadow:0 10px 20px rgba(0,0,0,0.05);
-
-        }
-
-        .preview-card img{
-
-            width:100%;
-
-            height:180px;
-
-            object-fit:cover;
-
-        }
-
-    </style>
-
+<meta charset="UTF-8">
+<title>Editar producto</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+*{box-sizing:border-box;font-family:'Montserrat',sans-serif}
+body{margin:0;background:#f3f1ec;color:#111827}
+
+.form-hero{
+    position:relative;
+    min-height:390px;
+    overflow:hidden;
+    background:linear-gradient(90deg,rgba(17,24,39,.97),rgba(17,24,39,.76),rgba(17,24,39,.28)),url("{% static 'img/banner_productos.png' %}");
+    background-size:cover;
+    background-position:center;
+    padding:45px 70px 70px;
+    margin-top:-95px;
+    display:flex;
+    align-items:center;
+}
+
+.form-hero-content{
+    max-width:720px;
+    color:white;
+    padding-top:60px;
+    position:relative;
+    z-index:2;
+}
+
+.hero-back-btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:space-between;
+    width:250px;
+    padding:6px 6px 6px 18px;
+    border-radius:999px;
+    color:white;
+    text-decoration:none;
+    border:2px solid rgba(201,162,39,.45);
+    background:rgba(17,24,39,.45);
+    backdrop-filter:blur(10px);
+    margin-top:20px;
+    margin-bottom:30px;
+    font-weight:900;
+}
+
+.hero-back-icon{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    background:#C9A227;
+    color:#111827;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.form-hero h1{
+    font-size:3rem;
+    font-weight:900;
+    margin-bottom:14px;
+    text-shadow:0 5px 25px rgba(0,0,0,.45);
+}
+
+.form-hero p{
+    max-width:640px;
+    color:rgba(255,255,255,.72);
+    font-size:1.05rem;
+    line-height:1.7;
+}
+
+.hero-wave{
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:-1px;
+    line-height:0;
+}
+
+.hero-wave svg{
+    width:100%;
+    height:55px;
+    display:block;
+}
+
+.form-page{
+    width:min(1180px,calc(100% - 36px));
+    margin:32px auto 70px;
+}
+
+.product-form{
+    background:transparent;
+}
+
+.form-glass-panel{
+    background:rgba(255,255,255,.72);
+    border:1px solid rgba(17,24,39,.08);
+    border-radius:28px;
+    padding:28px;
+    box-shadow:0 18px 42px rgba(17,24,39,.08);
+    margin-bottom:24px;
+    backdrop-filter:blur(8px);
+}
+
+.section-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:26px;
+}
+
+.section-header small{
+    display:block;
+    color:#C9A227;
+    font-size:.72rem;
+    font-weight:900;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    margin-bottom:4px;
+}
+
+.section-header h4{
+    margin:0;
+    font-size:1.45rem;
+    font-weight:900;
+    color:#111827;
+}
+
+.section-icon{
+    width:56px;
+    height:56px;
+    border-radius:18px;
+    background:rgba(201,162,39,.12);
+    border:1px solid rgba(201,162,39,.25);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.section-icon i{
+    font-size:1.45rem;
+    color:#C9A227;
+}
+
+label{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:.88rem;
+    font-weight:900;
+    margin-bottom:10px;
+}
+
+label i{color:#C9A227}
+
+.form-control,.form-select{
+    min-height:50px;
+    background:rgba(255,255,255,.78);
+    border:1px solid rgba(17,24,39,.16);
+    border-radius:14px;
+    padding:12px 16px;
+    font-weight:700;
+    box-shadow:0 8px 24px rgba(17,24,39,.04);
+}
+
+textarea.form-control{
+    min-height:125px;
+    resize:vertical;
+}
+
+.form-control:focus,.form-select:focus{
+    border-color:#C9A227;
+    box-shadow:0 0 0 .18rem rgba(201,162,39,.16);
+}
+
+.current-images-grid,
+.preview-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:18px;
+}
+
+.imagen-card,
+.preview-card{
+    position:relative;
+    border-radius:20px;
+    overflow:hidden;
+    background:#e5e7eb;
+    box-shadow:0 10px 22px rgba(17,24,39,.10);
+}
+
+.imagen-card img,
+.preview-card img{
+    width:100%;
+    height:165px;
+    object-fit:cover;
+}
+
+.btn-eliminar-img,
+.preview-card button{
+    position:absolute;
+    top:9px;
+    right:9px;
+    width:36px;
+    height:36px;
+    border-radius:50%;
+    border:0;
+    background:#DC2626;
+    color:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-decoration:none;
+}
+
+.empty-images{
+    color:#6B7280;
+    font-weight:700;
+}
+
+.upload-box{
+    border:1.5px dashed rgba(201,162,39,.75);
+    background:rgba(201,162,39,.05);
+    border-radius:20px;
+    padding:28px;
+    text-align:center;
+}
+
+.upload-box i{
+    width:46px;
+    height:46px;
+    border-radius:14px;
+    background:rgba(201,162,39,.15);
+    color:#C9A227;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin:0 auto 12px;
+    font-size:1.45rem;
+}
+
+.upload-box strong{
+    display:block;
+    font-weight:900;
+    margin-bottom:6px;
+}
+
+.upload-box p{
+    color:#6B7280;
+    font-size:.9rem;
+    margin-bottom:14px;
+}
+
+.form-actions{
+    display:flex;
+    justify-content:flex-end;
+    align-items:center;
+    gap:14px;
+    margin-top:34px;
+    padding-top:26px;
+    border-top:1px solid rgba(17,24,39,.10);
+}
+
+.btn-save{
+    border:0;
+    background:#C9A227;
+    color:#111827;
+    font-weight:900;
+    border-radius:999px;
+    padding:14px 34px;
+    min-width:210px;
+    box-shadow:0 14px 28px rgba(201,162,39,.28);
+    transition:.25s;
+}
+
+.btn-save:hover{
+    background:#B8860B;
+    color:#111827;
+    transform:translateY(-2px);
+}
+
+.btn-cancel{
+    background:white;
+    color:#111827;
+    border:1px solid rgba(17,24,39,.12);
+    text-decoration:none;
+    font-weight:900;
+    border-radius:999px;
+    padding:14px 28px;
+    transition:.25s;
+}
+
+.btn-cancel:hover{
+    background:#111827;
+    color:white;
+}
+
+@media(max-width:992px){
+    .current-images-grid,
+    .preview-grid{
+        grid-template-columns:repeat(2,1fr);
+    }
+}
+
+@media(max-width:768px){
+    .form-hero{
+        min-height:430px;
+        padding:35px 24px 70px;
+        margin-top:-80px;
+        align-items:flex-start;
+    }
+
+    .form-hero-content{
+        padding-top:95px;
+    }
+
+    .form-hero h1{
+        font-size:2.3rem;
+        line-height:1.15;
+    }
+
+    .form-hero p{
+        font-size:.98rem;
+        max-width:100%;
+    }
+
+    .hero-back-btn{
+        width:230px;
+        margin-bottom:22px;
+    }
+
+    .hero-wave svg{
+        height:40px;
+    }
+
+    .form-page{
+        width:calc(100% - 24px);
+        margin:26px auto 45px;
+    }
+
+    .form-glass-panel{
+        padding:22px;
+        border-radius:24px;
+    }
+
+    .form-actions{
+        flex-direction:column-reverse;
+        align-items:stretch;
+    }
+
+    .btn-save,
+    .btn-cancel{
+        width:100%;
+        text-align:center;
+    }
+}
+</style>
 </head>
 
 <body>
 
-<div class="contenedor">
+<section class="form-hero">
+    <div class="form-hero-content">
+        <a href="{% url 'lista_productos' %}" class="hero-back-btn">
+            <span>Volver a productos</span>
+            <div class="hero-back-icon"><i class="bi bi-box-seam"></i></div>
+        </a>
 
-    <!-- BOTÓN VOLVER -->
+        <h1>Editar producto</h1>
+        <p>Actualiza la información del producto y administra las imágenes de su galería.</p>
+    </div>
 
-    <a href="{% url 'lista_productos' %}"
-       class="btn btn-light shadow-sm rounded-pill mb-4 px-4">
+    <div class="hero-wave">
+        <svg viewBox="0 0 1440 80" preserveAspectRatio="none">
+            <path fill="#f3f1ec" d="M0,58 C260,78 470,80 720,65 C960,50 1180,48 1440,62 L1440,80 L0,80 Z"></path>
+        </svg>
+    </div>
+</section>
 
-        <i class="bi bi-arrow-left"></i>
-        Volver
+<main class="form-page">
 
-    </a>
+<form method="POST" enctype="multipart/form-data" class="product-form">
+    {% csrf_token %}
 
-    <div class="card-form">
+    <section class="form-glass-panel">
 
-        <!-- TITULO -->
-
-        <div class="d-flex justify-content-between align-items-center mb-5">
-
+        <div class="section-header">
             <div>
-
-                <h1>
-
-                    <i class="bi bi-pencil-square"></i>
-                    Editar producto
-
-                </h1>
-
-                <p class="text-muted mt-2">
-
-                    Modifica la información del producto y administra sus imágenes
-
-                </p>
-
+                <small>DATOS GENERALES</small>
+                <h4>Información del producto</h4>
             </div>
+
+            <div class="section-icon">
+                <i class="bi bi-pencil-square"></i>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-7 mb-4">
+                <label><i class="bi bi-tag"></i> Nombre del producto</label>
+                {{ form.nombre }}
+            </div>
+
+            <div class="col-md-5 mb-4">
+                <label><i class="bi bi-coin"></i> Precio base</label>
+                {{ form.precio }}
+            </div>
+        </div>
+
+        <div class="mb-4">
+            <label><i class="bi bi-card-text"></i> Descripción</label>
+            {{ form.descripcion }}
+        </div>
+
+        <div class="mb-0">
+            <label><i class="bi bi-folder"></i> Categoría</label>
+            {{ form.categoria }}
+        </div>
+
+    </section>
+
+    <section class="form-glass-panel">
+
+        <div class="section-header">
+            <div>
+                <small>GALERÍA ACTUAL</small>
+                <h4>Imágenes actuales</h4>
+            </div>
+
+            <div class="section-icon">
+                <i class="bi bi-images"></i>
+            </div>
+        </div>
+
+        <div class="current-images-grid">
+
+            {% for imagen in imagenes %}
+
+                <div class="imagen-card">
+                    <img src="{{ imagen.imagen.url }}" alt="Imagen actual">
+
+                    <a href="{% url 'eliminar_imagen' imagen.id %}"
+                       class="btn-eliminar-img">
+                        <i class="bi bi-x-lg"></i>
+                    </a>
+                </div>
+
+            {% empty %}
+
+                <p class="empty-images">Este producto todavía no tiene imágenes registradas.</p>
+
+            {% endfor %}
 
         </div>
 
-        <!-- FORMULARIO -->
+    </section>
 
-        <form method="POST"
-              enctype="multipart/form-data">
+    <section class="form-glass-panel">
 
-            {% csrf_token %}
-
-            <!-- FILA -->
-
-            <div class="row">
-
-                <div class="col-md-8 mb-4">
-
-                    <label>
-                        Nombre
-                    </label>
-
-                    {{ form.nombre }}
-
-                </div>
-
-                <div class="col-md-4 mb-4">
-
-                    <label>
-                        Precio
-                    </label>
-
-                    {{ form.precio }}
-
-                </div>
-
+        <div class="section-header">
+            <div>
+                <small>NUEVAS IMÁGENES</small>
+                <h4>Agregar imágenes</h4>
             </div>
 
-            <!-- DESCRIPCIÓN -->
-
-            <div class="mb-4">
-
-                <label>
-                    Descripción
-                </label>
-
-                {{ form.descripcion }}
-
+            <div class="section-icon">
+                <i class="bi bi-cloud-arrow-up"></i>
             </div>
+        </div>
 
-            <!-- CATEGORIA -->
+        <div class="upload-box">
+            <i class="bi bi-images"></i>
+            <strong>Seleccionar nuevas imágenes</strong>
+            <p>Puedes elegir imágenes en diferentes momentos y se acumularán en la vista previa.</p>
 
-            <div class="mb-5">
+            <input type="file" name="imagen" id="imagenInput" multiple class="form-control">
+        </div>
 
-                <label>
-                    Categoría
-                </label>
+        <div class="preview-grid mt-4" id="preview-container"></div>
 
-                {{ form.categoria }}
+    </section>
 
-            </div>
+    <div class="form-actions">
+        <a href="{% url 'lista_productos' %}" class="btn-cancel">
+            Cancelar
+        </a>
 
-            <!-- IMÁGENES ACTUALES -->
-
-            <h4 class="fw-bold mb-4">
-
-                Imágenes actuales
-
-            </h4>
-
-            <div class="row mb-5">
-
-                {% for imagen in imagenes %}
-
-                <div class="col-md-3 mb-4">
-
-                    <div class="imagen-card">
-
-                        <img src="{{ imagen.imagen.url }}">
-
-                        <a href="{% url 'eliminar_imagen' imagen.id %}"
-                           class="btn btn-danger btn-eliminar">
-
-                            <i class="bi bi-x-lg"></i>
-
-                        </a>
-
-                    </div>
-
-                </div>
-
-                {% empty %}
-
-                <div class="text-muted">
-
-                    No hay imágenes registradas
-
-                </div>
-
-                {% endfor %}
-
-            </div>
-
-            <!-- SUBIR NUEVAS -->
-
-            <h4 class="fw-bold mb-4">
-
-                Agregar nuevas imágenes
-
-            </h4>
-
-            <div class="mb-4">
-
-                <input type="file"
-                       name="imagen"
-                       id="imagenInput"
-                       multiple
-                       class="form-control">
-
-            </div>
-
-            <!-- PREVIEW -->
-
-            <div class="row mb-5"
-                 id="preview-container">
-
-            </div>
-
-            <!-- BOTONES -->
-
-            <div class="d-flex gap-3">
-
-                <button type="submit"
-                        class="btn btn-primary btn-lg rounded-pill px-5">
-
-                    <i class="bi bi-check-circle"></i>
-                    Guardar cambios
-
-                </button>
-
-                <a href="{% url 'lista_productos' %}"
-                   class="btn btn-light btn-lg rounded-pill px-5 shadow-sm">
-
-                    Cancelar
-
-                </a>
-
-            </div>
-
-        </form>
-
+        <button type="submit" class="btn-save">
+            <i class="bi bi-check-circle"></i>
+            Guardar cambios
+        </button>
     </div>
 
-</div>
+</form>
 
-<!-- SCRIPT PREVIEW -->
+</main>
 
 <script>
-
 const input = document.getElementById('imagenInput');
-
 const previewContainer = document.getElementById('preview-container');
 
-input.addEventListener('change', function() {
+let archivosSeleccionados = [];
 
+input.addEventListener('change', function(){
+    const nuevosArchivos = Array.from(this.files);
+    archivosSeleccionados.push(...nuevosArchivos);
+
+    actualizarInput();
+    mostrarPreview();
+
+    this.value = "";
+});
+
+function actualizarInput(){
+    const dataTransfer = new DataTransfer();
+
+    archivosSeleccionados.forEach(archivo => {
+        dataTransfer.items.add(archivo);
+    });
+
+    input.files = dataTransfer.files;
+}
+
+function mostrarPreview(){
     previewContainer.innerHTML = '';
 
-    const archivos = this.files;
-
-    for(let i = 0; i < archivos.length; i++){
-
-        const archivo = archivos[i];
-
+    archivosSeleccionados.forEach((archivo, index) => {
         const reader = new FileReader();
 
         reader.onload = function(e){
+            const card = document.createElement('div');
 
-            const col = document.createElement('div');
-
-            col.classList.add('col-md-3', 'mb-4');
-
-            col.innerHTML = `
-            
+            card.innerHTML = `
                 <div class="preview-card">
-
-                    <img src="${e.target.result}">
-
+                    <img src="${e.target.result}" alt="Vista previa">
+                    <button type="button" onclick="eliminarImagen(${index})">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
                 </div>
-
             `;
 
-            previewContainer.appendChild(col);
-
-        }
+            previewContainer.appendChild(card);
+        };
 
         reader.readAsDataURL(archivo);
+    });
+}
 
-    }
+function eliminarImagen(index){
+    archivosSeleccionados.splice(index, 1);
 
-});
-
+    actualizarInput();
+    mostrarPreview();
+}
 </script>
 
 </body>
 </html>
-```
