@@ -174,20 +174,21 @@
     gap:22px;
 }
 
+/* Pantallas grandes */
 @media (max-width:1400px){
+    .admin-products-grid{
+        grid-template-columns:repeat(4,1fr);
+    }
+}
+
+/* Laptop pequeña */
+@media (max-width:1200px){
     .admin-products-grid{
         grid-template-columns:repeat(3,1fr);
     }
 }
 
-/* Tablet */
-@media (max-width:992px){
-    .admin-products-grid{
-        grid-template-columns:repeat(2,1fr);
-    }
-}
-
-/* Teléfono */
+/* Tablet y ventana reducida */
 @media (max-width:768px){
     .admin-products-grid{
         grid-template-columns:repeat(2,1fr);
@@ -195,14 +196,18 @@
     }
 
     .admin-product-image{
-        height:150px;
+        height:160px;
     }
 }
 
-/* Teléfonos muy pequeños */
+/* Celulares pequeños */
 @media (max-width:480px){
     .admin-products-grid{
         grid-template-columns:1fr;
+    }
+
+    .admin-product-image{
+        height:150px;
     }
 }
 
