@@ -17,115 +17,209 @@
 }
 
 body{
+    margin:0;
     background:#f3f1ec;
     color:#111827;
 }
 
-.product-form-page{
-    width:min(1150px, calc(100% - 32px));
-    margin:45px auto 70px;
-}
+/* HERO */
 
-.back-link{
-    display:inline-flex;
-    align-items:center;
-    gap:8px;
-    text-decoration:none;
-    background:white;
-    color:#111827;
-    font-weight:900;
-    padding:12px 20px;
-    border-radius:999px;
-    box-shadow:0 10px 25px rgba(17,24,39,.08);
-    margin-bottom:22px;
-}
-
-.product-form-card{
-    background:white;
-    border-radius:32px;
+.product-form-hero{
+    position:relative;
+    min-height:350px;
     overflow:hidden;
-    box-shadow:0 20px 45px rgba(17,24,39,.10);
-    border:1px solid rgba(17,24,39,.08);
+    background:
+        linear-gradient(90deg, rgba(17,24,39,.97), rgba(17,24,39,.76), rgba(17,24,39,.28)),
+        url("{% static 'img/banner_productos.png' %}");
+    background-size:cover;
+    background-position:center;
+    display:flex;
+    align-items:center;
+    padding:45px 70px 70px;
+    margin-top:-95px;
 }
 
-.form-hero{
-    background:linear-gradient(135deg, #111827, #374151);
-    padding:34px 38px;
+.product-form-hero-content{
+    max-width:720px;
     color:white;
+    position:relative;
+    z-index:2;
+    padding-top:35px;
 }
 
-.form-hero span{
+.hero-back-btn{
     display:inline-flex;
     align-items:center;
-    gap:8px;
-    background:rgba(201,162,39,.15);
-    border:1px solid rgba(201,162,39,.35);
-    color:#E7C766;
-    padding:8px 15px;
+    justify-content:space-between;
+    width:255px;
+    max-width:100%;
+    padding:6px 6px 6px 18px;
     border-radius:999px;
+    text-decoration:none;
+    color:white;
+    border:2px solid rgba(201,162,39,.45);
+    background:rgba(17,24,39,.45);
+    backdrop-filter:blur(10px);
+    transition:.30s;
+    margin-bottom:28px;
+}
+
+.hero-back-btn:hover{
+    color:white;
+    transform:translateY(-3px);
+    border-color:#C9A227;
+    box-shadow:0 12px 35px rgba(201,162,39,.25);
+}
+
+.hero-back-btn span{
     font-weight:900;
-    font-size:.8rem;
-    margin-bottom:14px;
+    font-size:.95rem;
 }
 
-.form-hero h1{
-    font-size:2.2rem;
+.hero-back-icon{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    background:#C9A227;
+    color:#111827;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:1rem;
+    box-shadow:0 8px 20px rgba(201,162,39,.45);
+}
+
+.product-form-hero h1{
+    font-size:3rem;
     font-weight:900;
-    margin:0;
+    line-height:1.08;
+    margin-bottom:16px;
+    text-shadow:0 5px 25px rgba(0,0,0,.45);
 }
 
-.form-hero p{
-    color:rgba(255,255,255,.70);
-    margin:8px 0 0;
+.product-form-hero p{
+    max-width:640px;
+    color:rgba(255,255,255,.72);
+    font-size:1.05rem;
+    line-height:1.7;
+    margin-bottom:0;
 }
 
-.form-body{
-    padding:34px 38px 38px;
+.hero-wave-productos{
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:-1px;
+    z-index:4;
+    line-height:0;
+    pointer-events:none;
 }
 
-.form-section-title{
+.hero-wave-productos svg{
+    width:100%;
+    height:55px;
+    display:block;
+}
+
+/* FORMULARIO */
+
+.product-form-page{
+    width:min(1180px, calc(100% - 36px));
+    margin:28px auto 70px;
+}
+
+.product-create-form{
+    background:transparent;
+    border:0;
+    box-shadow:none;
+    padding:0;
+}
+
+.product-create-form h4{
+    font-size:1.65rem;
     font-weight:900;
-    margin:4px 0 22px;
+    margin-bottom:26px;
+}
+
+.product-create-form h4::after{
+    content:"";
+    display:block;
+    width:48px;
+    height:3px;
+    background:#C9A227;
+    border-radius:999px;
+    margin-top:12px;
 }
 
 label{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:.88rem;
     font-weight:900;
     color:#111827;
-    margin-bottom:8px;
+    margin-bottom:10px;
+}
+
+label i{
+    color:#C9A227;
+    font-size:1rem;
 }
 
 .form-control,
 .form-select{
-    border:1px solid rgba(17,24,39,.10);
-    border-radius:18px;
-    padding:13px 16px;
+    min-height:48px;
+    background:rgba(255,255,255,.74);
+    border:1px solid rgba(17,24,39,.18);
+    border-radius:12px;
+    padding:12px 16px;
     font-weight:700;
-    box-shadow:none;
+    box-shadow:0 8px 24px rgba(17,24,39,.04);
 }
 
 .form-control:focus,
 .form-select:focus{
     border-color:#C9A227;
-    box-shadow:0 0 0 .2rem rgba(201,162,39,.16);
+    box-shadow:0 0 0 .18rem rgba(201,162,39,.16);
+}
+
+textarea.form-control{
+    min-height:115px;
+    resize:vertical;
 }
 
 .upload-box{
-    border:2px dashed rgba(201,162,39,.45);
-    background:rgba(201,162,39,.07);
-    border-radius:24px;
-    padding:26px;
+    margin-top:22px;
+    border:1.5px dashed rgba(201,162,39,.75);
+    background:rgba(201,162,39,.05);
+    border-radius:18px;
+    padding:24px;
     text-align:center;
 }
 
 .upload-box i{
-    font-size:2.3rem;
+    width:42px;
+    height:42px;
+    border-radius:14px;
+    background:rgba(201,162,39,.14);
     color:#C9A227;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin:0 auto 10px;
+    font-size:1.35rem;
+}
+
+.upload-box strong{
+    display:block;
+    font-weight:900;
+    margin-bottom:6px;
 }
 
 .upload-box p{
-    margin:8px 0 16px;
     color:#6B7280;
-    font-weight:700;
+    font-size:.9rem;
+    margin-bottom:14px;
 }
 
 .preview-card{
@@ -161,7 +255,7 @@ label{
     display:flex;
     gap:14px;
     flex-wrap:wrap;
-    margin-top:34px;
+    margin-top:28px;
 }
 
 .btn-save{
@@ -170,7 +264,7 @@ label{
     color:#111827;
     font-weight:900;
     border-radius:999px;
-    padding:13px 28px;
+    padding:12px 26px;
 }
 
 .btn-cancel{
@@ -179,26 +273,48 @@ label{
     text-decoration:none;
     font-weight:900;
     border-radius:999px;
-    padding:13px 28px;
+    padding:12px 26px;
 }
 
 .btn-cancel:hover{
     color:white;
 }
 
+/* RESPONSIVE */
+
 @media(max-width:768px){
+    .product-form-hero{
+        min-height:430px;
+        padding:35px 24px 70px;
+        margin-top:-80px;
+        align-items:flex-start;
+    }
+
+    .product-form-hero-content{
+        padding-top:100px;
+    }
+
+    .product-form-hero h1{
+        font-size:2.45rem;
+    }
+
+    .product-form-hero p{
+        font-size:1rem;
+        max-width:310px;
+    }
+
+    .hero-back-btn{
+        width:235px;
+        margin-bottom:24px;
+    }
+
+    .hero-wave-productos svg{
+        height:38px;
+    }
+
     .product-form-page{
         width:calc(100% - 24px);
-        margin:28px auto 50px;
-    }
-
-    .form-hero,
-    .form-body{
-        padding:28px 22px;
-    }
-
-    .form-hero h1{
-        font-size:1.8rem;
+        margin:26px auto 50px;
     }
 
     .form-actions{
@@ -209,273 +325,8 @@ label{
     .btn-cancel{
         width:100%;
         text-align:center;
-        justify-content:center;
     }
-
-
-    
 }
-
-
-.product-form-page{
-    width:min(1150px, calc(100% - 32px));
-    margin:34px auto 70px;
-}
-
-.product-form-hero{
-    position:relative;
-    min-height:350px;
-    overflow:hidden;
-    background:
-        linear-gradient(90deg, rgba(17,24,39,.97), rgba(17,24,39,.76), rgba(17,24,39,.28)),
-        url("{% static 'img/banner_productos.png' %}");
-    background-size:cover;
-    background-position:center;
-    display:flex;
-    align-items:center;
-    padding:65px 60px 80px;
-    margin-top:-95px;
-}
-
-.product-form-hero-content{
-    max-width:720px;
-    color:white;
-    position:relative;
-    z-index:2;
-    padding-top:45px;
-}
-
-.product-form-hero h1{
-    font-size:3rem;
-    font-weight:900;
-    line-height:1.08;
-    margin-bottom:16px;
-    text-shadow:0 5px 25px rgba(0,0,0,.45);
-}
-
-.product-form-hero p{
-    max-width:640px;
-    color:rgba(255,255,255,.72);
-    font-size:1.05rem;
-    line-height:1.7;
-    margin-bottom:0;
-}
-
-.hero-wave-productos{
-    position:absolute;
-    left:0;
-    right:0;
-    bottom:-1px;
-    z-index:4;
-    line-height:0;
-    pointer-events:none;
-}
-
-.hero-wave-productos svg{
-    width:100%;
-    height:55px;
-    display:block;
-}
-
-.product-create-form{
-    background:white;
-    border-radius:32px;
-    padding:38px;
-    box-shadow:0 20px 45px rgba(17,24,39,.10);
-    border:1px solid rgba(17,24,39,.08);
-}
-
-
-.hero-back-btn{
-
-    display:inline-flex;
-    align-items:center;
-    justify-content:space-between;
-
-    gap:22px;
-
-    width:320px;
-    max-width:100%;
-
-    padding:8px 8px 8px 24px;
-
-    border-radius:999px;
-
-    text-decoration:none;
-
-    color:white;
-
-    border:2px solid rgba(201,162,39,.45);
-
-    background:rgba(17,24,39,.45);
-
-    backdrop-filter:blur(10px);
-
-    transition:.30s;
-
-    margin-bottom:34px;
-
-}
-
-.hero-back-btn:hover{
-
-    color:white;
-
-    transform:translateY(-3px);
-
-    border-color:#C9A227;
-
-    box-shadow:0 12px 35px rgba(201,162,39,.25);
-
-}
-
-.hero-back-btn span{
-
-    display:flex;
-
-    align-items:center;
-
-    gap:12px;
-
-    font-weight:800;
-
-    font-size:1.05rem;
-
-}
-
-.hero-back-icon{
-
-    width:52px;
-
-    height:52px;
-
-    border-radius:50%;
-
-    background:#C9A227;
-
-    color:#111827;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    font-size:1.35rem;
-
-    box-shadow:
-        0 8px 20px rgba(201,162,39,.45),
-        inset 0 1px 2px rgba(255,255,255,.45);
-
-}
-
-.hero-back-btn:hover .hero-back-icon{
-
-    transform:rotate(-10deg) scale(1.08);
-
-    transition:.30s;
-
-}
-
-@media(max-width:768px){
-
-    .hero-back-btn{
-    
-        width:260px;
-
-        padding:6px 6px 6px 18px;
-
-        gap:16px;
-
-        margin-bottom:26px;
-
-    }
-
-    .hero-back-icon{
-
-        width:46px;
-        height:46px;
-
-        font-size:1.1rem;
-
-    }
-
-}
-
-.product-create-form{
-    margin-top:-18px;
-    background:rgba(255,255,255,.96);
-    backdrop-filter:blur(10px);
-    border-radius:34px;
-    padding:34px 42px;
-    box-shadow:0 24px 60px rgba(17,24,39,.12);
-    border:1px solid rgba(17,24,39,.08);
-}
-
-.product-create-form h4{
-    font-size:1.35rem;
-    font-weight:900;
-    margin-bottom:26px;
-    position:relative;
-}
-
-.product-create-form h4::after{
-    content:"";
-    display:block;
-    width:56px;
-    height:3px;
-    background:#C9A227;
-    border-radius:999px;
-    margin-top:10px;
-}
-
-label{
-    font-size:.86rem;
-    font-weight:900;
-    margin-bottom:8px;
-}
-
-.form-control,
-.form-select{
-    min-height:48px;
-    background:#fff;
-    border:1px solid rgba(17,24,39,.10);
-    border-radius:16px;
-    padding:12px 15px;
-    font-weight:700;
-}
-
-textarea.form-control{
-    min-height:190px;
-    resize:vertical;
-}
-
-.upload-box{
-    margin-top:26px;
-    border:2px dashed rgba(201,162,39,.55);
-    background:linear-gradient(135deg, rgba(201,162,39,.08), rgba(255,255,255,.95));
-    border-radius:26px;
-    padding:28px;
-}
-
-.upload-box i{
-    width:58px;
-    height:58px;
-    border-radius:18px;
-    background:rgba(201,162,39,.16);
-    color:#C9A227;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    margin:0 auto 12px;
-    font-size:1.8rem;
-}
-
-.form-actions{
-    border-top:1px solid rgba(17,24,39,.08);
-    padding-top:24px;
-}
-
 </style>
 </head>
 
@@ -486,16 +337,13 @@ textarea.form-control{
     <section class="product-form-hero">
 
         <div class="product-form-hero-content">
-            <a href="{% url 'lista_productos' %}" class="hero-back-btn">
 
-                <span>
-                    Volver a productos
-                </span>
-            
+            <a href="{% url 'lista_productos' %}" class="hero-back-btn">
+                <span>Volver a productos</span>
+
                 <div class="hero-back-icon">
                     <i class="bi bi-box-seam"></i>
                 </div>
-
             </a>
 
             <h1>Agregar producto</h1>
@@ -503,6 +351,7 @@ textarea.form-control{
             <p>
                 Registra la información básica del producto, su precio base, categoría e imágenes.
             </p>
+
         </div>
 
         <div class="hero-wave-productos">
@@ -515,66 +364,91 @@ textarea.form-control{
 
     </section>
 
-    <section class="product-form-page">    
+    <section class="product-form-page">
 
         <form method="POST"
-            enctype="multipart/form-data"
-            class="product-create-form">
-    
-                {% csrf_token %}
+              enctype="multipart/form-data"
+              class="product-create-form">
 
-                <h4>Información del producto</h4>
+            {% csrf_token %}
 
-                <div class="row">
-                    <div class="col-md-8 mb-4">
-                        <label>Nombre</label>
-                        {{ form.nombre }}
-                    </div>
+            <h4>Información del producto</h4>
 
-                    <div class="col-md-4 mb-4">
-                        <label>Precio base</label>
-                        {{ form.precio }}
-                    </div>
+            <div class="row">
+
+                <div class="col-md-7 mb-4">
+                    <label>
+                        <i class="bi bi-tag"></i>
+                        Nombre del producto
+                    </label>
+
+                    {{ form.nombre }}
                 </div>
 
-                <div class="mb-4">
-                    <label>Descripción</label>
-                    {{ form.descripcion }}
+                <div class="col-md-5 mb-4">
+                    <label>
+                        <i class="bi bi-coin"></i>
+                        Precio base
+                    </label>
+
+                    {{ form.precio }}
                 </div>
 
-                <div class="mb-4">
-                    <label>Categoría</label>
-                    {{ form.categoria }}
-                </div>
+            </div>
 
-                <div class="upload-box">
-                    <i class="bi bi-images"></i>
-                    <div>
-                        <strong>Imágenes del producto</strong>
-                        <p>Selecciona una o varias imágenes para mostrar en el catálogo.</p>
-                    </div>
+            <div class="mb-4">
+                <label>
+                    <i class="bi bi-card-text"></i>
+                    Descripción
+                </label>
 
-                    <input type="file"
-                           name="imagen"
-                           id="imagenInput"
-                           multiple
-                           class="form-control">
-                </div>
+                {{ form.descripcion }}
+            </div>
 
-                <div class="row mt-4" id="preview-container"></div>
-    
-                <div class="form-actions">
-                    <button type="submit" class="btn-save">
-                        <i class="bi bi-check-circle"></i>
-                        Guardar producto
-                    </button>
-    
-                    <a href="{% url 'lista_productos' %}" class="btn-cancel">
-                        Cancelar
-                    </a>
-                </div>
-    
+            <div class="mb-4">
+                <label>
+                    <i class="bi bi-folder"></i>
+                    Categoría
+                </label>
+
+                {{ form.categoria }}
+            </div>
+
+            <div class="upload-box">
+
+                <i class="bi bi-images"></i>
+
+                <strong>Agregar imágenes del producto</strong>
+
+                <p>
+                    Selecciona una o varias imágenes para mostrar en el catálogo.
+                </p>
+
+                <input type="file"
+                       name="imagen"
+                       id="imagenInput"
+                       multiple
+                       class="form-control">
+
+            </div>
+
+            <div class="row mt-4" id="preview-container"></div>
+
+            <div class="form-actions">
+
+                <button type="submit" class="btn-save">
+                    <i class="bi bi-check-circle"></i>
+                    Guardar producto
+                </button>
+
+                <a href="{% url 'lista_productos' %}" class="btn-cancel">
+                    Cancelar
+                </a>
+
+            </div>
+
         </form>
+
     </section>
 
 </main>
@@ -610,7 +484,7 @@ function mostrarPreview(){
             `;
 
             previewContainer.appendChild(col);
-        }
+        };
 
         reader.readAsDataURL(archivo);
     });
