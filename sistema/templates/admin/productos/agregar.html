@@ -211,6 +211,99 @@ label{
         text-align:center;
         justify-content:center;
     }
+
+
+    .product-create-layout{
+        display:grid;
+        grid-template-columns:380px 1fr;
+        gap:26px;
+        align-items:stretch;
+    }
+
+    .product-create-hero{
+        background:
+            linear-gradient(135deg, rgba(17,24,39,.96), rgba(55,65,81,.92));
+        border-radius:32px;
+        padding:34px;
+        color:white;
+        box-shadow:0 20px 45px rgba(17,24,39,.12);
+    }
+
+    .product-create-hero span{
+        display:inline-flex;
+        align-items:center;
+        gap:8px;
+        background:rgba(201,162,39,.16);
+        border:1px solid rgba(201,162,39,.35);
+        color:#E7C766;
+        padding:8px 14px;
+        border-radius:999px;
+        font-weight:900;
+        font-size:.8rem;
+        margin-bottom:24px;
+    }
+
+    .product-create-hero h1{
+        font-size:2.4rem;
+        font-weight:900;
+        margin-bottom:14px;
+    }
+
+    .product-create-hero p{
+        color:rgba(255,255,255,.72);
+        line-height:1.7;
+    }
+
+    .hero-mini-card{
+        margin-top:34px;
+        padding:18px;
+        border-radius:22px;
+        background:rgba(255,255,255,.08);
+        border:1px solid rgba(255,255,255,.10);
+        display:flex;
+        gap:14px;
+        align-items:center;
+    }
+
+    .hero-mini-card i{
+        width:46px;
+        height:46px;
+        border-radius:16px;
+        background:rgba(201,162,39,.16);
+        color:#E7C766;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        font-size:1.35rem;
+    }
+
+    .hero-mini-card strong,
+    .hero-mini-card small{
+        display:block;
+    }
+
+    .hero-mini-card small{
+        color:rgba(255,255,255,.60);
+    }
+
+    .product-create-form{
+        background:white;
+        border-radius:32px;
+        padding:34px;
+        box-shadow:0 20px 45px rgba(17,24,39,.10);
+        border:1px solid rgba(17,24,39,.08);
+    }
+
+    .product-create-form h4{
+        font-weight:900;
+        margin-bottom:24px;
+    }
+
+    @media(max-width:992px){
+        .product-create-layout{
+            grid-template-columns:1fr;
+        }
+    }
 }
 </style>
 </head>
@@ -224,79 +317,87 @@ label{
         Volver a productos
     </a>
 
-    <section class="product-form-card">
+    <section class="product-create-layout">
 
-        <div class="form-hero">
+        <aside class="product-create-hero">
             <span>
-                <i class="bi bi-plus-circle"></i>
+            <i class="bi bi-plus-circle"></i>
                 Nuevo producto
             </span>
 
             <h1>Agregar producto</h1>
 
-            <p>Registra un producto para el catálogo administrativo.</p>
-        </div>
+            <p>
+                Registra la información básica del producto, su precio base, categoría e imágenes.
+            </p>
 
-        <div class="form-body">
+            <div class="hero-mini-card">
+                <i class="bi bi-box-seam"></i>
+                <div>
+                    <strong>Catálogo administrativo</strong>
+                    <small>Producto visible para clientes activos.</small>
+                </div>
+            </div>
+        </aside>
 
-            <form method="POST" enctype="multipart/form-data">
-                {% csrf_token %}
+        <form method="POST"
+              enctype="multipart/form-data"
+              class="product-create-form">
 
-                <h5 class="form-section-title">Información del producto</h5>
+            {% csrf_token %}
 
-                <div class="row">
-                    <div class="col-md-8 mb-4">
-                        <label>Nombre</label>
-                        {{ form.nombre }}
-                    </div>
+            <h4>Información del producto</h4>
 
-                    <div class="col-md-4 mb-4">
-                        <label>Precio base</label>
-                        {{ form.precio }}
-                    </div>
+            <div class="row">
+                <div class="col-md-8 mb-4">
+                    <label>Nombre</label>
+                    {{ form.nombre }}
                 </div>
 
-                <div class="mb-4">
-                    <label>Descripción</label>
-                    {{ form.descripcion }}
+                <div class="col-md-4 mb-4">
+                    <label>Precio base</label>
+                    {{ form.precio }}
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label>Descripción</label>
+                {{ form.descripcion }}
+            </div>
+
+            <div class="mb-4">
+                <label>Categoría</label>
+                {{ form.categoria }}
+            </div>
+
+            <div class="upload-box">
+                <i class="bi bi-images"></i>
+                <div>
+                    <strong>Imágenes del producto</strong>
+                    <p>Selecciona una o varias imágenes para mostrar en el catálogo.</p>
                 </div>
 
-                <div class="mb-4">
-                    <label>Categoría</label>
-                    {{ form.categoria }}
-                </div>
+                <input type="file"
+                       name="imagen"
+                       id="imagenInput"
+                       multiple
+                       class="form-control">
+            </div>
 
-                <hr class="my-5">
+            <div class="row mt-4" id="preview-container"></div>
 
-                <h5 class="form-section-title">Imágenes del producto</h5>
+            <div class="form-actions">
+                <button type="submit" class="btn-save">
+                    <i class="bi bi-check-circle"></i>
+                    Guardar producto
+                </button>
 
-                <div class="upload-box">
-                    <i class="bi bi-images"></i>
-                    <p>Selecciona una o varias imágenes del producto.</p>
+                <a href="{% url 'lista_productos' %}" class="btn-cancel">
+                    Cancelar
+                </a>
+            </div>
 
-                    <input type="file"
-                           name="imagen"
-                           id="imagenInput"
-                           multiple
-                           class="form-control">
-                </div>
-
-                <div class="row mt-4" id="preview-container"></div>
-
-                <div class="form-actions">
-                    <button type="submit" class="btn-save">
-                        <i class="bi bi-check-circle"></i>
-                        Guardar producto
-                    </button>
-
-                    <a href="{% url 'lista_productos' %}" class="btn-cancel">
-                        Cancelar
-                    </a>
-                </div>
-
-            </form>
-
-        </div>
+        </form>
 
     </section>
 
