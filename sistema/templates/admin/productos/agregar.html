@@ -217,30 +217,11 @@ label{
 }
 
 
-.product-create-hero span{
-    display:inline-flex;
-    align-items:center;
-    gap:8px;
-    background:rgba(201,162,39,.16);
-    border:1px solid rgba(201,162,39,.35);
-    color:#E7C766;
-    padding:8px 14px;
-    border-radius:999px;
-    font-weight:900;
-    font-size:.8rem;
-    margin-bottom:24px;
+.product-form-page{
+    width:min(1150px, calc(100% - 32px));
+    margin:34px auto 70px;
 }
 
-.product-create-hero h1{
-    font-size:2.4rem;
-    font-weight:900;
-    margin-bottom:14px;
-}
-
-.product-create-hero p{
-    color:rgba(255,255,255,.72);
-    line-height:1.7;
-}
 .product-form-hero{
     position:relative;
     min-height:350px;
@@ -280,19 +261,39 @@ label{
     margin-bottom:0;
 }
 
+.hero-wave-productos{
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:-1px;
+    z-index:4;
+    line-height:0;
+    pointer-events:none;
+}
+
+.hero-wave-productos svg{
+    width:100%;
+    height:55px;
+    display:block;
+}
+
+.product-create-form{
+    background:white;
+    border-radius:32px;
+    padding:38px;
+    box-shadow:0 20px 45px rgba(17,24,39,.10);
+    border:1px solid rgba(17,24,39,.08);
+}
+
 </style>
 </head>
 
 <body>
 
-<main class="product-form-page">
-
-    <a href="{% url 'lista_productos' %}" class="back-link">
-        <i class="bi bi-arrow-left"></i>
-        Volver a productos
-    </a>
+<main>
 
     <section class="product-form-hero">
+
         <div class="product-form-hero-content">
             <span class="admin-page-badge">
                 <i class="bi bi-plus-circle"></i>
@@ -305,66 +306,84 @@ label{
                 Registra la información básica del producto, su precio base, categoría e imágenes.
             </p>
         </div>
+
+        <div class="hero-wave-productos">
+            <svg viewBox="0 0 1440 80" preserveAspectRatio="none">
+                <path fill="#f3f1ec"
+                      d="M0,58 C260,78 470,80 720,65 C960,50 1180,48 1440,62 L1440,80 L0,80 Z">
+                </path>
+            </svg>
+        </div>
+
     </section>
 
-    <form method="POST"
-        enctype="multipart/form-data"
-        class="product-create-form">
+    <section class="product-form-page">
 
-            {% csrf_token %}
+        <a href="{% url 'lista_productos' %}" class="back-link">
+            <i class="bi bi-arrow-left"></i>
+            Volver a productos
+        </a>
+    
 
-            <h4>Información del producto</h4>
+        <form method="POST"
+            enctype="multipart/form-data"
+            class="product-create-form">
+    
+                {% csrf_token %}
 
-            <div class="row">
-                <div class="col-md-8 mb-4">
-                    <label>Nombre</label>
-                    {{ form.nombre }}
+                <h4>Información del producto</h4>
+
+                <div class="row">
+                    <div class="col-md-8 mb-4">
+                        <label>Nombre</label>
+                        {{ form.nombre }}
+                    </div>
+
+                    <div class="col-md-4 mb-4">
+                        <label>Precio base</label>
+                        {{ form.precio }}
+                    </div>
                 </div>
 
-                <div class="col-md-4 mb-4">
-                    <label>Precio base</label>
-                    {{ form.precio }}
-                </div>
-            </div>
-
-            <div class="mb-4">
-                <label>Descripción</label>
-                {{ form.descripcion }}
-            </div>
-
-            <div class="mb-4">
-                <label>Categoría</label>
-                {{ form.categoria }}
-            </div>
-
-            <div class="upload-box">
-                <i class="bi bi-images"></i>
-                <div>
-                    <strong>Imágenes del producto</strong>
-                    <p>Selecciona una o varias imágenes para mostrar en el catálogo.</p>
+                <div class="mb-4">
+                    <label>Descripción</label>
+                    {{ form.descripcion }}
                 </div>
 
-                <input type="file"
-                       name="imagen"
-                       id="imagenInput"
-                       multiple
-                       class="form-control">
-            </div>
+                <div class="mb-4">
+                    <label>Categoría</label>
+                    {{ form.categoria }}
+                </div>
 
-            <div class="row mt-4" id="preview-container"></div>
+                <div class="upload-box">
+                    <i class="bi bi-images"></i>
+                    <div>
+                        <strong>Imágenes del producto</strong>
+                        <p>Selecciona una o varias imágenes para mostrar en el catálogo.</p>
+                    </div>
 
-            <div class="form-actions">
-                <button type="submit" class="btn-save">
-                    <i class="bi bi-check-circle"></i>
-                    Guardar producto
-                </button>
+                    <input type="file"
+                           name="imagen"
+                           id="imagenInput"
+                           multiple
+                           class="form-control">
+                </div>
 
-                <a href="{% url 'lista_productos' %}" class="btn-cancel">
-                    Cancelar
-                </a>
-            </div>
-
-    </form>
+                <div class="row mt-4" id="preview-container"></div>
+    
+                <div class="form-actions">
+                    <button type="submit" class="btn-save">
+                        <i class="bi bi-check-circle"></i>
+                        Guardar producto
+                    </button>
+    
+                    <a href="{% url 'lista_productos' %}" class="btn-cancel">
+                        Cancelar
+                    </a>
+                </div>
+    
+        </form>
+    </section>
 
 </main>
 
