@@ -374,7 +374,20 @@ def editar_categoria(request, id):
                 'Categoría actualizada correctamente.'
             )
 
-    return redirect('lista_categorias')
+            return redirect('lista_categorias')
+
+    else:
+
+        form = CategoriaForm(instance=categoria)
+
+    return render(
+        request,
+        'admin/categorias/editar.html',
+        {
+            'form': form,
+            'categoria': categoria
+        }
+    )
 
 
 @login_required

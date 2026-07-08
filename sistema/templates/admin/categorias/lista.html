@@ -416,12 +416,10 @@ body{
                        placeholder="Buscar categoría...">
             </div>
 
-            <button class="btn-category-primary"
-                    data-bs-toggle="modal"
-                    data-bs-target="#modalCategoria">
+            <a href="{% url 'agregar_categoria' %}" class="btn-category-primary">
                 <i class="bi bi-plus-circle"></i>
                 Nueva categoría
-            </button>
+            </a>
 
         </div>
 
@@ -466,12 +464,10 @@ body{
 
                  <div class="category-actions">
 
-                     <button class="btn-edit-category"
-                             data-bs-toggle="modal"
-                             data-bs-target="#editarCategoria{{ categoria.id }}">
+                     <a href="{% url 'editar_categoria' categoria.id %}" class="btn-edit-category">
                          <i class="bi bi-pencil-square me-2"></i>
                          Editar
-                     </button>
+                     </a>
 
                      <a href="#"
                         class="btn-delete-category btn-eliminar"
