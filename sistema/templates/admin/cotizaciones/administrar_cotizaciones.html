@@ -1,70 +1,493 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Administrar cotizaciones</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<title>Cotizaciones | Panel Admin</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/admin.css' %}">
+
+<style>
+*{
+    font-family:'Montserrat', sans-serif;
+    box-sizing:border-box;
+}
+
+body{
+    background:#f3f1ec;
+    color:#111827;
+}
+
+.quotes-page{
+    width:100%;
+    margin:0 auto 70px;
+}
+
+.quotes-hero{
+    position:relative;
+    min-height:350px;
+    overflow:hidden;
+    background:
+        linear-gradient(90deg, rgba(17,24,39,.97), rgba(17,24,39,.76), rgba(17,24,39,.28)),
+        url("{% static 'img/banner_productos.png' %}");
+    background-size:cover;
+    background-position:center;
+    display:flex;
+    align-items:center;
+    padding:65px 60px 80px;
+    margin-top:-95px;
+}
+
+.quotes-hero-content{
+    max-width:720px;
+    color:white;
+    position:relative;
+    z-index:2;
+    padding-top:105px;
+}
+
+.quotes-hero h1{
+    font-size:3rem;
+    font-weight:900;
+    margin-bottom:14px;
+    text-shadow:0 5px 25px rgba(0,0,0,.45);
+}
+
+.quotes-hero p{
+    max-width:640px;
+    color:rgba(255,255,255,.72);
+    font-size:1.05rem;
+    line-height:1.7;
+}
+
+.hero-wave{
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:-1px;
+    line-height:0;
+}
+
+.hero-wave svg{
+    width:100%;
+    height:55px;
+    display:block;
+}
+
+.quotes-content{
+    width:min(1500px, calc(100% - 48px));
+    margin:32px auto 70px;
+}
+
+.quotes-toolbar{
+    display:grid;
+    grid-template-columns:1.5fr auto;
+    gap:18px;
+    align-items:center;
+    margin-bottom:28px;
+}
+
+.quote-search{
+    background:white;
+    border-radius:999px;
+    padding:0 18px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    box-shadow:0 12px 30px rgba(17,24,39,.08);
+}
+
+.quote-search i{
+    color:#C9A227;
+    font-size:1.25rem;
+}
+
+.quote-search input{
+    width:100%;
+    border:0;
+    outline:none;
+    padding:17px 10px;
+    font-weight:800;
+    background:transparent;
+}
+
+.quote-counter{
+    background:#111827;
+    color:white;
+    border-radius:999px;
+    padding:14px 22px;
+    font-weight:900;
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+
+.quote-counter i{
+    color:#C9A227;
+}
+
+.quotes-grid{
+    display:grid;
+    grid-template-columns:repeat(3, minmax(0,1fr));
+    gap:24px;
+}
+
+.quote-card{
+    background:white;
+    border-radius:28px;
+    border:1px solid rgba(17,24,39,.08);
+    box-shadow:0 18px 40px rgba(17,24,39,.10);
+    overflow:hidden;
+    transition:.30s;
+}
+
+.quote-card:hover{
+    transform:translateY(-7px);
+    box-shadow:0 28px 55px rgba(17,24,39,.16);
+}
+
+.quote-head{
+    padding:22px;
+    background:linear-gradient(135deg,#111827,#374151);
+    color:white;
+    position:relative;
+}
+
+.quote-head h3{
+    font-size:1.35rem;
+    font-weight:900;
+    margin-bottom:8px;
+}
+
+.quote-user{
+    color:rgba(255,255,255,.75);
+    font-weight:700;
+    font-size:.9rem;
+}
+
+.quote-date{
+    color:rgba(255,255,255,.58);
+    font-size:.82rem;
+    margin-top:4px;
+}
+
+.quote-status{
+    position:absolute;
+    top:18px;
+    right:18px;
+    border-radius:999px;
+    padding:7px 12px;
+    font-size:.72rem;
+    font-weight:900;
+}
+
+.quote-status.revision{
+    background:#FEF3C7;
+    color:#92400E;
+}
+
+.quote-status.cotizada{
+    background:#DCFCE7;
+    color:#166534;
+}
+
+.quote-status.rechazada{
+    background:#FEE2E2;
+    color:#991B1B;
+}
+
+.quote-body{
+    padding:22px;
+}
+
+.quote-products-title{
+    font-weight:900;
+    font-size:.82rem;
+    color:#B8860B;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    margin-bottom:14px;
+}
+
+.quote-product{
+    display:flex;
+    justify-content:space-between;
+    gap:12px;
+    padding:10px 0;
+    border-bottom:1px solid rgba(17,24,39,.07);
+    font-size:.9rem;
+}
+
+.quote-product:last-child{
+    border-bottom:0;
+}
+
+.quote-product span{
+    color:#111827;
+    font-weight:700;
+}
+
+.quote-product strong{
+    color:#6B7280;
+}
+
+.quote-actions{
+    display:flex;
+    gap:10px;
+    margin-top:20px;
+}
+
+.btn-quote-primary,
+.btn-quote-danger,
+.btn-quote-pdf{
+    border:0;
+    border-radius:999px;
+    padding:11px 15px;
+    text-decoration:none;
+    font-weight:900;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:7px;
+    font-size:.85rem;
+}
+
+.btn-quote-primary{
+    flex:1;
+    background:#C9A227;
+    color:#111827;
+}
+
+.btn-quote-danger{
+    background:rgba(220,38,38,.10);
+    color:#DC2626;
+}
+
+.btn-quote-pdf{
+    background:#111827;
+    color:white;
+}
+
+.empty-quotes{
+    grid-column:1/-1;
+    background:white;
+    border-radius:28px;
+    padding:55px 30px;
+    text-align:center;
+    box-shadow:0 18px 40px rgba(17,24,39,.08);
+}
+
+.empty-quotes i{
+    font-size:3rem;
+    color:#C9A227;
+}
+
+.empty-quotes h4{
+    font-weight:900;
+    margin-top:14px;
+}
+
+.empty-quotes p{
+    color:#6B7280;
+}
+
+@media(max-width:1200px){
+    .quotes-grid{
+        grid-template-columns:repeat(2,1fr);
+    }
+}
+
+@media(max-width:768px){
+    .quotes-hero{
+        min-height:430px;
+        padding:35px 24px 70px;
+        margin-top:-80px;
+        align-items:flex-start;
+    }
+
+    .quotes-hero-content{
+        padding-top:95px;
+    }
+
+    .quotes-hero h1{
+        font-size:2.4rem;
+    }
+
+    .quotes-content{
+        width:calc(100% - 24px);
+    }
+
+    .quotes-toolbar{
+        grid-template-columns:1fr;
+    }
+
+    .quotes-grid{
+        grid-template-columns:1fr;
+    }
+
+    .quote-actions{
+        flex-direction:column;
+    }
+}
+</style>
 </head>
-<body style="background:#F5F7FB;">
 
-<div class="container py-4">
+<body>
 
-    <h2 class="fw-bold mb-4">
-        📋 Solicitudes de cotización
-    </h2>
+{% include 'admin/components/navbar_admin.html' %}
 
-    {% for solicitud in solicitudes %}
+<main class="quotes-page">
 
-    <div class="card shadow-sm mb-3">
+    <section class="quotes-hero">
 
-        <div class="card-body">
+        <div class="quotes-hero-content">
+            <h1>Cotizaciones</h1>
 
-            <h5>
-                Solicitud #{{ solicitud.id }}
-            </h5>
-
-            <p class="mb-1">
-                <strong>Usuario:</strong>
-                {{ solicitud.usuario.username }}
+            <p>
+                Administra las solicitudes de cotización enviadas por los clientes y da seguimiento a su estado.
             </p>
+        </div>
 
-            <p class="text-muted">
-                {{ solicitud.fecha|date:"d/m/Y H:i" }}
-            </p>
+        <div class="hero-wave">
+            <svg viewBox="0 0 1440 80" preserveAspectRatio="none">
+                <path fill="#f3f1ec"
+                      d="M0,58 C260,78 470,80 720,65 C960,50 1180,48 1440,62 L1440,80 L0,80 Z">
+                </path>
+            </svg>
+        </div>
 
-            <hr>
+    </section>
 
-            {% for detalle in solicitud.detalles.all %}
+    <section class="quotes-content">
 
-                <div class="d-flex justify-content-between">
+        <div class="quotes-toolbar">
 
-                    <span>
-                        {{ detalle.producto.nombre }}
+            <div class="quote-search">
+                <i class="bi bi-search"></i>
+                <input type="text"
+                       id="buscarCotizacion"
+                       placeholder="Buscar por cliente o producto...">
+            </div>
+
+            <div class="quote-counter">
+                <i class="bi bi-file-earmark-text"></i>
+                {{ solicitudes|length }} solicitudes
+            </div>
+
+        </div>
+
+        <div class="quotes-grid">
+
+            {% for solicitud in solicitudes %}
+
+            <article class="quote-card cotizacion-item">
+
+                <div class="quote-head">
+
+                    <span class="quote-status {{ solicitud.estado }}">
+                        {{ solicitud.get_estado_display }}
                     </span>
 
-                    <strong>
-                        x{{ detalle.cantidad }}
-                    </strong>
+                    <h3>
+                        Solicitud #{{ solicitud.id }}
+                    </h3>
+
+                    <div class="quote-user">
+                        <i class="bi bi-person-circle"></i>
+                        {{ solicitud.usuario.username }}
+                    </div>
+
+                    <div class="quote-date">
+                        <i class="bi bi-calendar3"></i>
+                        {{ solicitud.fecha|date:"d/m/Y H:i" }}
+                    </div>
 
                 </div>
+
+                <div class="quote-body">
+
+                    <div class="quote-products-title">
+                        Productos solicitados
+                    </div>
+
+                    {% for detalle in solicitud.detalles.all %}
+
+                    <div class="quote-product">
+                        <span>{{ detalle.producto.nombre }}</span>
+                        <strong>x{{ detalle.cantidad }}</strong>
+                    </div>
+
+                    {% endfor %}
+
+                    <div class="quote-actions">
+
+                        {% if solicitud.estado == "revision" %}
+                            <a href="{% url 'generar_cotizacion' solicitud.id %}"
+                               class="btn-quote-primary">
+                                <i class="bi bi-cash-coin"></i>
+                                Cotizar
+                            </a>
+
+                            <a href="{% url 'rechazar_cotizacion' solicitud.id %}"
+                               class="btn-quote-danger">
+                                <i class="bi bi-x-lg"></i>
+                            </a>
+                        {% endif %}
+
+                        {% if solicitud.estado == "cotizada" %}
+                            <a href="{% url 'descargar_cotizacion_pdf' solicitud.id %}"
+                               class="btn-quote-pdf">
+                                <i class="bi bi-filetype-pdf"></i>
+                                PDF
+                            </a>
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            </article>
+
+            {% empty %}
+
+            <div class="empty-quotes">
+                <i class="bi bi-inbox"></i>
+                <h4>No hay solicitudes pendientes</h4>
+                <p>Cuando los clientes envíen solicitudes de cotización aparecerán aquí.</p>
+            </div>
 
             {% endfor %}
 
         </div>
 
-    </div>
+    </section>
 
-    {% empty %}
+</main>
 
-        <div class="alert alert-info">
-            No hay solicitudes pendientes.
-        </div>
+<script>
+const buscador = document.getElementById("buscarCotizacion");
 
-    {% endfor %}
+buscador.addEventListener("keyup", function(){
 
-</div>
+    const texto = this.value.toLowerCase();
+
+    document.querySelectorAll(".cotizacion-item").forEach(card => {
+
+        const contenido = card.textContent.toLowerCase();
+
+        card.style.display = contenido.includes(texto) ? "" : "none";
+
+    });
+
+});
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>
