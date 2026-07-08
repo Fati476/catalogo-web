@@ -307,7 +307,7 @@ def lista_categorias(request):
         total_productos=Count('producto')
     ).order_by('nombre')
 
-    paginator = Paginator(categorias_lista, 5)
+    paginator = Paginator(categorias_lista, 12)
 
     page_number = request.GET.get('page')
 

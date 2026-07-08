@@ -11,7 +11,6 @@ class CategoriaForm(forms.ModelForm):
         fields = [
             'nombre',
             'descripcion',
-            'destacada',
             'imagen'
         ]
 
@@ -26,10 +25,6 @@ class CategoriaForm(forms.ModelForm):
                 'class': 'form-control',
                 'placeholder': 'Describe brevemente esta categoría...',
                 'rows': 4
-            }),
-
-            'destacada': forms.CheckboxInput(attrs={
-                'class': 'form-check-input'
             }),
 
             'imagen': forms.FileInput(attrs={
