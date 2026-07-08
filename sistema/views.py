@@ -980,8 +980,7 @@ def generar_cotizacion(request, id):
                     f"El producto '{detalle.producto.nombre}' no tiene precio asignado."
                 )
 
-                request.session["abrir_modal"] = solicitud.id
-                return redirect("lista_solicitudes")
+                return redirect("detalle_solicitud_admin", id=solicitud.id)
 
             try:
                 detalle.precio_aplicado = Decimal(precio)
@@ -993,8 +992,7 @@ def generar_cotizacion(request, id):
                     f"El precio del producto '{detalle.producto.nombre}' es inválido."
                 )
 
-                request.session["abrir_modal"] = solicitud.id
-                return redirect("lista_solicitudes")
+                return redirect("detalle_solicitud_admin", id=solicitud.id)
         # Todo salió bien
         solicitud.estado = "cotizada"
         solicitud.save()
@@ -1589,3 +1587,17 @@ def password_reset_confirm_custom(request, uidb64, token):
 def password_reset_complete_custom(request):
 
     return render(request, "registration/password_reset_complete.html")
+
+
+@login_required
+def detalle_solicitud_admin(request, id):
+
+    solicitud = SolicitudCotizacion.objects.get(id=id)
+
+    return render(
+        request,
+        'admin/solicitudes/detalle.html',
+        {
+            'solicitud': solicitud
+        }
+    )

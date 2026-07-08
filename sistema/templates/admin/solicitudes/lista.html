@@ -1,307 +1,382 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta charset="UTF-8">
+<title>Cotizaciones | Panel Admin</title>
 
-    <title>Cotizaciones</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/admin.css' %}">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1">
+<style>
+*{
+    font-family:'Montserrat', sans-serif;
+    box-sizing:border-box;
+}
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-          rel="stylesheet">
+body{
+    background:#f3f1ec;
+    color:#111827;
+}
 
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+.quotes-page{
+    width:100%;
+    margin:0 auto 70px;
+}
 
+.quotes-hero{
+    position:relative;
+    min-height:350px;
+    overflow:hidden;
+    background:
+        linear-gradient(90deg, rgba(17,24,39,.97), rgba(17,24,39,.76), rgba(17,24,39,.28)),
+        url("{% static 'img/banner_productos.png' %}");
+    background-size:cover;
+    background-position:center;
+    display:flex;
+    align-items:center;
+    padding:65px 60px 80px;
+    margin-top:-95px;
+}
 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet">
+.quotes-hero-content{
+    max-width:720px;
+    color:white;
+    position:relative;
+    z-index:2;
+    padding-top:105px;
+}
 
-    <style>
+.quotes-hero h1{
+    font-size:3rem;
+    font-weight:900;
+    margin-bottom:14px;
+    text-shadow:0 5px 25px rgba(0,0,0,.45);
+}
 
-        *{
-            font-family:'Poppins',sans-serif;
-        }
+.quotes-hero p{
+    max-width:640px;
+    color:rgba(255,255,255,.72);
+    font-size:1.05rem;
+    line-height:1.7;
+}
 
-        body{
-            background:#F1F5F9;
-        }
+.hero-wave{
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:-1px;
+    line-height:0;
+}
 
-        .navbar-custom{
-            background:white;
-            padding:18px 40px;
-            box-shadow:0 5px 20px rgba(0,0,0,0.05);
-        }
+.hero-wave svg{
+    width:100%;
+    height:55px;
+    display:block;
+}
 
-        .logo{
-            font-size:26px;
-            font-weight:700;
-            color:#2563EB;
-        }
+.quotes-content{
+    width:min(1500px, calc(100% - 48px));
+    margin:32px auto 70px;
+}
 
-        .contenido{
-            padding:50px;
-            margin-left:0;
-        }
+.stats-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:22px;
+    margin-bottom:28px;
+}
 
-        .titulo{
-            font-size:38px;
-            font-weight:700;
-            color:#0F172A;
-        }
+.stat-card{
+    background:white;
+    border-radius:26px;
+    padding:24px;
+    box-shadow:0 16px 35px rgba(17,24,39,.09);
+    border:1px solid rgba(17,24,39,.08);
+    display:flex;
+    align-items:center;
+    gap:16px;
+}
 
-        .subtitulo{
-            color:#64748B;
-        }
+.stat-icon{
+    width:58px;
+    height:58px;
+    border-radius:18px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:1.6rem;
+}
 
-        .btn-custom{
-            border:none;
-            border-radius:14px;
-            padding:12px 18px;
-            font-weight:600;
-        }
+.stat-icon.warning{
+    background:#FEF3C7;
+    color:#92400E;
+}
 
-    </style>
+.stat-icon.primary{
+    background:#DBEAFE;
+    color:#1D4ED8;
+}
 
+.stat-icon.success{
+    background:#DCFCE7;
+    color:#166534;
+}
+
+.stat-card span{
+    color:#6B7280;
+    font-weight:800;
+    font-size:.85rem;
+}
+
+.stat-card h3{
+    margin:2px 0 0;
+    font-weight:900;
+    font-size:2rem;
+}
+
+.quotes-toolbar{
+    margin-bottom:28px;
+}
+
+.quote-search{
+    background:white;
+    border-radius:999px;
+    padding:0 18px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    box-shadow:0 12px 30px rgba(17,24,39,.08);
+}
+
+.quote-search i{
+    color:#C9A227;
+    font-size:1.25rem;
+}
+
+.quote-search input{
+    width:100%;
+    border:0;
+    outline:none;
+    padding:17px 10px;
+    font-weight:800;
+    background:transparent;
+}
+
+.quotes-table-card{
+    background:white;
+    border-radius:28px;
+    box-shadow:0 18px 42px rgba(17,24,39,.09);
+    border:1px solid rgba(17,24,39,.08);
+    overflow:hidden;
+}
+
+.quotes-table{
+    width:100%;
+    margin:0;
+}
+
+.quotes-table thead{
+    background:#111827;
+    color:white;
+}
+
+.quotes-table th{
+    padding:18px 20px;
+    font-size:.78rem;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    font-weight:900;
+}
+
+.quotes-table td{
+    padding:18px 20px;
+    vertical-align:middle;
+    font-weight:700;
+    border-bottom:1px solid rgba(17,24,39,.07);
+}
+
+.quotes-table tbody tr:hover{
+    background:#F9FAFB;
+}
+
+.client-name{
+    font-weight:900;
+    color:#111827;
+}
+
+.status-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    border-radius:999px;
+    padding:8px 14px;
+    font-weight:900;
+    font-size:.78rem;
+}
+
+.status-badge.revision{
+    background:#FEF3C7;
+    color:#92400E;
+}
+
+.status-badge.cotizada{
+    background:#DCFCE7;
+    color:#166534;
+}
+
+.status-badge.rechazada{
+    background:#FEE2E2;
+    color:#991B1B;
+}
+
+.btn-view{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    background:#111827;
+    color:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-decoration:none;
+    transition:.25s;
+}
+
+.btn-view:hover{
+    background:#C9A227;
+    color:#111827;
+    transform:translateY(-2px);
+}
+
+.empty-row{
+    text-align:center;
+    color:#6B7280;
+    padding:50px !important;
+}
+
+@media(max-width:992px){
+    .stats-grid{
+        grid-template-columns:1fr;
+    }
+
+    .quotes-table{
+        min-width:850px;
+    }
+}
+
+@media(max-width:768px){
+    .quotes-hero{
+        min-height:430px;
+        padding:35px 24px 70px;
+        margin-top:-80px;
+        align-items:flex-start;
+    }
+
+    .quotes-hero-content{
+        padding-top:95px;
+    }
+
+    .quotes-hero h1{
+        font-size:2.4rem;
+    }
+
+    .quotes-content{
+        width:calc(100% - 24px);
+        margin:26px auto 50px;
+    }
+}
+</style>
 </head>
 
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-custom">
+{% include 'admin/components/navbar_admin.html' %}
 
-    <div class="container-fluid">
+<main class="quotes-page">
 
-        <a class="navbar-brand logo" href="#">
-            Cotizaciones 
-        </a>
+    <section class="quotes-hero">
 
-        <button class="navbar-toggler"
-                type="button"
-                data-bs-toggle="collapse"
-                data-bs-target="#menu">
+        <div class="quotes-hero-content">
 
-            <span class="navbar-toggler-icon"></span>
+            <h1>Cotizaciones</h1>
 
-        </button>
-
-        <div class="collapse navbar-collapse"
-             id="menu">
-
-            <ul class="navbar-nav mx-auto">
-
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'panel_admin' %}">
-                        Inicio
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'dashboard' %}">
-                        Dashboard
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'lista_productos' %}">
-                        Productos
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'lista_categorias' %}">
-                        Categorías
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'lista_solicitudes' %}">
-                        Cotizaciones
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'lista_usuarios' %}">
-                        Usuarios
-                    </a>
-                </li>
-
-            </ul>
-
-            <div class="dropdown">
-
-                <button class="btn d-flex align-items-center gap-3"
-                        type="button"
-                        data-bs-toggle="dropdown"
-                        style="border:none; background:none;">
-
-                    <i class="bi bi-bell fs-5"></i>
-
-                    <i class="bi bi-person-circle perfil"></i>
-
-                </button>
-
-                <ul class="dropdown-menu dropdown-menu-end shadow border-0 p-2">
-
-                    <li>
-
-                        <span class="dropdown-item-text fw-bold">
-
-                            {{ request.user.username }}
-
-                        </span>
-
-                    </li>
-
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
-
-                    <li>
-
-                        <form method="POST"
-                              action="/accounts/logout/">
-
-                            {% csrf_token %}
-
-                            <button type="submit"
-                                    class="dropdown-item text-danger">
-
-                                <i class="bi bi-box-arrow-right"></i>
-                                Cerrar sesión
-
-                            </button>
-
-                        </form>
-
-                    </li>
-
-                </ul>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</nav>
-
-<div class="contenido">
-
-    <div class="d-flex justify-content-between align-items-center mb-5">
-
-        <div>
-
-            <h1 class="titulo">
-                Solicitudes de Cotización
-            </h1>
-
-            <p class="subtitulo">
-                Gestiona las solicitudes enviadas por los clientes
+            <p>
+                Gestiona las solicitudes enviadas por los clientes, revisa productos y genera cotizaciones.
             </p>
 
         </div>
 
-    </div>
+        <div class="hero-wave">
+            <svg viewBox="0 0 1440 80" preserveAspectRatio="none">
+                <path fill="#f3f1ec"
+                      d="M0,58 C260,78 470,80 720,65 C960,50 1180,48 1440,62 L1440,80 L0,80 Z">
+                </path>
+            </svg>
+        </div>
 
-    <!-- TARJETAS -->
+    </section>
 
-    <div class="row mb-5">
+    <section class="quotes-content">
 
-        <div class="col-md-4">
+        <div class="stats-grid">
 
-            <div class="card border-0 shadow-sm rounded-4">
-
-                <div class="card-body">
-
-                    <h6 class="text-muted">
-                        Pendientes
-                    </h6>
-
-                    <h2 class="fw-bold text-warning">
-                        {{ pendientes }}
-                    </h2>
-
+            <div class="stat-card">
+                <div class="stat-icon warning">
+                    <i class="bi bi-hourglass-split"></i>
                 </div>
 
+                <div>
+                    <span>Pendientes</span>
+                    <h3>{{ pendientes }}</h3>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon primary">
+                    <i class="bi bi-eye"></i>
+                </div>
+
+                <div>
+                    <span>Revisadas</span>
+                    <h3>{{ revisadas }}</h3>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon success">
+                    <i class="bi bi-check-circle"></i>
+                </div>
+
+                <div>
+                    <span>Cotizadas</span>
+                    <h3>{{ cotizadas }}</h3>
+                </div>
             </div>
 
         </div>
 
-        <div class="col-md-4">
+        <div class="quotes-toolbar">
 
-            <div class="card border-0 shadow-sm rounded-4">
-
-                <div class="card-body">
-
-                    <h6 class="text-muted">
-                        Revisadas
-                    </h6>
-
-                    <h2 class="fw-bold text-primary">
-                        {{ revisadas }}
-                    </h2>
-
-                </div>
-
-            </div>
-
-        </div>
-
-        <div class="col-md-4">
-
-            <div class="card border-0 shadow-sm rounded-4">
-
-                <div class="card-body">
-
-                    <h6 class="text-muted">
-                        Cotizadas
-                    </h6>
-
-                    <h2 class="fw-bold text-success">
-                        {{ cotizadas }}
-                    </h2>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-    <!-- BUSCADOR -->
-
-    <div class="mb-5">
-
-        <div class="input-group shadow-sm">
-
-            <span class="input-group-text bg-white border-0">
-
+            <div class="quote-search">
                 <i class="bi bi-search"></i>
 
-            </span>
-
-            <input type="text"
-                   id="buscadorSolicitud"
-                   class="form-control border-0 p-3"
-                   placeholder="Buscar cliente...">
+                <input type="text"
+                       id="buscadorSolicitud"
+                       placeholder="Buscar cliente...">
+            </div>
 
         </div>
 
-    </div>
-
-    <!-- TABLA -->
-
-    <!-- TABLA -->
-
-    <div class="card border-0 shadow-sm rounded-4">
-        <div class="card-body p-4">
+        <div class="quotes-table-card">
 
             <div class="table-responsive">
 
-                <table class="table align-middle">
+                <table class="table quotes-table align-middle">
 
                     <thead>
                         <tr>
@@ -310,7 +385,7 @@
                             <th>Fecha</th>
                             <th>Productos</th>
                             <th>Estado</th>
-                            <th width="120">Acción</th>
+                            <th>Acción</th>
                         </tr>
                     </thead>
 
@@ -322,7 +397,7 @@
 
                             <td>#{{ solicitud.id }}</td>
 
-                            <td class="nombre-cliente fw-semibold">
+                            <td class="nombre-cliente client-name">
                                 {{ solicitud.usuario.username }}
                             </td>
 
@@ -335,49 +410,39 @@
                             </td>
 
                             <td>
-
                                 {% if solicitud.estado == "revision" %}
-                                    <span class="badge bg-warning text-dark">
+                                    <span class="status-badge revision">
+                                        <i class="bi bi-hourglass-split"></i>
                                         En revisión
                                     </span>
-
                                 {% elif solicitud.estado == "cotizada" %}
-                                    <span class="badge bg-success">
+                                    <span class="status-badge cotizada">
+                                        <i class="bi bi-check-circle-fill"></i>
                                         Cotizada
                                     </span>
-
                                 {% elif solicitud.estado == "rechazada" %}
-                                    <span class="badge bg-danger">
+                                    <span class="status-badge rechazada">
+                                        <i class="bi bi-x-circle-fill"></i>
                                         Rechazada
                                     </span>
                                 {% endif %}
-
                             </td>
 
                             <td>
-
-                                <button
-                                    type="button"
-                                    class="btn btn-primary btn-sm rounded-3"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#modalCotizacion{{ solicitud.id }}">
-
+                                <a href="{% url 'detalle_solicitud_admin' solicitud.id %}"
+                                   class="btn-view">
                                     <i class="bi bi-eye"></i>
-
-                                </button>
-
+                                </a>
                             </td>
 
                         </tr>
 
                         {% empty %}
-    
-                        <tr>
 
-                            <td colspan="6" class="text-center text-muted py-5">
+                        <tr>
+                            <td colspan="6" class="empty-row">
                                 No existen solicitudes de cotización.
                             </td>
-
                         </tr>
 
                         {% endfor %}
@@ -389,244 +454,30 @@
             </div>
 
         </div>
-    </div>
 
-<!-- MODALES -->
-    {% for solicitud in solicitudes %}
+    </section>
 
-    <div
-        class="modal fade"
-        id="modalCotizacion{{ solicitud.id }}"
-        tabindex="-1"
-        aria-hidden="true">
-
-        <div class="modal-dialog modal-xl modal-dialog-scrollable">
-
-            <div class="modal-content">
-                <form method="POST" action="{% url 'generar_cotizacion' solicitud.id %}">
-                    {% csrf_token %}
-                    <div class="modal-header">
-
-                        <h5 class="modal-title">
-                            Cotización #{{ solicitud.id }}
-                        </h5>
-
-                        <button
-                            type="button"
-                            class="btn-close"
-                            data-bs-dismiss="modal">
-                        </button>
-
-                    </div>
-
-                    <div class="modal-body">
-
-                        {% if request.session.abrir_modal == solicitud.id %}
-                            {% if messages %}
-                                {% for message in messages %}
-                                    <div class="alert alert-danger">
-                                        {{ message }}
-                                    </div>
-                                {% endfor %}
-                            {% endif %}
-                        {% endif %}
-
-                        <h6 class="fw-bold mb-3">
-                            Cliente: {{ solicitud.usuario.username }}
-                        </h6>
-
-                        <table class="table table-bordered align-middle">
-
-                            <thead>
-
-                                <tr>
-                                    <th>Producto</th>
-                                    <th>Cantidad</th>
-                                    <th>Precio aplicado</th>
-                                </tr>
-
-                            </thead>
-
-                            <tbody>
-
-                                {% for detalle in solicitud.detalles.all %}
-
-                                <tr>
-
-                                    <td>
-                                        {{ detalle.producto.nombre }}
-                                    </td>
-
-                                    <td>
-                                        {{ detalle.cantidad }}
-                                    </td>
-
-                                    <td>
-
-                                        <select class="form-select" name="precio_{{ detalle.id }}">
-
-                                            {% if detalle.producto.precio_san_mateo %}
-                                                <option value="{{ detalle.producto.precio_san_mateo }}">
-                                                    Precio San Mateo (${{ detalle.producto.precio_san_mateo }})
-                                                </option>
-                                            {% endif %}
-
-                                            {% if detalle.producto.precio_fuera %}
-                                                <option value="{{ detalle.producto.precio_fuera }}">
-                                                    Precio Fuera (${{ detalle.producto.precio_fuera }})
-                                                </option>
-                                            {% endif %}
-
-                                            {% if not detalle.producto.precio_san_mateo and not detalle.producto.precio_fuera %}
-                                                <option value="" selected disabled>
-                                                    ⚠️ Este producto no tiene precios configurados
-                                                </option>
-                                            {% endif %}
-
-                                        </select>
-
-                                    </td>
-                                </tr>
-
-                                {% empty %}
-
-                                <tr>
-
-                                    <td colspan="3" class="text-center text-muted">
-                                        No hay productos en esta solicitud.
-                                    </td>
-
-                                </tr>
-
-                                {% endfor %}
-
-                            </tbody>
-
-                        </table>
-
-                    </div>
-
-                    <div class="modal-footer">
-
-                        <button type="submit" class="btn btn-success">
-                        Generar cotización
-                        </button>
-
-                        <a
-                            href="{% url 'rechazar_cotizacion' solicitud.id %}"
-                            class="btn btn-danger"
-                            onclick="confirmarRechazo(event, this.href)"
-                        >
-                            Rechazar
-                        </a>
-
-                        <button
-                            type="button"
-                            class="btn btn-secondary"
-                            data-bs-dismiss="modal">
-                            Cerrar
-                        </button>
-
-                    </div>
-
-                </form>
-
-            </div>
-
-        </div>
-
-    </div>
-
-    {% endfor %}
-
-</div>
-
-
-
-
-
-
+</main>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-
-const buscador =
-document.getElementById('buscadorSolicitud');
+const buscador = document.getElementById('buscadorSolicitud');
 
 buscador.addEventListener('keyup', function(){
 
-    const texto =
-    this.value.toLowerCase();
+    const texto = this.value.toLowerCase();
 
-    document
-    .querySelectorAll('.fila-solicitud')
-    .forEach(fila => {
+    document.querySelectorAll('.fila-solicitud').forEach(fila => {
 
-        const nombre =
-        fila.querySelector('.nombre-cliente')
-        .textContent
-        .toLowerCase();
+        const nombre = fila.querySelector('.nombre-cliente').textContent.toLowerCase();
 
-        fila.style.display =
-        nombre.includes(texto)
-        ? ''
-        : 'none';
+        fila.style.display = nombre.includes(texto) ? '' : 'none';
 
     });
 
 });
-
-</script>
-
-{% if abrir_modal %}
-
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-
-    var modal = document.getElementById(
-        "modalCotizacion{{ abrir_modal }}"
-    );
-
-    if (modal) {
-        var bsModal = new bootstrap.Modal(modal);
-        bsModal.show();
-    }
-
-});
-</script>
-
-{% endif %}
-
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-<script>
-function confirmarRechazo(event, url) {
-
-    event.preventDefault();
-
-    Swal.fire({
-        title: "¿Estás seguro?",
-        html: `
-            <p>Esta acción marcará la solicitud como <b>rechazada</b>.</p>
-            <p>Además, se enviará una notificación al cliente.</p>
-        `,
-        icon: "question",
-        showCancelButton: true,
-        confirmButtonText: "Rechazar solicitud",
-        cancelButtonText: "Volver",
-        confirmButtonColor: "#d33"
-    }).then((result) => {
-
-        if (result.isConfirmed) {
-            window.location.href = url;
-        }
-
-    });
-
-}
 </script>
 
 </body>
-
 </html>
