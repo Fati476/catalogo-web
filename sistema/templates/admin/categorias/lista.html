@@ -720,17 +720,21 @@ body{
 </div>
 
 {% if messages %}
+<div id="toastAdmin" class="admin-toast-wrap">
+
     {% for message in messages %}
 
-    <div id="mensajeExito"
-         class="alert alert-success shadow-sm rounded-4 border-0 mb-4">
+    <div class="admin-toast">
 
         <i class="bi bi-check-circle-fill"></i>
-        {{ message }}
+
+        <span>{{ message }}</span>
 
     </div>
 
     {% endfor %}
+
+</div>
 {% endif %}
 
 <div class="modal fade"
@@ -920,23 +924,19 @@ buscadorCategoria.addEventListener('keyup', function(){
 
 <script>
 
-const mensaje = document.getElementById('mensajeExito');
+const toast = document.getElementById("toastAdmin");
 
-if(mensaje){
+if(toast){
 
-    setTimeout(() => {
+    setTimeout(()=>{
 
-        mensaje.style.transition = "all .5s ease";
+        toast.style.transition = ".45s";
+        toast.style.opacity = "0";
+        toast.style.transform = "translateX(60px)";
 
-        mensaje.style.opacity = "0";
-
-        mensaje.style.transform = "translateY(-10px)";
-
-        setTimeout(() => {
-
-            mensaje.remove();
-
-        },500);
+        setTimeout(()=>{
+            toast.remove();
+        },450);
 
     },3000);
 
