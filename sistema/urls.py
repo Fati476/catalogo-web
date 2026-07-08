@@ -281,5 +281,11 @@ urlpatterns = [
         name='detalle_solicitud_admin'
     ),
 
+    path(
+        'panel/usuarios/detalle/<int:id>/',
+        views.detalle_usuario,
+        name='detalle_usuario'
+    ),
+
 
 ]

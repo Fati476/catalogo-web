@@ -450,11 +450,11 @@ def lista_usuarios(request):
 
     usuarios_lista = User.objects.select_related(
         'perfil'
-    ).all().order_by('username')
+    ).order_by('-date_joined')
 
     paginator = Paginator(
         usuarios_lista,
-        5
+        10
     )
 
     page_number = request.GET.get('page')
@@ -1599,5 +1599,18 @@ def detalle_solicitud_admin(request, id):
         'admin/solicitudes/detalle.html',
         {
             'solicitud': solicitud
+        }
+    )
+
+@login_required
+def detalle_usuario(request, id):
+
+    usuario = get_object_or_404(User, id=id)
+
+    return render(
+        request,
+        'admin/usuarios/detalle.html',
+        {
+            'usuario': usuario
         }
     )
