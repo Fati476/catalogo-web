@@ -140,7 +140,20 @@ body{
 }
 
 .quotes-toolbar{
+    display:grid;
+    grid-template-columns:1.5fr 280px;
+    gap:18px;
     margin-bottom:28px;
+}
+
+.quote-filter{
+    background:white;
+    border:0;
+    border-radius:999px;
+    padding:17px 20px;
+    font-weight:800;
+    box-shadow:0 12px 30px rgba(17,24,39,.08);
+    outline:none;
 }
 
 .quote-search{
@@ -367,8 +380,15 @@ body{
 
                 <input type="text"
                        id="buscadorSolicitud"
-                       placeholder="Buscar cliente...">
+                       placeholder="Buscar cliente, folio o estado...">
             </div>
+        
+            <select id="filtroEstado" class="quote-filter">
+                <option value="">Todos los estados</option>
+                <option value="revision">En revisión</option>
+                <option value="cotizada">Cotizadas</option>
+                <option value="rechazada">Rechazadas</option>
+            </select>
 
         </div>
 
@@ -393,8 +413,7 @@ body{
 
                         {% for solicitud in solicitudes %}
 
-                        <tr class="fila-solicitud">
-
+                        <tr class="fila-solicitud" data-estado="{{ solicitud.estado }}">
                             <td>#{{ solicitud.id }}</td>
 
                             <td class="nombre-cliente client-name">
@@ -463,20 +482,28 @@ body{
 
 <script>
 const buscador = document.getElementById('buscadorSolicitud');
+const filtroEstado = document.getElementById('filtroEstado');
 
-buscador.addEventListener('keyup', function(){
+function filtrarSolicitudes(){
 
-    const texto = this.value.toLowerCase();
+    const texto = buscador.value.toLowerCase();
+    const estado = filtroEstado.value;
 
     document.querySelectorAll('.fila-solicitud').forEach(fila => {
 
-        const nombre = fila.querySelector('.nombre-cliente').textContent.toLowerCase();
+        const contenido = fila.textContent.toLowerCase();
+        const estadoFila = fila.dataset.estado;
 
-        fila.style.display = nombre.includes(texto) ? '' : 'none';
+        const coincideTexto = contenido.includes(texto);
+        const coincideEstado = estado === "" || estadoFila === estado;
+
+        fila.style.display = coincideTexto && coincideEstado ? "" : "none";
 
     });
+}
 
-});
+buscador.addEventListener('input', filtrarSolicitudes);
+filtroEstado.addEventListener('change', filtrarSolicitudes);
 </script>
 
 </body>
