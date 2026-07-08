@@ -164,13 +164,15 @@ body{
 
 .category-card{
     background:white;
-    border-radius:30px;
+    border-radius:26px;
     overflow:hidden;
     border:1px solid rgba(17,24,39,.08);
-    box-shadow:0 18px 40px rgba(17,24,39,.10);
+    box-shadow:0 16px 35px rgba(17,24,39,.10);
     transition:.30s;
+
     display:flex;
     flex-direction:column;
+
     height:100%;
 }
 
@@ -180,7 +182,7 @@ body{
 }
 
 .category-image{
-    height:210px;
+    height:180px;
     background:linear-gradient(135deg,#faf8f3,#ece8df);
     overflow:hidden;
     display:flex;
@@ -188,7 +190,6 @@ body{
     justify-content:center;
     padding:0;
 }
-
 .category-image img{
     width:100%;
     height:100%;
@@ -222,7 +223,7 @@ body{
 
 .category-body{
     flex:1;
-    padding:26px 24px;
+    padding:20px;
     display:flex;
     flex-direction:column;
     justify-content:space-between;
@@ -230,18 +231,19 @@ body{
 }
 
 .category-body h3{
-    font-size:1.45rem;
+    font-size:1.35rem;
     font-weight:900;
-    margin-bottom:8px;
+    margin-bottom:6px;
     color:#111827;
 }
 
 .category-body p{
     color:#6B7280;
     font-size:.92rem;
-    line-height:1.55;
-    margin-bottom:20px;
-    min-height:46px;
+    line-height:1.45;
+    margin-bottom:16px;
+
+    min-height:40px;
 }
 
 .category-count{
@@ -249,18 +251,25 @@ body{
     align-items:center;
     justify-content:center;
     gap:7px;
+
     background:rgba(201,162,39,.13);
+
     color:#B8860B;
+
     border-radius:999px;
-    padding:8px 14px;
+
+    padding:7px 14px;
+
     font-weight:900;
+
     font-size:.8rem;
-    margin:0 auto 18px;
+
+    margin:0 auto 14px;
 }
 
 .category-actions{
     display:flex;
-    gap:10px;
+    gap:8px;
     margin-top:auto;
 }
 
@@ -275,6 +284,7 @@ body{
     align-items:center;
     justify-content:center;
     transition:.25s;
+    height:48px;
 }
 
 .btn-edit-category{
@@ -374,6 +384,29 @@ body{
     .category-image{
         height:190px;
     }
+}
+
+.admin-toast-wrap{
+    position:fixed;
+    top:115px;
+    right:28px;
+    z-index:9999;
+}
+
+.admin-toast{
+    background:#111827;
+    color:white;
+    padding:14px 20px;
+    border-radius:18px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-weight:800;
+    box-shadow:0 18px 40px rgba(17,24,39,.25);
+}
+
+.admin-toast i{
+    color:#C9A227;
 }
 
     </style>
@@ -687,19 +720,16 @@ body{
 </div>
 
 {% if messages %}
+<div class="admin-toast-wrap">
 
     {% for message in messages %}
-
-        <div class="alert alert-success shadow-sm rounded-4 border-0 mb-4">
-
-            <i class="bi bi-check-circle-fill"></i>
-
-            {{ message }}
-
-        </div>
-
+    <div class="admin-toast">
+        <i class="bi bi-check-circle-fill"></i>
+        <span>{{ message }}</span>
+    </div>
     {% endfor %}
 
+</div>
 {% endif %}
 
 <div class="modal fade"
