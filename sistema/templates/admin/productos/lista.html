@@ -540,19 +540,6 @@
 
 <main class="admin-page">
 
-    {% if messages %}
-        {% for message in messages %}
-        <div id="mensajeExito"
-             class="alert alert-success shadow-sm border-0 rounded-4 mx-auto mt-4"
-             style="width:min(1500px,calc(100% - 48px)); position:relative; z-index:20;">
-
-            <i class="bi bi-check-circle-fill me-2"></i>
-            {{ message }}
-
-        </div>
-        {% endfor %}
-    {% endif %}
-
     <section class="admin-products-hero">
 
         <div class="hero-content-productos">
@@ -582,6 +569,22 @@
         </div>
 
     </section>
+
+    {% if messages %}
+        {% for message in messages %}
+        <div id="mensajeExito"
+            class="alert alert-success shadow-sm border-0 rounded-4 mx-auto mt-4"
+            style="width:min(1500px,calc(100% - 48px)); position:relative; z-index:20;">
+
+            <i class="bi bi-check-circle-fill me-2"></i>
+            {{ message }}
+
+        </div>
+        {% endfor %}
+    {% endif %}
+
+
+
     <section class="admin-toolbar">
 
         <div class="admin-search">
