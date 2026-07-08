@@ -60,14 +60,13 @@ from .email_utils import enviar_correo_recuperacion
 @login_required
 def inicio(request):
 
-
     productos_destacados = Producto.objects.filter(
         estado=True
     ).order_by('-id')[:6]
 
-    categorias_destacadas = Categoria.objects.filter(
-        destacada=True
-    ).order_by('-id')[:3]
+    categorias_destacadas = Categoria.objects.annotate(
+        total_productos=Count('producto')
+    ).order_by('-total_productos')[:3]
 
     favoritos_ids = Favorito.objects.filter(
         usuario=request.user
