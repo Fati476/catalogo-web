@@ -115,7 +115,16 @@ body{
     font-weight:800;
     background:transparent;
 }
-
+.quote-filter{
+    background:white;
+    border:0;
+    border-radius:999px;
+    padding:17px 20px;
+    font-weight:800;
+    box-shadow:0 12px 30px rgba(17,24,39,.08);
+    outline:none;
+    cursor:pointer;
+}
 .quote-counter{
     background:#111827;
     color:white;
@@ -374,10 +383,23 @@ body{
                        placeholder="Buscar por cliente o producto...">
             </div>
 
-            <div class="quote-counter">
-                <i class="bi bi-file-earmark-text"></i>
-                {{ solicitudes|length }} solicitudes
-            </div>
+            <select id="filtroEstado" class="quote-filter">
+
+                <option value="">Todos los estados</option>
+
+                <option value="revision">
+                    En revisión
+                </option>
+
+                <option value="cotizada">
+                    Cotizadas
+                </option>
+
+                <option value="rechazada">
+                    Rechazadas
+                </option>
+
+            </select>
 
         </div>
 
@@ -385,7 +407,9 @@ body{
 
             {% for solicitud in solicitudes %}
 
-            <article class="quote-card cotizacion-item">
+            <article
+                class="quote-card cotizacion-item"
+                data-estado="{{ solicitud.estado }}">
 
                 <div class="quote-head">
 
@@ -471,20 +495,32 @@ body{
 
 <script>
 const buscador = document.getElementById("buscarCotizacion");
+const filtro = document.getElementById("filtroEstado");
 
-buscador.addEventListener("keyup", function(){
+function filtrar(){
 
-    const texto = this.value.toLowerCase();
+    const texto = buscador.value.toLowerCase();
+    const estado = filtro.value;
 
-    document.querySelectorAll(".cotizacion-item").forEach(card => {
+    document.querySelectorAll(".cotizacion-item").forEach(card=>{
 
         const contenido = card.textContent.toLowerCase();
+        const estadoCard = card.dataset.estado;
 
-        card.style.display = contenido.includes(texto) ? "" : "none";
+        const coincideTexto = contenido.includes(texto);
+        const coincideEstado = estado === "" || estadoCard === estado;
+
+        card.style.display =
+            coincideTexto && coincideEstado
+            ? ""
+            : "none";
 
     });
 
-});
+}
+
+buscador.addEventListener("input", filtrar);
+filtro.addEventListener("change", filtrar);
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
