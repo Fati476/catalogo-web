@@ -296,6 +296,26 @@ textarea.form-control{
         text-align:center;
     }
 }
+
+.preview-card{
+    position:relative;
+}
+
+.preview-remove{
+    position:absolute;
+    top:10px;
+    right:10px;
+    width:36px;
+    height:36px;
+    border:0;
+    border-radius:50%;
+    background:#DC2626;
+    color:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
 </style>
 </head>
 
@@ -415,12 +435,23 @@ if(inputImagen){
             preview.innerHTML = `
                 <div class="preview-card">
                     <img src="${e.target.result}" alt="Vista previa">
+
+                    <button type="button"
+                            class="preview-remove"
+                            onclick="quitarPreviewCategoria()">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
                 </div>
             `;
         };
 
         reader.readAsDataURL(archivo);
     });
+}
+
+function quitarPreviewCategoria(){
+    inputImagen.value = "";
+    preview.innerHTML = "";
 }
 </script>
 
