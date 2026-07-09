@@ -629,8 +629,6 @@ def agregar_cotizacion(request, producto_id):
             estado="revision"
         )
 
-        request.session["solicitud_editando_id"] = solicitud.id
-
     detalle, creado = DetalleSolicitud.objects.get_or_create(
         solicitud=solicitud,
         producto=producto,
@@ -733,13 +731,21 @@ def solicitudes(request):
     solicitud_id = request.session.get("solicitud_editando_id")
 
     solicitud = None
+    editando = False
 
     if solicitud_id:
         solicitud = SolicitudCotizacion.objects.filter(
             id=solicitud_id,
             usuario=request.user,
-            enviada=False
+            enviada=False,
+            estado="revision"
         ).first()
+
+        if solicitud:
+            editando = True
+        else:
+            request.session.pop("solicitud_editando_id", None)
+            solicitud_id = None
 
     if solicitud is None:
         solicitud = SolicitudCotizacion.objects.filter(
@@ -749,12 +755,10 @@ def solicitudes(request):
 
     if solicitud and not solicitud.detalles.exists():
 
-        if request.session.get("solicitud_editando_id") == solicitud.id:
+        if editando:
             pass
-
         else:
             solicitud.delete()
-            request.session.pop("solicitud_editando_id", None)
             solicitud = None
 
     total_productos = 0
@@ -773,7 +777,7 @@ def solicitudes(request):
             'solicitud': solicitud,
             'total_productos': total_productos,
             'total_unidades': total_unidades,
-            'editando': solicitud_id is not None,
+            'editando': editando,
         }
     )
 
