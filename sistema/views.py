@@ -1039,7 +1039,7 @@ def generar_cotizacion(request, id):
             enviar_cotizacion(
                 solicitud.usuario.email,
                 pdf_bytes,
-                solicitud.id,
+                solicitud.numero_usuario,
             )
 
             messages.success(
@@ -1073,7 +1073,7 @@ def rechazar_cotizacion(request, id):
     try:
         enviar_correo_rechazo(
             solicitud.usuario.email,
-            solicitud.id
+            solicitud.numero_usuario
         )
 
         messages.success(
