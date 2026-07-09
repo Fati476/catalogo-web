@@ -531,6 +531,43 @@
     color:#C9A227;
 }
 
+.admin-empty{
+    grid-column:1/-1;
+    width:100%;
+    background:white;
+    border-radius:30px;
+    padding:60px 30px;
+    text-align:center;
+    box-shadow:0 18px 42px rgba(17,24,39,.09);
+    border:1px solid rgba(17,24,39,.08);
+}
+
+.admin-empty i{
+    width:72px;
+    height:72px;
+    border-radius:22px;
+    background:rgba(201,162,39,.14);
+    color:#C9A227;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:2rem;
+    margin:0 auto 18px;
+}
+
+.admin-empty h4{
+    font-size:1.45rem;
+    font-weight:900;
+    color:#111827;
+    margin-bottom:8px;
+}
+
+.admin-empty p{
+    color:#6B7280;
+    font-weight:700;
+    margin:0;
+}
+
 </style>
 </head>
 
@@ -719,9 +756,18 @@
         {% empty %}
 
         <div class="admin-empty">
-            <i class="bi bi-box"></i>
+            <i class="bi bi-box-seam"></i>
+
             <h4>No hay productos registrados</h4>
-            <p>Agrega tu primer producto para comenzar.</p>
+
+            <p>
+                Agrega tu primer producto para comenzar a construir el catálogo.
+            </p>
+
+            <a href="{% url 'agregar_producto' %}" class="btn-admin-empty">
+                <i class="bi bi-plus-circle"></i>
+                Agregar producto
+            </a>
         </div>
 
         {% endfor %}
