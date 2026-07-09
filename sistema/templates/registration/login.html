@@ -283,7 +283,14 @@ body{
 
 <body>
 
-<video autoplay muted loop playsinline class="bg-video">
+<video id="loginVideo"
+       autoplay
+       muted
+       loop
+       playsinline
+       webkit-playsinline
+       preload="auto"
+       class="bg-video">
     <source src="{% static 'videos/Video.mp4' %}" type="video/mp4">
 </video>
 
@@ -394,6 +401,35 @@ function mostrarPassword(){
     const password = document.getElementById('password');
     password.type = password.type === 'password' ? 'text' : 'password';
 }
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function(){
+
+    const video = document.getElementById("loginVideo");
+
+    if(video){
+        video.muted = true;
+        video.defaultMuted = true;
+
+        video.setAttribute("muted", "");
+        video.setAttribute("playsinline", "");
+        video.setAttribute("webkit-playsinline", "");
+
+        const reproducir = () => {
+            video.play().catch(() => {});
+        };
+
+        reproducir();
+
+        setTimeout(reproducir, 500);
+        setTimeout(reproducir, 1500);
+
+        document.addEventListener("touchstart", reproducir, { once:true });
+        document.addEventListener("click", reproducir, { once:true });
+    }
+
+});
 </script>
 
 </body>
