@@ -914,21 +914,29 @@ def mis_cotizaciones(request):
     solicitudes = SolicitudCotizacion.objects.filter(
         usuario=request.user,
         enviada=True
-    ).order_by("-fecha")
+    ).order_by("fecha")
 
-    total_cotizaciones = solicitudes.count()
+    for indice, solicitud in enumerate(solicitudes, start=1):
+        solicitud.numero_usuario = indice
 
-    total_revision = solicitudes.filter(
-        estado="revision"
-    ).count()
+    solicitudes = list(reversed(solicitudes))
 
-    total_cotizadas = solicitudes.filter(
-        estado="cotizada"
-    ).count()
+    total_cotizaciones = len(solicitudes)
 
-    total_rechazadas = solicitudes.filter(
-        estado="rechazada"
-    ).count()
+    total_revision = sum(
+        1 for solicitud in solicitudes
+        if solicitud.estado == "revision"
+    )
+
+    total_cotizadas = sum(
+        1 for solicitud in solicitudes
+        if solicitud.estado == "cotizada"
+    )
+
+    total_rechazadas = sum(
+        1 for solicitud in solicitudes
+        if solicitud.estado == "rechazada"
+    )
 
     return render(
         request,

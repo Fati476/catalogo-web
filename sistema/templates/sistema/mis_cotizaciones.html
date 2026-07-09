@@ -768,7 +768,7 @@
         {% for solicitud in solicitudes %}
 
         <div class="card cotizacion-card mb-4 cotizacion-item"
-            data-id="{{ solicitud.id }}"
+            data-id="{{ solicitud.numero_usuario }}"
             data-estado="{{ solicitud.estado }}"
             data-productos="
                {% for detalle in solicitud.detalles.all %}
@@ -789,9 +789,9 @@
                         <h5 class="cotizacion-main-title">
 
                             {% if solicitud.estado == "cotizada" %}
-                                Cotización #{{ solicitud.id }}
+                                Cotización #{{ solicitud.numero_usuario }}
                             {% else %}
-                                Solicitud #{{ solicitud.id }}
+                                Solicitud #{{ solicitud.numero_usuario }}
                             {% endif %}
 
                         </h5>
