@@ -104,20 +104,36 @@ class Favorito(models.Model):
 
 
 class SolicitudCotizacion(models.Model):
+
     ESTADOS = [
         ("revision", "En revisión"),
         ("cotizada", "Cotizada"),
         ("rechazada", "Rechazada"),
     ]
 
-    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
-    fecha = models.DateTimeField(auto_now_add=True)
-    enviada = models.BooleanField(default=False)
+    usuario = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE
+    )
+
+    fecha = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    enviada = models.BooleanField(
+        default=False
+    )
 
     estado = models.CharField(
         max_length=20,
         choices=ESTADOS,
         default="revision"
+    )
+
+    numero_usuario = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        editable=False
     )
 
     pdf = models.FileField(
@@ -134,6 +150,7 @@ class SolicitudCotizacion(models.Model):
     def __str__(self):
         return f"Solicitud #{self.id}"
 
+
 class DetalleSolicitud(models.Model):
 
     solicitud = models.ForeignKey(
@@ -147,9 +164,13 @@ class DetalleSolicitud(models.Model):
         on_delete=models.CASCADE
     )
 
-    cantidad = models.PositiveIntegerField(default=1)
+    cantidad = models.PositiveIntegerField(
+        default=1
+    )
 
-    seleccionado = models.BooleanField(default=True)
+    seleccionado = models.BooleanField(
+        default=True
+    )
 
     precio_aplicado = models.DecimalField(
         max_digits=10,

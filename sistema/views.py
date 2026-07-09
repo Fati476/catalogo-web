@@ -984,6 +984,7 @@ def administrar_cotizaciones(request):
 from decimal import Decimal, InvalidOperation
 
 from .email_utils import enviar_cotizacion, enviar_correo_rechazo
+from django.db.models import Max
 
 @login_required
 def generar_cotizacion(request, id):
@@ -999,13 +1000,11 @@ def generar_cotizacion(request, id):
 
             precio = request.POST.get(f"precio_{detalle.id}")
 
-            # Si no se capturó un precio
             if not precio or precio.strip() == "":
                 messages.error(
                     request,
                     f"El producto '{detalle.producto.nombre}' no tiene precio asignado."
                 )
-
                 return redirect("detalle_solicitud_admin", id=solicitud.id)
 
             try:
@@ -1017,9 +1016,19 @@ def generar_cotizacion(request, id):
                     request,
                     f"El precio del producto '{detalle.producto.nombre}' es inválido."
                 )
-
                 return redirect("detalle_solicitud_admin", id=solicitud.id)
-        # Todo salió bien
+
+        if solicitud.numero_usuario is None:
+
+            ultimo = SolicitudCotizacion.objects.filter(
+                usuario=solicitud.usuario,
+                numero_usuario__isnull=False
+            ).aggregate(
+                Max("numero_usuario")
+            )["numero_usuario__max"] or 0
+
+            solicitud.numero_usuario = ultimo + 1
+
         solicitud.estado = "cotizada"
         solicitud.save()
 
@@ -1186,8 +1195,14 @@ def descargar_cotizacion_pdf(request, id):
 
     pdf.drawString(
         40,
-        height-175,
-        f"Folio: COT-{solicitud.id:04d}"
+        height - 175,
+        f"Folio interno: COT-{solicitud.id:04d}"
+    )
+
+    pdf.drawString(
+        330,
+        height - 175,
+        f"Cotización No. {solicitud.numero_usuario or 'Pendiente'}"
     )
 
     nombre = solicitud.usuario.get_full_name() or solicitud.usuario.email
