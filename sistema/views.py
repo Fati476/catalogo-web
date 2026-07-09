@@ -775,7 +775,8 @@ def solicitudes(request):
     if solicitud and editando:
 
         solicitudes_usuario = SolicitudCotizacion.objects.filter(
-            usuario=request.user
+            usuario=request.user,
+            enviada=True
         ).order_by("fecha")
 
         for indice, s in enumerate(solicitudes_usuario, start=1):
@@ -794,7 +795,6 @@ def solicitudes(request):
             'numero_usuario': numero_usuario,
         }
     )
-
 
 @login_required
 def eliminar_detalle(request, id):
