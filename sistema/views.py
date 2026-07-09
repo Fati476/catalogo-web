@@ -1605,12 +1605,40 @@ def detalle_solicitud_admin(request, id):
 @login_required
 def detalle_usuario(request, id):
 
-    usuario = get_object_or_404(User, id=id)
+    usuario = get_object_or_404(
+        User,
+        id=id
+    )
+
+    perfil = usuario.perfil
+
+    solicitudes = SolicitudCotizacion.objects.filter(
+        usuario=usuario
+    ).order_by("-fecha")
+
+    favoritos = Favorito.objects.filter(
+        usuario=usuario
+    ).count()
+
+    context = {
+        "usuario": usuario,
+        "perfil": perfil,
+        "solicitudes": solicitudes,
+        "favoritos": favoritos,
+        "total_solicitudes": solicitudes.count(),
+        "cotizadas": solicitudes.filter(
+            estado="cotizada"
+        ).count(),
+        "revision": solicitudes.filter(
+            estado="revision"
+        ).count(),
+        "rechazadas": solicitudes.filter(
+            estado="rechazada"
+        ).count(),
+    }
 
     return render(
         request,
-        'admin/usuarios/detalle.html',
-        {
-            'usuario': usuario
-        }
+        "admin/usuarios/detalle.html",
+        context
     )
