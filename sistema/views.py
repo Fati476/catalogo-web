@@ -770,6 +770,19 @@ def solicitudes(request):
             detalle.cantidad for detalle in solicitud.detalles.all()
         )
 
+    numero_usuario = None
+
+    if solicitud and editando:
+
+        solicitudes_usuario = SolicitudCotizacion.objects.filter(
+            usuario=request.user
+        ).order_by("fecha")
+
+        for indice, s in enumerate(solicitudes_usuario, start=1):
+            if s.id == solicitud.id:
+                numero_usuario = indice
+                break
+
     return render(
         request,
         'sistema/solicitudes.html',
@@ -778,6 +791,7 @@ def solicitudes(request):
             'total_productos': total_productos,
             'total_unidades': total_unidades,
             'editando': editando,
+            'numero_usuario': numero_usuario,
         }
     )
 
