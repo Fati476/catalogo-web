@@ -191,38 +191,67 @@ href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.m
             color:#111827;
         }
 
-        @media(max-width:768px){
+        @media(max-width:991.98px){
 
             body{
                 padding-top:0 !important;
             }
 
             .solicitudes-wrapper{
-                padding-top:115px;
+                padding-top:0;
             }
 
             .solicitud-header{
-                margin:0 12px 30px;
-                min-height:420px;
-                padding:120px 22px 85px;
-                border-radius:28px;
+                min-height:520px;
+                margin:-80px 0 30px;
+                padding:170px 28px 90px;
+                border-radius:0;
                 align-items:flex-start;
                 background-position:center;
             }
 
+            .solicitud-header-content{
+                width:100%;
+                max-width:620px;
+            }
+
             .solicitud-header h3{
-                font-size:2rem;
-                line-height:1.15;
+                font-size:2.35rem;
+                line-height:1.12;
+                margin-bottom:18px;
             }
 
             .solicitud-header p{
+                max-width:580px;
                 font-size:1.05rem;
-                line-height:1.6;
+                line-height:1.65;
+            }
+
+            .solicitud-header-wave svg{
+                height:60px;
             }
 
             .solicitud-img{
                 width:85px;
                 height:85px;
+            }
+        }
+
+        @media(max-width:576px){
+
+            .solicitud-header{
+                min-height:500px;
+                padding:165px 22px 82px;
+                background-position:62% center;
+            }
+
+            .solicitud-header h3{
+                font-size:2rem;
+            }
+
+            .solicitud-header p{
+                font-size:.98rem;
+                line-height:1.6;
             }
         }
 
