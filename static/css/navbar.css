@@ -89,17 +89,45 @@
 }
 
 @media(max-width:991px){
+
     .navbar-catalogo{
         border-radius:28px !important;
+        background:rgba(15,15,15,.65) !important;
+        overflow:visible;
     }
 
     .navbar-catalogo .navbar-collapse{
-        padding-top:12px;
+        padding:18px 0 20px;
+        background:transparent !important;
+        border-radius:0;
+        box-shadow:none !important;
+        backdrop-filter:none;
+        -webkit-backdrop-filter:none;
     }
 
     .navbar-catalogo .dropdown-menu{
+        position:static !important;
         width:85%;
-        margin:12px auto;
+        min-width:0;
+        margin:12px auto 0 !important;
         text-align:center;
+
+        background:transparent !important;
+        border:1px solid rgba(255,255,255,.10);
+        box-shadow:none !important;
+
+        backdrop-filter:none;
+        -webkit-backdrop-filter:none;
+        transform:none !important;
+    }
+
+    .navbar-catalogo .dropdown-menu.show{
+        background:transparent !important;
+    }
+
+    .navbar-catalogo .dropdown-user-head,
+    .navbar-catalogo .dropdown-menu li,
+    .navbar-catalogo .dropdown-item{
+        background:transparent !important;
     }
 }
