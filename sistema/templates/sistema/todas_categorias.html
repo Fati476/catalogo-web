@@ -11,63 +11,17 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="{% static 'css/navbar.css' %}">
 
+    <link rel="stylesheet" href="{% static 'css/hero.css' %}">
+
+    <link href="https://fonts.googleapis.com/css2?family=Arvo:wght@700&display=swap"
+          rel="stylesheet">
+
     <style>
         .categorias-wrapper{
             width:100%;
             overflow:hidden;
         }
 
-        .categorias-hero{
-            position:relative;
-            min-height:310px;
-            overflow:hidden;
-            background:
-                linear-gradient(90deg, rgba(17,24,39,.97), rgba(17,24,39,.72), rgba(17,24,39,.25)),
-                url("{% static 'img/banner_productos.png' %}");
-            background-size:cover;
-            background-position:center;
-            display:flex;
-            align-items:center;
-            padding:145px 60px 105px;
-            margin:0 0 35px;
-        }
-
-        .categorias-hero-content{
-            max-width:680px;
-            color:white;
-            position:relative;
-            z-index:2;
-        }
-
-        .categorias-hero h1{
-            font-family:'Arvo', serif;
-            font-size:2.6rem;
-            margin-bottom:14px;
-            text-shadow:0 4px 22px rgba(0,0,0,.7);
-        }
-
-        .categorias-hero p{
-            max-width:620px;
-            color:rgba(255,255,255,.92);
-            font-size:1.08rem;
-            line-height:1.6;
-            margin-bottom:0;
-        }
-
-        .categorias-hero-wave{
-            position:absolute;
-            left:0;
-            right:0;
-            bottom:-1px;
-            line-height:0;
-            z-index:2;
-        }
-
-        .categorias-hero-wave svg{
-            display:block;
-            width:100%;
-            height:70px;
-        }
 
         .categorias-info{
             margin-top:-12px;
@@ -220,14 +174,6 @@
         }
 
         @media(max-width:768px){
-            .categorias-hero{
-                min-height:260px;
-                padding:110px 24px 85px;
-            }
-
-            .categorias-hero h1{
-                font-size:2rem;
-            }
 
             .categoria-img-box{
                 height:155px;
@@ -250,7 +196,7 @@
 
         .buscador-box{
             max-width:620px;
-            margin:0 auto 35px;
+            margin:-42px auto 35px;
             position:relative;
             z-index:5;
             padding:0 14px;
@@ -300,6 +246,17 @@
             margin-bottom:0;
         }
 
+        .hero-categorias{
+            background:
+                linear-gradient(
+                    90deg,
+                    rgba(17,24,39,.97),
+                    rgba(17,24,39,.72),
+                    rgba(17,24,39,.25)
+                ),
+                url("{% static 'img/banner_productos.png' %}");
+        }
+
 
 
     </style>
@@ -312,26 +269,32 @@
 
 <div class="categorias-wrapper">
 
-    <section class="categorias-hero">
+    <section class="page-hero hero-categorias">
 
-        <div class="categorias-hero-content">
+        <div class="page-hero-content">
 
             <h1>
                 Categorías
             </h1>
 
             <p>
-                Explora las categorías disponibles y encuentra los productos que necesitas para tu solicitud de cotización.
+             Explora las categorías disponibles y encuentra los productos
+                que necesitas para tu solicitud de cotización.
             </p>
 
         </div>
 
-        <div class="categorias-hero-wave">
-            <svg viewBox="0 0 1440 140" preserveAspectRatio="none">
+        <div class="page-hero-wave">
+
+            <svg viewBox="0 0 1440 140"
+                preserveAspectRatio="none">
+
                 <path fill="#f3f1ec"
-                d="M0,70 C240,110 480,30 720,70 C960,110 1200,50 1440,80 L1440,140 L0,140 Z">
+                    d="M0,70 C240,110 480,30 720,70 C960,110 1200,50 1440,80 L1440,140 L0,140 Z">
                 </path>
+
             </svg>
+
         </div>
 
     </section>
@@ -374,7 +337,7 @@
 
             {% for categoria in categorias %}
 
-            <div class="col-6 col-md-4 col-xl-3">
+            <div class="col-6 col-md-4 col-xl-3 categoria-item">
 
                 <a href="{% url 'productos_categoria' categoria.id %}"
                    class="categoria-link">
