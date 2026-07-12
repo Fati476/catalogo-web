@@ -95,11 +95,8 @@
 
     .navbar-catalogo .navbar-collapse{
         padding-top:12px;
-        background:rgba(15,15,15,.55);
-        backdrop-filter:blur(15px);
-        -webkit-backdrop-filter:blur(15px);
-        border-radius:0 0 28px 28px;
     }
+
     .navbar-catalogo .dropdown-menu{
         width:85%;
         margin:12px auto;
