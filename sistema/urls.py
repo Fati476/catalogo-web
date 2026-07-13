@@ -282,6 +282,12 @@ urlpatterns = [
     ),
 
     path(
+        "panel/solicitudes/liberar/<int:id>/",
+        views.liberar_solicitud_admin,
+        name="liberar_solicitud_admin"
+    ),
+
+    path(
         'panel/usuarios/detalle/<int:id>/',
         views.detalle_usuario,
         name='detalle_usuario'

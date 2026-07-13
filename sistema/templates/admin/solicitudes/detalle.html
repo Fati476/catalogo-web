@@ -397,14 +397,24 @@ body{
 
         <div class="quote-detail-content">
 
-            <a href="{% url 'lista_solicitudes' %}" class="back-btn">
+            <a href="{% url 'liberar_solicitud_admin' solicitud.id %}"
+               class="back-btn">
+
                 <span>Volver a cotizaciones</span>
+
                 <div class="back-icon">
                     <i class="bi bi-file-earmark-text"></i>
                 </div>
+
             </a>
 
-            <h1>Solicitud #{{ solicitud.id }}</h1>
+            <h1>
+                {% if solicitud.estado == "cotizada" %}
+                    Cotización #{{ solicitud.numero_usuario }}
+                {% else %}
+                    Solicitud #{{ solicitud.numero_usuario }}
+                {% endif %}
+            </h1>
 
             <p>
                 Revisa los productos solicitados, asigna precios y genera la cotización para el cliente.

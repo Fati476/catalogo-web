@@ -1641,13 +1641,23 @@ def cancelar_edicion_solicitud(request, id):
     )
 
     solicitud.enviada = True
-    solicitud.save()
+    solicitud.bloqueada = False
 
-    request.session.pop("solicitud_editando_id", None)
+    solicitud.save(
+        update_fields=[
+            "enviada",
+            "bloqueada"
+        ]
+    )
+
+    request.session.pop(
+        "solicitud_editando_id",
+        None
+    )
 
     messages.info(
         request,
-        "La edición fue cancelada. La cotización quedó en revisión."
+        "La edición fue cancelada. La solicitud volvió a quedar en revisión."
     )
 
     return redirect("mis_cotizaciones")
@@ -1785,16 +1795,19 @@ def detalle_solicitud_admin(request, id):
         id=id
     )
 
+    # El cliente está editando la solicitud.
     if not solicitud.enviada:
 
         messages.warning(
             request,
-            "Esta solicitud está siendo modificada por el cliente y todavía no puede revisarse."
+            "Esta solicitud está siendo modificada por el cliente. "
+            "Podrás revisarla cuando vuelva a enviarla."
         )
 
         return redirect("lista_solicitudes")
 
-    if solicitud.estado == "revision" and not solicitud.bloqueada:
+    # Solo bloqueamos solicitudes que todavía están en revisión.
+    if solicitud.estado == "revision":
 
         solicitud.bloqueada = True
 
@@ -1809,6 +1822,32 @@ def detalle_solicitud_admin(request, id):
             "solicitud": solicitud
         }
     )
+
+
+@login_required
+def liberar_solicitud_admin(request, id):
+
+    solicitud = get_object_or_404(
+        SolicitudCotizacion,
+        id=id
+    )
+
+    # Solo se libera si sigue en revisión.
+    # Si ya fue cotizada o rechazada, permanece cerrada.
+    if solicitud.estado == "revision":
+
+        solicitud.bloqueada = False
+
+        solicitud.save(
+            update_fields=["bloqueada"]
+        )
+
+    messages.info(
+        request,
+        "La solicitud quedó disponible nuevamente."
+    )
+
+    return redirect("lista_solicitudes")
 @login_required
 def detalle_usuario(request, id):
 
