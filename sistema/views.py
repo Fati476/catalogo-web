@@ -745,7 +745,6 @@ def solicitudes(request):
             editando = True
         else:
             request.session.pop("solicitud_editando_id", None)
-            solicitud_id = None
 
     if solicitud is None:
         solicitud = SolicitudCotizacion.objects.filter(
@@ -755,9 +754,7 @@ def solicitudes(request):
 
     if solicitud and not solicitud.detalles.exists():
 
-        if editando:
-            pass
-        else:
+        if not editando:
             solicitud.delete()
             solicitud = None
 
@@ -767,32 +764,24 @@ def solicitudes(request):
     if solicitud:
         total_productos = solicitud.detalles.count()
         total_unidades = sum(
-            detalle.cantidad for detalle in solicitud.detalles.all()
+            detalle.cantidad
+            for detalle in solicitud.detalles.all()
         )
 
     numero_usuario = None
 
     if solicitud and editando:
-
-        solicitudes_usuario = SolicitudCotizacion.objects.filter(
-            usuario=request.user,
-            enviada=True
-        ).order_by("fecha")
-
-        for indice, s in enumerate(solicitudes_usuario, start=1):
-            if s.id == solicitud.id:
-                numero_usuario = indice
-                break
+        numero_usuario = solicitud.numero_usuario
 
     return render(
         request,
-        'sistema/solicitudes.html',
+        "sistema/solicitudes.html",
         {
-            'solicitud': solicitud,
-            'total_productos': total_productos,
-            'total_unidades': total_unidades,
-            'editando': editando,
-            'numero_usuario': numero_usuario,
+            "solicitud": solicitud,
+            "total_productos": total_productos,
+            "total_unidades": total_unidades,
+            "editando": editando,
+            "numero_usuario": numero_usuario,
         }
     )
 
@@ -1793,14 +1782,22 @@ def detalle_solicitud_admin(request, id):
 
     solicitud = get_object_or_404(
         SolicitudCotizacion,
-        id=id,
-        enviada=True
+        id=id
     )
 
-    # Solo se bloquean las solicitudes pendientes de revisión
+    if not solicitud.enviada:
+
+        messages.warning(
+            request,
+            "Esta solicitud está siendo modificada por el cliente y todavía no puede revisarse."
+        )
+
+        return redirect("lista_solicitudes")
+
     if solicitud.estado == "revision" and not solicitud.bloqueada:
 
         solicitud.bloqueada = True
+
         solicitud.save(
             update_fields=["bloqueada"]
         )
