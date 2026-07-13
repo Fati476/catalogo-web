@@ -11,6 +11,10 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <link rel="stylesheet" href="{% static 'css/navbar.css' %}">
+    <link rel="stylesheet" href="{% static 'css/hero.css' %}">
+
+    <link href="https://fonts.googleapis.com/css2?family=Arvo:wght@700&display=swap"
+        rel="stylesheet">
 
     <style>
 
@@ -28,57 +32,18 @@
             overflow:visible;
         }
 
-        .favoritos-hero{
-            position:relative;
-            min-height:310px;
-            overflow:hidden;
+        .hero-favoritos{
             background:
-                linear-gradient(90deg, rgba(17,24,39,.97), rgba(17,24,39,.72), rgba(17,24,39,.25)),
+                linear-gradient(
+                    90deg,
+                    rgba(17,24,39,.97),
+                    rgba(17,24,39,.72),
+                    rgba(17,24,39,.25)
+                ),
                 url("{% static 'img/banner_productos.png' %}");
-            background-size:cover;
-            background-position:center;
-            display:flex;
-            align-items:center;
-            padding:145px 60px 105px;
-            margin:0 0 35px;
         }
 
-        .favoritos-hero-content{
-            max-width:680px;
-            color:white;
-            position:relative;
-            z-index:2;
-        }
-
-        .favoritos-hero h1{
-            font-family:'Arvo', serif;
-            font-size:2.6rem;
-            margin-bottom:14px;
-            text-shadow:0 4px 22px rgba(0,0,0,.7);
-        }
-
-        .favoritos-hero p{
-            max-width:620px;
-            color:rgba(255,255,255,.92);
-            font-size:1.08rem;
-            line-height:1.6;
-            margin-bottom:0;
-        }
-
-        .favoritos-hero-wave{
-            position:absolute;
-            left:0;
-            right:0;
-            bottom:-1px;
-            line-height:0;
-            z-index:2;
-        }
-
-        .favoritos-hero-wave svg{
-            display:block;
-            width:100%;
-            height:70px;
-        }
+        
 
         .footer-wave{
             line-height:0;
@@ -344,26 +309,32 @@
 
 <div class="favoritos-wrapper">
 
-    <section class="favoritos-hero">
+    <section class="page-hero hero-favoritos">
 
-        <div class="favoritos-hero-content">
+        <div class="page-hero-content">
 
             <h1>
                 Mis favoritos
             </h1>
 
             <p>
-                Consulta los productos que guardaste para acceder rápidamente a ellos y agregarlos a tu solicitud de cotización.
+                Consulta los productos que guardaste para acceder rápidamente a ellos
+                y agregarlos a tu solicitud de cotización.
             </p>
 
         </div>
 
-        <div class="favoritos-hero-wave">
-            <svg viewBox="0 0 1440 140" preserveAspectRatio="none">
+        <div class="page-hero-wave">
+
+            <svg viewBox="0 0 1440 140"
+                 preserveAspectRatio="none">
+
                 <path fill="#f3f1ec"
-                d="M0,70 C240,110 480,30 720,70 C960,110 1200,50 1440,80 L1440,140 L0,140 Z">
+                      d="M0,70 C240,110 480,30 720,70 C960,110 1200,50 1440,80 L1440,140 L0,140 Z">
                 </path>
+
             </svg>
+
         </div>
 
     </section>
