@@ -1795,7 +1795,6 @@ def detalle_solicitud_admin(request, id):
         id=id
     )
 
-    # El cliente está editando la solicitud.
     if not solicitud.enviada:
 
         messages.warning(
@@ -1806,7 +1805,6 @@ def detalle_solicitud_admin(request, id):
 
         return redirect("lista_solicitudes")
 
-    # Solo bloqueamos solicitudes que todavía están en revisión.
     if solicitud.estado == "revision":
 
         solicitud.bloqueada = True
