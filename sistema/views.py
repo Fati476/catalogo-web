@@ -993,7 +993,7 @@ def mis_cotizaciones(request):
     )
 
 
-@staff_member_required
+@login_required
 def administrar_cotizaciones(request):
     solicitudes = (
         SolicitudCotizacion.objects
@@ -1014,7 +1014,7 @@ from decimal import Decimal, InvalidOperation
 from .email_utils import enviar_cotizacion, enviar_correo_rechazo
 from django.db.models import Max
 
-@staff_member_required
+@login_required
 def generar_cotizacion(request, id):
 
     solicitud = get_object_or_404(
@@ -1127,7 +1127,7 @@ def generar_cotizacion(request, id):
     
 
 
-@staff_member_required
+@login_required
 def rechazar_cotizacion(request, id):
 
     solicitud = get_object_or_404(
@@ -1546,15 +1546,6 @@ def editar_solicitud_en_revision(request, id):
 
         return redirect("mis_cotizaciones")
 
-    if not solicitud.enviada:
-
-        messages.warning(
-            request,
-            "Esta solicitud ya se encuentra en edición."
-        )
-
-        return redirect("solicitudes")
-
     if solicitud.bloqueada:
 
         messages.error(
@@ -1564,9 +1555,35 @@ def editar_solicitud_en_revision(request, id):
 
         return redirect("mis_cotizaciones")
 
+    if not solicitud.enviada:
+
+        messages.warning(
+            request,
+            "Esta solicitud ya se encuentra en edición."
+        )
+
+        return redirect("solicitudes")
+
+    # Si es una solicitud antigua y todavía no tiene número,
+    # se le asigna uno antes de comenzar la edición.
+    if solicitud.numero_usuario is None:
+
+        ultimo_numero = SolicitudCotizacion.objects.filter(
+            usuario=request.user,
+            numero_usuario__isnull=False
+        ).aggregate(
+            maximo=Max("numero_usuario")
+        )["maximo"] or 0
+
+        solicitud.numero_usuario = ultimo_numero + 1
+
     solicitud.enviada = False
+
     solicitud.save(
-        update_fields=["enviada"]
+        update_fields=[
+            "enviada",
+            "numero_usuario"
+        ]
     )
 
     request.session["solicitud_editando_id"] = solicitud.id
@@ -1771,7 +1788,7 @@ def password_reset_complete_custom(request):
     return render(request, "registration/password_reset_complete.html")
 
 
-@staff_member_required
+@login_required
 def detalle_solicitud_admin(request, id):
 
     solicitud = get_object_or_404(
