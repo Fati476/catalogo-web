@@ -855,7 +855,8 @@ def enviar_solicitud(request):
         solicitud = SolicitudCotizacion.objects.filter(
             id=solicitud_id,
             usuario=request.user,
-            enviada=False
+            enviada=False,
+            estado="revision"
         ).first()
 
     if solicitud is None:
@@ -884,13 +885,29 @@ def enviar_solicitud(request):
         seleccionado=False
     )
 
+    # Si es nueva, se le asigna un número permanente.
+    # Si es una edición, conserva el número que ya tenía.
+    numero_usuario = solicitud.numero_usuario
+
+    if numero_usuario is None:
+
+        ultimo_numero = SolicitudCotizacion.objects.filter(
+            usuario=request.user,
+            numero_usuario__isnull=False
+        ).aggregate(
+            maximo=Max("numero_usuario")
+        )["maximo"] or 0
+
+        numero_usuario = ultimo_numero + 1
+
     if detalles_no_seleccionados.exists():
 
         nueva_solicitud = SolicitudCotizacion.objects.create(
             usuario=request.user,
             enviada=True,
             estado="revision",
-            bloqueada=False
+            bloqueada=False,
+            numero_usuario=numero_usuario
         )
 
         for detalle in detalles_seleccionados:
@@ -913,12 +930,14 @@ def enviar_solicitud(request):
         solicitud.enviada = True
         solicitud.estado = "revision"
         solicitud.bloqueada = False
+        solicitud.numero_usuario = numero_usuario
 
         solicitud.save(
             update_fields=[
                 "enviada",
                 "estado",
-                "bloqueada"
+                "bloqueada",
+                "numero_usuario"
             ]
         )
 
@@ -931,7 +950,8 @@ def enviar_solicitud(request):
 
     return JsonResponse({
         "ok": True,
-        "solicitud_id": nueva_solicitud.id
+        "solicitud_id": nueva_solicitud.id,
+        "numero_usuario": nueva_solicitud.numero_usuario
     })
 
 @login_required
@@ -999,79 +1019,111 @@ def generar_cotizacion(request, id):
 
     solicitud = get_object_or_404(
         SolicitudCotizacion,
-        id=id
+        id=id,
+        enviada=True,
+        estado="revision"
     )
 
-    if request.method == "POST":
-
-        for detalle in solicitud.detalles.all():
-
-            precio = request.POST.get(f"precio_{detalle.id}")
-
-            if not precio or precio.strip() == "":
-                messages.error(
-                    request,
-                    f"El producto '{detalle.producto.nombre}' no tiene precio asignado."
-                )
-                return redirect("detalle_solicitud_admin", id=solicitud.id)
-
-            try:
-                detalle.precio_aplicado = Decimal(precio)
-                detalle.save()
-
-            except InvalidOperation:
-                messages.error(
-                    request,
-                    f"El precio del producto '{detalle.producto.nombre}' es inválido."
-                )
-                return redirect("detalle_solicitud_admin", id=solicitud.id)
-
-        if solicitud.numero_usuario is None:
-
-            ultimo = SolicitudCotizacion.objects.filter(
-                usuario=solicitud.usuario,
-                numero_usuario__isnull=False
-            ).aggregate(
-                Max("numero_usuario")
-            )["numero_usuario__max"] or 0
-
-            solicitud.numero_usuario = ultimo + 1
-
-        solicitud.estado = "cotizada"
-        solicitud.bloqueada = True
-
-        solicitud.save(
-            update_fields=[
-                "estado",
-                "bloqueada",
-                "numero_usuario"
-            ]
+    if request.method != "POST":
+        return redirect(
+            "detalle_solicitud_admin",
+            id=solicitud.id
         )
 
+    if solicitud.numero_usuario is None:
+
+        messages.error(
+            request,
+            "La solicitud no tiene un número asignado."
+        )
+
+        return redirect(
+            "detalle_solicitud_admin",
+            id=solicitud.id
+        )
+
+    for detalle in solicitud.detalles.all():
+
+        precio = request.POST.get(
+            f"precio_{detalle.id}"
+        )
+
+        if not precio or precio.strip() == "":
+
+            messages.error(
+                request,
+                f"El producto '{detalle.producto.nombre}' no tiene precio asignado."
+            )
+
+            return redirect(
+                "detalle_solicitud_admin",
+                id=solicitud.id
+            )
+
         try:
-            pdf_response = descargar_cotizacion_pdf(request, solicitud.id)
-            pdf_bytes = pdf_response.content
+            precio_decimal = Decimal(precio)
 
-            enviar_cotizacion(
-                solicitud.usuario.email,
-                pdf_bytes,
-                solicitud.numero_usuario,
+            if precio_decimal <= 0:
+                raise InvalidOperation
+
+            detalle.precio_aplicado = precio_decimal
+
+            detalle.save(
+                update_fields=["precio_aplicado"]
             )
 
-            messages.success(
+        except (InvalidOperation, ValueError):
+
+            messages.error(
                 request,
-                "La cotización fue generada y enviada correctamente al cliente."
+                f"El precio del producto '{detalle.producto.nombre}' es inválido."
             )
 
-        except Exception as e:
-            print("Error enviando correo:", e)
-
-            messages.warning(
-                request,
-                "La cotización se generó correctamente, pero ocurrió un problema al enviar el correo."
+            return redirect(
+                "detalle_solicitud_admin",
+                id=solicitud.id
             )
 
-        return redirect("lista_solicitudes")
+    solicitud.estado = "cotizada"
+    solicitud.bloqueada = True
+
+    solicitud.save(
+        update_fields=[
+            "estado",
+            "bloqueada"
+        ]
+    )
+
+    try:
+
+        pdf_response = descargar_cotizacion_pdf(
+            request,
+            solicitud.id
+        )
+
+        pdf_bytes = pdf_response.content
+
+        enviar_cotizacion(
+            solicitud.usuario.email,
+            pdf_bytes,
+            solicitud.numero_usuario
+        )
+
+        messages.success(
+            request,
+            "La cotización fue generada y enviada correctamente al cliente."
+        )
+
+    except Exception as e:
+
+        print("Error enviando correo:", e)
+
+        messages.warning(
+            request,
+            "La cotización se generó correctamente, pero ocurrió un problema al enviar el correo."
+        )
+
+    return redirect("lista_solicitudes")
     
 
 
@@ -1080,19 +1132,22 @@ def rechazar_cotizacion(request, id):
 
     solicitud = get_object_or_404(
         SolicitudCotizacion,
-        id=id
+        id=id,
+        enviada=True,
+        estado="revision"
     )
 
     if solicitud.numero_usuario is None:
 
-        ultimo = SolicitudCotizacion.objects.filter(
-            usuario=solicitud.usuario,
-            numero_usuario__isnull=False
-        ).aggregate(
-            Max("numero_usuario")
-        )["numero_usuario__max"] or 0
+        messages.error(
+            request,
+            "La solicitud no tiene un número asignado."
+        )
 
-        solicitud.numero_usuario = ultimo + 1
+        return redirect(
+            "detalle_solicitud_admin",
+            id=solicitud.id
+        )
 
     solicitud.estado = "rechazada"
     solicitud.bloqueada = True
@@ -1100,12 +1155,12 @@ def rechazar_cotizacion(request, id):
     solicitud.save(
         update_fields=[
             "estado",
-            "bloqueada",
-            "numero_usuario"
+            "bloqueada"
         ]
     )
 
     try:
+
         enviar_correo_rechazo(
             solicitud.usuario.email,
             solicitud.numero_usuario
