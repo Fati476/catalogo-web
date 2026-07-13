@@ -319,6 +319,18 @@ body{
     padding:17px 20px;
     border-radius:20px;
     box-shadow:0 10px 28px rgba(17,24,39,.08);
+
+    opacity:1;
+    transform:translateY(0);
+    overflow:hidden;
+
+    transition:
+        opacity .3s ease,
+        transform .3s ease,
+        max-height .35s ease,
+        padding .35s ease,
+        margin .35s ease,
+        border-width .35s ease;
 }
 
 .admin-message-icon{
@@ -347,52 +359,29 @@ body{
     line-height:1.45;
 }
 
-/* Éxito */
-.admin-message.success{
-    background:#ecfdf3;
-    color:#166534;
-    border:1px solid #bbf7d0;
-}
+/* ============================
+   Todos los mensajes
+============================ */
 
-.admin-message.success .admin-message-icon{
-    background:#16a34a;
-    color:white;
-}
+.admin-message.success,
+.admin-message.warning,
+.admin-message.error,
+.admin-message.info{
 
-/* Advertencia */
-.admin-message.warning{
     background:#fff8dc;
     color:#854d0e;
     border:1px solid #fde68a;
+
 }
 
-.admin-message.warning .admin-message-icon{
+.admin-message.success .admin-message-icon,
+.admin-message.warning .admin-message-icon,
+.admin-message.error .admin-message-icon,
+.admin-message.info .admin-message-icon{
+
     background:#c79b2d;
     color:white;
-}
 
-/* Error */
-.admin-message.error{
-    background:#feecec;
-    color:#991b1b;
-    border:1px solid #fecaca;
-}
-
-.admin-message.error .admin-message-icon{
-    background:#dc2626;
-    color:white;
-}
-
-/* Información */
-.admin-message.info{
-    background:#eff6ff;
-    color:#1e40af;
-    border:1px solid #bfdbfe;
-}
-
-.admin-message.info .admin-message-icon{
-    background:#2563eb;
-    color:white;
 }
 </style>
 </head>
@@ -650,6 +639,41 @@ function filtrarSolicitudes(){
 buscador.addEventListener('input', filtrarSolicitudes);
 filtroEstado.addEventListener('change', filtrarSolicitudes);
 </script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function(){
+
+    const mensajes = document.querySelectorAll(".admin-message");
+
+    if(!mensajes.length) return;
+
+    setTimeout(() => {
+
+        mensajes.forEach(mensaje => {
+
+            mensaje.style.opacity = "0";
+            mensaje.style.transform = "translateY(-12px)";
+            mensaje.style.maxHeight = mensaje.scrollHeight + "px";
+
+            setTimeout(() => {
+                mensaje.style.maxHeight = "0";
+                mensaje.style.paddingTop = "0";
+                mensaje.style.paddingBottom = "0";
+                mensaje.style.margin = "0";
+                mensaje.style.borderWidth = "0";
+            }, 300);
+
+            setTimeout(() => {
+                mensaje.remove();
+            }, 650);
+
+        });
+
+    }, 3000);
+
+});
+</script>
+
 
 </body>
 </html>
