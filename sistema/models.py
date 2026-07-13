@@ -136,6 +136,11 @@ class SolicitudCotizacion(models.Model):
         editable=False
     )
 
+    # Impide que el cliente edite mientras el administrador la procesa
+    bloqueada = models.BooleanField(
+        default=False
+    )
+
     pdf = models.FileField(
         upload_to="cotizaciones/",
         blank=True,

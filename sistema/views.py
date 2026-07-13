@@ -889,7 +889,8 @@ def enviar_solicitud(request):
         nueva_solicitud = SolicitudCotizacion.objects.create(
             usuario=request.user,
             enviada=True,
-            estado="revision"
+            estado="revision",
+            bloqueada=False
         )
 
         for detalle in detalles_seleccionados:
@@ -911,11 +912,22 @@ def enviar_solicitud(request):
 
         solicitud.enviada = True
         solicitud.estado = "revision"
-        solicitud.save()
+        solicitud.bloqueada = False
+
+        solicitud.save(
+            update_fields=[
+                "enviada",
+                "estado",
+                "bloqueada"
+            ]
+        )
 
         nueva_solicitud = solicitud
 
-    request.session.pop("solicitud_editando_id", None)
+    request.session.pop(
+        "solicitud_editando_id",
+        None
+    )
 
     return JsonResponse({
         "ok": True,
@@ -925,32 +937,28 @@ def enviar_solicitud(request):
 @login_required
 def mis_cotizaciones(request):
 
-    solicitudes = SolicitudCotizacion.objects.filter(
-        usuario=request.user,
-        enviada=True
-    ).order_by("fecha")
-
-    for indice, solicitud in enumerate(solicitudes, start=1):
-        solicitud.numero_usuario = indice
-
-    solicitudes = list(reversed(solicitudes))
-
-    total_cotizaciones = len(solicitudes)
-
-    total_revision = sum(
-        1 for solicitud in solicitudes
-        if solicitud.estado == "revision"
+    solicitudes = (
+        SolicitudCotizacion.objects
+        .filter(
+            usuario=request.user,
+            enviada=True
+        )
+        .order_by("-fecha")
     )
 
-    total_cotizadas = sum(
-        1 for solicitud in solicitudes
-        if solicitud.estado == "cotizada"
-    )
+    total_cotizaciones = solicitudes.count()
 
-    total_rechazadas = sum(
-        1 for solicitud in solicitudes
-        if solicitud.estado == "rechazada"
-    )
+    total_revision = solicitudes.filter(
+        estado="revision"
+    ).count()
+
+    total_cotizadas = solicitudes.filter(
+        estado="cotizada"
+    ).count()
+
+    total_rechazadas = solicitudes.filter(
+        estado="rechazada"
+    ).count()
 
     return render(
         request,
@@ -986,7 +994,7 @@ from decimal import Decimal, InvalidOperation
 from .email_utils import enviar_cotizacion, enviar_correo_rechazo
 from django.db.models import Max
 
-@login_required
+@staff_member_required
 def generar_cotizacion(request, id):
 
     solicitud = get_object_or_404(
@@ -1030,7 +1038,15 @@ def generar_cotizacion(request, id):
             solicitud.numero_usuario = ultimo + 1
 
         solicitud.estado = "cotizada"
-        solicitud.save()
+        solicitud.bloqueada = True
+
+        solicitud.save(
+            update_fields=[
+                "estado",
+                "bloqueada",
+                "numero_usuario"
+            ]
+        )
 
         try:
             pdf_response = descargar_cotizacion_pdf(request, solicitud.id)
@@ -1059,7 +1075,7 @@ def generar_cotizacion(request, id):
     
 
 
-@login_required
+@staff_member_required
 def rechazar_cotizacion(request, id):
 
     solicitud = get_object_or_404(
@@ -1067,8 +1083,27 @@ def rechazar_cotizacion(request, id):
         id=id
     )
 
+    if solicitud.numero_usuario is None:
+
+        ultimo = SolicitudCotizacion.objects.filter(
+            usuario=solicitud.usuario,
+            numero_usuario__isnull=False
+        ).aggregate(
+            Max("numero_usuario")
+        )["numero_usuario__max"] or 0
+
+        solicitud.numero_usuario = ultimo + 1
+
     solicitud.estado = "rechazada"
-    solicitud.save()
+    solicitud.bloqueada = True
+
+    solicitud.save(
+        update_fields=[
+            "estado",
+            "bloqueada",
+            "numero_usuario"
+        ]
+    )
 
     try:
         enviar_correo_rechazo(
@@ -1444,13 +1479,40 @@ def editar_solicitud_en_revision(request, id):
     solicitud = get_object_or_404(
         SolicitudCotizacion,
         id=id,
-        usuario=request.user,
-        enviada=True,
-        estado="revision"
+        usuario=request.user
     )
 
+    if solicitud.estado != "revision":
+
+        messages.error(
+            request,
+            "Esta solicitud ya fue procesada y no puede editarse."
+        )
+
+        return redirect("mis_cotizaciones")
+
+    if not solicitud.enviada:
+
+        messages.warning(
+            request,
+            "Esta solicitud ya se encuentra en edición."
+        )
+
+        return redirect("solicitudes")
+
+    if solicitud.bloqueada:
+
+        messages.error(
+            request,
+            "No puedes editar esta solicitud porque un administrador ya la está revisando."
+        )
+
+        return redirect("mis_cotizaciones")
+
     solicitud.enviada = False
-    solicitud.save()
+    solicitud.save(
+        update_fields=["enviada"]
+    )
 
     request.session["solicitud_editando_id"] = solicitud.id
 
@@ -1461,17 +1523,41 @@ def editar_solicitud_en_revision(request, id):
 
     return redirect("solicitudes")
 
-
 @login_required
 def eliminar_solicitud_en_revision(request, id):
 
     solicitud = get_object_or_404(
         SolicitudCotizacion,
         id=id,
-        usuario=request.user,
-        enviada=True,
-        estado="revision"
+        usuario=request.user
     )
+
+    if solicitud.estado != "revision":
+
+        messages.error(
+            request,
+            "Esta solicitud ya fue procesada y no puede eliminarse."
+        )
+
+        return redirect("mis_cotizaciones")
+
+    if solicitud.bloqueada:
+
+        messages.error(
+            request,
+            "No puedes eliminar esta solicitud porque un administrador ya la está revisando."
+        )
+
+        return redirect("mis_cotizaciones")
+
+    if not solicitud.enviada:
+
+        messages.warning(
+            request,
+            "No puedes eliminarla desde aquí porque actualmente está en edición."
+        )
+
+        return redirect("solicitudes")
 
     solicitud.delete()
 
@@ -1630,19 +1716,30 @@ def password_reset_complete_custom(request):
     return render(request, "registration/password_reset_complete.html")
 
 
-@login_required
+@staff_member_required
 def detalle_solicitud_admin(request, id):
 
-    solicitud = SolicitudCotizacion.objects.get(id=id)
+    solicitud = get_object_or_404(
+        SolicitudCotizacion,
+        id=id,
+        enviada=True
+    )
+
+    # Solo se bloquean las solicitudes pendientes de revisión
+    if solicitud.estado == "revision" and not solicitud.bloqueada:
+
+        solicitud.bloqueada = True
+        solicitud.save(
+            update_fields=["bloqueada"]
+        )
 
     return render(
         request,
-        'admin/solicitudes/detalle.html',
+        "admin/solicitudes/detalle.html",
         {
-            'solicitud': solicitud
+            "solicitud": solicitud
         }
     )
-
 @login_required
 def detalle_usuario(request, id):
 

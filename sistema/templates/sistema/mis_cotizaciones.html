@@ -602,6 +602,42 @@
                 url("{% static 'img/banner_productos.png' %}");
         }
 
+        .solicitud-bloqueada-aviso{
+            width:100%;
+            display:flex;
+            align-items:flex-start;
+            gap:12px;
+            padding:15px 16px;
+            border-radius:16px;
+            background:#f3f1ec;
+            color:#111827;
+            text-align:left;
+        }
+
+        .solicitud-bloqueada-aviso > i{
+            width:38px;
+            height:38px;
+            flex-shrink:0;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            border-radius:12px;
+            background:#111827;
+            color:white;
+        }
+
+        .solicitud-bloqueada-aviso strong,
+        .solicitud-bloqueada-aviso span{        
+           display:block;
+        }
+
+        .solicitud-bloqueada-aviso span{        
+           margin-top:4px;
+           color:#6b7280;
+           font-size:.84rem;
+           line-height:1.45;
+        }
+
 
 
 
@@ -881,17 +917,42 @@
 
                             <div class="acciones-cotizacion">
 
-                                <a href="{% url 'editar_solicitud_en_revision' solicitud.id %}"
-                                   class="btn-descargar-pdf">
-                                    <i class="bi bi-pencil-square"></i>
-                                    Editar solicitud
-                                </a>
+                                {% if solicitud.bloqueada %}
 
-                                <a href="{% url 'eliminar_solicitud_en_revision' solicitud.id %}"
-                                   class="btn-eliminar-cotizacion btn-eliminar-solicitud">
-                                    <i class="bi bi-trash"></i>
-                                    Eliminar solicitud
-                                </a>
+                                    <div class="solicitud-bloqueada-aviso">
+
+                                        <i class="bi bi-lock-fill"></i>
+
+                                        <div>
+                                            <strong>Solicitud en proceso</strong>
+
+                                            <span>
+                                                Un administrador ya está revisando esta solicitud,
+                                                por lo que temporalmente no puede editarse ni eliminarse.
+                                            </span>
+                                        </div>
+
+                                    </div>
+
+                                {% else %}
+
+                                    <a href="{% url 'editar_solicitud_en_revision' solicitud.id %}"
+                                       class="btn-descargar-pdf">
+
+                                        <i class="bi bi-pencil-square"></i>
+                                        Editar solicitud
+
+                                    </a>
+
+                                    <a href="{% url 'eliminar_solicitud_en_revision' solicitud.id %}"
+                                       class="btn-eliminar-cotizacion btn-eliminar-solicitud">
+
+                                        <i class="bi bi-trash"></i>
+                                        Eliminar solicitud
+                            
+                                    </a>
+
+                                {% endif %}
 
                             </div>
 
