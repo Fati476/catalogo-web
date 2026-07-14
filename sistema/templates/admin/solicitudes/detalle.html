@@ -628,7 +628,8 @@ body{
                                min="0.01"
                                id="precio_{{ detalle.id }}"
                                name="precio_{{ detalle.id }}"
-                               value="{% if detalle.precio_aplicado is not None %}{{ detalle.precio_aplicado }}{% elif detalle.producto.precio is not None %}{{ detalle.producto.precio }}{% endif %}"
+                               value="{% if detalle.precio_aplicado %}{{ detalle.precio_aplicado }}{% else %}{{ detalle.producto.precio }}{% endif %}"
+                               data-precio-original="{% if detalle.precio_aplicado %}{{ detalle.precio_aplicado }}{% else %}{{ detalle.producto.precio }}{% endif %}"
                                placeholder="0.00">
 
                         </div>
@@ -767,10 +768,24 @@ document.addEventListener("DOMContentLoaded", function(){
             precioWrapper.classList.remove("field-hidden");
             precioInput.required = true;
 
+            if(precioInput.value === ""){
+
+                precioInput.value =
+                    precioInput.dataset.precioTemporal
+                    || precioInput.dataset.precioOriginal
+                    || "";
+
+            }
+
         }else{
 
             precioWrapper.classList.add("field-hidden");
             precioInput.required = false;
+
+            if(precioInput.value !== ""){
+                precioInput.dataset.precioTemporal = precioInput.value;
+            }
+
             precioInput.value = "";
 
         }
