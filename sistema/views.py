@@ -1205,14 +1205,15 @@ def descargar_cotizacion_pdf(request, id):
         return redirect("lista_solicitudes")
 
     # Mismo número de la solicitud, pero con prefijo COT
-    folio = f"COT-{solicitud.numero_usuario:04d}"
+    folio_interno = f"COT-{solicitud.id:04d}"
+    numero_cliente = solicitud.numero_usuario
 
     response = HttpResponse(
         content_type="application/pdf"
     )
 
     response["Content-Disposition"] = (
-        f'attachment; filename="{folio}.pdf"'
+        f'attachment; filename="{folio_interno}.pdf"'
     )
 
     pdf = canvas.Canvas(
@@ -1325,7 +1326,13 @@ def descargar_cotizacion_pdf(request, id):
     pdf.drawString(
         40,
         height - 175,
-        f"Folio: {folio}"
+        f"Folio interno: {folio_interno}"
+    )
+
+    pdf.drawString(
+        330,
+        height - 175,
+        f"Cotización No. {numero_cliente}"
     )
 
     nombre = (

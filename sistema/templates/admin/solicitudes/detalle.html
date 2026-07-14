@@ -410,9 +410,9 @@ body{
 
             <h1>
                 {% if solicitud.estado == "cotizada" %}
-                    COT-{{ solicitud.numero_usuario|stringformat:"04d" }}
+                    COT-{{ solicitud.id|stringformat:"04d" }}
                 {% else %}
-                    SOL-{{ solicitud.numero_usuario|stringformat:"04d" }}
+                    SOL-{{ solicitud.id|stringformat:"04d" }}
                 {% endif %}
             </h1>
 
