@@ -514,7 +514,19 @@ def lista_solicitudes(request):
         estado="rechazada"
     ).count()
 
-    abrir_modal = request.session.pop("abrir_modal", None)
+    paginator = Paginator(
+        solicitudes,
+        10   # 10 solicitudes por página
+    )
+
+    page_number = request.GET.get("page")
+
+    solicitudes = paginator.get_page(page_number)
+
+    abrir_modal = request.session.pop(
+        "abrir_modal",
+        None
+    )
 
     return render(
         request,

@@ -608,6 +608,67 @@ body{
 
         </div>
 
+        {% if solicitudes.has_other_pages %}
+
+        <div class="d-flex justify-content-center mt-4">
+
+            <nav>
+
+                <ul class="pagination">
+
+                    {% if solicitudes.has_previous %}
+
+                    <li class="page-item">
+                        <a class="page-link"
+                            href="?page={{ solicitudes.previous_page_number }}">
+                            <i class="bi bi-chevron-left"></i>
+                        </a>
+                    </li>
+
+                    {% endif %}
+
+                    {% for num in solicitudes.paginator.page_range %}
+
+                        {% if solicitudes.number == num %}
+
+                            <li class="page-item active">
+                                <span class="page-link">
+                                    {{ num }}
+                                </span>
+                            </li>
+
+                        {% else %}
+
+                            <li class="page-item">
+                                <a class="page-link"
+                                    href="?page={{ num }}">
+                                    {{ num }}
+                                </a>
+                            </li>
+
+                        {% endif %}
+
+                    {% endfor %}
+
+                    {% if solicitudes.has_next %}
+
+                    <li class="page-item">
+                        <a class="page-link"
+                            href="?page={{ solicitudes.next_page_number }}">
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+        
+                    {% endif %}
+
+                </ul>
+
+            </nav>
+
+        </div>
+
+        {% endif %}
+
     </section>
 
 </main>
