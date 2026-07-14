@@ -1194,12 +1194,31 @@ def descargar_cotizacion_pdf(request, id):
         id=id
     )
 
-    response = HttpResponse(content_type="application/pdf")
-    response["Content-Disposition"] = (
-        f'attachment; filename="cotizacion_{solicitud.id}.pdf"'
+    # La cotización debe tener un número asignado
+    if solicitud.numero_usuario is None:
+
+        messages.error(
+            request,
+            "La cotización no tiene un folio asignado."
+        )
+
+        return redirect("lista_solicitudes")
+
+    # Mismo número de la solicitud, pero con prefijo COT
+    folio = f"COT-{solicitud.numero_usuario:04d}"
+
+    response = HttpResponse(
+        content_type="application/pdf"
     )
 
-    pdf = canvas.Canvas(response, pagesize=letter)
+    response["Content-Disposition"] = (
+        f'attachment; filename="{folio}.pdf"'
+    )
+
+    pdf = canvas.Canvas(
+        response,
+        pagesize=letter
+    )
 
     width, height = letter
 
@@ -1215,6 +1234,7 @@ def descargar_cotizacion_pdf(request, id):
     )
 
     if os.path.exists(logo_path):
+
         pdf.drawImage(
             logo_path,
             30,
@@ -1229,7 +1249,10 @@ def descargar_cotizacion_pdf(request, id):
     # ENCABEZADO
     # ==========================
 
-    pdf.setFont("Helvetica-Bold", 17)
+    pdf.setFont(
+        "Helvetica-Bold",
+        17
+    )
 
     pdf.drawCentredString(
         width / 2 + 40,
@@ -1243,7 +1266,10 @@ def descargar_cotizacion_pdf(request, id):
         "para uso del Artesano Pirotécnico, S.A. de C.V."
     )
 
-    pdf.setFont("Helvetica", 10)
+    pdf.setFont(
+        "Helvetica",
+        10
+    )
 
     pdf.drawCentredString(
         width / 2 + 40,
@@ -1257,8 +1283,10 @@ def descargar_cotizacion_pdf(request, id):
         "Venta de Artificios Pirotécnicos y Transporte Especializado"
     )
 
-    # línea roja
-    pdf.setStrokeColor(colors.HexColor("#C9A227"))
+    pdf.setStrokeColor(
+        colors.HexColor("#C9A227")
+    )
+
     pdf.setLineWidth(2)
 
     pdf.line(
@@ -1269,12 +1297,19 @@ def descargar_cotizacion_pdf(request, id):
     )
 
     # ==========================
-    # TITULO
+    # TÍTULO
     # ==========================
 
-    pdf.setFillColorRGB(0, 0, 0)
+    pdf.setFillColorRGB(
+        0,
+        0,
+        0
+    )
 
-    pdf.setFont("Helvetica-Bold", 18)
+    pdf.setFont(
+        "Helvetica-Bold",
+        18
+    )
 
     pdf.drawCentredString(
         width / 2,
@@ -1282,21 +1317,21 @@ def descargar_cotizacion_pdf(request, id):
         "COTIZACIÓN"
     )
 
-    pdf.setFont("Helvetica", 11)
+    pdf.setFont(
+        "Helvetica",
+        11
+    )
 
     pdf.drawString(
         40,
         height - 175,
-        f"Folio interno: COT-{solicitud.id:04d}"
+        f"Folio: {folio}"
     )
 
-    pdf.drawString(
-        330,
-        height - 175,
-        f"Cotización No. {solicitud.numero_usuario or 'Pendiente'}"
+    nombre = (
+        solicitud.usuario.get_full_name()
+        or solicitud.usuario.email
     )
-
-    nombre = solicitud.usuario.get_full_name() or solicitud.usuario.email
 
     pdf.drawString(
         40,
@@ -1316,7 +1351,9 @@ def descargar_cotizacion_pdf(request, id):
 
     y = height - 255
 
-    pdf.setFillColor(colors.HexColor("#F3F4F6"))
+    pdf.setFillColor(
+        colors.HexColor("#F3F4F6")
+    )
 
     pdf.rect(
         35,
@@ -1326,26 +1363,59 @@ def descargar_cotizacion_pdf(request, id):
         fill=1
     )
 
-    pdf.setFillColorRGB(0, 0, 0)
+    pdf.setFillColorRGB(
+        0,
+        0,
+        0
+    )
 
-    pdf.setFont("Helvetica-Bold", 10)
+    pdf.setFont(
+        "Helvetica-Bold",
+        10
+    )
 
-    pdf.drawString(45, y + 7, "Producto")
-    pdf.drawString(315, y + 7, "Cantidad")
-    pdf.drawString(395, y + 7, "Precio")
-    pdf.drawString(485, y + 7, "Subtotal")
+    pdf.drawString(
+        45,
+        y + 7,
+        "Producto"
+    )
+
+    pdf.drawString(
+        315,
+        y + 7,
+        "Cantidad"
+    )
+
+    pdf.drawString(
+        395,
+        y + 7,
+        "Precio"
+    )
+
+    pdf.drawString(
+        485,
+        y + 7,
+        "Subtotal"
+    )
 
     y -= 20
 
     total = 0
 
-    pdf.setFont("Helvetica", 10)
+    pdf.setFont(
+        "Helvetica",
+        10
+    )
 
     for detalle in solicitud.detalles.all():
 
-        precio = float(detalle.precio_aplicado or 0)
+        precio = float(
+            detalle.precio_aplicado or 0
+        )
 
-        subtotal = precio * detalle.cantidad
+        subtotal = (
+            precio * detalle.cantidad
+        )
 
         total += subtotal
 
@@ -1381,7 +1451,9 @@ def descargar_cotizacion_pdf(request, id):
 
     y -= 20
 
-    pdf.setStrokeColor(colors.HexColor("#C9A227"))
+    pdf.setStrokeColor(
+        colors.HexColor("#C9A227")
+    )
 
     pdf.line(
         390,
@@ -1390,7 +1462,10 @@ def descargar_cotizacion_pdf(request, id):
         y + 15
     )
 
-    pdf.setFont("Helvetica-Bold",15)
+    pdf.setFont(
+        "Helvetica-Bold",
+        15
+    )
 
     pdf.drawRightString(
         560,
@@ -1404,7 +1479,11 @@ def descargar_cotizacion_pdf(request, id):
 
     y -= 45
 
-    pdf.setFont("Helvetica-Bold", 11)
+    pdf.setFont(
+        "Helvetica-Bold",
+        11
+    )
+
     pdf.drawString(
         40,
         y,
@@ -1413,7 +1492,10 @@ def descargar_cotizacion_pdf(request, id):
 
     y -= 20
 
-    pdf.setFont("Helvetica", 10)
+    pdf.setFont(
+        "Helvetica",
+        10
+    )
 
     pdf.drawString(
         40,
@@ -1441,7 +1523,9 @@ def descargar_cotizacion_pdf(request, id):
     # PIE
     # ==========================
 
-    pdf.setStrokeColor(colors.HexColor("#C9A227"))
+    pdf.setStrokeColor(
+        colors.HexColor("#C9A227")
+    )
 
     pdf.line(
         30,
@@ -1450,7 +1534,10 @@ def descargar_cotizacion_pdf(request, id):
         65
     )
 
-    pdf.setFont("Helvetica", 8)
+    pdf.setFont(
+        "Helvetica",
+        8
+    )
 
     pdf.drawString(
         30,

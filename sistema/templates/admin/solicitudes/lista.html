@@ -534,7 +534,7 @@ body{
 
                     <thead>
                         <tr>
-                            <th>ID</th>
+                            <th>Folio</th>
                             <th>Cliente</th>
                             <th>Fecha</th>
                             <th>Productos</th>
@@ -548,7 +548,17 @@ body{
                         {% for solicitud in solicitudes %}
 
                         <tr class="fila-solicitud" data-estado="{{ solicitud.estado }}">
-                            <td>#{{ solicitud.id }}</td>
+                            <td>
+                                {% if solicitud.estado == "cotizada" %}
+                                    <strong>
+                                        COT-{{ solicitud.numero_usuario|stringformat:"04d" }}
+                                    </strong>
+                                {% else %}
+                                    <strong>
+                                        SOL-{{ solicitud.numero_usuario|stringformat:"04d" }}
+                                    </strong>
+                                {% endif %}
+                            </td>
 
                             <td class="nombre-cliente client-name">
                                 {{ solicitud.usuario.username }}

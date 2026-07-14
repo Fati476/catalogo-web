@@ -15,10 +15,12 @@ from django.conf import settings
 
 def enviar_cotizacion(destinatario, pdf_bytes, numero_cotizacion):
 
+    folio = f"COT-{numero_cotizacion:04d}"
+
     mensaje = Mail(
         from_email=settings.DEFAULT_FROM_EMAIL,
         to_emails=destinatario,
-        subject=f"Cotización #{numero_cotizacion} - Cooperativa Pirotécnica",
+        subject=f"Cotización {folio} - Cooperativa Pirotécnica",
         html_content=f"""
         <div style="font-family:Arial,sans-serif; max-width:650px; margin:auto; border-radius:18px; overflow:hidden; border:1px solid #e5e7eb;">
 
@@ -39,7 +41,7 @@ def enviar_cotizacion(destinatario, pdf_bytes, numero_cotizacion):
 
                 <p style="font-size:16px; color:#4b5563; line-height:1.7;">
                     Hemos generado correctamente la
-                    <strong>cotización #{numero_cotizacion}</strong>.
+                    <strong>cotización {folio}</strong>.
                     En este correo encontrarás el archivo PDF adjunto
                     con todos los detalles de tu solicitud.
                 </p>
@@ -72,7 +74,7 @@ def enviar_cotizacion(destinatario, pdf_bytes, numero_cotizacion):
 
     mensaje.attachment = Attachment(
         FileContent(encoded),
-        FileName(f"Cotizacion_{numero_cotizacion}.pdf"),
+        FileName(f"{folio}.pdf"),
         FileType("application/pdf"),
         Disposition("attachment"),
     )
@@ -87,10 +89,12 @@ def enviar_cotizacion(destinatario, pdf_bytes, numero_cotizacion):
 
 def enviar_correo_rechazo(destinatario, numero_cotizacion):
 
+    folio = f"SOL-{numero_cotizacion:04d}"
+
     mensaje = Mail(
         from_email=settings.DEFAULT_FROM_EMAIL,
         to_emails=destinatario,
-        subject=f"Solicitud #{numero_cotizacion} - Actualización de estado",
+        subject=f"Solicitud {folio} - Actualización de estado",
         html_content=f"""
         <div style="font-family:Arial,sans-serif; max-width:650px; margin:auto; border-radius:18px; overflow:hidden; border:1px solid #e5e7eb;">
 
@@ -111,7 +115,7 @@ def enviar_correo_rechazo(destinatario, numero_cotizacion):
 
                 <p style="font-size:16px; color:#4b5563; line-height:1.7;">
                     Hemos revisado tu solicitud
-                    <strong>#{numero_cotizacion}</strong>.
+                    <strong>{folio}</strong>.
                     En esta ocasión no fue posible generar una cotización.
                 </p>
 
