@@ -2030,3 +2030,37 @@ def estado_cotizaciones_ajax(request):
         "ok": True,
         "solicitudes": datos
     })
+
+
+
+@login_required
+def estado_cotizaciones_ajax(request):
+
+    es_admin = (
+        request.user.is_staff
+        or request.user.groups.filter(
+            name="Administrador"
+        ).exists()
+    )
+
+    if es_admin:
+        solicitudes = SolicitudCotizacion.objects.all().order_by("id")
+    else:
+        solicitudes = SolicitudCotizacion.objects.filter(
+            usuario=request.user
+        ).order_by("id")
+
+    datos = list(
+        solicitudes.values(
+            "id",
+            "enviada",
+            "estado",
+            "bloqueada",
+            "numero_usuario"
+        )
+    )
+
+    return JsonResponse({
+        "ok": True,
+        "solicitudes": datos
+    })

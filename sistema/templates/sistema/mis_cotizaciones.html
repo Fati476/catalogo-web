@@ -1216,5 +1216,62 @@ document.addEventListener("DOMContentLoaded", function(){
 });
 </script>
 
+<script>
+document.addEventListener("DOMContentLoaded", function(){
+
+    let estadoAnterior = null;
+    let consultando = false;
+
+    function comprobarCambios(){
+
+        if(consultando) return;
+
+        consultando = true;
+
+        fetch("{% url 'estado_cotizaciones_ajax' %}", {
+            method: "GET",
+            headers: {
+                "X-Requested-With": "XMLHttpRequest"
+            },
+            cache: "no-store"
+        })
+        .then(response => {
+
+            if(!response.ok){
+                throw new Error("No fue posible consultar las cotizaciones.");
+            }
+
+            return response.json();
+        })
+        .then(data => {
+
+            const estadoActual = JSON.stringify(data.solicitudes);
+
+            if(estadoAnterior === null){
+                estadoAnterior = estadoActual;
+                return;
+            }
+
+            if(estadoActual !== estadoAnterior){
+                window.location.reload();
+            }
+
+        })
+        .catch(error => {
+            console.error("Error comprobando cambios:", error);
+        })
+        .finally(() => {
+            consultando = false;
+        });
+
+    }
+
+    comprobarCambios();
+
+    setInterval(comprobarCambios, 3000);
+
+});
+</script>
+
 </body>
 </html>
