@@ -1026,6 +1026,7 @@ def generar_cotizacion(request, id):
     )
 
     if request.method != "POST":
+
         return redirect(
             "detalle_solicitud_admin",
             id=solicitud.id
@@ -1045,15 +1046,33 @@ def generar_cotizacion(request, id):
 
     for detalle in solicitud.detalles.all():
 
-        precio = request.POST.get(
-            f"precio_{detalle.id}"
+        disponibilidad = request.POST.get(
+            f"disponibilidad_{detalle.id}"
         )
 
-        if not precio or precio.strip() == "":
+        precio = request.POST.get(
+            f"precio_{detalle.id}",
+            ""
+        ).strip()
+
+        observacion = request.POST.get(
+            f"observacion_{detalle.id}",
+            ""
+        ).strip()
+
+        disponibilidades_validas = [
+            "disponible",
+            "bajo_pedido",
+            "no_disponible",
+            "descontinuado",
+        ]
+
+        if disponibilidad not in disponibilidades_validas:
 
             messages.error(
                 request,
-                f"El producto '{detalle.producto.nombre}' no tiene precio asignado."
+                f"Selecciona una disponibilidad válida para "
+                f"'{detalle.producto.nombre}'."
             )
 
             return redirect(
@@ -1061,29 +1080,126 @@ def generar_cotizacion(request, id):
                 id=solicitud.id
             )
 
-        try:
-            precio_decimal = Decimal(precio)
+        # Disponible: requiere precio, no requiere observación.
+        if disponibilidad == "disponible":
 
-            if precio_decimal <= 0:
-                raise InvalidOperation
+            if not precio:
+
+                messages.error(
+                    request,
+                    f"Debes asignar un precio al producto "
+                    f"'{detalle.producto.nombre}'."
+                )
+
+                return redirect(
+                    "detalle_solicitud_admin",
+                    id=solicitud.id
+                )
+
+            try:
+
+                precio_decimal = Decimal(precio)
+
+                if precio_decimal <= 0:
+                    raise InvalidOperation
+
+            except (InvalidOperation, ValueError):
+
+                messages.error(
+                    request,
+                    f"El precio de '{detalle.producto.nombre}' "
+                    f"es inválido."
+                )
+
+                return redirect(
+                    "detalle_solicitud_admin",
+                    id=solicitud.id
+                )
 
             detalle.precio_aplicado = precio_decimal
+            detalle.observacion_disponibilidad = None
 
-            detalle.save(
-                update_fields=["precio_aplicado"]
-            )
+        # Bajo pedido: requiere precio y observación.
+        elif disponibilidad == "bajo_pedido":
 
-        except (InvalidOperation, ValueError):
+            if not precio:
 
-            messages.error(
-                request,
-                f"El precio del producto '{detalle.producto.nombre}' es inválido."
-            )
+                messages.error(
+                    request,
+                    f"Debes asignar un precio al producto bajo pedido "
+                    f"'{detalle.producto.nombre}'."
+                )
 
-            return redirect(
-                "detalle_solicitud_admin",
-                id=solicitud.id
-            )
+                return redirect(
+                    "detalle_solicitud_admin",
+                    id=solicitud.id
+                )
+
+            if not observacion:
+
+                messages.error(
+                    request,
+                    f"Debes indicar el tiempo o las condiciones de entrega "
+                    f"de '{detalle.producto.nombre}'."
+                )
+
+                return redirect(
+                    "detalle_solicitud_admin",
+                    id=solicitud.id
+                )
+
+            try:
+
+                precio_decimal = Decimal(precio)
+
+                if precio_decimal <= 0:
+                    raise InvalidOperation
+
+            except (InvalidOperation, ValueError):
+
+                messages.error(
+                    request,
+                    f"El precio de '{detalle.producto.nombre}' "
+                    f"es inválido."
+                )
+
+                return redirect(
+                    "detalle_solicitud_admin",
+                    id=solicitud.id
+                )
+
+            detalle.precio_aplicado = precio_decimal
+            detalle.observacion_disponibilidad = observacion
+
+        # No disponible o descontinuado:
+        # no requiere precio, pero sí una justificación.
+        else:
+
+            if not observacion:
+
+                messages.error(
+                    request,
+                    f"Debes justificar por qué "
+                    f"'{detalle.producto.nombre}' no puede cotizarse."
+                )
+
+                return redirect(
+                    "detalle_solicitud_admin",
+                    id=solicitud.id
+                )
+
+            detalle.precio_aplicado = None
+            detalle.observacion_disponibilidad = observacion
+
+        detalle.disponibilidad = disponibilidad
+
+        detalle.save(
+            update_fields=[
+                "disponibilidad",
+                "precio_aplicado",
+                "observacion_disponibilidad",
+            ]
+        )
 
     solicitud.estado = "cotizada"
     solicitud.bloqueada = True
@@ -1121,69 +1237,12 @@ def generar_cotizacion(request, id):
 
         messages.warning(
             request,
-            "La cotización se generó correctamente, pero ocurrió un problema al enviar el correo."
+            "La cotización se generó correctamente, "
+            "pero ocurrió un problema al enviar el correo."
         )
 
     return redirect("lista_solicitudes")
     
-
-
-@login_required
-def rechazar_cotizacion(request, id):
-
-    solicitud = get_object_or_404(
-        SolicitudCotizacion,
-        id=id,
-        enviada=True,
-        estado="revision"
-    )
-
-    if solicitud.numero_usuario is None:
-
-        messages.error(
-            request,
-            "La solicitud no tiene un número asignado."
-        )
-
-        return redirect(
-            "detalle_solicitud_admin",
-            id=solicitud.id
-        )
-
-    solicitud.estado = "rechazada"
-    solicitud.bloqueada = True
-
-    solicitud.save(
-        update_fields=[
-            "estado",
-            "bloqueada"
-        ]
-    )
-
-    try:
-
-        enviar_correo_rechazo(
-            solicitud.usuario.email,
-            solicitud.numero_usuario
-        )
-
-        messages.success(
-            request,
-            "La solicitud fue rechazada y el cliente fue notificado por correo."
-        )
-
-    except Exception as e:
-
-        print("Error enviando correo:", e)
-
-        messages.warning(
-            request,
-            "La solicitud fue rechazada, pero no se pudo enviar el correo."
-        )
-
-    return redirect("lista_solicitudes")
-
-
 
 
 @login_required
@@ -1194,7 +1253,6 @@ def descargar_cotizacion_pdf(request, id):
         id=id
     )
 
-    # La cotización debe tener un número asignado
     if solicitud.numero_usuario is None:
 
         messages.error(
@@ -1204,7 +1262,6 @@ def descargar_cotizacion_pdf(request, id):
 
         return redirect("lista_solicitudes")
 
-    # Mismo número de la solicitud, pero con prefijo COT
     folio_interno = f"COT-{solicitud.id:04d}"
     numero_cliente = solicitud.numero_usuario
 
@@ -1378,7 +1435,7 @@ def descargar_cotizacion_pdf(request, id):
 
     pdf.setFont(
         "Helvetica-Bold",
-        10
+        9
     )
 
     pdf.drawString(
@@ -1388,19 +1445,25 @@ def descargar_cotizacion_pdf(request, id):
     )
 
     pdf.drawString(
-        315,
+        260,
         y + 7,
         "Cantidad"
     )
 
     pdf.drawString(
-        395,
+        325,
+        y + 7,
+        "Disponibilidad"
+    )
+
+    pdf.drawString(
+        445,
         y + 7,
         "Precio"
     )
 
     pdf.drawString(
-        485,
+        510,
         y + 7,
         "Subtotal"
     )
@@ -1411,52 +1474,109 @@ def descargar_cotizacion_pdf(request, id):
 
     pdf.setFont(
         "Helvetica",
-        10
+        9
     )
 
     for detalle in solicitud.detalles.all():
+
+        disponibilidad_texto = (
+            detalle.get_disponibilidad_display()
+        )
 
         precio = float(
             detalle.precio_aplicado or 0
         )
 
-        subtotal = (
-            precio * detalle.cantidad
+        if detalle.disponibilidad in [
+            "disponible",
+            "bajo_pedido"
+        ]:
+
+            subtotal = precio * detalle.cantidad
+
+            total += subtotal
+
+            precio_texto = f"${precio:,.2f}"
+            subtotal_texto = f"${subtotal:,.2f}"
+
+        else:
+
+            precio_texto = "N/A"
+            subtotal_texto = "$0.00"
+
+        pdf.setFillColorRGB(
+            0,
+            0,
+            0
         )
 
-        total += subtotal
+        pdf.setFont(
+            "Helvetica",
+            9
+        )
 
         pdf.drawString(
             45,
             y,
-            detalle.producto.nombre[:45]
+            detalle.producto.nombre[:30]
         )
 
         pdf.drawString(
-            330,
+            280,
             y,
             str(detalle.cantidad)
         )
 
         pdf.drawString(
-            395,
+            325,
             y,
-            f"${precio:,.2f}"
+            disponibilidad_texto[:19]
         )
 
         pdf.drawString(
-            485,
+            445,
             y,
-            f"${subtotal:,.2f}"
+            precio_texto
         )
 
-        y -= 18
+        pdf.drawString(
+            510,
+            y,
+            subtotal_texto
+        )
+
+        y -= 16
+
+        if detalle.observacion_disponibilidad:
+
+            pdf.setFillColor(
+                colors.HexColor("#6B7280")
+            )
+
+            pdf.setFont(
+                "Helvetica-Oblique",
+                8
+            )
+
+            observacion = (
+                detalle.observacion_disponibilidad[:85]
+            )
+
+            pdf.drawString(
+                55,
+                y,
+                f"Observación: {observacion}"
+            )
+
+            y -= 16
+
+        y -= 4
 
     # ==========================
     # TOTAL
     # ==========================
 
-    y -= 20
+    y -= 10
 
     pdf.setStrokeColor(
         colors.HexColor("#C9A227")
@@ -1467,6 +1587,12 @@ def descargar_cotizacion_pdf(request, id):
         y + 15,
         560,
         y + 15
+    )
+
+    pdf.setFillColorRGB(
+        0,
+        0,
+        0
     )
 
     pdf.setFont(
@@ -1481,7 +1607,7 @@ def descargar_cotizacion_pdf(request, id):
     )
 
     # ==========================
-    # OBSERVACIONES
+    # OBSERVACIONES GENERALES
     # ==========================
 
     y -= 45
@@ -1494,7 +1620,7 @@ def descargar_cotizacion_pdf(request, id):
     pdf.drawString(
         40,
         y,
-        "Observaciones"
+        "Observaciones generales"
     )
 
     y -= 20
@@ -1503,6 +1629,22 @@ def descargar_cotizacion_pdf(request, id):
         "Helvetica",
         10
     )
+
+    pdf.drawString(
+        40,
+        y,
+        "• Los productos no disponibles no se incluyen en el total."
+    )
+
+    y -= 18
+
+    pdf.drawString(
+        40,
+        y,
+        "• Los productos bajo pedido están sujetos a las condiciones indicadas."
+    )
+
+    y -= 18
 
     pdf.drawString(
         40,

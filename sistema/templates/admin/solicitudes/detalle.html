@@ -224,15 +224,74 @@ body{
 /* PRODUCTOS */
 .product-quote-item{
     display:grid;
-    grid-template-columns:1.3fr 110px 180px;
+    grid-template-columns:1.2fr 220px 190px;
     gap:16px;
-    align-items:center;
+    align-items:start;
     background:white;
     border:1px solid rgba(17,24,39,.08);
     border-radius:22px;
-    padding:18px;
-    margin-bottom:14px;
+    padding:20px;
+    margin-bottom:18px;
     box-shadow:0 10px 25px rgba(17,24,39,.05);
+}
+
+.product-main-info{
+    min-width:0;
+}
+
+.availability-field,
+.price-input,
+.observation-field{
+    display:flex;
+    flex-direction:column;
+}
+
+.availability-field label,
+.price-input label,
+.observation-field label{
+    font-size:.75rem;
+    font-weight:900;
+    color:#6B7280;
+    margin-bottom:6px;
+}
+
+.availability-select,
+.price-input input,
+.observation-field textarea{
+    width:100%;
+    border:1px solid rgba(17,24,39,.12);
+    border-radius:16px;
+    padding:12px 14px;
+    font-weight:800;
+    outline:none;
+    background:white;
+}
+
+.availability-select:focus,
+.price-input input:focus,
+.observation-field textarea:focus{
+    border-color:#C9A227;
+    box-shadow:0 0 0 .18rem rgba(201,162,39,.16);
+}
+
+.observation-field{
+    grid-column:2 / 4;
+}
+
+.observation-field textarea{
+    resize:vertical;
+    min-height:90px;
+}
+
+.observation-field small{
+    margin-top:6px;
+    color:#6B7280;
+    font-size:.72rem;
+    font-weight:700;
+}
+
+.field-hidden{
+    display:none !important;
 }
 
 .product-name{
@@ -507,7 +566,8 @@ body{
 
                     <div class="product-quote-item">
 
-                        <div>
+                        <div class="product-main-info">
+
                             <div class="product-name">
                                 {{ detalle.producto.nombre }}
                             </div>
@@ -515,24 +575,88 @@ body{
                             <div class="product-desc">
                                 {{ detalle.producto.categoria.nombre }}
                             </div>
-                        </div>
 
-                        <div>
-                            <span class="qty-pill">
-                                x{{ detalle.cantidad }}
+                            <span class="qty-pill mt-2">
+                                Cantidad solicitada: {{ detalle.cantidad }}
                             </span>
+
                         </div>
 
-                        <div class="price-input">
-                            <label>Precio aplicado</label>
+                        <div class="availability-field">
 
-                            <input type="number"
-                                   step="0.01"
-                                   min="0"
-                                   name="precio_{{ detalle.id }}"
-                                   value="{{ detalle.precio_aplicado|default:detalle.producto.precio|default:'' }}"
-                                   placeholder="0.00"
-                                   required>
+                            <label for="disponibilidad_{{ detalle.id }}">
+                                Disponibilidad
+                            </label>
+
+                            <select
+                                id="disponibilidad_{{ detalle.id }}"
+                                name="disponibilidad_{{ detalle.id }}"
+                                class="availability-select"
+                                data-detalle="{{ detalle.id }}"
+                                required>
+
+                                <option value="disponible"
+                                    {% if detalle.disponibilidad == "disponible" %}selected{% endif %}>
+                                    Disponible
+                                </option>
+
+                                <option value="bajo_pedido"
+                                    {% if detalle.disponibilidad == "bajo_pedido" %}selected{% endif %}>
+                                    Disponible bajo pedido
+                                </option>
+
+                                <option value="no_disponible"
+                                    {% if detalle.disponibilidad == "no_disponible" %}selected{% endif %}>
+                                    Temporalmente no disponible
+                                </option>
+
+                                <option value="descontinuado"
+                                    {% if detalle.disponibilidad == "descontinuado" %}selected{% endif %}>
+                                    Producto descontinuado
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                        <div
+                            class="price-input price-wrapper"
+                            id="precio-wrapper-{{ detalle.id }}">
+
+                            <label for="precio_{{ detalle.id }}">
+                                Precio sugerido
+                            </label>
+
+                            <input
+                                type="number"
+                                step="0.01"
+                                min="0.01"
+                                id="precio_{{ detalle.id }}"
+                                name="precio_{{ detalle.id }}"
+                                value="{{ detalle.precio_aplicado|default:'' }}"
+                                placeholder="0.00">
+
+                        </div>
+
+                        <div
+                            class="observation-field"
+                            id="observacion-wrapper-{{ detalle.id }}">
+
+                            <label for="observacion_{{ detalle.id }}">
+                                Observación
+                            </label>
+
+                            <textarea
+                                id="observacion_{{ detalle.id }}"
+                                name="observacion_{{ detalle.id }}"
+                                rows="3"
+                                maxlength="250"
+                                placeholder="Explica la disponibilidad o el motivo por el que no puede cotizarse.">{{ detalle.observacion_disponibilidad|default:'' }}</textarea>
+
+                            <small>
+                                Máximo 250 caracteres.
+                            </small>
+
                         </div>
 
                     </div>
@@ -606,6 +730,84 @@ function confirmarRechazo(event, url){
         }
     });
 }
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function(){
+
+    const selects = document.querySelectorAll(".availability-select");
+
+    function actualizarCampos(select){
+
+        const detalleId = select.dataset.detalle;
+        const disponibilidad = select.value;
+
+        const precioWrapper = document.getElementById(
+            `precio-wrapper-${detalleId}`
+        );
+
+        const precioInput = document.getElementById(
+            `precio_${detalleId}`
+        );
+
+        const observacionWrapper = document.getElementById(
+            `observacion-wrapper-${detalleId}`
+        );
+
+        const observacionInput = document.getElementById(
+            `observacion_${detalleId}`
+        );
+
+        const requierePrecio = (
+            disponibilidad === "disponible"
+            || disponibilidad === "bajo_pedido"
+        );
+
+        const requiereObservacion = (
+            disponibilidad === "bajo_pedido"
+            || disponibilidad === "no_disponible"
+            || disponibilidad === "descontinuado"
+        );
+
+        if(requierePrecio){
+
+            precioWrapper.classList.remove("field-hidden");
+            precioInput.required = true;
+
+        }else{
+
+            precioWrapper.classList.add("field-hidden");
+            precioInput.required = false;
+            precioInput.value = "";
+
+        }
+
+        if(requiereObservacion){
+
+            observacionWrapper.classList.remove("field-hidden");
+            observacionInput.required = true;
+
+        }else{
+
+            observacionWrapper.classList.add("field-hidden");
+            observacionInput.required = false;
+            observacionInput.value = "";
+
+        }
+
+    }
+
+    selects.forEach(select => {
+
+        actualizarCampos(select);
+
+        select.addEventListener("change", function(){
+            actualizarCampos(this);
+        });
+
+    });
+
+});
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

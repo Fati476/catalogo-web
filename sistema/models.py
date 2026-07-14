@@ -158,6 +158,13 @@ class SolicitudCotizacion(models.Model):
 
 class DetalleSolicitud(models.Model):
 
+    DISPONIBILIDADES = [
+        ("disponible", "Disponible"),
+        ("bajo_pedido", "Disponible bajo pedido"),
+        ("no_disponible", "Temporalmente no disponible"),
+        ("descontinuado", "Producto descontinuado"),
+    ]
+
     solicitud = models.ForeignKey(
         SolicitudCotizacion,
         on_delete=models.CASCADE,
@@ -182,6 +189,18 @@ class DetalleSolicitud(models.Model):
         decimal_places=2,
         null=True,
         blank=True
+    )
+
+    disponibilidad = models.CharField(
+        max_length=20,
+        choices=DISPONIBILIDADES,
+        default="disponible"
+    )
+
+    observacion_disponibilidad = models.CharField(
+        max_length=250,
+        blank=True,
+        null=True
     )
 
     def __str__(self):
