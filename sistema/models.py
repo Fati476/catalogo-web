@@ -160,7 +160,6 @@ class DetalleSolicitud(models.Model):
 
     DISPONIBILIDADES = [
         ("disponible", "Disponible"),
-        ("bajo_pedido", "Disponible bajo pedido"),
         ("no_disponible", "Temporalmente no disponible"),
         ("descontinuado", "Producto descontinuado"),
     ]
