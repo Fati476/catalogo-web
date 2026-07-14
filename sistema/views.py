@@ -1246,6 +1246,64 @@ def generar_cotizacion(request, id):
 
 
 @login_required
+def rechazar_cotizacion(request, id):
+
+    solicitud = get_object_or_404(
+        SolicitudCotizacion,
+        id=id,
+        enviada=True,
+        estado="revision"
+    )
+
+    if solicitud.numero_usuario is None:
+
+        messages.error(
+            request,
+            "La solicitud no tiene un número asignado."
+        )
+
+        return redirect(
+            "detalle_solicitud_admin",
+            id=solicitud.id
+        )
+
+    solicitud.estado = "rechazada"
+    solicitud.bloqueada = True
+
+    solicitud.save(
+        update_fields=[
+            "estado",
+            "bloqueada"
+        ]
+    )
+
+    try:
+
+        enviar_correo_rechazo(
+            solicitud.usuario.email,
+            solicitud.numero_usuario
+        )
+
+        messages.success(
+            request,
+            "La solicitud fue rechazada y el cliente fue notificado por correo."
+        )
+
+    except Exception as e:
+
+        print("Error enviando correo:", e)
+
+        messages.warning(
+            request,
+            "La solicitud fue rechazada, pero no se pudo enviar el correo."
+        )
+
+    return redirect("lista_solicitudes")
+
+
+
+
+@login_required
 def descargar_cotizacion_pdf(request, id):
 
     solicitud = get_object_or_404(
