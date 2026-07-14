@@ -294,4 +294,11 @@ urlpatterns = [
     ),
 
 
+    path(
+        "cotizaciones/estado-actual/",
+        views.estado_cotizaciones_ajax,
+        name="estado_cotizaciones_ajax"
+    ),
+
+
 ]
