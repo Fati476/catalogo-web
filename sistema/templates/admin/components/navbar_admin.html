@@ -31,13 +31,6 @@
                     </a>
                 </li>
 
-                <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"
-                       href="{% url 'dashboard' %}">
-                        <i class="bi bi-speedometer2"></i>
-                        Dashboard
-                    </a>
-                </li>
 
                 <li class="nav-item">
                     <a class="nav-link {% if request.resolver_match.url_name == 'lista_productos' %}active{% endif %}"
