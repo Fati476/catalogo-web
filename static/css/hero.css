@@ -11,7 +11,7 @@
     margin:0;
 
     background-size:cover;
-    background-position:center;
+    background-position:center center;
     background-repeat:no-repeat;
 }
 
@@ -63,6 +63,7 @@
         min-height:430px;
         padding:165px 32px 90px;
         align-items:flex-start;
+        background-position:70% center;
     }
 
     .page-hero h1{
@@ -80,7 +81,7 @@
     .page-hero{
         min-height:430px;
         padding:160px 22px 85px;
-        background-position:center;
+        background-position:75% center;
     }
 
     .page-hero h1{
