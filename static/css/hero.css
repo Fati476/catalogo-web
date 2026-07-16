@@ -11,7 +11,7 @@
     margin:0;
 
     background-size:cover;
-    background-position:center center;
+    background-position:right center;
     background-repeat:no-repeat;
 }
 
@@ -56,14 +56,14 @@
     height:70px;
 }
 
-/* Tablet y navbar hamburguesa */
+/* Tablet */
 @media(max-width:991.98px){
 
     .page-hero{
         min-height:430px;
         padding:165px 32px 90px;
         align-items:flex-start;
-        background-position:70% center;
+        background-position:82% center;
     }
 
     .page-hero h1{
@@ -81,7 +81,7 @@
     .page-hero{
         min-height:430px;
         padding:160px 22px 85px;
-        background-position:75% center;
+        background-position:78% center;
     }
 
     .page-hero h1{
