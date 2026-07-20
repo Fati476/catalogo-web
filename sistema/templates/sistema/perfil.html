@@ -978,7 +978,8 @@ body{
                         Cancelar
                     </button>
 
-                    <button type="submit"
+                    <button type="button"
+                            id="btnGuardarPerfil"
                             class="btn-modal-guardar">
                         <i class="bi bi-check-circle"></i>
                         Guardar cambios
@@ -1205,32 +1206,41 @@ document.addEventListener("DOMContentLoaded", function(){
 
 <script>
 
-const formPerfil = document.getElementById("formEditarPerfil");
-const correoPerfil = document.getElementById("correoPerfil");
+const formulario = document.getElementById("formEditarPerfil");
+const correo = document.getElementById("correoPerfil");
+const btnGuardar = document.getElementById("btnGuardarPerfil");
 
-const correoOriginal = correoPerfil.value.trim();
+const correoOriginal = correo.value.trim();
 
-formPerfil.addEventListener("submit", function(e){
+const modalCorreo = new bootstrap.Modal(
+    document.getElementById("modalConfirmarCorreo")
+);
 
-    const correoNuevo = correoPerfil.value.trim();
+btnGuardar.addEventListener("click", function(){
+
+    const correoNuevo = correo.value.trim();
 
     if(correoNuevo !== correoOriginal){
 
-        const confirmar = confirm(
-`Vas a cambiar tu correo electrónico.
+        document.getElementById(
+            "correoNuevoTexto"
+        ).textContent = correoNuevo;
 
-A partir de este momento deberás iniciar sesión con el nuevo correo:
+        modalCorreo.show();
 
-${correoNuevo}
+    }else{
 
-¿Deseas continuar?`
-        );
-
-        if(!confirmar){
-            e.preventDefault();
-        }
+        formulario.submit();
 
     }
+
+});
+
+document.getElementById(
+    "confirmarCambioCorreo"
+).addEventListener("click", function(){
+
+    formulario.submit();
 
 });
 
