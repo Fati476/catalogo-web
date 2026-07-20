@@ -1992,6 +1992,7 @@ def perfil(request):
     if request.method == "POST":
 
         request.user.first_name = request.POST.get("first_name")
+        request.user.last_name = request.POST.get("last_name")
         request.user.email = request.POST.get("email")
         request.user.save()
 
@@ -2004,7 +2005,11 @@ def perfil(request):
 
         perfil.save()
 
-        messages.success(request, "Perfil actualizado correctamente.")
+        messages.success(
+            request,
+            "Perfil actualizado correctamente."
+        )
+
         return redirect("perfil")
 
     return render(

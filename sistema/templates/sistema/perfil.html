@@ -644,8 +644,10 @@ body{
                     <div class="col-12 col-md-6 col-xl-4">
                         <div class="info-item">
                             <i class="bi bi-person"></i>
-                            <div class="info-label mt-2">Usuario</div>
-                            <div class="info-value">{{ request.user.username }}</div>
+                            <div class="info-label mt-2">Nombre completo</div>
+                            <div class="info-value">
+                                {{ request.user.first_name }} {{ request.user.last_name }}
+                            </div>
                         </div>
                     </div>
 
@@ -894,12 +896,24 @@ body{
 
                     <div class="row g-3">
 
-                        <div class="col-12">
-                            <label>Nombre</label>
-                            <input type="text"
-                                   name="first_name"
-                                   class="form-control"
-                                   value="{% if request.user.first_name %}{{ request.user.first_name }}{% else %}{{ request.user.username }}{% endif %}">
+                        <div class="col-12 col-md-6">
+                            <label>Nombre(s)</label>
+                            <input
+                                type="text"
+                                name="first_name"
+                                class="form-control"
+                                value="{{ request.user.first_name }}"
+                                required>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label>Apellidos</label>
+                            <input
+                                type="text"
+                                name="last_name"
+                                class="form-control"
+                                value="{{ request.user.last_name }}"
+                                required>
                         </div>
 
                         <div class="col-12">
@@ -920,19 +934,30 @@ body{
                         </div>
 
                         <div class="col-12 col-md-4">
-                            <label>Municipio</label>
-                            <input type="text"
-                                   name="municipio"
-                                   class="form-control"
-                                   value="{{ perfil.municipio }}">
+                            <label>Estado</label>
+
+                            <select id="estado"
+                                    name="estado"
+                                    class="form-control"
+                                    required>
+
+                                <option value="">Seleccione un estado</option>
+
+                            </select>
                         </div>
 
                         <div class="col-12 col-md-4">
-                            <label>Estado</label>
-                            <input type="text"
-                                   name="estado"
-                                   class="form-control"
-                                   value="{{ perfil.estado }}">
+                            <label>Municipio</label>
+
+                            <select id="municipio"
+                                    name="municipio"
+                                    class="form-control"
+                                    required
+                                    disabled>
+
+                                <option value="">Primero selecciona un estado</option>
+
+                            </select>
                         </div>
 
                     </div>
@@ -1048,6 +1073,107 @@ if(btnQuitarFoto){
     });
 
 }
+</script>
+
+
+<script>
+const estadoSelect = document.getElementById("estado");
+const municipioSelect = document.getElementById("municipio");
+
+const estadoGuardado = "{{ perfil.estado|default:''|escapejs }}";
+const municipioGuardado = "{{ perfil.municipio|default:''|escapejs }}";
+
+let municipiosData = {};
+
+fetch("{% static 'json/municipios.json' %}")
+    .then(response => {
+
+        if(!response.ok){
+            throw new Error("No se pudo cargar municipios.json");
+        }
+
+        return response.json();
+
+    })
+    .then(data => {
+
+        municipiosData = data;
+
+        Object.keys(municipiosData).forEach(estado => {
+
+            const option = document.createElement("option");
+
+            option.value = estado;
+            option.textContent = estado;
+
+            if(estado === estadoGuardado){
+                option.selected = true;
+            }
+
+            estadoSelect.appendChild(option);
+
+        });
+
+        cargarMunicipios(municipioGuardado);
+
+    })
+    .catch(error => {
+
+        console.error(error);
+
+        estadoSelect.innerHTML =
+            '<option value="">No se pudieron cargar los estados</option>';
+
+        municipioSelect.innerHTML =
+            '<option value="">No se pudieron cargar los municipios</option>';
+
+    });
+
+function cargarMunicipios(municipioSeleccionado = ""){
+
+    const estado = estadoSelect.value;
+    const municipios = municipiosData[estado] || [];
+
+    municipioSelect.innerHTML = "";
+
+    if(municipios.length === 0){
+
+        municipioSelect.disabled = true;
+
+        municipioSelect.innerHTML =
+            '<option value="">Primero selecciona un estado</option>';
+
+        return;
+
+    }
+
+    municipioSelect.disabled = false;
+
+    municipioSelect.innerHTML =
+        '<option value="">Seleccione un municipio</option>';
+
+    municipios.forEach(municipio => {
+
+        const option = document.createElement("option");
+
+        option.value = municipio;
+        option.textContent = municipio;
+
+        if(municipio === municipioSeleccionado){
+            option.selected = true;
+        }
+
+        municipioSelect.appendChild(option);
+
+    });
+
+}
+
+estadoSelect.addEventListener("change", function(){
+
+    cargarMunicipios();
+
+});
 </script>
 
 <script>
