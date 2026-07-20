@@ -1883,11 +1883,6 @@ def editar_solicitud_en_revision(request, id):
 
     request.session["solicitud_editando_id"] = solicitud.id
 
-    messages.success(
-        request,
-        "Tu solicitud volvió a edición. Puedes modificarla y enviarla nuevamente."
-    )
-
     return redirect("solicitudes")
 
 @login_required
