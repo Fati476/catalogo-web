@@ -822,7 +822,9 @@ body{
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content shadow">
 
-            <form method="POST" enctype="multipart/form-data">
+            <form id="formEditarPerfil"
+                method="POST"
+                enctype="multipart/form-data">
                 {% csrf_token %}
 
                 <div class="modal-perfil-header">
@@ -923,9 +925,10 @@ body{
                         <div class="col-12">
                             <label>Correo</label>
                             <input type="email"
-                                   name="email"
-                                   class="form-control"
-                                   value="{{ request.user.email }}">
+                                id="correoPerfil"
+                                name="email"
+                                class="form-control"
+                                value="{{ request.user.email }}">
                         </div>
 
                         <div class="col-12 col-md-4">
@@ -1199,6 +1202,40 @@ document.addEventListener("DOMContentLoaded", function(){
 });
 
 </script>
+
+<script>
+
+const formPerfil = document.getElementById("formEditarPerfil");
+const correoPerfil = document.getElementById("correoPerfil");
+
+const correoOriginal = correoPerfil.value.trim();
+
+formPerfil.addEventListener("submit", function(e){
+
+    const correoNuevo = correoPerfil.value.trim();
+
+    if(correoNuevo !== correoOriginal){
+
+        const confirmar = confirm(
+`Vas a cambiar tu correo electrónico.
+
+A partir de este momento deberás iniciar sesión con el nuevo correo:
+
+${correoNuevo}
+
+¿Deseas continuar?`
+        );
+
+        if(!confirmar){
+            e.preventDefault();
+        }
+
+    }
+
+});
+
+</script>
+
 
 </body>
 </html>

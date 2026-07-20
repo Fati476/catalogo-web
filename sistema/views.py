@@ -1991,14 +1991,60 @@ def perfil(request):
 
     if request.method == "POST":
 
-        request.user.first_name = request.POST.get("first_name")
-        request.user.last_name = request.POST.get("last_name")
-        request.user.email = request.POST.get("email")
+        nuevo_correo = request.POST.get(
+            "email",
+            ""
+        ).strip().lower()
+
+        # Verificar que el correo no pertenezca a otro usuario
+        correo_existente = User.objects.filter(
+            username__iexact=nuevo_correo
+        ).exclude(
+            id=request.user.id
+        ).exists()
+
+        if correo_existente:
+
+            messages.error(
+                request,
+                "Ese correo electrónico ya está registrado."
+            )
+
+            return redirect("perfil")
+
+        # Actualizar datos del usuario
+        request.user.first_name = request.POST.get(
+            "first_name",
+            ""
+        ).strip()
+
+        request.user.last_name = request.POST.get(
+            "last_name",
+            ""
+        ).strip()
+
+        request.user.email = nuevo_correo
+
+        # En tu sistema el username también es el correo
+        request.user.username = nuevo_correo
+
         request.user.save()
 
-        perfil.telefono = request.POST.get("telefono")
-        perfil.municipio = request.POST.get("municipio")
-        perfil.estado = request.POST.get("estado")
+        # Actualizar datos del perfil
+        perfil.telefono = request.POST.get(
+            "telefono",
+            ""
+        ).strip()
+
+        perfil.estado = request.POST.get(
+            "estado",
+            ""
+        ).strip()
+
+        perfil.municipio = request.POST.get(
+            "municipio",
+            ""
+        ).strip()
 
         if request.FILES.get("foto"):
             perfil.foto = request.FILES.get("foto")
@@ -2007,7 +2053,7 @@ def perfil(request):
 
         messages.success(
             request,
-            "Perfil actualizado correctamente."
+            "Perfil actualizado correctamente. Si cambiaste tu correo, utiliza el nuevo para iniciar sesión."
         )
 
         return redirect("perfil")
