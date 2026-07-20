@@ -849,14 +849,13 @@ if(botonEnviar){
 
                 if(data.ok){
 
-                   
-
                     Swal.fire({
                         icon:"success",
-                        title:"¡Solicitud de cotización enviada!"
+                        title:"¡Solicitud de cotización enviada!",
+                        text:"Ahora puedes consultar su estado en Mis cotizaciones."
                     }).then(()=>{
 
-                        location.reload();
+                        window.location.href = data.redirect_url;
 
                     });
 

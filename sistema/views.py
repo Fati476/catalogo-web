@@ -886,8 +886,6 @@ def enviar_solicitud(request):
         seleccionado=False
     )
 
-    # Si es nueva, se le asigna un número permanente.
-    # Si es una edición, conserva el número que ya tenía.
     numero_usuario = solicitud.numero_usuario
 
     if numero_usuario is None:
@@ -949,10 +947,16 @@ def enviar_solicitud(request):
         None
     )
 
+    messages.success(
+        request,
+        "Tu solicitud fue enviada correctamente. Puedes consultar su estado aquí."
+    )
+
     return JsonResponse({
         "ok": True,
         "solicitud_id": nueva_solicitud.id,
-        "numero_usuario": nueva_solicitud.numero_usuario
+        "numero_usuario": nueva_solicitud.numero_usuario,
+        "redirect_url": reverse("mis_cotizaciones")
     })
 
 @login_required
