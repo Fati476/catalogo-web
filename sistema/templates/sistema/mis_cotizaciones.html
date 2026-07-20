@@ -638,6 +638,47 @@
            line-height:1.45;
         }
 
+        .mensajes-cotizaciones{
+            display:flex;
+            flex-direction:column;
+            gap:14px;
+        }
+
+        .mensaje-cotizacion{
+            display:flex;
+            align-items:center;
+            gap:15px;
+            padding:18px 20px;
+            border-radius:22px;
+            background:#fff8dc;
+            border-left:6px solid #c79b2d;
+            box-shadow:0 10px 24px rgba(17,24,39,.08);
+        }
+
+        .mensaje-icono{        
+    width:48px;
+    height:48px;
+    border-radius:14px;
+    background:#c79b2d;
+    color:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:1.2rem;
+    flex-shrink:0;
+        }
+
+        .mensaje-cotizacion strong{        
+            display:block;
+            color:#111827;
+            font-weight:900;
+            margin-bottom:4px;
+        }
+
+        .mensaje-cotizacion div:last-child{        
+            color:#6b7280;
+        }
+        
 
 
 
@@ -686,6 +727,36 @@
     </section>
 
     <div class="container-fluid px-3 px-lg-4 mt-4">
+
+        {% if messages %}
+
+        <div class="mensajes-cotizaciones mb-4">
+
+            {% for message in messages %}
+
+            <div class="mensaje-cotizacion">
+
+                <div class="mensaje-icono">
+                    <i class="bi bi-info-circle-fill"></i>
+                </div>
+
+                <div>
+
+                    <strong>Información</strong>
+
+                    <div>
+                        {{ message }}
+                    </div>
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+        {% endif %}
 
 
         <div class="cotizaciones-resumen">
@@ -1269,6 +1340,35 @@ document.addEventListener("DOMContentLoaded", function(){
     comprobarCambios();
 
     setInterval(comprobarCambios, 3000);
+
+});
+</script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function(){
+
+    const mensajes = document.querySelectorAll(".mensaje-cotizacion");
+
+    if(!mensajes.length){
+        return;
+    }
+
+    setTimeout(function(){
+
+        mensajes.forEach(function(mensaje){
+
+            mensaje.style.transition = ".35s";
+            mensaje.style.opacity = "0";
+            mensaje.style.transform = "translateY(-10px)";
+
+            setTimeout(function(){
+                mensaje.remove();
+            },350);
+
+        });
+
+    },3000);
 
 });
 </script>
