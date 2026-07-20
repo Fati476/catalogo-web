@@ -992,6 +992,92 @@ body{
     </div>
 </div>
 
+<div class="modal fade"
+     id="modalConfirmarCorreo"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content border-0 shadow"
+             style="border-radius:28px; overflow:hidden;">
+
+            <div class="modal-body text-center p-4 p-md-5">
+
+                <div style="
+                    width:82px;
+                    height:82px;
+                    border-radius:50%;
+                    background:#fff3cd;
+                    color:#c79b2d;
+                    display:flex;
+                    align-items:center;
+                    justify-content:center;
+                    margin:0 auto 22px;
+                    font-size:2rem;
+                ">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                </div>
+
+                <h3 class="fw-bold mb-3">
+                    Cambiar correo
+                </h3>
+
+                <p class="text-muted mb-4">
+                    Estás a punto de cambiar el correo con el que
+                    inicias sesión en el sistema.
+                </p>
+
+                <div class="p-3 mb-4"
+                     style="
+                        background:#f3f1ec;
+                        border-radius:18px;
+                        border:1px solid rgba(17,24,39,.08);
+                     ">
+
+                    <div class="small text-muted fw-bold mb-1">
+                        Nuevo correo
+                    </div>
+
+                    <div id="correoNuevoTexto"
+                         class="fw-bold"
+                         style="color:#111827; word-break:break-word;">
+                    </div>
+
+                </div>
+
+                <p class="small text-muted mb-0">
+                    A partir del próximo inicio de sesión deberás utilizar
+                    este nuevo correo. También se usará para recuperar tu
+                    contraseña y recibir tus cotizaciones.
+                </p>
+
+            </div>
+
+            <div class="modal-footer border-0 justify-content-center gap-2 px-4 pb-4">
+
+                <button type="button"
+                        class="btn-modal-cancelar"
+                        data-bs-dismiss="modal">
+                    Cancelar
+                </button>
+
+                <button type="button"
+                        id="confirmarCambioCorreo"
+                        class="btn-modal-guardar">
+                    <i class="bi bi-check-circle"></i>
+                    Sí, cambiar correo
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 const inputFoto = document.getElementById("inputFoto");
@@ -1209,8 +1295,10 @@ document.addEventListener("DOMContentLoaded", function(){
 const formulario = document.getElementById("formEditarPerfil");
 const correo = document.getElementById("correoPerfil");
 const btnGuardar = document.getElementById("btnGuardarPerfil");
+const btnConfirmarCorreo = document.getElementById("confirmarCambioCorreo");
+const correoNuevoTexto = document.getElementById("correoNuevoTexto");
 
-const correoOriginal = correo.value.trim();
+const correoOriginal = correo.value.trim().toLowerCase();
 
 const modalCorreo = new bootstrap.Modal(
     document.getElementById("modalConfirmarCorreo")
@@ -1218,13 +1306,16 @@ const modalCorreo = new bootstrap.Modal(
 
 btnGuardar.addEventListener("click", function(){
 
-    const correoNuevo = correo.value.trim();
+    if(!formulario.checkValidity()){
+        formulario.reportValidity();
+        return;
+    }
+
+    const correoNuevo = correo.value.trim().toLowerCase();
 
     if(correoNuevo !== correoOriginal){
 
-        document.getElementById(
-            "correoNuevoTexto"
-        ).textContent = correoNuevo;
+        correoNuevoTexto.textContent = correoNuevo;
 
         modalCorreo.show();
 
@@ -1236,9 +1327,14 @@ btnGuardar.addEventListener("click", function(){
 
 });
 
-document.getElementById(
-    "confirmarCambioCorreo"
-).addEventListener("click", function(){
+btnConfirmarCorreo.addEventListener("click", function(){
+
+    btnConfirmarCorreo.disabled = true;
+
+    btnConfirmarCorreo.innerHTML = `
+        <span class="spinner-border spinner-border-sm me-2"></span>
+        Guardando...
+    `;
 
     formulario.submit();
 
