@@ -301,4 +301,11 @@ urlpatterns = [
     ),
 
 
+    path(
+        "perfil/revertir-correo/<str:token>/",
+        views.revertir_cambio_correo,
+        name="revertir_cambio_correo"
+    ),
+
+
 ]

@@ -1996,6 +1996,9 @@ def perfil(request):
             ""
         ).strip().lower()
 
+        # Guardar el correo actual antes de modificarlo
+        correo_anterior = request.user.email.strip().lower()
+
         # Verificar que el correo no pertenezca a otro usuario
         correo_existente = User.objects.filter(
             username__iexact=nuevo_correo
@@ -2029,6 +2032,15 @@ def perfil(request):
         request.user.username = nuevo_correo
 
         request.user.save()
+
+        # Crear el historial solamente si el correo cambió
+        if correo_anterior != nuevo_correo:
+
+            CambioCorreo.objects.create(
+                usuario=request.user,
+                correo_anterior=correo_anterior,
+                correo_nuevo=nuevo_correo
+            )
 
         # Actualizar datos del perfil
         perfil.telefono = request.POST.get(
@@ -2068,7 +2080,6 @@ def perfil(request):
             "total_cotizaciones": total_cotizaciones,
         }
     )
-
 
 def password_reset_custom(request):
 
@@ -2314,3 +2325,115 @@ def estado_cotizaciones_ajax(request):
         "ok": True,
         "solicitudes": datos
     })
+
+
+
+from django.core import signing
+from django.contrib.auth import logout
+from .models import CambioCorreo
+
+
+def revertir_cambio_correo(request, token):
+
+    try:
+        datos = signing.loads(
+            token,
+            salt="cambio-correo",
+            max_age=60 * 60 * 24
+        )
+
+    except signing.SignatureExpired:
+        return render(
+            request,
+            "sistema/correo_reversion_resultado.html",
+            {
+                "estado": "expirado"
+            }
+        )
+
+    except signing.BadSignature:
+        return render(
+            request,
+            "sistema/correo_reversion_resultado.html",
+            {
+                "estado": "invalido"
+            }
+        )
+
+    cambio_id = datos.get("cambio_id")
+
+    try:
+        cambio = CambioCorreo.objects.select_related(
+            "usuario"
+        ).get(
+            id=cambio_id
+        )
+
+    except CambioCorreo.DoesNotExist:
+        return render(
+            request,
+            "sistema/correo_reversion_resultado.html",
+            {
+                "estado": "invalido"
+            }
+        )
+
+    if cambio.usado:
+        return render(
+            request,
+            "sistema/correo_reversion_resultado.html",
+            {
+                "estado": "usado",
+                "cambio": cambio
+            }
+        )
+
+    usuario = cambio.usuario
+
+    # Evitar restaurar un correo que ahora pertenece a otra cuenta
+    correo_ocupado = User.objects.filter(
+        username__iexact=cambio.correo_anterior
+    ).exclude(
+        id=usuario.id
+    ).exists()
+
+    if correo_ocupado:
+        return render(
+            request,
+            "sistema/correo_reversion_resultado.html",
+            {
+                "estado": "ocupado",
+                "cambio": cambio
+            }
+        )
+
+    usuario.email = cambio.correo_anterior
+    usuario.username = cambio.correo_anterior
+    usuario.save(
+        update_fields=[
+            "email",
+            "username"
+        ]
+    )
+
+    cambio.usado = True
+    cambio.revertido = True
+    cambio.save(
+        update_fields=[
+            "usado",
+            "revertido"
+        ]
+    )
+
+    # Si el usuario tenía una sesión iniciada, se cierra
+    if request.user.is_authenticated and request.user.id == usuario.id:
+        logout(request)
+
+    return render(
+        request,
+        "sistema/correo_reversion_resultado.html",
+        {
+            "estado": "revertido",
+            "cambio": cambio
+        }
+    )

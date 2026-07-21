@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Seguridad de la cuenta</title>
+</head>
+
+<body>
+
+    {% if estado == "revertido" %}
+
+        <h1>Correo restaurado correctamente</h1>
+
+        <p>
+            El correo de la cuenta volvió a:
+            <strong>{{ cambio.correo_anterior }}</strong>
+        </p>
+
+        <a href="{% url 'login' %}">
+            Ir al inicio de sesión
+        </a>
+
+    {% elif estado == "expirado" %}
+
+        <h1>El enlace expiró</h1>
+
+        <p>
+            El botón para revertir el cambio solamente era válido durante 24 horas.
+        </p>
+
+        <a href="{% url 'login' %}">
+            Ir al inicio de sesión
+        </a>
+
+    {% elif estado == "usado" %}
+
+        <h1>El enlace ya fue utilizado</h1>
+
+        <p>
+            Esta solicitud ya fue procesada anteriormente.
+        </p>
+
+        <a href="{% url 'login' %}">
+            Ir al inicio de sesión
+        </a>
+
+    {% elif estado == "ocupado" %}
+
+        <h1>No fue posible restaurar el correo</h1>
+
+        <p>
+            El correo anterior está siendo utilizado por otra cuenta.
+            Comunícate con el administrador.
+        </p>
+
+        <a href="{% url 'login' %}">
+            Ir al inicio de sesión
+        </a>
+
+    {% else %}
+
+        <h1>Enlace inválido</h1>
+
+        <p>
+            El enlace no es válido o fue modificado.
+        </p>
+
+        <a href="{% url 'login' %}">
+            Ir al inicio de sesión
+        </a>
+
+    {% endif %}
+
+</body>
+</html>

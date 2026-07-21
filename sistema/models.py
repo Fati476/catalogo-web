@@ -204,3 +204,33 @@ class DetalleSolicitud(models.Model):
 
     def __str__(self):
         return self.producto.nombre
+    
+class CambioCorreo(models.Model):
+
+    usuario = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="cambios_correo"
+    )
+
+    correo_anterior = models.EmailField()
+
+    correo_nuevo = models.EmailField()
+
+    creado = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    usado = models.BooleanField(
+        default=False
+    )
+
+    revertido = models.BooleanField(
+        default=False
+    )
+
+    def __str__(self):
+        return (
+            f"{self.usuario.username} | "
+            f"{self.correo_anterior} → {self.correo_nuevo}"
+        )
