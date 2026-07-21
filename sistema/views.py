@@ -1996,7 +1996,6 @@ def perfil(request):
             ""
         ).strip().lower()
 
-        # Guardar el correo actual antes de modificarlo
         correo_anterior = request.user.email.strip().lower()
 
         # Verificar que el correo no pertenezca a otro usuario
@@ -2027,20 +2026,54 @@ def perfil(request):
         ).strip()
 
         request.user.email = nuevo_correo
-
-        # En tu sistema el username también es el correo
         request.user.username = nuevo_correo
 
         request.user.save()
 
-        # Crear el historial solamente si el correo cambió
+        # Registrar el cambio solamente si el correo cambió
         if correo_anterior != nuevo_correo:
 
-            CambioCorreo.objects.create(
+            # Cancelar cualquier cambio pendiente anterior
+            CambioCorreo.objects.filter(
+                usuario=request.user,
+                usado=False,
+                revertido=False,
+                cancelado=False
+            ).update(
+                cancelado=True
+            )
+
+            # Crear el nuevo cambio pendiente
+            cambio = CambioCorreo.objects.create(
                 usuario=request.user,
                 correo_anterior=correo_anterior,
                 correo_nuevo=nuevo_correo
             )
+
+            # Generar un token seguro
+            token = signing.dumps(
+                {
+                    "cambio_id": cambio.id
+                },
+                salt="cambio-correo"
+            )
+
+            # Construir la URL de reversión
+            url_reversion = request.build_absolute_uri(
+                reverse(
+                    "revertir_cambio_correo",
+                    kwargs={
+                        "token": token
+                    }
+                )
+            )
+
+            # Solo para pruebas
+            print("\n========== CAMBIO DE CORREO ==========")
+            print(f"Correo anterior : {correo_anterior}")
+            print(f"Correo nuevo    : {nuevo_correo}")
+            print(f"URL reversión   : {url_reversion}")
+            print("======================================\n")
 
         # Actualizar datos del perfil
         perfil.telefono = request.POST.get(
@@ -2378,16 +2411,15 @@ def revertir_cambio_correo(request, token):
             }
         )
 
-    if cambio.usado:
+    if cambio.usado or cambio.revertido or cambio.cancelado:
         return render(
-            request,
+           request,
             "sistema/correo_reversion_resultado.html",
             {
                 "estado": "usado",
                 "cambio": cambio
             }
         )
-
     usuario = cambio.usuario
 
     # Evitar restaurar un correo que ahora pertenece a otra cuenta

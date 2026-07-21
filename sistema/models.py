@@ -229,6 +229,10 @@ class CambioCorreo(models.Model):
         default=False
     )
 
+    cancelado = models.BooleanField(
+        default=False
+    )
+
     def __str__(self):
         return (
             f"{self.usuario.username} | "
