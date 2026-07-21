@@ -57,6 +57,12 @@ from django.utils.encoding import force_bytes
 from django.urls import reverse
 from .email_utils import enviar_correo_recuperacion
 
+
+from .email_utils import (
+    enviar_correo_cambio,
+    enviar_correo_reversion,
+)
+
 @login_required
 def inicio(request):
 
@@ -2068,12 +2074,28 @@ def perfil(request):
                 )
             )
 
-            # Solo para pruebas
-            print("\n========== CAMBIO DE CORREO ==========")
-            print(f"Correo anterior : {correo_anterior}")
-            print(f"Correo nuevo    : {nuevo_correo}")
-            print(f"URL reversión   : {url_reversion}")
-            print("======================================\n")
+            try:
+                # Avisar al correo nuevo
+                enviar_correo_cambio(
+                    nuevo_correo
+                )
+
+                # Enviar el enlace al correo anterior
+                enviar_correo_reversion(
+                    correo_anterior,
+                    url_reversion
+                )
+
+            except Exception as error:
+                print(
+                    "Error al enviar correos por cambio de correo:",
+                    error
+                )
+
+                messages.warning(
+                    request,
+                    "El correo fue actualizado, pero no fue posible enviar las notificaciones por correo electrónico."
+                )
 
         # Actualizar datos del perfil
         perfil.telefono = request.POST.get(

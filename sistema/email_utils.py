@@ -290,3 +290,194 @@ def enviar_correo_recuperacion(usuario, reset_url):
 
     sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
     sg.send(mensaje)
+
+
+
+
+def enviar_correo_cambio(destinatario):
+
+    mensaje = Mail(
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to_emails=destinatario,
+        subject="Tu correo electrónico fue actualizado",
+        html_content=f"""
+        <div style="font-family:Arial,sans-serif; max-width:650px; margin:auto; border-radius:18px; overflow:hidden; border:1px solid #e5e7eb;">
+
+            <div style="background:#111827; padding:30px; text-align:center;">
+
+                <h1 style="color:#D4AF37; margin:0;">
+                    Cooperativa Pirotécnica
+                </h1>
+
+                <p style="color:white; margin-top:8px;">
+                    Catálogo Web
+                </p>
+
+            </div>
+
+            <div style="padding:35px;">
+
+                <h2 style="color:#111827;">
+                    Tu correo fue actualizado correctamente
+                </h2>
+
+                <p style="font-size:16px; color:#4b5563; line-height:1.7;">
+
+                    Este correo electrónico ha sido registrado
+                    correctamente como el nuevo acceso de tu cuenta.
+
+                </p>
+
+                <div style="background:#f8fafc;
+                            border-left:5px solid #D4AF37;
+                            padding:18px;
+                            margin:25px 0;">
+
+                    A partir de este momento deberás iniciar sesión
+                    utilizando este correo electrónico.
+
+                </div>
+
+                <p style="color:#6b7280;">
+
+                    Si realizaste este cambio, no necesitas realizar
+                    ninguna otra acción.
+
+                </p>
+
+            </div>
+
+            <div style="background:#111827;
+                        color:white;
+                        text-align:center;
+                        padding:18px;">
+
+                © Cooperativa Pirotécnica
+
+            </div>
+
+        </div>
+        """
+    )
+
+    sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
+    sg.send(mensaje)
+
+
+def enviar_correo_reversion(
+    destinatario,
+    url_reversion
+):
+
+    mensaje = Mail(
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to_emails=destinatario,
+        subject="Aviso de cambio de correo - Catálogo Web",
+        html_content=f"""
+        <div style="font-family:Arial,sans-serif; max-width:650px; margin:auto; border-radius:18px; overflow:hidden; border:1px solid #e5e7eb;">
+
+            <div style="background:#111827; padding:30px; text-align:center;">
+
+                <h1 style="color:#D4AF37; margin:0;">
+                    Cooperativa Pirotécnica
+                </h1>
+
+                <p style="color:white; margin-top:8px;">
+                    Catálogo Web
+                </p>
+
+            </div>
+
+            <div style="padding:35px;">
+
+                <h2 style="color:#111827;">
+                    Se cambió el correo de tu cuenta
+                </h2>
+
+                <p style="font-size:16px; color:#4b5563; line-height:1.7;">
+
+                    El correo electrónico asociado a tu cuenta
+                    fue actualizado recientemente.
+
+                </p>
+
+                <div style="
+                    background:#fff8e8;
+                    border-left:5px solid #D4AF37;
+                    padding:18px;
+                    margin:25px 0;
+                    color:#4b5563;
+                    line-height:1.7;">
+
+                    Si tú realizaste este cambio, puedes ignorar este correo.
+
+                    <br><br>
+
+                    Si no reconoces esta actividad, utiliza el siguiente
+                    botón para restaurar tu correo anterior.
+
+                </div>
+
+                <div style="text-align:center; margin:32px 0;">
+
+                    <a href="{url_reversion}"
+                       style="
+                           display:inline-block;
+                           background:#C9A227;
+                           color:#111827;
+                           padding:15px 28px;
+                           border-radius:999px;
+                           text-decoration:none;
+                           font-weight:bold;
+                           font-size:16px;">
+
+                        Revertir cambio de correo
+
+                    </a>
+
+                </div>
+
+                <p style="font-size:14px; color:#6b7280; line-height:1.7;">
+
+                    Por seguridad, este enlace solo estará disponible
+                    durante 24 horas y podrá utilizarse una sola vez.
+
+                </p>
+
+                <p style="font-size:14px; color:#6b7280; line-height:1.7;">
+
+                    Si el botón no funciona, copia y pega el siguiente
+                    enlace en tu navegador:
+
+                </p>
+
+                <p style="
+                    font-size:13px;
+                    color:#6b7280;
+                    word-break:break-all;
+                    background:#f8fafc;
+                    padding:14px;
+                    border-radius:10px;">
+
+                    {url_reversion}
+
+                </p>
+
+            </div>
+
+            <div style="
+                background:#111827;
+                color:white;
+                text-align:center;
+                padding:18px;">
+
+                © Cooperativa Pirotécnica
+
+            </div>
+
+        </div>
+        """
+    )
+
+    sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
+    sg.send(mensaje)
