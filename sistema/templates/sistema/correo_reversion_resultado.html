@@ -1,77 +1,347 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Seguridad de la cuenta</title>
+<title>Seguridad de la cuenta</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    min-height:100vh;
+    font-family:Arial, Helvetica, sans-serif;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:22px;
+    overflow-x:hidden;
+}
+
+.bg-video{
+    position:fixed;
+    inset:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    z-index:-3;
+}
+
+.video-overlay{
+    position:fixed;
+    inset:0;
+    background:linear-gradient(
+        135deg,
+        rgba(0,0,0,.84),
+        rgba(15,15,15,.58),
+        rgba(0,0,0,.84)
+    );
+    z-index:-2;
+}
+
+.resultado-box{
+    width:100%;
+    max-width:470px;
+    background:rgba(15,15,15,.62);
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+    border:1px solid rgba(255,255,255,.10);
+    border-radius:30px;
+    padding:36px 34px;
+    color:white;
+    text-align:center;
+    box-shadow:0 18px 50px rgba(0,0,0,.48);
+    animation:aparecer .65s ease;
+}
+
+@keyframes aparecer{
+    from{
+        opacity:0;
+        transform:translateY(25px) scale(.97);
+    }
+
+    to{
+        opacity:1;
+        transform:translateY(0) scale(1);
+    }
+}
+
+.logo-resultado{
+    display:block;
+    width:95px;
+    height:95px;
+    object-fit:cover;
+    border-radius:50%;
+    margin:0 auto 22px;
+    background:white;
+    padding:6px;
+}
+
+.icono-estado{
+    width:82px;
+    height:82px;
+    border-radius:50%;
+    margin:0 auto 22px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:2.2rem;
+    border:1px solid rgba(255,255,255,.12);
+}
+
+.icono-exito{
+    color:#22c55e;
+    background:rgba(34,197,94,.13);
+}
+
+.icono-advertencia{
+    color:#D4AF37;
+    background:rgba(212,175,55,.13);
+}
+
+.icono-error{
+    color:#ef4444;
+    background:rgba(239,68,68,.13);
+}
+
+.titulo{
+    font-weight:900;
+    font-size:2rem;
+    line-height:1.2;
+    margin-bottom:14px;
+}
+
+.titulo span{
+    color:#D4AF37;
+}
+
+.descripcion{
+    color:rgba(255,255,255,.74);
+    font-size:.98rem;
+    line-height:1.7;
+    margin-bottom:26px;
+}
+
+.correo-restaurado{
+    display:block;
+    margin-top:12px;
+    padding:13px 16px;
+    border-radius:16px;
+    background:rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.09);
+    color:#D4AF37;
+    font-weight:900;
+    word-break:break-word;
+}
+
+.aviso{
+    text-align:left;
+    background:rgba(255,255,255,.07);
+    border-left:5px solid #D4AF37;
+    padding:17px;
+    margin:22px 0 26px;
+    border-radius:0 16px 16px 0;
+    color:rgba(255,255,255,.78);
+    font-size:.91rem;
+    line-height:1.65;
+}
+
+.btn-login{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:9px;
+    width:100%;
+    border:0;
+    border-radius:999px;
+    padding:14px 22px;
+    background:#C9A227;
+    color:#111827;
+    font-weight:900;
+    text-decoration:none;
+    transition:.3s;
+}
+
+.btn-login:hover{
+    background:#B8860B;
+    color:#111827;
+    transform:translateY(-2px);
+}
+
+@media(max-width:576px){
+
+    body{
+        padding:16px;
+    }
+
+    .resultado-box{
+        padding:30px 22px;
+        border-radius:24px;
+    }
+
+    .logo-resultado{
+        width:82px;
+        height:82px;
+    }
+
+    .icono-estado{
+        width:72px;
+        height:72px;
+        font-size:1.9rem;
+    }
+
+    .titulo{
+        font-size:1.65rem;
+    }
+
+    .descripcion{
+        font-size:.92rem;
+    }
+}
+</style>
 </head>
 
 <body>
 
+<video autoplay muted loop playsinline class="bg-video">
+    <source src="{% static 'videos/Video.mp4' %}" type="video/mp4">
+</video>
+
+<div class="video-overlay"></div>
+
+<div class="resultado-box">
+
+    <img
+        src="{% static 'img/imagen.png' %}"
+        class="logo-resultado"
+        alt="Cooperativa Pirotécnica"
+    >
+
     {% if estado == "revertido" %}
 
-        <h1>Correo restaurado correctamente</h1>
+        <div class="icono-estado icono-exito">
+            <i class="fa-solid fa-circle-check"></i>
+        </div>
 
-        <p>
-            El correo de la cuenta volvió a:
-            <strong>{{ cambio.correo_anterior }}</strong>
+        <h1 class="titulo">
+            Correo <span>restaurado</span>
+        </h1>
+
+        <p class="descripcion">
+            El cambio de correo fue revertido correctamente.
+            A partir de ahora podrás iniciar sesión utilizando:
+            
+            <strong class="correo-restaurado">
+                {{ cambio.correo_anterior }}
+            </strong>
         </p>
 
-        <a href="{% url 'login' %}">
-            Ir al inicio de sesión
-        </a>
+        <div class="aviso">
+            <i class="fa-solid fa-shield-halved me-2"></i>
+            Por seguridad, la sesión activa fue cerrada y este enlace
+            ya no podrá utilizarse nuevamente.
+        </div>
 
     {% elif estado == "expirado" %}
 
-        <h1>El enlace expiró</h1>
+        <div class="icono-estado icono-advertencia">
+            <i class="fa-solid fa-clock"></i>
+        </div>
 
-        <p>
-            El botón para revertir el cambio solamente era válido durante 24 horas.
+        <h1 class="titulo">
+            Enlace <span>expirado</span>
+        </h1>
+
+        <p class="descripcion">
+            El enlace para revertir el cambio de correo solamente
+            era válido durante 24 horas.
         </p>
 
-        <a href="{% url 'login' %}">
-            Ir al inicio de sesión
-        </a>
+        <div class="aviso">
+            <i class="fa-solid fa-circle-info me-2"></i>
+            Si no reconoces el cambio realizado, comunícate con el
+            administrador del sistema.
+        </div>
 
     {% elif estado == "usado" %}
 
-        <h1>El enlace ya fue utilizado</h1>
+        <div class="icono-estado icono-advertencia">
+            <i class="fa-solid fa-link-slash"></i>
+        </div>
 
-        <p>
-            Esta solicitud ya fue procesada anteriormente.
+        <h1 class="titulo">
+            Enlace ya <span>utilizado</span>
+        </h1>
+
+        <p class="descripcion">
+            Esta solicitud ya fue procesada anteriormente o fue
+            reemplazada por un cambio de correo más reciente.
         </p>
 
-        <a href="{% url 'login' %}">
-            Ir al inicio de sesión
-        </a>
+        <div class="aviso">
+            <i class="fa-solid fa-shield-halved me-2"></i>
+            Por seguridad, cada enlace solamente puede utilizarse una vez.
+        </div>
 
     {% elif estado == "ocupado" %}
 
-        <h1>No fue posible restaurar el correo</h1>
+        <div class="icono-estado icono-error">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
 
-        <p>
-            El correo anterior está siendo utilizado por otra cuenta.
-            Comunícate con el administrador.
+        <h1 class="titulo">
+            No se pudo <span>restaurar</span>
+        </h1>
+
+        <p class="descripcion">
+            El correo anterior está siendo utilizado actualmente
+            por otra cuenta.
         </p>
 
-        <a href="{% url 'login' %}">
-            Ir al inicio de sesión
-        </a>
+        <div class="aviso">
+            <i class="fa-solid fa-headset me-2"></i>
+            Comunícate con el administrador para verificar la propiedad
+            de la cuenta y recibir ayuda.
+        </div>
 
     {% else %}
 
-        <h1>Enlace inválido</h1>
+        <div class="icono-estado icono-error">
+            <i class="fa-solid fa-circle-xmark"></i>
+        </div>
 
-        <p>
-            El enlace no es válido o fue modificado.
+        <h1 class="titulo">
+            Enlace <span>inválido</span>
+        </h1>
+
+        <p class="descripcion">
+            El enlace no es válido, fue modificado o ya no corresponde
+            a una solicitud disponible.
         </p>
 
-        <a href="{% url 'login' %}">
-            Ir al inicio de sesión
-        </a>
+        <div class="aviso">
+            <i class="fa-solid fa-shield-halved me-2"></i>
+            No compartas enlaces de seguridad ni datos de acceso con
+            otras personas.
+        </div>
 
     {% endif %}
+
+    <a href="{% url 'login' %}" class="btn-login">
+        <i class="fa-solid fa-right-to-bracket"></i>
+        Ir al inicio de sesión
+    </a>
+
+</div>
 
 </body>
 </html>
