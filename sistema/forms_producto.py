@@ -34,3 +34,13 @@ class ProductoForm(forms.ModelForm):
                 'class': 'form-select'
             }),
         }
+
+    def clean_precio(self):
+        precio = self.cleaned_data.get("precio")
+
+        if precio is not None and precio < 0:
+            raise forms.ValidationError(
+                "No se permiten números negativos."
+            )
+
+        return precio
