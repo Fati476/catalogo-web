@@ -363,6 +363,12 @@ textarea.form-control{
     color:#C9A227;
 }
 
+
+.is-invalid{
+    border-color:#dc3545 !important;
+    box-shadow:0 0 0 .15rem rgba(220,53,69,.15);
+}
+
 </style>
 </head>
 
@@ -414,6 +420,10 @@ textarea.form-control{
         <div class="col-md-5 mb-4">
             <label><i class="bi bi-coin"></i> Precio base</label>
             {{ form.precio }}
+
+            <div id="precio-error" class="text-danger mt-2" style="display:none;">
+                <small>No se permiten números negativos.</small>
+            </div>
         </div>
     </div>
 
@@ -536,6 +546,28 @@ function eliminarImagen(index){
     mostrarPreview();
 
 }
+
+
+const precioInput = document.getElementById("id_precio");
+const precioError = document.getElementById("precio-error");
+
+precioInput.addEventListener("input", function () {
+
+    const valor = parseFloat(this.value);
+
+    if (!isNaN(valor) && valor < 0) {
+
+        precioError.style.display = "block";
+        this.classList.add("is-invalid");
+
+    } else {
+
+        precioError.style.display = "none";
+        this.classList.remove("is-invalid");
+
+    }
+
+});
 </script>
 
 </body>
