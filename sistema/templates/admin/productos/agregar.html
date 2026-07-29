@@ -413,16 +413,7 @@ textarea.form-control{
 
         <div class="col-md-5 mb-4">
             <label><i class="bi bi-coin"></i> Precio base</label>
-
             {{ form.precio }}
-
-            {% if form.precio.errors %}
-                <div class="text-danger mt-2">
-                    {% for error in form.precio.errors %}
-                        <small>{{ error }}</small>
-                    {% endfor %}
-                </div>
-            {% endif %}
         </div>
     </div>
 
