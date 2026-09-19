@@ -105,7 +105,11 @@ cloudinary.config(
 )
 
 DATABASES = {
-    'default': {
+    'default': dj_database_url.parse(
+        os.getenv('DATABASE_URL')
+    ),
+
+    'clever': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': os.getenv('MYSQL_ADDON_DB'),
         'USER': os.getenv('MYSQL_ADDON_USER'),
@@ -115,7 +119,7 @@ DATABASES = {
         'OPTIONS': {
             'charset': 'utf8mb4',
         },
-    }
+    },
 }
 SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY")
 #print("API KEY:", SENDGRID_API_KEY)
