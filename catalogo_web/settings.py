@@ -105,12 +105,20 @@ cloudinary.config(
 )
 
 DATABASES = {
-    'default': dj_database_url.parse(
-        os.getenv('DATABASE_URL')
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.getenv('MYSQL_ADDON_DB'),
+        'USER': os.getenv('MYSQL_ADDON_USER'),
+        'PASSWORD': os.getenv('MYSQL_ADDON_PASSWORD'),
+        'HOST': os.getenv('MYSQL_ADDON_HOST'),
+        'PORT': os.getenv('MYSQL_ADDON_PORT', '3306'),
+        'OPTIONS': {
+            'charset': 'utf8mb4',
+        },
+    }
 }
 SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY")
-print("API KEY:", SENDGRID_API_KEY)
+#print("API KEY:", SENDGRID_API_KEY)
 
 DEFAULT_FROM_EMAIL = "catalogowebempresa@gmail.com" 
 
