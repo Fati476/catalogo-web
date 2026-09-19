@@ -35,7 +35,8 @@ DEBUG = os.getenv("DEBUG", "False") == "True"
 ALLOWED_HOSTS = [
     '127.0.0.1',
     'localhost',
-    'catalogo-web-s5um.onrender.com'
+    'catalogo-web-s5um.onrender.com',
+    'migracion-mysql-temporal.onrender.com'
 ]
 
 CSRF_TRUSTED_ORIGINS = [
