@@ -1,0 +1,596 @@
+<!-- ============================= -->
+<!-- 🚀 PIROIA - CHATBOT -->
+<!-- ============================= -->
+
+<div class="piroia-container">
+
+    <!-- Botón flotante -->
+    <button
+        type="button"
+        class="piroia-button"
+        id="piroiaButton"
+        aria-label="Abrir asistente PiroIA"
+        title="Asistente PiroIA">
+
+        <span class="piroia-rocket">🚀</span>
+        <span class="piroia-sparkle">✨</span>
+
+    </button>
+
+
+    <!-- Ventana del chatbot -->
+    <div class="piroia-chat" id="piroiaChat">
+
+        <!-- Encabezado -->
+        <div class="piroia-header">
+
+            <div class="piroia-title">
+
+                <div class="piroia-icon">
+                    🚀
+                </div>
+
+                <div>
+                    <strong>PiroIA</strong>
+                    <small>Asistente del catálogo</small>
+                </div>
+
+            </div>
+
+            <button
+                type="button"
+                class="piroia-close"
+                id="piroiaClose"
+                aria-label="Cerrar asistente">
+                ×
+            </button>
+
+        </div>
+
+
+        <!-- Mensajes -->
+        <div class="piroia-messages" id="piroiaMessages">
+
+            <div class="piroia-message piroia-message-bot">
+
+                <div class="piroia-avatar">
+                    🚀
+                </div>
+
+                <div class="piroia-bubble">
+                    ¡Hola! 👋<br>
+                    Soy <strong>PiroIA</strong>, tu asistente del catálogo.
+                    <br><br>
+                    Puedo ayudarte a consultar nuestros productos,
+                    categorías y características.
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Entrada -->
+        <div class="piroia-input-area">
+
+            <input
+                type="text"
+                id="piroiaInput"
+                class="piroia-input"
+                placeholder="Escribe tu pregunta..."
+                autocomplete="off">
+
+            <button
+                type="button"
+                id="piroiaSend"
+                class="piroia-send"
+                aria-label="Enviar mensaje">
+                ➤
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<style>
+
+/* ========================================= */
+/* CONTENEDOR GENERAL */
+/* ========================================= */
+
+.piroia-container {
+    position: fixed;
+    right: 25px;
+    bottom: 25px;
+    z-index: 99999;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+
+/* ========================================= */
+/* BOTÓN FLOTANTE */
+/* ========================================= */
+
+.piroia-button {
+
+    width: 64px;
+    height: 64px;
+
+    border: none;
+    border-radius: 50%;
+
+    background: linear-gradient(
+        135deg,
+        #D4AF37,
+        #C9A227
+    );
+
+    box-shadow:
+        0 8px 25px rgba(0, 0, 0, 0.35),
+        0 0 0 4px rgba(212, 175, 55, 0.15);
+
+    cursor: pointer;
+
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease;
+
+}
+
+
+/* Cohete */
+
+.piroia-rocket {
+
+    font-size: 30px;
+
+    display: block;
+
+    transition:
+        transform 0.3s ease;
+
+}
+
+
+/* Brillito */
+
+.piroia-sparkle {
+
+    position: absolute;
+
+    top: 7px;
+    right: 8px;
+
+    font-size: 14px;
+
+    animation: piroiaSparkle 1.5s infinite ease-in-out;
+
+}
+
+
+/* Hover */
+
+.piroia-button:hover {
+
+    transform: scale(1.08);
+
+    box-shadow:
+        0 10px 30px rgba(0, 0, 0, 0.4),
+        0 0 0 6px rgba(212, 175, 55, 0.18);
+
+}
+
+
+.piroia-button:hover .piroia-rocket {
+
+    transform: translateY(-3px) rotate(-8deg);
+
+}
+
+
+/* ========================================= */
+/* ANIMACIÓN DEL BRILLO */
+/* ========================================= */
+
+@keyframes piroiaSparkle {
+
+    0%,
+    100% {
+        transform: scale(0.8);
+        opacity: 0.5;
+    }
+
+    50% {
+        transform: scale(1.2);
+        opacity: 1;
+    }
+
+}
+
+
+/* ========================================= */
+/* VENTANA DEL CHAT */
+/* ========================================= */
+
+.piroia-chat {
+
+    position: absolute;
+
+    right: 0;
+    bottom: 78px;
+
+    width: 370px;
+    max-width: calc(100vw - 30px);
+
+    height: 520px;
+    max-height: calc(100vh - 120px);
+
+    background: #ffffff;
+
+    border-radius: 20px;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.35);
+
+    border: 1px solid rgba(212, 175, 55, 0.35);
+
+    display: none;
+
+    flex-direction: column;
+
+}
+
+
+/* ========================================= */
+/* ENCABEZADO */
+/* ========================================= */
+
+.piroia-header {
+
+    background:
+        linear-gradient(
+            135deg,
+            #111827,
+            #1f2937
+        );
+
+    color: white;
+
+    padding: 15px 17px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+}
+
+
+.piroia-title {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+}
+
+
+.piroia-icon {
+
+    width: 42px;
+    height: 42px;
+
+    border-radius: 50%;
+
+    background: rgba(212, 175, 55, 0.15);
+
+    border: 1px solid rgba(212, 175, 55, 0.5);
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    font-size: 21px;
+
+}
+
+
+.piroia-title strong {
+
+    display: block;
+
+    font-size: 1rem;
+
+    color: #D4AF37;
+
+}
+
+
+.piroia-title small {
+
+    display: block;
+
+    margin-top: 2px;
+
+    color: #e5e7eb;
+
+    font-size: 0.75rem;
+
+}
+
+
+.piroia-close {
+
+    border: none;
+
+    background: transparent;
+
+    color: white;
+
+    font-size: 28px;
+
+    line-height: 1;
+
+    cursor: pointer;
+
+    opacity: 0.8;
+
+}
+
+
+.piroia-close:hover {
+
+    opacity: 1;
+
+    color: #D4AF37;
+
+}
+
+
+/* ========================================= */
+/* MENSAJES */
+/* ========================================= */
+
+.piroia-messages {
+
+    flex: 1;
+
+    padding: 18px;
+
+    overflow-y: auto;
+
+    background: #f8fafc;
+
+}
+
+
+.piroia-message {
+
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 8px;
+
+    margin-bottom: 15px;
+
+}
+
+
+.piroia-avatar {
+
+    width: 32px;
+    height: 32px;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    background: #111827;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    font-size: 16px;
+
+}
+
+
+.piroia-bubble {
+
+    background: white;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 5px 15px 15px 15px;
+
+    padding: 11px 13px;
+
+    color: #374151;
+
+    font-size: 0.88rem;
+
+    line-height: 1.5;
+
+    box-shadow:
+        0 2px 6px rgba(0, 0, 0, 0.04);
+
+}
+
+
+/* ========================================= */
+/* ÁREA DE ESCRITURA */
+/* ========================================= */
+
+.piroia-input-area {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    padding: 12px;
+
+    background: white;
+
+    border-top: 1px solid #e5e7eb;
+
+}
+
+
+.piroia-input {
+
+    flex: 1;
+
+    min-width: 0;
+
+    border: 1px solid #d1d5db;
+
+    border-radius: 999px;
+
+    padding: 10px 14px;
+
+    outline: none;
+
+    font-size: 0.88rem;
+
+}
+
+
+.piroia-input:focus {
+
+    border-color: #C9A227;
+
+    box-shadow:
+        0 0 0 3px rgba(201, 162, 39, 0.12);
+
+}
+
+
+.piroia-send {
+
+    width: 42px;
+    height: 42px;
+
+    border: none;
+
+    border-radius: 50%;
+
+    background: #C9A227;
+
+    color: #111827;
+
+    font-size: 18px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition: transform 0.2s ease;
+
+}
+
+
+.piroia-send:hover {
+
+    transform: scale(1.05);
+
+}
+
+
+/* ========================================= */
+/* RESPONSIVE */
+/* ========================================= */
+
+@media (max-width: 576px) {
+
+    .piroia-container {
+
+        right: 15px;
+
+        bottom: 15px;
+
+    }
+
+
+    .piroia-button {
+
+        width: 58px;
+
+        height: 58px;
+
+    }
+
+
+    .piroia-chat {
+
+        right: -2px;
+
+        bottom: 70px;
+
+        width: calc(100vw - 30px);
+
+        height: 480px;
+
+    }
+
+}
+
+</style>
+
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const button = document.getElementById("piroiaButton");
+    const chat = document.getElementById("piroiaChat");
+    const close = document.getElementById("piroiaClose");
+
+    if (!button || !chat || !close) {
+        return;
+    }
+
+
+    /* Abrir */
+
+    button.addEventListener("click", function () {
+
+        chat.style.display = "flex";
+
+        button.style.display = "none";
+
+    });
+
+
+    /* Cerrar */
+
+    close.addEventListener("click", function () {
+
+        chat.style.display = "none";
+
+        button.style.display = "flex";
+
+    });
+
+});
+
+</script>
