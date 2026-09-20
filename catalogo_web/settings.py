@@ -106,17 +106,25 @@ cloudinary.config(
 )
 
 DATABASES = {
-    'default': dj_database_url.parse(
-        os.getenv('DATABASE_URL')
-    ),
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.getenv('MYSQL_ADDON_DB'),
+        'USER': os.getenv('MYSQL_ADDON_USER'),
+        'PASSWORD': os.getenv('MYSQL_ADDON_PASSWORD'),
+        'HOST': os.getenv('MYSQL_ADDON_DIRECT_HOST'),
+        'PORT': os.getenv('MYSQL_ADDON_DIRECT_PORT', '3306'),
+        'OPTIONS': {
+            'charset': 'utf8mb4',
+        },
+    },
 
     'clever': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': os.getenv('MYSQL_ADDON_DB'),
         'USER': os.getenv('MYSQL_ADDON_USER'),
         'PASSWORD': os.getenv('MYSQL_ADDON_PASSWORD'),
-        'HOST': os.getenv('MYSQL_ADDON_HOST'),
-        'PORT': os.getenv('MYSQL_ADDON_PORT', '3306'),
+        'HOST': os.getenv('MYSQL_ADDON_DIRECT_HOST'),
+        'PORT': os.getenv('MYSQL_ADDON_DIRECT_PORT', '3306'),
         'OPTIONS': {
             'charset': 'utf8mb4',
         },
