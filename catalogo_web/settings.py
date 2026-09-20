@@ -111,8 +111,8 @@ DATABASES = {
         'NAME': os.getenv('MYSQL_ADDON_DB'),
         'USER': os.getenv('MYSQL_ADDON_USER'),
         'PASSWORD': os.getenv('MYSQL_ADDON_PASSWORD'),
-        'HOST': os.getenv('MYSQL_ADDON_DIRECT_HOST'),
-        'PORT': os.getenv('MYSQL_ADDON_DIRECT_PORT', '3306'),
+        'HOST': os.getenv('MYSQL_ADDON_HOST'),
+        'PORT': os.getenv('MYSQL_ADDON_PORT', '3306'),
         'OPTIONS': {
             'charset': 'utf8mb4',
         },
@@ -123,8 +123,8 @@ DATABASES = {
         'NAME': os.getenv('MYSQL_ADDON_DB'),
         'USER': os.getenv('MYSQL_ADDON_USER'),
         'PASSWORD': os.getenv('MYSQL_ADDON_PASSWORD'),
-        'HOST': os.getenv('MYSQL_ADDON_DIRECT_HOST'),
-        'PORT': os.getenv('MYSQL_ADDON_DIRECT_PORT', '3306'),
+        'HOST': os.getenv('MYSQL_ADDON_HOST'),
+        'PORT': os.getenv('MYSQL_ADDON_PORT', '3306'),
         'OPTIONS': {
             'charset': 'utf8mb4',
         },
