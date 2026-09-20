@@ -34,7 +34,9 @@
             <div class="piroia-title">
 
                 <div class="piroia-icon">
-                    <span class="piroia-mini-firework">✦</span>
+                    <span class="piroia-ai-core">
+                        <span class="ai-core-dot"></span>
+                    </span>
                 </div>
 
             </div>
@@ -56,7 +58,9 @@
             <div class="piroia-message piroia-message-bot">
 
                 <div class="piroia-avatar">
-                    🚀
+                    <span class="piroia-ai-mini">
+                        <span class="ai-mini-dot"></span>
+                    </span>
                 </div>
 
                 <div class="piroia-bubble">
@@ -387,25 +391,176 @@
 
 }
 
-.piroia-mini-firework {
-    font-size: 25px;
-    color: #D4AF37;
-    text-shadow:
-        0 0 5px #D4AF37,
-        0 0 12px rgba(212,175,55,.8);
-    animation: miniFirework 1.8s infinite ease-in-out;
+/* ========================================= */
+/* NÚCLEO DE IA */
+/* ========================================= */
+
+.piroia-ai-core {
+    position: relative;
+    width: 27px;
+    height: 27px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-@keyframes miniFirework {
+/* Órbita exterior */
+
+.piroia-ai-core::before {
+    content: "";
+    position: absolute;
+    width: 25px;
+    height: 11px;
+    border: 1.5px solid #D4AF37;
+    border-radius: 50%;
+    transform: rotate(35deg);
+    box-shadow: 0 0 8px rgba(212,175,55,.55);
+    animation: aiOrbit 2.4s linear infinite;
+}
+
+/* Segunda órbita */
+
+.piroia-ai-core::after {
+    content: "";
+    position: absolute;
+    width: 25px;
+    height: 11px;
+    border: 1.5px solid rgba(255,255,255,.75);
+    border-radius: 50%;
+    transform: rotate(-35deg);
+    animation: aiOrbitReverse 2.4s linear infinite;
+}
+
+/* Núcleo */
+
+.ai-core-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #fff8d6;
+
+    box-shadow:
+        0 0 5px #ffffff,
+        0 0 10px #D4AF37,
+        0 0 18px rgba(212,175,55,.9);
+
+    animation: aiCorePulse 1.5s infinite ease-in-out;
+}
+
+/* Animaciones */
+
+@keyframes aiOrbit {
+
+    0% {
+        transform: rotate(35deg);
+    }
+
+    100% {
+        transform: rotate(395deg);
+    }
+
+}
+
+@keyframes aiOrbitReverse {
+
+    0% {
+        transform: rotate(-35deg);
+    }
+
+    100% {
+        transform: rotate(-395deg);
+    }
+
+}
+
+@keyframes aiCorePulse {
 
     0%, 100% {
-        transform: scale(.9);
+        transform: scale(.8);
         opacity: .75;
     }
 
     50% {
         transform: scale(1.15);
         opacity: 1;
+    }
+
+}
+
+/* ========================================= */
+/* MINI NÚCLEO DE IA DEL CHAT */
+/* ========================================= */
+
+.piroia-ai-mini {
+    position: relative;
+    width: 21px;
+    height: 21px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Órbita */
+
+.piroia-ai-mini::before {
+    content: "";
+    position: absolute;
+    width: 19px;
+    height: 8px;
+    border: 1px solid #D4AF37;
+    border-radius: 50%;
+    transform: rotate(45deg);
+    animation: miniOrbit 2s linear infinite;
+}
+
+/* Segunda órbita */
+
+.piroia-ai-mini::after {
+    content: "";
+    position: absolute;
+    width: 19px;
+    height: 8px;
+    border: 1px solid rgba(255,255,255,.7);
+    border-radius: 50%;
+    transform: rotate(-45deg);
+    animation: miniOrbitReverse 2s linear infinite;
+}
+
+/* Punto central */
+
+.ai-mini-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #D4AF37;
+
+    box-shadow:
+        0 0 5px #D4AF37,
+        0 0 10px rgba(212,175,55,.8);
+}
+
+@keyframes miniOrbit {
+
+    from {
+        transform: rotate(45deg);
+    }
+
+    to {
+        transform: rotate(405deg);
+    }
+
+}
+
+@keyframes miniOrbitReverse {
+
+    from {
+        transform: rotate(-45deg);
+    }
+
+    to {
+        transform: rotate(-405deg);
     }
 
 }
