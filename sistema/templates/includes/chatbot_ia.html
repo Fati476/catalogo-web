@@ -12,8 +12,15 @@
         aria-label="Abrir asistente PiroIA"
         title="Asistente PiroIA">
 
-        <span class="piroia-rocket">🚀</span>
-        <span class="piroia-sparkle">✨</span>
+        <span class="piroia-firework">
+            <span class="firework-ray ray-1"></span>
+            <span class="firework-ray ray-2"></span>
+            <span class="firework-ray ray-3"></span>
+            <span class="firework-ray ray-4"></span>
+            <span class="firework-ray ray-5"></span>
+            <span class="firework-ray ray-6"></span>
+            <span class="firework-center"></span>
+        </span>
 
     </button>
 
@@ -30,9 +37,8 @@
                     🚀
                 </div>
 
-                <div>
-                    <strong>PiroIA</strong>
-                    <small>Asistente del catálogo</small>
+                <div class="piroia-icon">
+                    <span class="piroia-mini-firework">✦</span>
                 </div>
 
             </div>
@@ -149,16 +155,7 @@
 
 /* Cohete */
 
-.piroia-rocket {
 
-    font-size: 30px;
-
-    display: block;
-
-    transition:
-        transform 0.3s ease;
-
-}
 
 
 /* Brillito */
@@ -190,12 +187,97 @@
 }
 
 
-.piroia-button:hover .piroia-rocket {
 
-    transform: translateY(-3px) rotate(-8deg);
+/* ========================================= */
+/* ICONO PIROTECNIA */
+/* ========================================= */
+
+.piroia-firework {
+    position: relative;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Centro de la explosión */
+
+.firework-center {
+    position: absolute;
+    width: 9px;
+    height: 9px;
+    background: #fff8d6;
+    border-radius: 50%;
+    box-shadow:
+        0 0 6px #ffffff,
+        0 0 12px #D4AF37,
+        0 0 20px rgba(212,175,55,.9);
+}
+
+/* Rayos */
+
+.firework-ray {
+    position: absolute;
+    width: 3px;
+    height: 13px;
+    border-radius: 999px;
+    background: linear-gradient(
+        to top,
+        #D4AF37,
+        #fff8d6
+    );
+    transform-origin: center bottom;
+    animation: fireworkPulse 1.8s infinite ease-in-out;
+}
+
+/* Posiciones */
+
+.ray-1 {
+    transform: rotate(0deg) translateY(-11px);
+}
+
+.ray-2 {
+    transform: rotate(60deg) translateY(-11px);
+}
+
+.ray-3 {
+    transform: rotate(120deg) translateY(-11px);
+}
+
+.ray-4 {
+    transform: rotate(180deg) translateY(-11px);
+}
+
+.ray-5 {
+    transform: rotate(240deg) translateY(-11px);
+}
+
+.ray-6 {
+    transform: rotate(300deg) translateY(-11px);
+}
+
+/* Animación */
+
+@keyframes fireworkPulse {
+
+    0%, 100% {
+        opacity: .6;
+    }
+
+    50% {
+        opacity: 1;
+        filter: brightness(1.5);
+    }
 
 }
 
+/* Efecto al pasar el mouse */
+
+.piroia-button:hover .piroia-firework {
+    transform: scale(1.12);
+    transition: transform .25s ease;
+}
 
 /* ========================================= */
 /* ANIMACIÓN DEL BRILLO */
@@ -306,6 +388,29 @@
     justify-content: center;
 
     font-size: 21px;
+
+}
+
+.piroia-mini-firework {
+    font-size: 25px;
+    color: #D4AF37;
+    text-shadow:
+        0 0 5px #D4AF37,
+        0 0 12px rgba(212,175,55,.8);
+    animation: miniFirework 1.8s infinite ease-in-out;
+}
+
+@keyframes miniFirework {
+
+    0%, 100% {
+        transform: scale(.9);
+        opacity: .75;
+    }
+
+    50% {
+        transform: scale(1.15);
+        opacity: 1;
+    }
 
 }
 
