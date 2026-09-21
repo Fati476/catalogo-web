@@ -831,6 +831,108 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     /* ========================================= */
+    /* MEMORIA DE LA CONVERSACIÓN */
+    /* ========================================= */
+
+    const claveConversacion = "piroia_conversacion";
+
+
+    function guardarConversacion() {
+
+        const mensajes = [];
+
+        messages.querySelectorAll(
+            ".piroia-message-user, .piroia-message-bot"
+        ).forEach(function (mensaje) {
+
+            /* No guardar el indicador de "PiroIA está pensando..." */
+            if (mensaje.id === "piroiaTyping") {
+                return;
+            }
+
+            const burbuja = mensaje.querySelector(".piroia-bubble");
+
+            if (!burbuja) {
+                return;
+            }
+
+            mensajes.push({
+                tipo: mensaje.classList.contains("piroia-message-user")
+                    ? "usuario"
+                    : "bot",
+
+                texto: burbuja.textContent
+            });
+
+        });
+
+
+        sessionStorage.setItem(
+            claveConversacion,
+            JSON.stringify(mensajes)
+        );
+
+    }
+
+
+    function cargarConversacion() {
+
+        const guardada = sessionStorage.getItem(
+            claveConversacion
+        );
+
+        if (!guardada) {
+            return;
+        }
+
+
+        try {
+
+            const mensajesGuardados = JSON.parse(guardada);
+
+
+            mensajesGuardados.forEach(function (mensaje) {
+
+                if (mensaje.tipo === "usuario") {
+
+                    agregarMensajeUsuario(
+                        mensaje.texto,
+                        false
+                    );
+
+                } else {
+
+                    agregarMensajeBot(
+                        mensaje.texto,
+                        false
+                    );
+
+                }
+
+            });
+
+
+            messages.scrollTop = messages.scrollHeight;
+
+
+        } catch (error) {
+
+            console.error(
+                "PiroIA: No se pudo recuperar la conversación.",
+                error
+            );
+
+
+            sessionStorage.removeItem(
+                claveConversacion
+            );
+
+        }
+
+    }
+
+
+    /* ========================================= */
     /* ABRIR CHAT */
     /* ========================================= */
 
@@ -866,9 +968,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const cookies = document.cookie.split(";");
 
+
         for (let cookie of cookies) {
 
             cookie = cookie.trim();
+
 
             if (cookie.startsWith("csrftoken=")) {
 
@@ -880,6 +984,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         }
 
+
         return "";
 
     }
@@ -889,7 +994,10 @@ document.addEventListener("DOMContentLoaded", function () {
     /* AGREGAR MENSAJE DEL USUARIO */
     /* ========================================= */
 
-    function agregarMensajeUsuario(texto) {
+    function agregarMensajeUsuario(
+        texto,
+        guardar = true
+    ) {
 
         const contenedor = document.createElement("div");
 
@@ -916,6 +1024,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
         messages.scrollTop = messages.scrollHeight;
 
+
+        /* Guardar conversación */
+
+        if (guardar) {
+
+            guardarConversacion();
+
+        }
+
     }
 
 
@@ -923,7 +1040,10 @@ document.addEventListener("DOMContentLoaded", function () {
     /* AGREGAR RESPUESTA DE PIROIA */
     /* ========================================= */
 
-    function agregarMensajeBot(texto) {
+    function agregarMensajeBot(
+        texto,
+        guardar = true
+    ) {
 
         const contenedor = document.createElement("div");
 
@@ -947,6 +1067,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
         miniIA.appendChild(punto);
+
         avatar.appendChild(miniIA);
 
 
@@ -958,11 +1079,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
         contenedor.appendChild(avatar);
+
         contenedor.appendChild(burbuja);
 
         messages.appendChild(contenedor);
 
         messages.scrollTop = messages.scrollHeight;
+
+
+        /* Guardar conversación */
+
+        if (guardar) {
+
+            guardarConversacion();
+
+        }
 
     }
 
@@ -997,6 +1128,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
         miniIA.appendChild(punto);
+
         avatar.appendChild(miniIA);
 
 
@@ -1004,10 +1136,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
         burbuja.className = "piroia-bubble";
 
-        burbuja.textContent = "PiroIA está pensando...";
+        burbuja.textContent =
+            "PiroIA está pensando...";
 
 
         indicador.appendChild(avatar);
+
         indicador.appendChild(burbuja);
 
         messages.appendChild(indicador);
@@ -1026,8 +1160,11 @@ document.addEventListener("DOMContentLoaded", function () {
         const indicador =
             document.getElementById("piroiaTyping");
 
+
         if (indicador) {
+
             indicador.remove();
+
         }
 
     }
@@ -1041,8 +1178,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const pregunta = input.value.trim();
 
+
         if (!pregunta) {
+
             return;
+
         }
 
 
@@ -1050,9 +1190,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
         agregarMensajeUsuario(pregunta);
 
+
         input.value = "";
 
         input.disabled = true;
+
         send.disabled = true;
 
 
@@ -1109,7 +1251,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 error
             );
 
+
             quitarEscribiendo();
+
 
             agregarMensajeBot(
                 "No pude conectarme con PiroIA en este momento."
@@ -1119,6 +1263,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
         input.disabled = false;
+
         send.disabled = false;
 
         input.focus();
@@ -1156,7 +1301,17 @@ document.addEventListener("DOMContentLoaded", function () {
     );
 
 
-    console.log("PiroIA: JavaScript cargado correctamente.");
+    /* ========================================= */
+    /* RECUPERAR CONVERSACIÓN */
+    /* ========================================= */
+
+    cargarConversacion();
+
+
+    console.log(
+        "PiroIA: JavaScript cargado correctamente."
+    );
 
 });
+</script>
 </script>
