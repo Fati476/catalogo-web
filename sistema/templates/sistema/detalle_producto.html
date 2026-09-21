@@ -583,41 +583,300 @@ document.querySelectorAll('.favorito-btn').forEach(btn => {
 <script>
 document.addEventListener("DOMContentLoaded", function () {
 
-    const container = document.getElementById("imageContainer");
-    const img = document.getElementById("imagenPrincipal");
-    const magnifier = document.getElementById("magnifier");
+    const button = document.getElementById("piroiaButton");
+    const chat = document.getElementById("piroiaChat");
+    const close = document.getElementById("piroiaClose");
 
-    if (!container || !img || !magnifier) return;
+    const input = document.getElementById("piroiaInput");
+    const send = document.getElementById("piroiaSend");
+    const messages = document.getElementById("piroiaMessages");
 
-    const zoom = 2.8;
-    const radio = 60;
+    if (!button || !chat || !close || !input || !send || !messages) {
+        return;
+    }
 
-    container.addEventListener("mousemove", function (e) {
 
-        const rect = container.getBoundingClientRect();
+    /* ============================= */
+    /* ABRIR CHAT */
+    /* ============================= */
 
-        let x = e.clientX - rect.left;
-        let y = e.clientY - rect.top;
+    button.addEventListener("click", function () {
 
-        if (x < 0 || y < 0 || x > rect.width || y > rect.height) {
-            magnifier.style.display = "none";
+        chat.style.display = "flex";
+        button.style.display = "none";
+
+        setTimeout(() => {
+            input.focus();
+        }, 100);
+
+    });
+
+
+    /* ============================= */
+    /* CERRAR CHAT */
+    /* ============================= */
+
+    close.addEventListener("click", function () {
+
+        chat.style.display = "none";
+        button.style.display = "flex";
+
+    });
+
+
+    /* ============================= */
+    /* OBTENER CSRF */
+    /* ============================= */
+
+    function obtenerCSRF() {
+
+        const cookies = document.cookie.split(";");
+
+        for (let cookie of cookies) {
+
+            cookie = cookie.trim();
+
+            if (cookie.startsWith("csrftoken=")) {
+
+                return decodeURIComponent(
+                    cookie.substring("csrftoken=".length)
+                );
+
+            }
+
+        }
+
+        return "";
+    }
+
+
+    /* ============================= */
+    /* AGREGAR MENSAJE DEL USUARIO */
+    /* ============================= */
+
+    function agregarMensajeUsuario(texto) {
+
+        const contenedor = document.createElement("div");
+
+        contenedor.className =
+            "piroia-message piroia-message-user";
+
+        contenedor.style.justifyContent = "flex-end";
+
+        contenedor.innerHTML = `
+            <div class="piroia-bubble"
+                 style="
+                    background:#C9A227;
+                    color:#111827;
+                    border-radius:15px 5px 15px 15px;
+                 ">
+                ${texto}
+            </div>
+        `;
+
+        messages.appendChild(contenedor);
+
+        messages.scrollTop = messages.scrollHeight;
+    }
+
+
+    /* ============================= */
+    /* AGREGAR RESPUESTA DE PIROIA */
+    /* ============================= */
+
+    function agregarMensajeBot(texto) {
+
+        const contenedor = document.createElement("div");
+
+        contenedor.className =
+            "piroia-message piroia-message-bot";
+
+        contenedor.innerHTML = `
+            <div class="piroia-avatar">
+                <span class="piroia-ai-mini">
+                    <span class="ai-mini-dot"></span>
+                </span>
+            </div>
+
+            <div class="piroia-bubble">
+                ${texto}
+            </div>
+        `;
+
+        messages.appendChild(contenedor);
+
+        messages.scrollTop = messages.scrollHeight;
+    }
+
+
+    /* ============================= */
+    /* INDICADOR DE RESPUESTA */
+    /* ============================= */
+
+    function mostrarEscribiendo() {
+
+        const indicador = document.createElement("div");
+
+        indicador.id = "piroiaTyping";
+
+        indicador.className =
+            "piroia-message piroia-message-bot";
+
+        indicador.innerHTML = `
+            <div class="piroia-avatar">
+                <span class="piroia-ai-mini">
+                    <span class="ai-mini-dot"></span>
+                </span>
+            </div>
+
+            <div class="piroia-bubble">
+                PiroIA está pensando...
+            </div>
+        `;
+
+        messages.appendChild(indicador);
+
+        messages.scrollTop = messages.scrollHeight;
+    }
+
+
+    /* ============================= */
+    /* QUITAR INDICADOR */
+    /* ============================= */
+
+    function quitarEscribiendo() {
+
+        const indicador =
+            document.getElementById("piroiaTyping");
+
+        if (indicador) {
+            indicador.remove();
+        }
+
+    }
+
+
+    /* ============================= */
+    /* ENVIAR MENSAJE */
+    /* ============================= */
+
+    async function enviarMensaje() {
+
+        const pregunta = input.value.trim();
+
+        if (!pregunta) {
             return;
         }
 
-        magnifier.style.display = "block";
 
-        magnifier.style.left = (x - radio) + "px";
-        magnifier.style.top = (y - radio) + "px";
+        /* Mostrar pregunta */
 
-        magnifier.style.backgroundImage = `url('${img.src}')`;
-        magnifier.style.backgroundSize = `${rect.width * zoom}px ${rect.height * zoom}px`;
-        magnifier.style.backgroundPosition = `${-(x * zoom - radio)}px ${-(y * zoom - radio)}px`;
+        agregarMensajeUsuario(pregunta);
 
-    });
+        input.value = "";
 
-    container.addEventListener("mouseleave", function () {
-        magnifier.style.display = "none";
-    });
+        input.disabled = true;
+        send.disabled = true;
+
+
+        /* Mostrar indicador */
+
+        mostrarEscribiendo();
+
+
+        try {
+
+            const respuesta = await fetch(
+                "/api/chatbot/",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": obtenerCSRF()
+                    },
+
+                    body: JSON.stringify({
+                        mensaje: pregunta
+                    })
+                }
+            );
+
+
+            const datos = await respuesta.json();
+
+
+            quitarEscribiendo();
+
+
+            if (datos.ok) {
+
+                agregarMensajeBot(
+                    datos.respuesta
+                );
+
+            } else {
+
+                agregarMensajeBot(
+                    datos.respuesta ||
+                    "No pude procesar tu pregunta."
+                );
+
+            }
+
+
+        } catch (error) {
+
+            console.error(
+                "Error comunicando con PiroIA:",
+                error
+            );
+
+            quitarEscribiendo();
+
+            agregarMensajeBot(
+                "No pude conectarme con PiroIA en este momento."
+            );
+
+        }
+
+
+        input.disabled = false;
+        send.disabled = false;
+
+        input.focus();
+
+    }
+
+
+    /* ============================= */
+    /* BOTÓN ENVIAR */
+    /* ============================= */
+
+    send.addEventListener(
+        "click",
+        enviarMensaje
+    );
+
+
+    /* ============================= */
+    /* ENTER PARA ENVIAR */
+    /* ============================= */
+
+    input.addEventListener(
+        "keydown",
+        function (event) {
+
+            if (event.key === "Enter") {
+
+                event.preventDefault();
+
+                enviarMensaje();
+
+            }
+
+        }
+    );
 
 });
 </script>

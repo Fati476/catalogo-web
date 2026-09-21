@@ -56,6 +56,7 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
 from django.urls import reverse
 from .email_utils import enviar_correo_recuperacion
+from google import genai
 
 
 from .email_utils import (
@@ -2491,3 +2492,103 @@ def revertir_cambio_correo(request, token):
             "cambio": cambio
         }
     )
+
+
+
+@login_required
+@require_POST
+def chatbot_ia(request):
+
+    try:
+        data = json.loads(request.body)
+        pregunta = data.get("mensaje", "").strip()
+
+        if not pregunta:
+            return JsonResponse({
+                "ok": False,
+                "respuesta": "Escribe una pregunta para poder ayudarte."
+            }, status=400)
+
+        productos = (
+            Producto.objects
+            .filter(estado=True)
+            .select_related("categoria")
+            .order_by("categoria__nombre", "nombre")
+        )
+
+        catalogo = []
+
+        for producto in productos:
+            catalogo.append({
+                "producto": producto.nombre,
+                "categoria": producto.categoria.nombre,
+                "descripcion": producto.descripcion or "",
+                "precio": (
+                    str(producto.precio)
+                    if producto.precio is not None
+                    else "Consultar"
+                ),
+            })
+
+        contexto_catalogo = json.dumps(
+            catalogo,
+            ensure_ascii=False,
+            indent=2
+        )
+
+        cliente = genai.Client(
+            api_key=os.getenv("GEMINI_API_KEY")
+        )
+
+        instrucciones = f"""
+Eres PiroIA, el asistente virtual del catálogo de productos.
+
+Ayudas a los clientes a consultar información sobre los
+productos y categorías disponibles en el catálogo.
+
+Puedes responder sobre:
+- productos
+- categorías
+- características
+- descripciones
+- precios
+- información general del catálogo
+
+REGLAS IMPORTANTES:
+
+1. Utiliza únicamente la información proporcionada en el catálogo.
+2. No inventes productos, precios o características.
+3. Si la información no está en el catálogo, indica que el
+   cliente debe consultarla con la cooperativa.
+4. Responde siempre en español.
+5. Sé amable, claro y breve.
+6. No proporciones instrucciones para fabricar, modificar,
+   combinar o manipular productos pirotécnicos.
+7. Tu función es únicamente informativa y comercial.
+
+CATÁLOGO ACTUAL:
+
+{contexto_catalogo}
+"""
+
+        respuesta = cliente.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=pregunta,
+            config={
+                "system_instruction": instrucciones
+            }
+        )
+
+        return JsonResponse({
+            "ok": True,
+            "respuesta": respuesta.text
+        })
+
+    except Exception as e:
+
+        print("Error en PiroIA:", e)
+
+        return JsonResponse({
+            "ok": False,
+            "respuesta": "No pude procesar tu pregunta en este momento."
+        }, status=500)

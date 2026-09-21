@@ -307,5 +307,11 @@ urlpatterns = [
         name="revertir_cambio_correo"
     ),
 
+    path(
+        'api/chatbot/',
+        views.chatbot_ia,
+        name='chatbot_ia'
+    ),
+
 
 ]

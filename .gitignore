@@ -1,2 +1,8 @@
 .env
 backup.json
+respaldo_final.json
+respaldo_nuevo.json
+respaldo_utf8.json
+
+__pycache__/
+*.pyc
