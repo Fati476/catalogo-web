@@ -2574,7 +2574,10 @@ CATÁLOGO ACTUAL:
         respuesta = cliente.interactions.create(
             model="gemini-3.6-flash",
             input=pregunta,
-            system_instruction=instrucciones
+            system_instruction=instrucciones,
+            generation_config={
+                "thinking_level": "low"
+            }
         )
 
         return JsonResponse({
