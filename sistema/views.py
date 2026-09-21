@@ -2571,17 +2571,15 @@ CATÁLOGO ACTUAL:
 {contexto_catalogo}
 """
 
-        respuesta = cliente.models.generate_content(
-            model="gemini-2.5-flash",
-            contents=pregunta,
-            config={
-                "system_instruction": instrucciones
-            }
+        respuesta = cliente.interactions.create(
+            model="gemini-3.6-flash",
+            input=pregunta,
+            system_instruction=instrucciones
         )
 
         return JsonResponse({
             "ok": True,
-            "respuesta": respuesta.text
+            "respuesta": respuesta.output_text
         })
 
     except Exception as e:
