@@ -2956,7 +2956,7 @@ Pregunta del usuario:
         }
 
         payload = {
-            "model": "nvidia/nemotron-3.5-lightning:free",
+            "model": "qwen/qwen3-30b-a3b:free",
             "messages": [
                 {
                     "role": "user",
@@ -2964,7 +2964,8 @@ Pregunta del usuario:
                 }
             ],
             "temperature": 0.2,
-            "max_tokens": 700
+            "max_tokens": 500,
+            "reasoning_effort": "none"
         }
 
         print("====================================")
