@@ -2543,12 +2543,15 @@ def revertir_cambio_correo(request, token):
 @login_required
 @require_POST
 def chatbot_ia(request):
+    """
+    PiroIA:
+    - Consulta el catálogo
+    - Crea solicitudes de cotización
+    - Modifica solicitudes mediante lenguaje natural
+    - Funciona con texto y voz desde el frontend
+    """
 
     try:
-        # ==========================================================
-        # RECIBIR MENSAJE
-        # ==========================================================
-
         data = json.loads(request.body)
 
         pregunta = data.get("mensaje", "").strip()
@@ -2557,219 +2560,580 @@ def chatbot_ia(request):
         if not pregunta:
             return JsonResponse({
                 "ok": False,
-                "respuesta": "Escribe un mensaje para PiroIA."
-            }, status=400)
+                "respuesta": "Escribe o di algo para que pueda ayudarte."
+            })
 
-        # ==========================================================
-        # OBTENER API KEY DE GEMINI
-        # ==========================================================
-
-        api_key = os.getenv("GEMINI_API_KEY")
+        api_key = os.getenv("OPENROUTER_API_KEY")
 
         if not api_key:
-
-            print("====================================")
-            print("ERROR: GEMINI_API_KEY NO ENCONTRADA")
-            print("====================================")
-
             return JsonResponse({
                 "ok": False,
-                "respuesta": (
-                    "No se encontró la configuración de Gemini "
-                    "en el servidor."
-                )
+                "respuesta": "No se encontró la configuración de PiroIA."
             }, status=500)
 
         # ==========================================================
-        # PRUEBA DIRECTA CON GEMINI
+        # 1. OBTENER CATÁLOGO REAL
         # ==========================================================
 
-        print("====================================")
-        print("PRUEBA DIRECTA DE GEMINI")
-        print("Pregunta:", pregunta)
-        print("Modo:", modo)
-        print("API KEY encontrada: SI")
-        print("====================================")
+        productos_catalogo = Producto.objects.filter(
+            estado=True
+        ).select_related("categoria").prefetch_related("imagenes")
 
-        url = (
-            "https://generativelanguage.googleapis.com/"
-            "v1beta/models/gemini-3.6-flash:generateContent"
+        catalogo = []
+
+        for producto in productos_catalogo:
+
+            imagen_url = ""
+
+            try:
+                primera_imagen = producto.imagenes.first()
+
+                if primera_imagen and primera_imagen.imagen:
+                    imagen_url = primera_imagen.imagen.url
+            except Exception:
+                imagen_url = ""
+
+            catalogo.append({
+                "id": producto.id,
+                "nombre": producto.nombre,
+                "descripcion": producto.descripcion or "",
+                "categoria": producto.categoria.nombre if producto.categoria else "",
+                "precio": str(producto.precio) if producto.precio is not None else "",
+                "imagen": imagen_url,
+            })
+
+        # ==========================================================
+        # 2. SOLICITUD ACTIVA DE PIROIA
+        # ==========================================================
+
+        solicitud_id = (
+            request.session.get("piroia_solicitud_id")
+            or request.session.get("solicitud_editando_id")
         )
 
+        solicitud_actual = None
+
+        if solicitud_id:
+            solicitud_actual = SolicitudCotizacion.objects.filter(
+                id=solicitud_id,
+                usuario=request.user
+            ).first()
+
+        productos_solicitud = []
+
+        if solicitud_actual:
+            detalles = solicitud_actual.detalles.select_related(
+                "producto"
+            ).all()
+
+            for detalle in detalles:
+                productos_solicitud.append({
+                    "id": detalle.producto.id,
+                    "nombre": detalle.producto.nombre,
+                    "cantidad": detalle.cantidad,
+                })
+
+        # ==========================================================
+        # 3. INFORMACIÓN PARA LA IA
+        # ==========================================================
+
+        catalogo_texto = json.dumps(
+            catalogo,
+            ensure_ascii=False
+        )
+
+        solicitud_texto = json.dumps(
+            productos_solicitud,
+            ensure_ascii=False
+        )
+
+        # ==========================================================
+        # 4. PROMPT DE PIROIA
+        # ==========================================================
+
+        if modo == "solicitud":
+
+            instrucciones = f"""
+Eres PiroIA, el asistente inteligente del catálogo web de una
+cooperativa de productos pirotécnicos.
+
+Tu función es ayudar EXCLUSIVAMENTE con el catálogo y las
+solicitudes de cotización.
+
+NO proporciones instrucciones para fabricar, modificar, combinar,
+manipular, encender o utilizar productos pirotécnicos.
+
+Tu trabajo es interpretar lo que el usuario quiere comprar o
+solicitar y relacionarlo con los productos reales del catálogo.
+
+CATÁLOGO REAL:
+{catalogo_texto}
+
+SOLICITUD ACTUAL DEL USUARIO:
+{solicitud_texto}
+
+Si el usuario quiere crear una solicitud nueva, identifica los
+productos del catálogo y las cantidades.
+
+Si el usuario quiere agregar un producto, quitarlo o cambiar su
+cantidad, identifica correctamente el producto.
+
+IMPORTANTE:
+- Solo puedes utilizar productos que existan en el catálogo.
+- No inventes productos.
+- No inventes IDs.
+- No inventes cantidades que el usuario no haya indicado.
+- Si no estás seguro del producto, pide aclaración.
+- No envíes automáticamente la solicitud.
+- El usuario debe revisar la solicitud y presionar el botón
+  "Enviar solicitud".
+
+Debes responder ÚNICAMENTE con JSON válido usando exactamente
+esta estructura:
+
+{{
+    "respuesta": "mensaje para el usuario",
+    "accion": "agregar|quitar|cambiar|ninguna",
+    "confirmado": false,
+    "productos": [
+        {{
+            "producto_id": 1,
+            "cantidad": 2
+        }}
+    ]
+}}
+
+Reglas:
+
+1. "agregar":
+   Se utiliza cuando el usuario quiere agregar productos.
+
+2. "quitar":
+   Se utiliza cuando el usuario quiere eliminar un producto o
+   disminuir su cantidad.
+
+3. "cambiar":
+   Se utiliza cuando el usuario quiere establecer una cantidad
+   diferente.
+
+4. "ninguna":
+   Se utiliza cuando solamente está preguntando algo,
+   necesita aclaración o todavía no ha confirmado.
+
+5. "confirmado" debe ser true SOLO cuando el usuario confirme
+   claramente que desea crear o actualizar la solicitud.
+
+Si el usuario dice algo como:
+"quiero 2 cajas de X y 3 de Y"
+
+puedes preparar la solicitud.
+
+Si dice:
+"sí, créala",
+"confirmo",
+"esa está bien",
+"crear solicitud"
+
+entonces "confirmado" debe ser true.
+
+Si ya existe una solicitud activa, las acciones deben aplicarse
+sobre esa solicitud.
+
+Pregunta del usuario:
+{pregunta}
+"""
+
+        else:
+
+            instrucciones = f"""
+Eres PiroIA, el asistente inteligente del catálogo web.
+
+Tu función en este modo es CONSULTAR el catálogo.
+
+CATÁLOGO REAL:
+{catalogo_texto}
+
+Responde de forma clara y sencilla utilizando solamente la
+información disponible en el catálogo.
+
+Puedes informar sobre:
+- productos
+- descripciones
+- categorías
+- precios disponibles
+- características descritas en el catálogo
+
+NO proporciones instrucciones para fabricar, modificar, combinar,
+manipular, encender o utilizar productos pirotécnicos.
+
+Si el producto que busca el usuario no existe en el catálogo,
+indícalo claramente.
+
+Pregunta del usuario:
+{pregunta}
+"""
+
+        # ==========================================================
+        # 5. LLAMADA A OPENROUTER
+        # ==========================================================
+
+        url = "https://openrouter.ai/api/v1/chat/completions"
+
         headers = {
-            "x-goog-api-key": api_key,
-            "Content-Type": "application/json"
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
+            "HTTP-Referer": "https://catalogo-web-s5um.onrender.com",
+            "X-Title": "PiroIA - Catalogo Web",
         }
 
         payload = {
-            "contents": [
+            "model": "openrouter/free",
+            "messages": [
                 {
-                    "parts": [
-                        {
-                            "text": (
-                                "Eres PiroIA, un asistente virtual "
-                                "de un catálogo de productos. "
-                                "Responde siempre en español, "
-                                "de forma clara y breve. "
-                                "No proporciones instrucciones para "
-                                "fabricar, modificar, combinar o "
-                                "manipular productos pirotécnicos. "
-                                "Tu función es informativa y comercial.\n\n"
-                                "Mensaje del usuario:\n"
-                                + pregunta
-                            )
-                        }
-                    ]
+                    "role": "user",
+                    "content": instrucciones
                 }
-            ]
+            ],
+            "temperature": 0.2,
+            "max_tokens": 1000
         }
 
-        try:
+        print("====================================")
+        print("PIROIA - PRUEBA OPENROUTER")
+        print("Pregunta:", pregunta)
+        print("Modo:", modo)
+        print("API KEY:", "SI" if api_key else "NO")
+        print("====================================")
 
-            respuesta_gemini = requests.post(
+        try:
+            respuesta_ia = requests.post(
                 url,
                 headers=headers,
                 json=payload,
-                timeout=8
+                timeout=20
             )
 
         except requests.exceptions.Timeout:
 
-            print("====================================")
-            print("GEMINI TIMEOUT")
-            print("Gemini tardó más de 8 segundos.")
-            print("====================================")
+            print("OPENROUTER TIMEOUT")
 
             return JsonResponse({
                 "ok": False,
-                "respuesta": (
-                    "La API de Gemini tardó demasiado "
-                    "en responder."
-                ),
-                "gemini_timeout": True
+                "respuesta": "PiroIA tardó demasiado en responder. Intenta nuevamente.",
+                "gemini_timeout": False
             })
 
         except requests.exceptions.RequestException as e:
 
-            print("====================================")
-            print("ERROR DE CONEXIÓN CON GEMINI")
-            print("ERROR:", str(e))
-            print("====================================")
+            print("ERROR DE CONEXIÓN OPENROUTER:", str(e))
 
             return JsonResponse({
                 "ok": False,
-                "respuesta": (
-                    "No se pudo establecer conexión "
-                    "con la API de Gemini."
-                ),
-                "gemini_error": str(e)
+                "respuesta": "No fue posible conectar con PiroIA en este momento."
+            })
+
+        print("STATUS OPENROUTER:", respuesta_ia.status_code)
+        print("RESPUESTA OPENROUTER:", respuesta_ia.text[:2000])
+
+        # ==========================================================
+        # 6. ERROR DE OPENROUTER
+        # ==========================================================
+
+        if respuesta_ia.status_code != 200:
+
+            try:
+                error_data = respuesta_ia.json()
+                error_mensaje = (
+                    error_data.get("error", {}).get("message")
+                    or "Error desconocido de OpenRouter."
+                )
+            except Exception:
+                error_mensaje = "OpenRouter no pudo procesar la solicitud."
+
+            return JsonResponse({
+                "ok": False,
+                "respuesta": f"PiroIA no pudo responder: {error_mensaje}"
             })
 
         # ==========================================================
-        # MOSTRAR RESPUESTA DE GEMINI EN LOS LOGS
+        # 7. EXTRAER RESPUESTA
         # ==========================================================
 
-        print("====================================")
-        print("RESPUESTA DIRECTA DE GEMINI")
-        print("STATUS:", respuesta_gemini.status_code)
-        print("BODY:")
-        print(respuesta_gemini.text[:5000])
-        print("====================================")
+        try:
+            resultado = respuesta_ia.json()
+
+            contenido = (
+                resultado["choices"][0]["message"]["content"]
+            )
+
+        except Exception as e:
+
+            print("ERROR LEYENDO RESPUESTA:", str(e))
+
+            return JsonResponse({
+                "ok": False,
+                "respuesta": "PiroIA recibió una respuesta que no pudo interpretar."
+            })
+
+        contenido = contenido.strip()
 
         # ==========================================================
-        # GEMINI RESPONDIÓ CORRECTAMENTE
+        # 8. MODO CONSULTA
         # ==========================================================
 
-        if respuesta_gemini.status_code == 200:
+        if modo != "solicitud":
 
-            try:
+            return JsonResponse({
+                "ok": True,
+                "respuesta": contenido,
+                "confirmado": False,
+                "accion": "ninguna",
+                "productos": []
+            })
 
-                datos_gemini = respuesta_gemini.json()
+        # ==========================================================
+        # 9. INTERPRETAR JSON DE LA IA
+        # ==========================================================
 
-                candidatos = datos_gemini.get(
-                    "candidates",
-                    []
-                )
+        contenido_json = contenido
 
-                if not candidatos:
+        if contenido_json.startswith("```"):
+            contenido_json = contenido_json.replace("```json", "")
+            contenido_json = contenido_json.replace("```", "")
+            contenido_json = contenido_json.strip()
 
-                    return JsonResponse({
-                        "ok": False,
-                        "respuesta": (
-                            "Gemini respondió pero "
-                            "no devolvió contenido."
-                        ),
-                        "gemini_status": 200,
-                        "gemini_respuesta": (
-                            respuesta_gemini.text[:3000]
+        try:
+            resultado_ia = json.loads(contenido_json)
+
+        except json.JSONDecodeError:
+
+            print("LA IA NO DEVOLVIÓ JSON VÁLIDO:")
+            print(contenido)
+
+            return JsonResponse({
+                "ok": True,
+                "respuesta": contenido,
+                "confirmado": False,
+                "accion": "ninguna",
+                "productos": []
+            })
+
+        respuesta_texto = resultado_ia.get(
+            "respuesta",
+            "Puedo ayudarte a preparar la solicitud."
+        )
+
+        accion = resultado_ia.get(
+            "accion",
+            "ninguna"
+        )
+
+        confirmado = resultado_ia.get(
+            "confirmado",
+            False
+        )
+
+        productos = resultado_ia.get(
+            "productos",
+            []
+        )
+
+        # ==========================================================
+        # 10. CREAR SOLICITUD NUEVA
+        # ==========================================================
+
+        if confirmado and not solicitud_actual:
+
+            solicitud_actual = SolicitudCotizacion.objects.create(
+                usuario=request.user,
+                enviada=False,
+                estado="revision",
+                bloqueada=False
+            )
+
+            request.session["piroia_solicitud_id"] = solicitud_actual.id
+
+            solicitud_id = solicitud_actual.id
+
+        # ==========================================================
+        # 11. MODIFICAR SOLICITUD
+        # ==========================================================
+
+        if solicitud_actual and accion in [
+            "agregar",
+            "quitar",
+            "cambiar"
+        ]:
+
+            for item in productos:
+
+                try:
+                    producto_id = int(item.get("producto_id"))
+                    cantidad = int(item.get("cantidad", 1))
+                except (TypeError, ValueError):
+                    continue
+
+                if cantidad < 0:
+                    continue
+
+                producto = Producto.objects.filter(
+                    id=producto_id,
+                    estado=True
+                ).first()
+
+                if not producto:
+                    continue
+
+                detalle = DetalleSolicitud.objects.filter(
+                    solicitud=solicitud_actual,
+                    producto=producto
+                ).first()
+
+                # ----------------------------------------------
+                # AGREGAR
+                # ----------------------------------------------
+
+                if accion == "agregar":
+
+                    if detalle:
+
+                        detalle.cantidad += max(cantidad, 1)
+
+                        detalle.seleccionado = True
+
+                        detalle.save()
+
+                    else:
+
+                        DetalleSolicitud.objects.create(
+                            solicitud=solicitud_actual,
+                            producto=producto,
+                            cantidad=max(cantidad, 1),
+                            seleccionado=True
+                        )
+
+                # ----------------------------------------------
+                # CAMBIAR
+                # ----------------------------------------------
+
+                elif accion == "cambiar":
+
+                    if cantidad <= 0:
+
+                        if detalle:
+                            detalle.delete()
+
+                    else:
+
+                        if detalle:
+
+                            detalle.cantidad = cantidad
+                            detalle.seleccionado = True
+                            detalle.save()
+
+                        else:
+
+                            DetalleSolicitud.objects.create(
+                                solicitud=solicitud_actual,
+                                producto=producto,
+                                cantidad=cantidad,
+                                seleccionado=True
+                            )
+
+                # ----------------------------------------------
+                # QUITAR
+                # ----------------------------------------------
+
+                elif accion == "quitar":
+
+                    if detalle:
+
+                        if cantidad >= detalle.cantidad:
+                            detalle.delete()
+
+                        else:
+
+                            detalle.cantidad -= cantidad
+
+                            if detalle.cantidad <= 0:
+                                detalle.delete()
+                            else:
+                                detalle.save()
+
+        # ==========================================================
+        # 12. CONFIRMACIÓN FINAL
+        # ==========================================================
+
+        if confirmado:
+
+            if solicitud_actual:
+
+                detalles_finales = solicitud_actual.detalles.select_related(
+                    "producto"
+                ).all()
+
+                productos_finales = []
+
+                for detalle in detalles_finales:
+
+                    productos_finales.append({
+                        "producto_id": detalle.producto.id,
+                        "nombre": detalle.producto.nombre,
+                        "cantidad": detalle.cantidad,
+                        "imagen": (
+                            detalle.producto.imagenes.first().imagen.url
+                            if detalle.producto.imagenes.first()
+                            else ""
                         )
                     })
 
-                contenido = candidatos[0].get(
-                    "content",
-                    {}
-                )
-
-                partes = contenido.get(
-                    "parts",
-                    []
-                )
-
-                texto = ""
-
-                for parte in partes:
-
-                    if parte.get("text"):
-
-                        texto += parte["text"]
-
-                if not texto:
-
-                    texto = (
-                        "Gemini respondió correctamente, "
-                        "pero no se encontró texto en la respuesta."
-                    )
-
                 return JsonResponse({
                     "ok": True,
-                    "respuesta": texto,
-                    "modo": modo,
-                    "prueba_gemini": True
-                })
-
-            except Exception as e:
-
-                print("====================================")
-                print("ERROR PROCESANDO RESPUESTA GEMINI")
-                print("ERROR:", str(e))
-                print("====================================")
-
-                return JsonResponse({
-                    "ok": False,
-                    "respuesta": (
-                        "Gemini respondió, pero no pude "
-                        "interpretar su respuesta."
-                    ),
-                    "gemini_status": 200,
-                    "error": str(e)
+                    "respuesta": respuesta_texto,
+                    "confirmado": True,
+                    "accion": accion,
+                    "productos": productos_finales,
+                    "redirect_url": reverse("solicitudes")
                 })
 
         # ==========================================================
-        # ERROR DE GEMINI
+        # 13. RESPUESTA NORMAL DE SOLICITUD
         # ==========================================================
+
+        productos_actualizados = []
+
+        if solicitud_actual:
+
+            detalles_actualizados = solicitud_actual.detalles.select_related(
+                "producto"
+            ).all()
+
+            for detalle in detalles_actualizados:
+
+                imagen_url = ""
+
+                try:
+                    imagen = detalle.producto.imagenes.first()
+
+                    if imagen and imagen.imagen:
+                        imagen_url = imagen.imagen.url
+                except Exception:
+                    imagen_url = ""
+
+                productos_actualizados.append({
+                    "producto_id": detalle.producto.id,
+                    "nombre": detalle.producto.nombre,
+                    "cantidad": detalle.cantidad,
+                    "imagen": imagen_url
+                })
 
         return JsonResponse({
-            "ok": False,
-            "respuesta": (
-                "Gemini respondió con un error."
-            ),
-            "gemini_status": respuesta_gemini.status_code,
-            "gemini_error": respuesta_gemini.text[:5000]
+            "ok": True,
+            "respuesta": respuesta_texto,
+            "confirmado": False,
+            "accion": accion,
+            "productos": productos_actualizados
         })
-
-    # ==============================================================
-    # ERROR GENERAL DE DJANGO
-    # ==============================================================
 
     except json.JSONDecodeError:
 
@@ -2781,14 +3145,11 @@ def chatbot_ia(request):
     except Exception as e:
 
         print("====================================")
-        print("ERROR GENERAL EN PIROIA")
-        print("ERROR:", str(e))
+        print("ERROR GENERAL PIROIA")
+        print(str(e))
         print("====================================")
 
         return JsonResponse({
             "ok": False,
-            "respuesta": (
-                "Ocurrió un error al procesar la solicitud."
-            ),
-            "error": str(e)
+            "respuesta": "Ocurrió un problema al procesar tu solicitud."
         }, status=500)
