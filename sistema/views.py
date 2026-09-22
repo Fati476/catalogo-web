@@ -747,10 +747,14 @@ def favoritos(request):
 @login_required
 def solicitudes(request):
 
-    solicitud_id = request.session.get("solicitud_editando_id")
+    solicitud_id = (
+        request.session.get("piroia_solicitud_id")
+        or request.session.get("solicitud_editando_id")
+    )
 
     solicitud = None
     editando = False
+    piroia_activa = False
 
     if solicitud_id:
         solicitud = SolicitudCotizacion.objects.filter(
@@ -761,9 +765,15 @@ def solicitudes(request):
         ).first()
 
         if solicitud:
-            editando = True
+            editando = bool(
+                request.session.get("solicitud_editando_id")
+            )
+            piroia_activa = bool(
+                request.session.get("piroia_solicitud_id")
+            )
         else:
             request.session.pop("solicitud_editando_id", None)
+            request.session.pop("piroia_solicitud_id", None)
 
     if solicitud is None:
         solicitud = SolicitudCotizacion.objects.filter(
@@ -800,6 +810,7 @@ def solicitudes(request):
             "total_productos": total_productos,
             "total_unidades": total_unidades,
             "editando": editando,
+            "piroia_activa": piroia_activa,
             "numero_usuario": numero_usuario,
         }
     )
@@ -951,6 +962,11 @@ def enviar_solicitud(request):
 
     request.session.pop(
         "solicitud_editando_id",
+        None
+    )
+
+    request.session.pop(
+        "piroia_solicitud_id",
         None
     )
 
@@ -1952,6 +1968,33 @@ def cancelar_edicion_solicitud(request, id):
         estado="revision"
     )
 
+    # Si la solicitud fue creada por PiroIA,
+    # se elimina completamente porque todavía es un borrador.
+    if request.session.get("piroia_solicitud_id") == solicitud.id:
+
+        solicitud.delete()
+
+        request.session.pop(
+            "piroia_solicitud_id",
+            None
+        )
+
+        request.session.pop(
+            "solicitud_editando_id",
+            None
+        )
+
+        messages.info(
+            request,
+            "La solicitud creada por PiroIA fue cancelada."
+        )
+
+        return redirect("solicitudes")
+
+    # ----------------------------------------------------------
+    # EDICIÓN NORMAL DE UNA SOLICITUD YA ENVIADA
+    # ----------------------------------------------------------
+
     solicitud.enviada = True
     solicitud.bloqueada = False
 
@@ -2547,7 +2590,10 @@ def chatbot_ia(request):
         # SOLICITUD ACTIVA DEL USUARIO
         # ==========================================================
 
-        solicitud_id = request.session.get("solicitud_editando_id")
+        solicitud_id = (
+            request.session.get("piroia_solicitud_id")
+            or request.session.get("solicitud_editando_id")
+        )
 
         solicitud = None
 
@@ -2811,7 +2857,7 @@ No agregues explicaciones fuera del JSON.
                     bloqueada=False
                 )
 
-                request.session["solicitud_editando_id"] = solicitud.id
+                request.session["piroia_solicitud_id"] = solicitud.id
 
             # ======================================================
             # AGREGAR PRODUCTOS
