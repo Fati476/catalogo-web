@@ -4,7 +4,10 @@
 
 <div class="piroia-container">
 
-    <!-- Botón flotante -->
+    <!-- ============================= -->
+    <!-- BOTÓN FLOTANTE -->
+    <!-- ============================= -->
+
     <button
         type="button"
         class="piroia-button"
@@ -25,10 +28,16 @@
     </button>
 
 
-    <!-- Ventana del chatbot -->
+    <!-- ============================= -->
+    <!-- VENTANA DEL CHAT -->
+    <!-- ============================= -->
+
     <div class="piroia-chat" id="piroiaChat">
 
-        <!-- Encabezado -->
+        <!-- ============================= -->
+        <!-- ENCABEZADO -->
+        <!-- ============================= -->
+
         <div class="piroia-header">
 
             <div class="piroia-title">
@@ -37,6 +46,11 @@
                     <span class="piroia-ai-core">
                         <span class="ai-core-dot"></span>
                     </span>
+                </div>
+
+                <div class="piroia-title-text">
+                    <strong>PiroIA</strong>
+                    <small>Asistente inteligente</small>
                 </div>
 
             </div>
@@ -52,7 +66,37 @@
         </div>
 
 
-        <!-- Mensajes -->
+        <!-- ============================= -->
+        <!-- SELECTOR DE MODO -->
+        <!-- ============================= -->
+
+        <div class="piroia-mode-bar">
+
+            <button
+                type="button"
+                id="piroiaModoConsulta"
+                class="piroia-mode-btn active">
+
+                💬 Consultar
+
+            </button>
+
+            <button
+                type="button"
+                id="piroiaModoSolicitud"
+                class="piroia-mode-btn">
+
+                ✨ Crear solicitud
+
+            </button>
+
+        </div>
+
+
+        <!-- ============================= -->
+        <!-- MENSAJES -->
+        <!-- ============================= -->
+
         <div class="piroia-messages" id="piroiaMessages">
 
             <div class="piroia-message piroia-message-bot">
@@ -64,11 +108,27 @@
                 </div>
 
                 <div class="piroia-bubble">
+
                     ¡Hola! 👋<br>
-                    Soy <strong>PiroIA</strong>, tu asistente del catálogo.
+
+                    Soy <strong>PiroIA</strong>, tu asistente inteligente del catálogo.
+
                     <br><br>
-                    Puedo ayudarte a consultar nuestros productos,
-                    categorías y características.
+
+                    Puedo ayudarte a:
+
+                    <br>
+
+                    💬 Consultar productos, categorías y características.
+
+                    <br>
+
+                    ✨ Crear una solicitud de cotización.
+
+                    <br>
+
+                    🎤 También puedes hablar conmigo usando tu voz.
+
                 </div>
 
             </div>
@@ -76,29 +136,86 @@
         </div>
 
 
-        <!-- Entrada -->
+        <!-- ============================= -->
+        <!-- ÁREA DE ENTRADA -->
+        <!-- ============================= -->
+
         <div class="piroia-input-area">
+
+            <!-- Botón de voz -->
+
+            <button
+                type="button"
+                id="piroiaVoice"
+                class="piroia-voice"
+                title="Hablar con PiroIA"
+                aria-label="Hablar con PiroIA">
+
+                🎤
+
+            </button>
+
+
+            <!-- Input -->
 
             <input
                 type="text"
                 id="piroiaInput"
                 class="piroia-input"
-                placeholder="Escribe tu pregunta..."
+                placeholder="Pregunta sobre productos, categorías o precios..."
                 autocomplete="off">
+
+
+            <!-- Enviar -->
 
             <button
                 type="button"
                 id="piroiaSend"
                 class="piroia-send"
                 aria-label="Enviar mensaje">
+
                 ➤
+
             </button>
+
+        </div>
+
+
+        <!-- ============================= -->
+        <!-- BOTÓN ESCUCHAR -->
+        <!-- ============================= -->
+
+        <div class="piroia-speech-area">
+
+            <button
+                type="button"
+                id="piroiaSpeak"
+                class="piroia-speak-btn"
+                style="display: none;">
+
+                🔊 Escuchar respuesta
+
+            </button>
+
+        </div>
+
+
+        <!-- ============================= -->
+        <!-- AYUDA -->
+        <!-- ============================= -->
+
+        <div
+            class="piroia-help"
+            id="piroiaHelp">
+
+            Puedes consultar productos, categorías, características o precios.
 
         </div>
 
     </div>
 
 </div>
+
 
 
 <style>
@@ -108,11 +225,19 @@
 /* ========================================= */
 
 .piroia-container {
+
     position: fixed;
+
     right: 25px;
     bottom: 25px;
+
     z-index: 99999;
-    font-family: Arial, Helvetica, sans-serif;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
 }
 
 
@@ -128,11 +253,12 @@
     border: none;
     border-radius: 50%;
 
-    background: linear-gradient(
-        135deg,
-        #D4AF37,
-        #C9A227
-    );
+    background:
+        linear-gradient(
+            135deg,
+            #D4AF37,
+            #C9A227
+        );
 
     box-shadow:
         0 8px 25px rgba(0, 0, 0, 0.35),
@@ -143,6 +269,7 @@
     position: relative;
 
     display: flex;
+
     align-items: center;
     justify-content: center;
 
@@ -153,23 +280,133 @@
 }
 
 
-/* Cohete */
+/* ========================================= */
+/* ICONO PIROTECNIA */
+/* ========================================= */
+
+.piroia-firework {
+
+    position: relative;
+
+    width: 34px;
+    height: 34px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+}
 
 
+/* Centro */
 
-
-/* Brillito */
-
-.piroia-sparkle {
+.firework-center {
 
     position: absolute;
 
-    top: 7px;
-    right: 8px;
+    width: 9px;
+    height: 9px;
 
-    font-size: 14px;
+    background: #fff8d6;
 
-    animation: piroiaSparkle 1.5s infinite ease-in-out;
+    border-radius: 50%;
+
+    box-shadow:
+        0 0 6px #ffffff,
+        0 0 12px #D4AF37,
+        0 0 20px rgba(212,175,55,.9);
+
+}
+
+
+/* Rayos */
+
+.firework-ray {
+
+    position: absolute;
+
+    width: 3px;
+    height: 13px;
+
+    border-radius: 999px;
+
+    background:
+        linear-gradient(
+            to top,
+            #D4AF37,
+            #fff8d6
+        );
+
+    transform-origin: center bottom;
+
+    animation:
+        fireworkPulse
+        1.8s
+        infinite
+        ease-in-out;
+
+}
+
+
+/* Posiciones */
+
+.ray-1 {
+    transform:
+        rotate(0deg)
+        translateY(-11px);
+}
+
+.ray-2 {
+    transform:
+        rotate(60deg)
+        translateY(-11px);
+}
+
+.ray-3 {
+    transform:
+        rotate(120deg)
+        translateY(-11px);
+}
+
+.ray-4 {
+    transform:
+        rotate(180deg)
+        translateY(-11px);
+}
+
+.ray-5 {
+    transform:
+        rotate(240deg)
+        translateY(-11px);
+}
+
+.ray-6 {
+    transform:
+        rotate(300deg)
+        translateY(-11px);
+}
+
+
+/* Animación */
+
+@keyframes fireworkPulse {
+
+    0%,
+    100% {
+
+        opacity: .6;
+
+    }
+
+    50% {
+
+        opacity: 1;
+
+        filter:
+            brightness(1.5);
+
+    }
 
 }
 
@@ -186,115 +423,12 @@
 
 }
 
-
-
-/* ========================================= */
-/* ICONO PIROTECNIA */
-/* ========================================= */
-
-.piroia-firework {
-    position: relative;
-    width: 34px;
-    height: 34px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Centro de la explosión */
-
-.firework-center {
-    position: absolute;
-    width: 9px;
-    height: 9px;
-    background: #fff8d6;
-    border-radius: 50%;
-    box-shadow:
-        0 0 6px #ffffff,
-        0 0 12px #D4AF37,
-        0 0 20px rgba(212,175,55,.9);
-}
-
-/* Rayos */
-
-.firework-ray {
-    position: absolute;
-    width: 3px;
-    height: 13px;
-    border-radius: 999px;
-    background: linear-gradient(
-        to top,
-        #D4AF37,
-        #fff8d6
-    );
-    transform-origin: center bottom;
-    animation: fireworkPulse 1.8s infinite ease-in-out;
-}
-
-/* Posiciones */
-
-.ray-1 {
-    transform: rotate(0deg) translateY(-11px);
-}
-
-.ray-2 {
-    transform: rotate(60deg) translateY(-11px);
-}
-
-.ray-3 {
-    transform: rotate(120deg) translateY(-11px);
-}
-
-.ray-4 {
-    transform: rotate(180deg) translateY(-11px);
-}
-
-.ray-5 {
-    transform: rotate(240deg) translateY(-11px);
-}
-
-.ray-6 {
-    transform: rotate(300deg) translateY(-11px);
-}
-
-/* Animación */
-
-@keyframes fireworkPulse {
-
-    0%, 100% {
-        opacity: .6;
-    }
-
-    50% {
-        opacity: 1;
-        filter: brightness(1.5);
-    }
-
-}
-
-/* Efecto al pasar el mouse */
-
 .piroia-button:hover .piroia-firework {
+
     transform: scale(1.12);
-    transition: transform .25s ease;
-}
 
-/* ========================================= */
-/* ANIMACIÓN DEL BRILLO */
-/* ========================================= */
-
-@keyframes piroiaSparkle {
-
-    0%,
-    100% {
-        transform: scale(0.8);
-        opacity: 0.5;
-    }
-
-    50% {
-        transform: scale(1.2);
-        opacity: 1;
-    }
+    transition:
+        transform .25s ease;
 
 }
 
@@ -310,11 +444,15 @@
     right: 0;
     bottom: 78px;
 
-    width: 370px;
-    max-width: calc(100vw - 30px);
+    width: 390px;
 
-    height: 520px;
-    max-height: calc(100vh - 120px);
+    max-width:
+        calc(100vw - 30px);
+
+    height: 590px;
+
+    max-height:
+        calc(100vh - 100px);
 
     background: #ffffff;
 
@@ -325,7 +463,13 @@
     box-shadow:
         0 20px 60px rgba(0, 0, 0, 0.35);
 
-    border: 1px solid rgba(212, 175, 55, 0.35);
+    border:
+        1px solid rgba(
+            212,
+            175,
+            55,
+            0.35
+        );
 
     display: none;
 
@@ -371,197 +515,11 @@
 }
 
 
-.piroia-icon {
-
-    width: 42px;
-    height: 42px;
-
-    border-radius: 50%;
-
-    background: rgba(212, 175, 55, 0.15);
-
-    border: 1px solid rgba(212, 175, 55, 0.5);
+.piroia-title-text {
 
     display: flex;
 
-    align-items: center;
-    justify-content: center;
-
-    font-size: 21px;
-
-}
-
-/* ========================================= */
-/* NÚCLEO DE IA */
-/* ========================================= */
-
-.piroia-ai-core {
-    position: relative;
-    width: 27px;
-    height: 27px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Órbita exterior */
-
-.piroia-ai-core::before {
-    content: "";
-    position: absolute;
-    width: 25px;
-    height: 11px;
-    border: 1.5px solid #D4AF37;
-    border-radius: 50%;
-    transform: rotate(35deg);
-    box-shadow: 0 0 8px rgba(212,175,55,.55);
-    animation: aiOrbit 2.4s linear infinite;
-}
-
-/* Segunda órbita */
-
-.piroia-ai-core::after {
-    content: "";
-    position: absolute;
-    width: 25px;
-    height: 11px;
-    border: 1.5px solid rgba(255,255,255,.75);
-    border-radius: 50%;
-    transform: rotate(-35deg);
-    animation: aiOrbitReverse 2.4s linear infinite;
-}
-
-/* Núcleo */
-
-.ai-core-dot {
-    width: 9px;
-    height: 9px;
-    border-radius: 50%;
-    background: #fff8d6;
-
-    box-shadow:
-        0 0 5px #ffffff,
-        0 0 10px #D4AF37,
-        0 0 18px rgba(212,175,55,.9);
-
-    animation: aiCorePulse 1.5s infinite ease-in-out;
-}
-
-/* Animaciones */
-
-@keyframes aiOrbit {
-
-    0% {
-        transform: rotate(35deg);
-    }
-
-    100% {
-        transform: rotate(395deg);
-    }
-
-}
-
-@keyframes aiOrbitReverse {
-
-    0% {
-        transform: rotate(-35deg);
-    }
-
-    100% {
-        transform: rotate(-395deg);
-    }
-
-}
-
-@keyframes aiCorePulse {
-
-    0%, 100% {
-        transform: scale(.8);
-        opacity: .75;
-    }
-
-    50% {
-        transform: scale(1.15);
-        opacity: 1;
-    }
-
-}
-
-/* ========================================= */
-/* MINI NÚCLEO DE IA DEL CHAT */
-/* ========================================= */
-
-.piroia-ai-mini {
-    position: relative;
-    width: 21px;
-    height: 21px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Órbita */
-
-.piroia-ai-mini::before {
-    content: "";
-    position: absolute;
-    width: 19px;
-    height: 8px;
-    border: 1px solid #D4AF37;
-    border-radius: 50%;
-    transform: rotate(45deg);
-    animation: miniOrbit 2s linear infinite;
-}
-
-/* Segunda órbita */
-
-.piroia-ai-mini::after {
-    content: "";
-    position: absolute;
-    width: 19px;
-    height: 8px;
-    border: 1px solid rgba(255,255,255,.7);
-    border-radius: 50%;
-    transform: rotate(-45deg);
-    animation: miniOrbitReverse 2s linear infinite;
-}
-
-/* Punto central */
-
-.ai-mini-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: #D4AF37;
-
-    box-shadow:
-        0 0 5px #D4AF37,
-        0 0 10px rgba(212,175,55,.8);
-}
-
-@keyframes miniOrbit {
-
-    from {
-        transform: rotate(45deg);
-    }
-
-    to {
-        transform: rotate(405deg);
-    }
-
-}
-
-@keyframes miniOrbitReverse {
-
-    from {
-        transform: rotate(-45deg);
-    }
-
-    to {
-        transform: rotate(-405deg);
-    }
+    flex-direction: column;
 
 }
 
@@ -590,11 +548,238 @@
 }
 
 
+/* ========================================= */
+/* ICONO IA */
+/* ========================================= */
+
+.piroia-icon {
+
+    width: 42px;
+    height: 42px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(
+            212,
+            175,
+            55,
+            0.15
+        );
+
+    border:
+        1px solid
+        rgba(
+            212,
+            175,
+            55,
+            0.5
+        );
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+}
+
+
+/* Núcleo */
+
+.piroia-ai-core {
+
+    position: relative;
+
+    width: 27px;
+    height: 27px;
+
+    border-radius: 50%;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+}
+
+
+/* Órbita */
+
+.piroia-ai-core::before {
+
+    content: "";
+
+    position: absolute;
+
+    width: 25px;
+    height: 11px;
+
+    border:
+        1.5px solid
+        #D4AF37;
+
+    border-radius: 50%;
+
+    transform:
+        rotate(35deg);
+
+    box-shadow:
+        0 0 8px
+        rgba(
+            212,
+            175,
+            55,
+            .55
+        );
+
+    animation:
+        aiOrbit
+        2.4s
+        linear
+        infinite;
+
+}
+
+
+/* Segunda órbita */
+
+.piroia-ai-core::after {
+
+    content: "";
+
+    position: absolute;
+
+    width: 25px;
+    height: 11px;
+
+    border:
+        1.5px solid
+        rgba(
+            255,
+            255,
+            255,
+            .75
+        );
+
+    border-radius: 50%;
+
+    transform:
+        rotate(-35deg);
+
+    animation:
+        aiOrbitReverse
+        2.4s
+        linear
+        infinite;
+
+}
+
+
+/* Núcleo */
+
+.ai-core-dot {
+
+    width: 9px;
+    height: 9px;
+
+    border-radius: 50%;
+
+    background: #fff8d6;
+
+    box-shadow:
+        0 0 5px #ffffff,
+        0 0 10px #D4AF37,
+        0 0 18px
+        rgba(
+            212,
+            175,
+            55,
+            .9
+        );
+
+    animation:
+        aiCorePulse
+        1.5s
+        infinite
+        ease-in-out;
+
+}
+
+
+/* Animaciones IA */
+
+@keyframes aiOrbit {
+
+    0% {
+
+        transform:
+            rotate(35deg);
+
+    }
+
+    100% {
+
+        transform:
+            rotate(395deg);
+
+    }
+
+}
+
+
+@keyframes aiOrbitReverse {
+
+    0% {
+
+        transform:
+            rotate(-35deg);
+
+    }
+
+    100% {
+
+        transform:
+            rotate(-395deg);
+
+    }
+
+}
+
+
+@keyframes aiCorePulse {
+
+    0%,
+    100% {
+
+        transform:
+            scale(.8);
+
+        opacity: .75;
+
+    }
+
+    50% {
+
+        transform:
+            scale(1.15);
+
+        opacity: 1;
+
+    }
+
+}
+
+
+/* ========================================= */
+/* BOTÓN CERRAR */
+/* ========================================= */
+
 .piroia-close {
 
     border: none;
 
-    background: transparent;
+    background:
+        transparent;
 
     color: white;
 
@@ -619,6 +804,100 @@
 
 
 /* ========================================= */
+/* MODOS */
+/* ========================================= */
+
+.piroia-mode-bar {
+
+    display: flex;
+
+    gap: 7px;
+
+    padding: 9px 10px;
+
+    background: #ffffff;
+
+    border-bottom:
+        1px solid
+        #e5e7eb;
+
+}
+
+
+.piroia-mode-btn {
+
+    flex: 1;
+
+    border:
+        1px solid
+        #d1d5db;
+
+    background:
+        #f8fafc;
+
+    color:
+        #374151;
+
+    border-radius:
+        999px;
+
+    padding:
+        8px 10px;
+
+    font-size:
+        .75rem;
+
+    font-weight:
+        600;
+
+    cursor:
+        pointer;
+
+    transition:
+        all .2s ease;
+
+}
+
+
+.piroia-mode-btn:hover {
+
+    border-color:
+        #C9A227;
+
+    transform:
+        translateY(-1px);
+
+}
+
+
+.piroia-mode-btn.active {
+
+    background:
+        linear-gradient(
+            135deg,
+            #D4AF37,
+            #C9A227
+        );
+
+    border-color:
+        #C9A227;
+
+    color:
+        #111827;
+
+    box-shadow:
+        0 3px 10px
+        rgba(
+            201,
+            162,
+            39,
+            .20
+        );
+
+}
+
+
+/* ========================================= */
 /* MENSAJES */
 /* ========================================= */
 
@@ -630,7 +909,8 @@
 
     overflow-y: auto;
 
-    background: #f8fafc;
+    background:
+        #f8fafc;
 
 }
 
@@ -639,11 +919,13 @@
 
     display: flex;
 
-    align-items: flex-start;
+    align-items:
+        flex-start;
 
     gap: 8px;
 
-    margin-bottom: 15px;
+    margin-bottom:
+        15px;
 
 }
 
@@ -657,36 +939,232 @@
 
     border-radius: 50%;
 
-    background: #111827;
+    background:
+        #111827;
 
     display: flex;
 
-    align-items: center;
-    justify-content: center;
+    align-items:
+        center;
 
-    font-size: 16px;
+    justify-content:
+        center;
 
 }
 
 
-.piroia-bubble {
+/* Mini IA */
 
-    background: white;
+.piroia-ai-mini {
 
-    border: 1px solid #e5e7eb;
+    position: relative;
 
-    border-radius: 5px 15px 15px 15px;
+    width: 21px;
+    height: 21px;
 
-    padding: 11px 13px;
+    border-radius: 50%;
 
-    color: #374151;
+    display: flex;
 
-    font-size: 0.88rem;
+    align-items:
+        center;
 
-    line-height: 1.5;
+    justify-content:
+        center;
+
+}
+
+
+.piroia-ai-mini::before {
+
+    content: "";
+
+    position: absolute;
+
+    width: 19px;
+    height: 8px;
+
+    border:
+        1px solid
+        #D4AF37;
+
+    border-radius: 50%;
+
+    transform:
+        rotate(45deg);
+
+    animation:
+        miniOrbit
+        2s
+        linear
+        infinite;
+
+}
+
+
+.piroia-ai-mini::after {
+
+    content: "";
+
+    position: absolute;
+
+    width: 19px;
+    height: 8px;
+
+    border:
+        1px solid
+        rgba(
+            255,
+            255,
+            255,
+            .7
+        );
+
+    border-radius: 50%;
+
+    transform:
+        rotate(-45deg);
+
+    animation:
+        miniOrbitReverse
+        2s
+        linear
+        infinite;
+
+}
+
+
+.ai-mini-dot {
+
+    width: 6px;
+    height: 6px;
+
+    border-radius: 50%;
+
+    background:
+        #D4AF37;
 
     box-shadow:
-        0 2px 6px rgba(0, 0, 0, 0.04);
+        0 0 5px #D4AF37,
+        0 0 10px
+        rgba(
+            212,
+            175,
+            55,
+            .8
+        );
+
+}
+
+
+@keyframes miniOrbit {
+
+    from {
+
+        transform:
+            rotate(45deg);
+
+    }
+
+    to {
+
+        transform:
+            rotate(405deg);
+
+    }
+
+}
+
+
+@keyframes miniOrbitReverse {
+
+    from {
+
+        transform:
+            rotate(-45deg);
+
+    }
+
+    to {
+
+        transform:
+            rotate(-405deg);
+
+    }
+
+}
+
+
+/* ========================================= */
+/* BURBUJAS */
+/* ========================================= */
+
+.piroia-bubble {
+
+    background:
+        white;
+
+    border:
+        1px solid
+        #e5e7eb;
+
+    border-radius:
+        5px 15px 15px 15px;
+
+    padding:
+        11px 13px;
+
+    color:
+        #374151;
+
+    font-size:
+        .88rem;
+
+    line-height:
+        1.5;
+
+    box-shadow:
+        0 2px 6px
+        rgba(
+            0,
+            0,
+            0,
+            .04
+        );
+
+    max-width:
+        85%;
+
+}
+
+
+/* Mensaje usuario */
+
+.piroia-message-user {
+
+    justify-content:
+        flex-end;
+
+}
+
+
+.piroia-message-user .piroia-bubble {
+
+    background:
+        linear-gradient(
+            135deg,
+            #D4AF37,
+            #C9A227
+        );
+
+    color:
+        #111827;
+
+    border-radius:
+        15px 5px 15px 15px;
+
+    border:
+        none;
 
 }
 
@@ -699,15 +1177,20 @@
 
     display: flex;
 
-    align-items: center;
+    align-items:
+        center;
 
     gap: 8px;
 
-    padding: 12px;
+    padding:
+        12px;
 
-    background: white;
+    background:
+        white;
 
-    border-top: 1px solid #e5e7eb;
+    border-top:
+        1px solid
+        #e5e7eb;
 
 }
 
@@ -718,56 +1201,279 @@
 
     min-width: 0;
 
-    border: 1px solid #d1d5db;
+    border:
+        1px solid
+        #d1d5db;
 
-    border-radius: 999px;
+    border-radius:
+        999px;
 
-    padding: 10px 14px;
+    padding:
+        10px 14px;
 
-    outline: none;
+    outline:
+        none;
 
-    font-size: 0.88rem;
+    font-size:
+        .88rem;
 
 }
 
 
 .piroia-input:focus {
 
-    border-color: #C9A227;
+    border-color:
+        #C9A227;
 
     box-shadow:
-        0 0 0 3px rgba(201, 162, 39, 0.12);
+        0 0 0 3px
+        rgba(
+            201,
+            162,
+            39,
+            .12
+        );
 
 }
 
+
+/* ========================================= */
+/* BOTÓN VOZ */
+/* ========================================= */
+
+.piroia-voice {
+
+    width: 42px;
+    height: 42px;
+
+    flex-shrink: 0;
+
+    border: none;
+
+    border-radius:
+        50%;
+
+    background:
+        #f3f4f6;
+
+    color:
+        #374151;
+
+    font-size:
+        17px;
+
+    cursor:
+        pointer;
+
+    transition:
+        all .2s ease;
+
+}
+
+
+.piroia-voice:hover {
+
+    background:
+        #e5e7eb;
+
+    transform:
+        scale(1.05);
+
+}
+
+
+.piroia-voice.listening {
+
+    background:
+        #C9A227;
+
+    color:
+        #111827;
+
+    animation:
+        piroiaVoicePulse
+        1s infinite;
+
+}
+
+
+@keyframes piroiaVoicePulse {
+
+    0%,
+    100% {
+
+        box-shadow:
+            0 0 0 0
+            rgba(
+                201,
+                162,
+                39,
+                .35
+            );
+
+    }
+
+    50% {
+
+        box-shadow:
+            0 0 0 8px
+            rgba(
+                201,
+                162,
+                39,
+                .08
+            );
+
+    }
+
+}
+
+
+/* ========================================= */
+/* BOTÓN ENVIAR */
+/* ========================================= */
 
 .piroia-send {
 
     width: 42px;
     height: 42px;
 
+    flex-shrink: 0;
+
     border: none;
 
-    border-radius: 50%;
+    border-radius:
+        50%;
 
-    background: #C9A227;
+    background:
+        linear-gradient(
+            135deg,
+            #D4AF37,
+            #C9A227
+        );
 
-    color: #111827;
+    color:
+        #111827;
 
-    font-size: 18px;
+    font-size:
+        18px;
 
-    font-weight: bold;
+    font-weight:
+        bold;
 
-    cursor: pointer;
+    cursor:
+        pointer;
 
-    transition: transform 0.2s ease;
+    transition:
+        transform
+        .2s ease;
 
 }
 
 
 .piroia-send:hover {
 
-    transform: scale(1.05);
+    transform:
+        scale(1.05);
+
+}
+
+
+.piroia-send:disabled {
+
+    opacity:
+        .55;
+
+    cursor:
+        not-allowed;
+
+    transform:
+        none;
+
+}
+
+
+/* ========================================= */
+/* ESCUCHAR RESPUESTA */
+/* ========================================= */
+
+.piroia-speech-area {
+
+    background:
+        white;
+
+    padding:
+        0 12px 5px;
+
+}
+
+
+.piroia-speak-btn {
+
+    border:
+        none;
+
+    background:
+        transparent;
+
+    color:
+        #6b7280;
+
+    font-size:
+        .72rem;
+
+    cursor:
+        pointer;
+
+    padding:
+        3px 5px;
+
+}
+
+
+.piroia-speak-btn:hover {
+
+    color:
+        #C9A227;
+
+}
+
+
+/* ========================================= */
+/* AYUDA */
+/* ========================================= */
+
+.piroia-help {
+
+    background:
+        white;
+
+    color:
+        #9ca3af;
+
+    font-size:
+        .68rem;
+
+    text-align:
+        center;
+
+    padding:
+        0 10px 9px;
+
+}
+
+
+/* ========================================= */
+/* INDICADOR DE ESCRITURA */
+/* ========================================= */
+
+#piroiaTyping .piroia-bubble {
+
+    color:
+        #6b7280;
+
+    font-style:
+        italic;
 
 }
 
@@ -780,31 +1486,58 @@
 
     .piroia-container {
 
-        right: 15px;
+        right:
+            15px;
 
-        bottom: 15px;
+        bottom:
+            15px;
 
     }
 
 
     .piroia-button {
 
-        width: 58px;
+        width:
+            58px;
 
-        height: 58px;
+        height:
+            58px;
 
     }
 
 
     .piroia-chat {
 
-        right: -2px;
+        right:
+            -2px;
 
-        bottom: 70px;
+        bottom:
+            70px;
 
-        width: calc(100vw - 30px);
+        width:
+            calc(100vw - 30px);
 
-        height: 480px;
+        height:
+            520px;
+
+    }
+
+
+    .piroia-mode-btn {
+
+        font-size:
+            .7rem;
+
+        padding:
+            7px 5px;
+
+    }
+
+
+    .piroia-help {
+
+        font-size:
+            .62rem;
 
     }
 
@@ -813,505 +1546,1156 @@
 </style>
 
 
+
 <script>
-document.addEventListener("DOMContentLoaded", function () {
 
-    const button = document.getElementById("piroiaButton");
-    const chat = document.getElementById("piroiaChat");
-    const close = document.getElementById("piroiaClose");
-
-    const input = document.getElementById("piroiaInput");
-    const send = document.getElementById("piroiaSend");
-    const messages = document.getElementById("piroiaMessages");
-
-    if (!button || !chat || !close || !input || !send || !messages) {
-        console.error("PiroIA: No se encontraron todos los elementos del chatbot.");
-        return;
-    }
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
 
 
-    /* ========================================= */
-    /* MEMORIA DE LA CONVERSACIÓN */
-    /* ========================================= */
+        /* ========================================= */
+        /* ELEMENTOS */
+        /* ========================================= */
 
-    const claveConversacion = "piroia_conversacion";
+        const button =
+            document.getElementById(
+                "piroiaButton"
+            );
+
+        const chat =
+            document.getElementById(
+                "piroiaChat"
+            );
+
+        const close =
+            document.getElementById(
+                "piroiaClose"
+            );
+
+        const input =
+            document.getElementById(
+                "piroiaInput"
+            );
+
+        const send =
+            document.getElementById(
+                "piroiaSend"
+            );
+
+        const messages =
+            document.getElementById(
+                "piroiaMessages"
+            );
+
+        const modoConsulta =
+            document.getElementById(
+                "piroiaModoConsulta"
+            );
+
+        const modoSolicitud =
+            document.getElementById(
+                "piroiaModoSolicitud"
+            );
+
+        const voiceButton =
+            document.getElementById(
+                "piroiaVoice"
+            );
+
+        const speakButton =
+            document.getElementById(
+                "piroiaSpeak"
+            );
+
+        const helpText =
+            document.getElementById(
+                "piroiaHelp"
+            );
 
 
-    function guardarConversacion() {
+        if (
+            !button ||
+            !chat ||
+            !close ||
+            !input ||
+            !send ||
+            !messages
+        ) {
 
-        const mensajes = [];
+            console.error(
+                "PiroIA: No se encontraron todos los elementos."
+            );
 
-        messages.querySelectorAll(
-            ".piroia-message-user, .piroia-message-bot"
-        ).forEach(function (mensaje) {
-
-            /* No guardar el indicador de "PiroIA está pensando..." */
-            if (mensaje.id === "piroiaTyping") {
-                return;
-            }
-
-            const burbuja = mensaje.querySelector(".piroia-bubble");
-
-            if (!burbuja) {
-                return;
-            }
-
-            mensajes.push({
-                tipo: mensaje.classList.contains("piroia-message-user")
-                    ? "usuario"
-                    : "bot",
-
-                texto: burbuja.textContent
-            });
-
-        });
-
-
-        sessionStorage.setItem(
-            claveConversacion,
-            JSON.stringify(mensajes)
-        );
-
-    }
-
-
-    function cargarConversacion() {
-
-        const guardada = sessionStorage.getItem(
-            claveConversacion
-        );
-
-        if (!guardada) {
             return;
+
         }
 
 
-        try {
+        /* ========================================= */
+        /* VARIABLES */
+        /* ========================================= */
 
-            const mensajesGuardados = JSON.parse(guardada);
+        let modoActual =
+            "consulta";
+
+        let ultimaRespuesta =
+            "";
+
+        let reconocimiento =
+            null;
 
 
-            mensajesGuardados.forEach(function (mensaje) {
+        /* ========================================= */
+        /* MEMORIA */
+        /* ========================================= */
 
-                if (mensaje.tipo === "usuario") {
+        const claveConversacion =
+            "piroia_conversacion";
 
-                    agregarMensajeUsuario(
-                        mensaje.texto,
-                        false
+
+        function guardarConversacion() {
+
+            const mensajes = [];
+
+
+            messages.querySelectorAll(
+                ".piroia-message-user, .piroia-message-bot"
+            ).forEach(
+                function (mensaje) {
+
+                    if (
+                        mensaje.id ===
+                        "piroiaTyping"
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    const burbuja =
+                        mensaje.querySelector(
+                            ".piroia-bubble"
+                        );
+
+
+                    if (!burbuja) {
+
+                        return;
+
+                    }
+
+
+                    mensajes.push({
+
+                        tipo:
+                            mensaje.classList.contains(
+                                "piroia-message-user"
+                            )
+                                ? "usuario"
+                                : "bot",
+
+                        texto:
+                            burbuja.textContent
+
+                    });
+
+                }
+            );
+
+
+            sessionStorage.setItem(
+
+                claveConversacion,
+
+                JSON.stringify(
+                    mensajes
+                )
+
+            );
+
+        }
+
+
+        function cargarConversacion() {
+
+            const guardada =
+                sessionStorage.getItem(
+                    claveConversacion
+                );
+
+
+            if (!guardada) {
+
+                return;
+
+            }
+
+
+            try {
+
+                const mensajesGuardados =
+                    JSON.parse(
+                        guardada
                     );
+
+
+                mensajesGuardados.forEach(
+                    function (mensaje) {
+
+                        if (
+                            mensaje.tipo ===
+                            "usuario"
+                        ) {
+
+                            agregarMensajeUsuario(
+                                mensaje.texto,
+                                false
+                            );
+
+                        } else {
+
+                            agregarMensajeBot(
+                                mensaje.texto,
+                                false
+                            );
+
+                        }
+
+                    }
+                );
+
+
+                messages.scrollTop =
+                    messages.scrollHeight;
+
+
+            } catch (error) {
+
+                console.error(
+                    "PiroIA: No se pudo recuperar la conversación.",
+                    error
+                );
+
+
+                sessionStorage.removeItem(
+                    claveConversacion
+                );
+
+            }
+
+        }
+
+
+        /* ========================================= */
+        /* CAMBIAR MODO */
+        /* ========================================= */
+
+        function cambiarModo(modo) {
+
+            modoActual =
+                modo;
+
+
+            if (
+                modo ===
+                "consulta"
+            ) {
+
+                modoConsulta.classList.add(
+                    "active"
+                );
+
+                modoSolicitud.classList.remove(
+                    "active"
+                );
+
+
+                input.placeholder =
+                    "Pregunta sobre productos, categorías o precios...";
+
+
+                helpText.textContent =
+                    "Puedes consultar productos, categorías, características o precios.";
+
+
+            } else {
+
+                modoSolicitud.classList.add(
+                    "active"
+                );
+
+                modoConsulta.classList.remove(
+                    "active"
+                );
+
+
+                input.placeholder =
+                    "Describe los productos y cantidades que necesitas...";
+
+
+                helpText.textContent =
+                    "Ejemplo: Necesito 5 piezas de un producto del catálogo.";
+
+            }
+
+        }
+
+
+        modoConsulta.addEventListener(
+            "click",
+            function () {
+
+                cambiarModo(
+                    "consulta"
+                );
+
+            }
+        );
+
+
+        modoSolicitud.addEventListener(
+            "click",
+            function () {
+
+                cambiarModo(
+                    "solicitud"
+                );
+
+            }
+        );
+
+
+        /* ========================================= */
+        /* ABRIR CHAT */
+        /* ========================================= */
+
+        button.addEventListener(
+            "click",
+            function () {
+
+                chat.style.display =
+                    "flex";
+
+                button.style.display =
+                    "none";
+
+
+                setTimeout(
+                    function () {
+
+                        input.focus();
+
+                    },
+                    100
+                );
+
+            }
+        );
+
+
+        /* ========================================= */
+        /* CERRAR CHAT */
+        /* ========================================= */
+
+        close.addEventListener(
+            "click",
+            function () {
+
+                chat.style.display =
+                    "none";
+
+                button.style.display =
+                    "flex";
+
+            }
+        );
+
+
+        /* ========================================= */
+        /* CSRF */
+        /* ========================================= */
+
+        function obtenerCSRF() {
+
+            const cookies =
+                document.cookie.split(
+                    ";"
+                );
+
+
+            for (
+                let cookie of cookies
+            ) {
+
+                cookie =
+                    cookie.trim();
+
+
+                if (
+                    cookie.startsWith(
+                        "csrftoken="
+                    )
+                ) {
+
+                    return decodeURIComponent(
+                        cookie.substring(
+                            "csrftoken=".length
+                        )
+                    );
+
+                }
+
+            }
+
+
+            return "";
+
+        }
+
+
+        /* ========================================= */
+        /* MENSAJE USUARIO */
+        /* ========================================= */
+
+        function agregarMensajeUsuario(
+            texto,
+            guardar = true
+        ) {
+
+            const contenedor =
+                document.createElement(
+                    "div"
+                );
+
+
+            contenedor.className =
+                "piroia-message piroia-message-user";
+
+
+            const burbuja =
+                document.createElement(
+                    "div"
+                );
+
+
+            burbuja.className =
+                "piroia-bubble";
+
+
+            burbuja.textContent =
+                texto;
+
+
+            contenedor.appendChild(
+                burbuja
+            );
+
+
+            messages.appendChild(
+                contenedor
+            );
+
+
+            messages.scrollTop =
+                messages.scrollHeight;
+
+
+            if (guardar) {
+
+                guardarConversacion();
+
+            }
+
+        }
+
+
+        /* ========================================= */
+        /* MENSAJE PIROIA */
+        /* ========================================= */
+
+        function agregarMensajeBot(
+            texto,
+            guardar = true
+        ) {
+
+            const contenedor =
+                document.createElement(
+                    "div"
+                );
+
+
+            contenedor.className =
+                "piroia-message piroia-message-bot";
+
+
+            const avatar =
+                document.createElement(
+                    "div"
+                );
+
+
+            avatar.className =
+                "piroia-avatar";
+
+
+            const miniIA =
+                document.createElement(
+                    "span"
+                );
+
+
+            miniIA.className =
+                "piroia-ai-mini";
+
+
+            const punto =
+                document.createElement(
+                    "span"
+                );
+
+
+            punto.className =
+                "ai-mini-dot";
+
+
+            miniIA.appendChild(
+                punto
+            );
+
+
+            avatar.appendChild(
+                miniIA
+            );
+
+
+            const burbuja =
+                document.createElement(
+                    "div"
+                );
+
+
+            burbuja.className =
+                "piroia-bubble";
+
+
+            burbuja.textContent =
+                texto;
+
+
+            contenedor.appendChild(
+                avatar
+            );
+
+
+            contenedor.appendChild(
+                burbuja
+            );
+
+
+            messages.appendChild(
+                contenedor
+            );
+
+
+            messages.scrollTop =
+                messages.scrollHeight;
+
+
+            if (guardar) {
+
+                guardarConversacion();
+
+            }
+
+        }
+
+
+        /* ========================================= */
+        /* PIROIA PENSANDO */
+        /* ========================================= */
+
+        function mostrarEscribiendo() {
+
+            const indicador =
+                document.createElement(
+                    "div"
+                );
+
+
+            indicador.id =
+                "piroiaTyping";
+
+
+            indicador.className =
+                "piroia-message piroia-message-bot";
+
+
+            const avatar =
+                document.createElement(
+                    "div"
+                );
+
+
+            avatar.className =
+                "piroia-avatar";
+
+
+            const miniIA =
+                document.createElement(
+                    "span"
+                );
+
+
+            miniIA.className =
+                "piroia-ai-mini";
+
+
+            const punto =
+                document.createElement(
+                    "span"
+                );
+
+
+            punto.className =
+                "ai-mini-dot";
+
+
+            miniIA.appendChild(
+                punto
+            );
+
+
+            avatar.appendChild(
+                miniIA
+            );
+
+
+            const burbuja =
+                document.createElement(
+                    "div"
+                );
+
+
+            burbuja.className =
+                "piroia-bubble";
+
+
+            burbuja.textContent =
+                "PiroIA está pensando...";
+
+
+            indicador.appendChild(
+                avatar
+            );
+
+
+            indicador.appendChild(
+                burbuja
+            );
+
+
+            messages.appendChild(
+                indicador
+            );
+
+
+            messages.scrollTop =
+                messages.scrollHeight;
+
+        }
+
+
+        function quitarEscribiendo() {
+
+            const indicador =
+                document.getElementById(
+                    "piroiaTyping"
+                );
+
+
+            if (indicador) {
+
+                indicador.remove();
+
+            }
+
+        }
+
+
+        /* ========================================= */
+        /* ENTRADA POR VOZ */
+        /* ========================================= */
+
+        const SpeechRecognition =
+            window.SpeechRecognition ||
+            window.webkitSpeechRecognition;
+
+
+        if (SpeechRecognition) {
+
+            reconocimiento =
+                new SpeechRecognition();
+
+
+            reconocimiento.lang =
+                "es-MX";
+
+
+            reconocimiento.continuous =
+                false;
+
+
+            reconocimiento.interimResults =
+                false;
+
+
+            reconocimiento.maxAlternatives =
+                1;
+
+
+            reconocimiento.onstart =
+                function () {
+
+                    voiceButton.classList.add(
+                        "listening"
+                    );
+
+
+                    input.placeholder =
+                        "🎤 Escuchando...";
+
+                };
+
+
+            reconocimiento.onresult =
+                function (event) {
+
+                    const texto =
+                        event
+                            .results[0][0]
+                            .transcript;
+
+
+                    input.value =
+                        texto;
+
+
+                    input.focus();
+
+                };
+
+
+            reconocimiento.onend =
+                function () {
+
+                    voiceButton.classList.remove(
+                        "listening"
+                    );
+
+
+                    if (
+                        modoActual ===
+                        "consulta"
+                    ) {
+
+                        input.placeholder =
+                            "Pregunta sobre productos, categorías o precios...";
+
+                    } else {
+
+                        input.placeholder =
+                            "Describe los productos y cantidades que necesitas...";
+
+                    }
+
+                };
+
+
+            reconocimiento.onerror =
+                function (event) {
+
+                    console.error(
+                        "PiroIA voz:",
+                        event.error
+                    );
+
+
+                    voiceButton.classList.remove(
+                        "listening"
+                    );
+
+
+                    if (
+                        event.error ===
+                        "not-allowed"
+                    ) {
+
+                        agregarMensajeBot(
+                            "Necesito permiso para usar el micrófono. Actívalo en el navegador e inténtalo nuevamente."
+                        );
+
+                    }
+
+
+                    input.placeholder =
+                        modoActual ===
+                        "consulta"
+                            ? "Pregunta sobre productos, categorías o precios..."
+                            : "Describe los productos y cantidades que necesitas...";
+
+                };
+
+
+            voiceButton.addEventListener(
+                "click",
+                function () {
+
+                    if (
+                        voiceButton.classList.contains(
+                            "listening"
+                        )
+                    ) {
+
+                        reconocimiento.stop();
+
+                    } else {
+
+                        try {
+
+                            reconocimiento.start();
+
+                        } catch (error) {
+
+                            console.error(
+                                "PiroIA: No se pudo iniciar el micrófono.",
+                                error
+                            );
+
+                        }
+
+                    }
+
+                }
+            );
+
+
+        } else {
+
+            voiceButton.style.display =
+                "none";
+
+        }
+
+
+        /* ========================================= */
+        /* VOZ DE RESPUESTA */
+        /* ========================================= */
+
+        function hablarRespuesta(
+            texto
+        ) {
+
+            if (
+                !(
+                    "speechSynthesis"
+                    in window
+                )
+            ) {
+
+                agregarMensajeBot(
+                    "Tu navegador no permite reproducir la respuesta por voz."
+                );
+
+                return;
+
+            }
+
+
+            window.speechSynthesis.cancel();
+
+
+            const mensaje =
+                new SpeechSynthesisUtterance(
+                    texto
+                );
+
+
+            mensaje.lang =
+                "es-MX";
+
+
+            mensaje.rate =
+                1;
+
+
+            mensaje.pitch =
+                1;
+
+
+            window.speechSynthesis.speak(
+                mensaje
+            );
+
+        }
+
+
+        speakButton.addEventListener(
+            "click",
+            function () {
+
+                if (
+                    ultimaRespuesta
+                ) {
+
+                    hablarRespuesta(
+                        ultimaRespuesta
+                    );
+
+                }
+
+            }
+        );
+
+
+        /* ========================================= */
+        /* ENVIAR MENSAJE */
+        /* ========================================= */
+
+        async function enviarMensaje() {
+
+            const pregunta =
+                input.value.trim();
+
+
+            if (!pregunta) {
+
+                return;
+
+            }
+
+
+            /* Mostrar usuario */
+
+            agregarMensajeUsuario(
+                pregunta
+            );
+
+
+            input.value =
+                "";
+
+
+            input.disabled =
+                true;
+
+
+            send.disabled =
+                true;
+
+
+            voiceButton.disabled =
+                true;
+
+
+            speakButton.style.display =
+                "none";
+
+
+            mostrarEscribiendo();
+
+
+            try {
+
+                const respuesta =
+                    await fetch(
+                        "/api/chatbot/",
+                        {
+
+                            method:
+                                "POST",
+
+                            headers: {
+
+                                "Content-Type":
+                                    "application/json",
+
+                                "X-CSRFToken":
+                                    obtenerCSRF()
+
+                            },
+
+                            body:
+                                JSON.stringify({
+
+                                    mensaje:
+                                        pregunta,
+
+                                    modo:
+                                        modoActual
+
+                                })
+
+                        }
+                    );
+
+
+                const datos =
+                    await respuesta.json();
+
+
+                quitarEscribiendo();
+
+
+                if (datos.ok) {
+
+                    ultimaRespuesta =
+                        datos.respuesta ||
+                        "Listo.";
+
+
+                    agregarMensajeBot(
+                        ultimaRespuesta
+                    );
+
+
+                    /* Mostrar escuchar */
+
+                    if (
+                        "speechSynthesis"
+                        in window
+                    ) {
+
+                        speakButton.style.display =
+                            "inline-block";
+
+                    }
+
+
+                    /* ================================= */
+                    /* REDIRECCIÓN A SOLICITUD */
+                    /* ================================= */
+
+                    if (
+                        datos.redirect_url
+                    ) {
+
+                        setTimeout(
+                            function () {
+
+                                window.location.href =
+                                    datos.redirect_url;
+
+                            },
+                            1200
+                        );
+
+                    }
+
 
                 } else {
 
                     agregarMensajeBot(
-                        mensaje.texto,
-                        false
+
+                        datos.respuesta ||
+                        "No pude procesar tu solicitud."
+
                     );
 
                 }
 
-            });
+
+            } catch (error) {
+
+                console.error(
+                    "Error comunicando con PiroIA:",
+                    error
+                );
 
 
-            messages.scrollTop = messages.scrollHeight;
+                quitarEscribiendo();
 
 
-        } catch (error) {
+                agregarMensajeBot(
+                    "No pude conectarme con PiroIA en este momento. Intenta nuevamente."
+                );
 
-            console.error(
-                "PiroIA: No se pudo recuperar la conversación.",
-                error
-            );
-
-
-            sessionStorage.removeItem(
-                claveConversacion
-            );
-
-        }
-
-    }
+            }
 
 
-    /* ========================================= */
-    /* ABRIR CHAT */
-    /* ========================================= */
+            input.disabled =
+                false;
 
-    button.addEventListener("click", function () {
 
-        chat.style.display = "flex";
-        button.style.display = "none";
+            send.disabled =
+                false;
 
-        setTimeout(function () {
+
+            voiceButton.disabled =
+                false;
+
+
             input.focus();
-        }, 100);
-
-    });
-
-
-    /* ========================================= */
-    /* CERRAR CHAT */
-    /* ========================================= */
-
-    close.addEventListener("click", function () {
-
-        chat.style.display = "none";
-        button.style.display = "flex";
-
-    });
-
-
-    /* ========================================= */
-    /* OBTENER CSRF */
-    /* ========================================= */
-
-    function obtenerCSRF() {
-
-        const cookies = document.cookie.split(";");
-
-
-        for (let cookie of cookies) {
-
-            cookie = cookie.trim();
-
-
-            if (cookie.startsWith("csrftoken=")) {
-
-                return decodeURIComponent(
-                    cookie.substring("csrftoken=".length)
-                );
-
-            }
 
         }
 
 
-        return "";
+        /* ========================================= */
+        /* BOTÓN ENVIAR */
+        /* ========================================= */
 
-    }
+        send.addEventListener(
+            "click",
+            enviarMensaje
+        );
 
 
-    /* ========================================= */
-    /* AGREGAR MENSAJE DEL USUARIO */
-    /* ========================================= */
+        /* ========================================= */
+        /* ENTER PARA ENVIAR */
+        /* ========================================= */
 
-    function agregarMensajeUsuario(
-        texto,
-        guardar = true
-    ) {
+        input.addEventListener(
+            "keydown",
+            function (event) {
 
-        const contenedor = document.createElement("div");
+                if (
+                    event.key ===
+                    "Enter"
+                ) {
 
-        contenedor.className =
-            "piroia-message piroia-message-user";
+                    event.preventDefault();
 
-        contenedor.style.justifyContent = "flex-end";
+                    enviarMensaje();
 
-
-        const burbuja = document.createElement("div");
-
-        burbuja.className = "piroia-bubble";
-
-        burbuja.style.background = "#C9A227";
-        burbuja.style.color = "#111827";
-        burbuja.style.borderRadius = "15px 5px 15px 15px";
-
-        burbuja.textContent = texto;
-
-
-        contenedor.appendChild(burbuja);
-
-        messages.appendChild(contenedor);
-
-        messages.scrollTop = messages.scrollHeight;
-
-
-        /* Guardar conversación */
-
-        if (guardar) {
-
-            guardarConversacion();
-
-        }
-
-    }
-
-
-    /* ========================================= */
-    /* AGREGAR RESPUESTA DE PIROIA */
-    /* ========================================= */
-
-    function agregarMensajeBot(
-        texto,
-        guardar = true
-    ) {
-
-        const contenedor = document.createElement("div");
-
-        contenedor.className =
-            "piroia-message piroia-message-bot";
-
-
-        const avatar = document.createElement("div");
-
-        avatar.className = "piroia-avatar";
-
-
-        const miniIA = document.createElement("span");
-
-        miniIA.className = "piroia-ai-mini";
-
-
-        const punto = document.createElement("span");
-
-        punto.className = "ai-mini-dot";
-
-
-        miniIA.appendChild(punto);
-
-        avatar.appendChild(miniIA);
-
-
-        const burbuja = document.createElement("div");
-
-        burbuja.className = "piroia-bubble";
-
-        burbuja.textContent = texto;
-
-
-        contenedor.appendChild(avatar);
-
-        contenedor.appendChild(burbuja);
-
-        messages.appendChild(contenedor);
-
-        messages.scrollTop = messages.scrollHeight;
-
-
-        /* Guardar conversación */
-
-        if (guardar) {
-
-            guardarConversacion();
-
-        }
-
-    }
-
-
-    /* ========================================= */
-    /* INDICADOR DE RESPUESTA */
-    /* ========================================= */
-
-    function mostrarEscribiendo() {
-
-        const indicador = document.createElement("div");
-
-        indicador.id = "piroiaTyping";
-
-        indicador.className =
-            "piroia-message piroia-message-bot";
-
-
-        const avatar = document.createElement("div");
-
-        avatar.className = "piroia-avatar";
-
-
-        const miniIA = document.createElement("span");
-
-        miniIA.className = "piroia-ai-mini";
-
-
-        const punto = document.createElement("span");
-
-        punto.className = "ai-mini-dot";
-
-
-        miniIA.appendChild(punto);
-
-        avatar.appendChild(miniIA);
-
-
-        const burbuja = document.createElement("div");
-
-        burbuja.className = "piroia-bubble";
-
-        burbuja.textContent =
-            "PiroIA está pensando...";
-
-
-        indicador.appendChild(avatar);
-
-        indicador.appendChild(burbuja);
-
-        messages.appendChild(indicador);
-
-        messages.scrollTop = messages.scrollHeight;
-
-    }
-
-
-    /* ========================================= */
-    /* QUITAR INDICADOR */
-    /* ========================================= */
-
-    function quitarEscribiendo() {
-
-        const indicador =
-            document.getElementById("piroiaTyping");
-
-
-        if (indicador) {
-
-            indicador.remove();
-
-        }
-
-    }
-
-
-    /* ========================================= */
-    /* ENVIAR MENSAJE */
-    /* ========================================= */
-
-    async function enviarMensaje() {
-
-        const pregunta = input.value.trim();
-
-
-        if (!pregunta) {
-
-            return;
-
-        }
-
-
-        /* Mostrar mensaje del usuario */
-
-        agregarMensajeUsuario(pregunta);
-
-
-        input.value = "";
-
-        input.disabled = true;
-
-        send.disabled = true;
-
-
-        /* Mostrar indicador */
-
-        mostrarEscribiendo();
-
-
-        try {
-
-            const respuesta = await fetch(
-                "/api/chatbot/",
-                {
-                    method: "POST",
-
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRFToken": obtenerCSRF()
-                    },
-
-                    body: JSON.stringify({
-                        mensaje: pregunta
-                    })
                 }
-            );
-
-
-            const datos = await respuesta.json();
-
-
-            quitarEscribiendo();
-
-
-            if (datos.ok) {
-
-                agregarMensajeBot(
-                    datos.respuesta
-                );
-
-            } else {
-
-                agregarMensajeBot(
-                    datos.respuesta ||
-                    "No pude procesar tu pregunta."
-                );
 
             }
+        );
 
 
-        } catch (error) {
+        /* ========================================= */
+        /* CARGAR CONVERSACIÓN */
+        /* ========================================= */
 
-            console.error(
-                "Error comunicando con PiroIA:",
-                error
-            );
-
-
-            quitarEscribiendo();
+        cargarConversacion();
 
 
-            agregarMensajeBot(
-                "No pude conectarme con PiroIA en este momento."
-            );
+        /* ========================================= */
+        /* INICIAR MODO */
+        /* ========================================= */
 
-        }
+        cambiarModo(
+            "consulta"
+        );
 
 
-        input.disabled = false;
+        console.log(
+            "PiroIA: JavaScript cargado correctamente."
+        );
 
-        send.disabled = false;
-
-        input.focus();
 
     }
+);
 
-
-    /* ========================================= */
-    /* BOTÓN ENVIAR */
-    /* ========================================= */
-
-    send.addEventListener(
-        "click",
-        enviarMensaje
-    );
-
-
-    /* ========================================= */
-    /* ENTER PARA ENVIAR */
-    /* ========================================= */
-
-    input.addEventListener(
-        "keydown",
-        function (event) {
-
-            if (event.key === "Enter") {
-
-                event.preventDefault();
-
-                enviarMensaje();
-
-            }
-
-        }
-    );
-
-
-    /* ========================================= */
-    /* RECUPERAR CONVERSACIÓN */
-    /* ========================================= */
-
-    cargarConversacion();
-
-
-    console.log(
-        "PiroIA: JavaScript cargado correctamente."
-    );
-
-});
-</script>
 </script>

@@ -20,7 +20,7 @@ from .models import ProductoImagen
 
 from django.contrib import messages
 
-from django.db.models import Count
+from django.db.models import Count, Max
 
 from django.contrib.auth.models import User
 
@@ -2501,13 +2501,19 @@ def chatbot_ia(request):
 
     try:
         data = json.loads(request.body)
+
         pregunta = data.get("mensaje", "").strip()
+        modo = data.get("modo", "consulta").strip().lower()
 
         if not pregunta:
             return JsonResponse({
                 "ok": False,
                 "respuesta": "Escribe una pregunta para poder ayudarte."
             }, status=400)
+
+        # ==========================================================
+        # CATÁLOGO ACTUAL
+        # ==========================================================
 
         productos = (
             Producto.objects
@@ -2520,6 +2526,7 @@ def chatbot_ia(request):
 
         for producto in productos:
             catalogo.append({
+                "id": producto.id,
                 "producto": producto.nombre,
                 "categoria": producto.categoria.nombre,
                 "descripcion": producto.descripcion or "",
@@ -2536,15 +2543,41 @@ def chatbot_ia(request):
             indent=2
         )
 
+        # ==========================================================
+        # SOLICITUD ACTIVA DEL USUARIO
+        # ==========================================================
+
+        solicitud_id = request.session.get("solicitud_editando_id")
+
+        solicitud = None
+
+        if solicitud_id:
+            solicitud = SolicitudCotizacion.objects.filter(
+                id=solicitud_id,
+                usuario=request.user,
+                enviada=False,
+                estado="revision"
+            ).first()
+
+        # ==========================================================
+        # CLIENTE GEMINI
+        # ==========================================================
+
         cliente = genai.Client(
             api_key=os.getenv("GEMINI_API_KEY")
         )
 
-        instrucciones = f"""
+        # ==========================================================
+        # MODO CONSULTA
+        # ==========================================================
+
+        if modo == "consulta":
+
+            instrucciones = f"""
 Eres PiroIA, el asistente virtual del catálogo de productos.
 
-Ayudas a los clientes a consultar información sobre los
-productos y categorías disponibles en el catálogo.
+Tu función es ayudar al cliente a consultar información real
+del catálogo.
 
 Puedes responder sobre:
 - productos
@@ -2552,38 +2585,416 @@ Puedes responder sobre:
 - características
 - descripciones
 - precios
-- información general del catálogo
+- disponibilidad de información del catálogo
 
-REGLAS IMPORTANTES:
+REGLAS:
 
 1. Utiliza únicamente la información proporcionada en el catálogo.
-2. No inventes productos, precios o características.
-3. Si la información no está en el catálogo, indica que el
-   cliente debe consultarla con la cooperativa.
+2. No inventes productos, precios ni características.
+3. Si un producto no aparece en el catálogo, indícalo claramente.
 4. Responde siempre en español.
 5. Sé amable, claro y breve.
 6. No proporciones instrucciones para fabricar, modificar,
    combinar o manipular productos pirotécnicos.
 7. Tu función es únicamente informativa y comercial.
+8. No agregues productos a una solicitud en este modo.
 
 CATÁLOGO ACTUAL:
 
 {contexto_catalogo}
 """
 
-        respuesta = cliente.interactions.create(
-            model="gemini-3.6-flash",
-            input=pregunta,
-            system_instruction=instrucciones,
-            generation_config={
-                "thinking_level": "low"
-            }
-        )
+            respuesta = cliente.interactions.create(
+                model="gemini-3.6-flash",
+                input=pregunta,
+                system_instruction=instrucciones,
+                generation_config={
+                    "thinking_level": "low"
+                }
+            )
 
-        return JsonResponse({
-            "ok": True,
-            "respuesta": respuesta.output_text
-        })
+            return JsonResponse({
+                "ok": True,
+                "respuesta": respuesta.output_text,
+                "modo": "consulta"
+            })
+
+        # ==========================================================
+        # MODO CREAR / MODIFICAR SOLICITUD
+        # ==========================================================
+
+        if modo == "solicitud":
+
+            detalles_actuales = []
+
+            if solicitud:
+                for detalle in solicitud.detalles.select_related(
+                    "producto"
+                ).all():
+
+                    detalles_actuales.append({
+                        "id_detalle": detalle.id,
+                        "producto_id": detalle.producto.id,
+                        "producto": detalle.producto.nombre,
+                        "cantidad": detalle.cantidad,
+                        "seleccionado": detalle.seleccionado,
+                    })
+
+            contexto_solicitud = json.dumps(
+                detalles_actuales,
+                ensure_ascii=False,
+                indent=2
+            )
+
+            instrucciones = f"""
+Eres PiroIA, un asistente inteligente para crear y modificar
+solicitudes de cotización.
+
+Tu función es interpretar lo que el cliente necesita utilizando
+ÚNICAMENTE los productos existentes en el catálogo.
+
+El cliente puede expresar su solicitud de manera natural.
+
+Ejemplos:
+
+"Necesito 5 cajas del producto X"
+
+"Quiero 10 piezas de X y 3 de Y"
+
+"Agrega 2 unidades de X"
+
+"Quita 3 unidades de Y"
+
+"Cambia X a 8 piezas"
+
+REGLAS:
+
+1. Utiliza únicamente productos existentes en el catálogo.
+2. No inventes productos.
+3. Identifica el producto y la cantidad solicitada.
+4. Si la cantidad no está clara, pregunta al cliente.
+5. Si el nombre no coincide claramente con un producto,
+   pregunta antes de modificar la solicitud.
+6. No inventes precios.
+7. No proporciones instrucciones para fabricar, modificar,
+   combinar o manipular productos pirotécnicos.
+8. Tu función es comercial y de gestión de solicitudes.
+9. Responde siempre en español.
+10. Sé breve y claro.
+
+IMPORTANTE:
+
+Debes indicar claramente qué productos y cantidades identificaste.
+
+CATÁLOGO:
+
+{contexto_catalogo}
+
+SOLICITUD ACTUAL DEL CLIENTE:
+
+{contexto_solicitud}
+"""
+
+            respuesta = cliente.interactions.create(
+                model="gemini-3.6-flash",
+                input=pregunta,
+                system_instruction=instrucciones,
+                generation_config={
+                    "thinking_level": "low"
+                }
+            )
+
+            texto_respuesta = respuesta.output_text
+
+            # ======================================================
+            # SEGUNDA FASE:
+            # INTERPRETAR LA RESPUESTA DE LA IA
+            # ======================================================
+
+            instrucciones_accion = f"""
+Analiza la solicitud del cliente y determina si está solicitando
+AGREGAR, QUITAR o CAMBIAR cantidades de productos.
+
+CATÁLOGO:
+
+{contexto_catalogo}
+
+SOLICITUD ACTUAL:
+
+{contexto_solicitud}
+
+MENSAJE DEL CLIENTE:
+
+{pregunta}
+
+Devuelve ÚNICAMENTE un JSON válido con esta estructura:
+
+{{
+    "accion": "agregar",
+    "productos": [
+        {{
+            "producto_id": 1,
+            "cantidad": 2
+        }}
+    ]
+}}
+
+Valores permitidos para "accion":
+- "agregar"
+- "quitar"
+- "cambiar"
+- "ninguna"
+
+Si no puedes identificar claramente el producto o la cantidad,
+usa:
+
+{{
+    "accion": "ninguna",
+    "productos": []
+}}
+
+No agregues explicaciones fuera del JSON.
+"""
+
+            interpretacion = cliente.interactions.create(
+                model="gemini-3.6-flash",
+                input=pregunta,
+                system_instruction=instrucciones_accion,
+                generation_config={
+                    "thinking_level": "low"
+                }
+            )
+
+            texto_json = interpretacion.output_text.strip()
+
+            # Limpiar posibles bloques markdown
+            if texto_json.startswith("```"):
+                texto_json = texto_json.replace("```json", "")
+                texto_json = texto_json.replace("```", "")
+                texto_json = texto_json.strip()
+
+            try:
+                accion_data = json.loads(texto_json)
+            except json.JSONDecodeError:
+
+                return JsonResponse({
+                    "ok": True,
+                    "respuesta": texto_respuesta,
+                    "modo": "solicitud"
+                })
+
+            accion = accion_data.get("accion", "ninguna")
+            productos_accion = accion_data.get("productos", [])
+
+            # ======================================================
+            # SI NO HAY UNA ACCIÓN CLARA
+            # ======================================================
+
+            if accion == "ninguna" or not productos_accion:
+
+                return JsonResponse({
+                    "ok": True,
+                    "respuesta": texto_respuesta,
+                    "modo": "solicitud"
+                })
+
+            # ======================================================
+            # CREAR SOLICITUD SI NO EXISTE
+            # ======================================================
+
+            if solicitud is None:
+
+                solicitud = SolicitudCotizacion.objects.create(
+                    usuario=request.user,
+                    enviada=False,
+                    estado="revision",
+                    bloqueada=False
+                )
+
+                request.session["solicitud_editando_id"] = solicitud.id
+
+            # ======================================================
+            # AGREGAR PRODUCTOS
+            # ======================================================
+
+            if accion == "agregar":
+
+                cambios = []
+
+                for item in productos_accion:
+
+                    producto_id = item.get("producto_id")
+                    cantidad = item.get("cantidad")
+
+                    try:
+                        producto_id = int(producto_id)
+                        cantidad = int(cantidad)
+                    except (TypeError, ValueError):
+                        continue
+
+                    if cantidad <= 0:
+                        continue
+
+                    producto = Producto.objects.filter(
+                        id=producto_id,
+                        estado=True
+                    ).first()
+
+                    if not producto:
+                        continue
+
+                    detalle, creado = DetalleSolicitud.objects.get_or_create(
+                        solicitud=solicitud,
+                        producto=producto,
+                        defaults={
+                            "cantidad": cantidad,
+                            "seleccionado": True
+                        }
+                    )
+
+                    if not creado:
+                        detalle.cantidad += cantidad
+                        detalle.seleccionado = True
+                        detalle.save()
+
+                    cambios.append(
+                        f"{producto.nombre} ({cantidad})"
+                    )
+
+                if cambios:
+
+                    respuesta_final = (
+                        "Perfecto. Agregué a tu solicitud: "
+                        + ", ".join(cambios)
+                        + ". Puedes revisar los productos en tu solicitud."
+                    )
+
+                    return JsonResponse({
+                        "ok": True,
+                        "respuesta": respuesta_final,
+                        "modo": "solicitud",
+                        "redirect_url": reverse("solicitudes")
+                    })
+
+            # ======================================================
+            # QUITAR PRODUCTOS
+            # ======================================================
+
+            elif accion == "quitar":
+
+                cambios = []
+
+                for item in productos_accion:
+
+                    producto_id = item.get("producto_id")
+                    cantidad = item.get("cantidad")
+
+                    try:
+                        producto_id = int(producto_id)
+                        cantidad = int(cantidad)
+                    except (TypeError, ValueError):
+                        continue
+
+                    if cantidad <= 0:
+                        continue
+
+                    detalle = DetalleSolicitud.objects.filter(
+                        solicitud=solicitud,
+                        producto_id=producto_id
+                    ).first()
+
+                    if not detalle:
+                        continue
+
+                    if detalle.cantidad > cantidad:
+                        detalle.cantidad -= cantidad
+                        detalle.save()
+
+                        cambios.append(
+                            f"se quitaron {cantidad} de {detalle.producto.nombre}"
+                        )
+
+                    else:
+                        nombre = detalle.producto.nombre
+                        detalle.delete()
+
+                        cambios.append(
+                            f"se eliminó {nombre}"
+                        )
+
+                if cambios:
+
+                    return JsonResponse({
+                        "ok": True,
+                        "respuesta": (
+                            "Listo. "
+                            + ", ".join(cambios)
+                            + "."
+                        ),
+                        "modo": "solicitud",
+                        "redirect_url": reverse("solicitudes")
+                    })
+
+            # ======================================================
+            # CAMBIAR CANTIDAD
+            # ======================================================
+
+            elif accion == "cambiar":
+
+                cambios = []
+
+                for item in productos_accion:
+
+                    producto_id = item.get("producto_id")
+                    cantidad = item.get("cantidad")
+
+                    try:
+                        producto_id = int(producto_id)
+                        cantidad = int(cantidad)
+                    except (TypeError, ValueError):
+                        continue
+
+                    if cantidad <= 0:
+                        continue
+
+                    detalle = DetalleSolicitud.objects.filter(
+                        solicitud=solicitud,
+                        producto_id=producto_id
+                    ).first()
+
+                    if not detalle:
+                        continue
+
+                    detalle.cantidad = cantidad
+                    detalle.seleccionado = True
+                    detalle.save()
+
+                    cambios.append(
+                        f"{detalle.producto.nombre} ahora tiene {cantidad}"
+                    )
+
+                if cambios:
+
+                    return JsonResponse({
+                        "ok": True,
+                        "respuesta": (
+                            "Listo. Actualicé tu solicitud: "
+                            + ", ".join(cambios)
+                            + "."
+                        ),
+                        "modo": "solicitud",
+                        "redirect_url": reverse("solicitudes")
+                    })
+
+            # ======================================================
+            # RESPUESTA NORMAL
+            # ======================================================
+
+            return JsonResponse({
+                "ok": True,
+                "respuesta": texto_respuesta,
+                "modo": "solicitud"
+            })
 
     except Exception as e:
 
@@ -2591,5 +3002,8 @@ CATÁLOGO ACTUAL:
 
         return JsonResponse({
             "ok": False,
-            "respuesta": "No pude procesar tu pregunta en este momento."
+            "respuesta": (
+                "No pude procesar tu solicitud en este momento. "
+                "Intenta nuevamente."
+            )
         }, status=500)
