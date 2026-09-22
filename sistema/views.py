@@ -2727,6 +2727,15 @@ REGLAS:
 8. Tu función es comercial y de gestión de solicitudes.
 9. Responde siempre en español.
 10. Sé breve y claro.
+11. Si el cliente confirma que los productos y cantidades son correctos
+    y que no desea realizar más modificaciones, indícalo claramente
+    como una confirmación final.
+12. Una confirmación puede expresarse como:
+    "sí", "no quiero cambiar nada", "son todos", "eso es todo",
+    "está bien", "correcto", "ya quedó", entre otras expresiones
+    equivalentes.
+13. No consideres una frase como confirmación final si el cliente
+    está solicitando agregar, quitar o cambiar algún producto.
 
 IMPORTANTE:
 
@@ -2777,6 +2786,7 @@ Devuelve ÚNICAMENTE un JSON válido con esta estructura:
 
 {{
     "accion": "agregar",
+    "confirmado": false,
     "productos": [
         {{
             "producto_id": 1,
@@ -2791,11 +2801,46 @@ Valores permitidos para "accion":
 - "cambiar"
 - "ninguna"
 
+El campo "confirmado" debe ser:
+- false si el cliente todavía quiere agregar, quitar o cambiar productos.
+- true si el cliente confirma que ya no desea realizar ninguna modificación.
+
+Si el cliente confirma que los productos y cantidades son correctos,
+usa exactamente:
+
+{{
+    "accion": "ninguna",
+    "confirmado": true,
+    "productos": []
+}}
+
+Ejemplos de confirmación:
+- "Sí, esos son todos"
+- "Eso es todo"
+- "No quiero cambiar nada"
+- "Está bien así"
+- "Correcto"
+- "Ya quedó"
+- "Esos son los productos que necesito"
+
+Si el cliente todavía está solicitando cambios, usa:
+
+{{
+    "accion": "agregar",
+    "confirmado": false,
+    "productos": [...]
+}}
+
+o la acción correspondiente:
+- "quitar"
+- "cambiar"
+
 Si no puedes identificar claramente el producto o la cantidad,
 usa:
 
 {{
     "accion": "ninguna",
+    "confirmado": false,
     "productos": []
 }}
 
@@ -2830,6 +2875,7 @@ No agregues explicaciones fuera del JSON.
                 })
 
             accion = accion_data.get("accion", "ninguna")
+            confirmado = accion_data.get("confirmado", False)
             productos_accion = accion_data.get("productos", [])
 
             # ======================================================
@@ -2841,7 +2887,8 @@ No agregues explicaciones fuera del JSON.
                 return JsonResponse({
                     "ok": True,
                     "respuesta": texto_respuesta,
-                    "modo": "solicitud"
+                    "modo": "solicitud",
+                    "confirmado": confirmado
                 })
 
             # ======================================================
@@ -2912,7 +2959,8 @@ No agregues explicaciones fuera del JSON.
                     respuesta_final = (
                         "Perfecto. Agregué a tu solicitud: "
                         + ", ".join(cambios)
-                        + ". Puedes revisar los productos en tu solicitud."
+                        + ". ¿Son esos todos los productos que deseas o "
+                          "quieres agregar, quitar o modificar alguna cantidad?"
                     )
 
                     return JsonResponse({

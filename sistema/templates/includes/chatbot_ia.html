@@ -1645,6 +1645,8 @@ document.addEventListener(
         let reconocimiento =
             null;
 
+        let solicitudConfirmada = false;
+
 
         /* ========================================= */
         /* MEMORIA */
@@ -2244,7 +2246,7 @@ document.addEventListener(
 
 
             reconocimiento.continuous =
-                false;
+                true;
 
 
             reconocimiento.interimResults =
@@ -2554,7 +2556,7 @@ document.addEventListener(
                         datos.respuesta ||
                         "Listo.";
 
-
+                    solicitudConfirmada = datos.confirmado === true;
                     agregarMensajeBot(
                         ultimaRespuesta
                     );
@@ -2562,13 +2564,19 @@ document.addEventListener(
 
                     /* Mostrar escuchar */
 
+                    /* Hablar automáticamente */
+
                     if (
                         "speechSynthesis"
                         in window
-                    ) {
+                    )                     {
 
                         speakButton.style.display =
                             "inline-block";
+
+                        hablarRespuesta(
+                            ultimaRespuesta
+                        );
 
                     }
 
@@ -2577,19 +2585,29 @@ document.addEventListener(
                     /* REDIRECCIÓN A SOLICITUD */
                     /* ================================= */
 
-                    if (
-                        datos.redirect_url
-                    ) {
+                    if (datos.redirect_url) {
 
-                        setTimeout(
-                            function () {
+                        if (
+                            modoActual === "solicitud" &&
+                            !solicitudConfirmada
+                        ) {
 
-                                window.location.href =
-                                    datos.redirect_url;
+                            // Todavía no se redirige.
+                            // PiroIA seguirá conversando con el usuario.
 
-                            },
-                            1200
-                        );
+                        } else {
+
+                            setTimeout(
+                                function () {
+
+                                    window.location.href =
+                                        datos.redirect_url;
+
+                                },
+                                                    1200
+                            );
+
+                        }
 
                     }
 
