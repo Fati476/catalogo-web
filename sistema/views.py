@@ -2575,9 +2575,12 @@ def chatbot_ia(request):
         # 1. OBTENER CATÁLOGO REAL
         # ==========================================================
 
-        productos_catalogo = Producto.objects.filter(
-            estado=True
-        ).select_related("categoria").prefetch_related("imagenes")
+        productos_catalogo = (
+            Producto.objects
+            .filter(estado=True)
+            .select_related("categoria")
+            .prefetch_related("imagenes")
+        )
 
         catalogo = []
 
@@ -2590,15 +2593,22 @@ def chatbot_ia(request):
 
                 if primera_imagen and primera_imagen.imagen:
                     imagen_url = primera_imagen.imagen.url
+
             except Exception:
                 imagen_url = ""
 
+            # IMPORTANTE:
+            # El ID se conserva solamente para uso interno del sistema.
+            # El precio NO se manda a PiroIA.
             catalogo.append({
                 "id": producto.id,
                 "nombre": producto.nombre,
                 "descripcion": producto.descripcion or "",
-                "categoria": producto.categoria.nombre if producto.categoria else "",
-                "precio": str(producto.precio) if producto.precio is not None else "",
+                "categoria": (
+                    producto.categoria.nombre
+                    if producto.categoria
+                    else ""
+                ),
                 "imagen": imagen_url,
             })
 
@@ -2648,7 +2658,37 @@ def chatbot_ia(request):
         )
 
         # ==========================================================
-        # 4. PROMPT DE PIROIA
+        # 4. REGLAS GENERALES DE PIROIA
+        # ==========================================================
+
+        reglas_piroia = """
+REGLAS OBLIGATORIAS DE RESPUESTA:
+
+- Nunca muestres IDs, identificadores internos o números internos
+  de productos.
+- Nunca muestres precios, costos, importes ni cantidades monetarias.
+- El precio de todos los productos se determina mediante cotización.
+- Si el usuario pregunta por un precio, responde exactamente con una
+  idea como:
+  "El precio de los productos se determina mediante cotización.
+  Si deseas, puedo ayudarte a preparar una solicitud con la cantidad
+  que necesitas."
+- Cuando hables de cantidades utiliza siempre "pieza" o "piezas".
+- Ejemplo correcto:
+  "Agregué 3 piezas de Pachanga Plus."
+- Ejemplo incorrecto:
+  "Agregué el ID 33 cantidad 3."
+- Los IDs solamente sirven internamente para que el sistema encuentre
+  los productos.
+- Nunca menciones esos IDs al usuario.
+- No inventes productos.
+- No inventes cantidades.
+- Responde siempre en español.
+- Sé claro, natural y breve.
+"""
+
+        # ==========================================================
+        # 5. PROMPT DE PIROIA
         # ==========================================================
 
         if modo == "solicitud":
@@ -2660,16 +2700,20 @@ cooperativa de productos pirotécnicos.
 Tu función es ayudar EXCLUSIVAMENTE con el catálogo y las
 solicitudes de cotización.
 
+{reglas_piroia}
+
 NO proporciones instrucciones para fabricar, modificar, combinar,
 manipular, encender o utilizar productos pirotécnicos.
 
-Tu trabajo es interpretar lo que el usuario quiere comprar o
-solicitar y relacionarlo con los productos reales del catálogo.
+Tu trabajo es interpretar lo que el usuario quiere solicitar
+y relacionarlo con los productos reales del catálogo.
 
 CATÁLOGO REAL:
+
 {catalogo_texto}
 
 SOLICITUD ACTUAL DEL USUARIO:
+
 {solicitud_texto}
 
 Si el usuario quiere crear una solicitud nueva, identifica los
@@ -2679,6 +2723,7 @@ Si el usuario quiere agregar un producto, quitarlo o cambiar su
 cantidad, identifica correctamente el producto.
 
 IMPORTANTE:
+
 - Solo puedes utilizar productos que existan en el catálogo.
 - No inventes productos.
 - No inventes IDs.
@@ -2687,6 +2732,33 @@ IMPORTANTE:
 - No envíes automáticamente la solicitud.
 - El usuario debe revisar la solicitud y presionar el botón
   "Enviar solicitud".
+- Nunca menciones el ID del producto.
+- Nunca menciones el precio.
+- Nunca menciones información interna del sistema.
+
+Cuando respondas sobre una cantidad, utiliza:
+
+1 pieza
+
+o:
+
+5 piezas
+
+Nunca escribas solamente:
+
+"cantidad 5"
+
+Nunca escribas:
+
+"ID 33 cantidad 5"
+
+Cuando confirmes una solicitud, menciona el nombre del producto
+y su cantidad.
+
+Ejemplo:
+
+"Perfecto. Tu solicitud quedó preparada con 3 piezas de Pachanga Plus.
+Los precios se determinarán mediante cotización."
 
 Debes responder ÚNICAMENTE con JSON válido usando exactamente
 esta estructura:
@@ -2703,7 +2775,7 @@ esta estructura:
     ]
 }}
 
-Reglas:
+REGLAS DE ACCIONES:
 
 1. "agregar":
    Se utiliza cuando el usuario quiere agregar productos.
@@ -2723,16 +2795,20 @@ Reglas:
 5. "confirmado" debe ser true SOLO cuando el usuario confirme
    claramente que desea crear o actualizar la solicitud.
 
-Si el usuario dice algo como:
+Si el usuario dice:
+
 "quiero 2 cajas de X y 3 de Y"
 
 puedes preparar la solicitud.
 
 Si dice:
-"sí, créala",
-"confirmo",
-"esa está bien",
+
+"sí, créala"
+"confirmo"
+"esa está bien"
 "crear solicitud"
+"ya quedó"
+"eso es todo"
 
 entonces "confirmado" debe ser true.
 
@@ -2740,6 +2816,7 @@ Si ya existe una solicitud activa, las acciones deben aplicarse
 sobre esa solicitud.
 
 Pregunta del usuario:
+
 {pregunta}
 """
 
@@ -2750,31 +2827,47 @@ Eres PiroIA, el asistente inteligente del catálogo web.
 
 Tu función en este modo es CONSULTAR el catálogo.
 
+{reglas_piroia}
+
 CATÁLOGO REAL:
+
 {catalogo_texto}
 
 Responde de forma clara y sencilla utilizando solamente la
 información disponible en el catálogo.
 
 Puedes informar sobre:
+
 - productos
 - descripciones
 - categorías
-- precios disponibles
 - características descritas en el catálogo
+- disponibilidad de productos en el catálogo
 
 NO proporciones instrucciones para fabricar, modificar, combinar,
 manipular, encender o utilizar productos pirotécnicos.
 
+Si el usuario pregunta por el precio o costo de un producto,
+NO proporciones ninguna cantidad monetaria.
+
+Responde:
+
+"El precio de los productos se determina mediante cotización.
+Si deseas, puedo ayudarte a preparar una solicitud con la cantidad
+que necesitas."
+
 Si el producto que busca el usuario no existe en el catálogo,
 indícalo claramente.
 
+Nunca muestres IDs ni identificadores internos.
+
 Pregunta del usuario:
+
 {pregunta}
 """
 
         # ==========================================================
-        # 5. LLAMADA A OPENROUTER
+        # 6. LLAMADA A OPENROUTER
         # ==========================================================
 
         url = "https://openrouter.ai/api/v1/chat/completions"
@@ -2799,7 +2892,7 @@ Pregunta del usuario:
         }
 
         print("====================================")
-        print("PIROIA - PRUEBA OPENROUTER")
+        print("PIROIA - OPENROUTER")
         print("Pregunta:", pregunta)
         print("Modo:", modo)
         print("API KEY:", "SI" if api_key else "NO")
@@ -2819,47 +2912,72 @@ Pregunta del usuario:
 
             return JsonResponse({
                 "ok": False,
-                "respuesta": "PiroIA tardó demasiado en responder. Intenta nuevamente.",
+                "respuesta": (
+                    "PiroIA tardó demasiado en responder. "
+                    "Intenta nuevamente."
+                ),
                 "gemini_timeout": False
             })
 
         except requests.exceptions.RequestException as e:
 
-            print("ERROR DE CONEXIÓN OPENROUTER:", str(e))
+            print(
+                "ERROR DE CONEXIÓN OPENROUTER:",
+                str(e)
+            )
 
             return JsonResponse({
                 "ok": False,
-                "respuesta": "No fue posible conectar con PiroIA en este momento."
+                "respuesta": (
+                    "No fue posible conectar con PiroIA "
+                    "en este momento."
+                )
             })
 
-        print("STATUS OPENROUTER:", respuesta_ia.status_code)
-        print("RESPUESTA OPENROUTER:", respuesta_ia.text[:2000])
+        print(
+            "STATUS OPENROUTER:",
+            respuesta_ia.status_code
+        )
+
+        print(
+            "RESPUESTA OPENROUTER:",
+            respuesta_ia.text[:2000]
+        )
 
         # ==========================================================
-        # 6. ERROR DE OPENROUTER
+        # 7. ERROR DE OPENROUTER
         # ==========================================================
 
         if respuesta_ia.status_code != 200:
 
             try:
                 error_data = respuesta_ia.json()
+
                 error_mensaje = (
                     error_data.get("error", {}).get("message")
                     or "Error desconocido de OpenRouter."
                 )
+
             except Exception:
-                error_mensaje = "OpenRouter no pudo procesar la solicitud."
+
+                error_mensaje = (
+                    "OpenRouter no pudo procesar la solicitud."
+                )
 
             return JsonResponse({
                 "ok": False,
-                "respuesta": f"PiroIA no pudo responder: {error_mensaje}"
+                "respuesta": (
+                    f"PiroIA no pudo responder: "
+                    f"{error_mensaje}"
+                )
             })
 
         # ==========================================================
-        # 7. EXTRAER RESPUESTA
+        # 8. EXTRAER RESPUESTA
         # ==========================================================
 
         try:
+
             resultado = respuesta_ia.json()
 
             contenido = (
@@ -2868,20 +2986,55 @@ Pregunta del usuario:
 
         except Exception as e:
 
-            print("ERROR LEYENDO RESPUESTA:", str(e))
+            print(
+                "ERROR LEYENDO RESPUESTA:",
+                str(e)
+            )
 
             return JsonResponse({
                 "ok": False,
-                "respuesta": "PiroIA recibió una respuesta que no pudo interpretar."
+                "respuesta": (
+                    "PiroIA recibió una respuesta "
+                    "que no pudo interpretar."
+                )
             })
 
         contenido = contenido.strip()
 
         # ==========================================================
-        # 8. MODO CONSULTA
+        # 9. MODO CONSULTA
         # ==========================================================
 
         if modo != "solicitud":
+
+            # Protección adicional:
+            # nunca devolver al frontend una respuesta que contenga
+            # información monetaria o identificadores internos.
+
+            palabras_precio = [
+                "precio",
+                "precios",
+                "costo",
+                "costos",
+                "cuánto cuesta",
+                "cuanto cuesta",
+                "cuánto vale",
+                "cuanto vale"
+            ]
+
+            pregunta_lower = pregunta.lower()
+
+            if any(
+                palabra in pregunta_lower
+                for palabra in palabras_precio
+            ):
+
+                contenido = (
+                    "El precio de los productos se determina "
+                    "mediante cotización. Si deseas, puedo ayudarte "
+                    "a preparar una solicitud con la cantidad "
+                    "que necesitas."
+                )
 
             return JsonResponse({
                 "ok": True,
@@ -2892,22 +3045,37 @@ Pregunta del usuario:
             })
 
         # ==========================================================
-        # 9. INTERPRETAR JSON DE LA IA
+        # 10. INTERPRETAR JSON DE LA IA
         # ==========================================================
 
         contenido_json = contenido
 
         if contenido_json.startswith("```"):
-            contenido_json = contenido_json.replace("```json", "")
-            contenido_json = contenido_json.replace("```", "")
+
+            contenido_json = contenido_json.replace(
+                "```json",
+                ""
+            )
+
+            contenido_json = contenido_json.replace(
+                "```",
+                ""
+            )
+
             contenido_json = contenido_json.strip()
 
         try:
-            resultado_ia = json.loads(contenido_json)
+
+            resultado_ia = json.loads(
+                contenido_json
+            )
 
         except json.JSONDecodeError:
 
-            print("LA IA NO DEVOLVIÓ JSON VÁLIDO:")
+            print(
+                "LA IA NO DEVOLVIÓ JSON VÁLIDO:"
+            )
+
             print(contenido)
 
             return JsonResponse({
@@ -2939,7 +3107,42 @@ Pregunta del usuario:
         )
 
         # ==========================================================
-        # 10. CREAR SOLICITUD NUEVA
+        # 11. PROTECCIÓN CONTRA PRECIOS
+        # ==========================================================
+
+        palabras_precio = [
+            "precio",
+            "precios",
+            "costo",
+            "costos",
+            "cuánto cuesta",
+            "cuanto cuesta",
+            "cuánto vale",
+            "cuanto vale"
+        ]
+
+        if any(
+            palabra in pregunta.lower()
+            for palabra in palabras_precio
+        ):
+
+            respuesta_texto = (
+                "El precio de los productos se determina "
+                "mediante cotización. Si deseas, puedo ayudarte "
+                "a preparar una solicitud con la cantidad "
+                "que necesitas."
+            )
+
+            return JsonResponse({
+                "ok": True,
+                "respuesta": respuesta_texto,
+                "confirmado": False,
+                "accion": "ninguna",
+                "productos": []
+            })
+
+        # ==========================================================
+        # 12. CREAR SOLICITUD NUEVA
         # ==========================================================
 
         if confirmado and not solicitud_actual:
@@ -2951,13 +3154,17 @@ Pregunta del usuario:
                 bloqueada=False
             )
 
-            request.session["piroia_solicitud_id"] = solicitud_actual.id
+            request.session[
+                "piroia_solicitud_id"
+            ] = solicitud_actual.id
 
             solicitud_id = solicitud_actual.id
 
         # ==========================================================
-        # 11. MODIFICAR SOLICITUD
+        # 13. MODIFICAR SOLICITUD
         # ==========================================================
+
+        cambios_realizados = []
 
         if solicitud_actual and accion in [
             "agregar",
@@ -2968,9 +3175,17 @@ Pregunta del usuario:
             for item in productos:
 
                 try:
-                    producto_id = int(item.get("producto_id"))
-                    cantidad = int(item.get("cantidad", 1))
+
+                    producto_id = int(
+                        item.get("producto_id")
+                    )
+
+                    cantidad = int(
+                        item.get("cantidad", 1)
+                    )
+
                 except (TypeError, ValueError):
+
                     continue
 
                 if cantidad < 0:
@@ -2989,18 +3204,24 @@ Pregunta del usuario:
                     producto=producto
                 ).first()
 
-                # ----------------------------------------------
+                # ==================================================
                 # AGREGAR
-                # ----------------------------------------------
+                # ==================================================
 
                 if accion == "agregar":
 
+                    cantidad_agregada = max(
+                        cantidad,
+                        1
+                    )
+
                     if detalle:
 
-                        detalle.cantidad += max(cantidad, 1)
+                        detalle.cantidad += (
+                            cantidad_agregada
+                        )
 
                         detalle.seleccionado = True
-
                         detalle.save()
 
                     else:
@@ -3008,13 +3229,32 @@ Pregunta del usuario:
                         DetalleSolicitud.objects.create(
                             solicitud=solicitud_actual,
                             producto=producto,
-                            cantidad=max(cantidad, 1),
+                            cantidad=cantidad_agregada,
                             seleccionado=True
                         )
 
-                # ----------------------------------------------
+                    cantidad_actual = (
+                        detalle.cantidad
+                        if detalle
+                        else cantidad_agregada
+                    )
+
+                    unidad = (
+                        "pieza"
+                        if cantidad_agregada == 1
+                        else "piezas"
+                    )
+
+                    cambios_realizados.append(
+                        f"Agregué {cantidad_agregada} "
+                        f"{unidad} de {producto.nombre}. "
+                        f"Ahora tienes {cantidad_actual} "
+                        f"{'pieza' if cantidad_actual == 1 else 'piezas'}."
+                    )
+
+                # ==================================================
                 # CAMBIAR
-                # ----------------------------------------------
+                # ==================================================
 
                 elif accion == "cambiar":
 
@@ -3022,6 +3262,11 @@ Pregunta del usuario:
 
                         if detalle:
                             detalle.delete()
+
+                        cambios_realizados.append(
+                            f"Quité {producto.nombre} "
+                            f"de la solicitud."
+                        )
 
                     else:
 
@@ -3040,56 +3285,124 @@ Pregunta del usuario:
                                 seleccionado=True
                             )
 
-                # ----------------------------------------------
+                        cambios_realizados.append(
+                            f"Cambié {producto.nombre} "
+                            f"a {cantidad} "
+                            f"{'pieza' if cantidad == 1 else 'piezas'}."
+                        )
+
+                # ==================================================
                 # QUITAR
-                # ----------------------------------------------
+                # ==================================================
 
                 elif accion == "quitar":
 
                     if detalle:
 
                         if cantidad >= detalle.cantidad:
+
                             detalle.delete()
+
+                            cambios_realizados.append(
+                                f"Quité {producto.nombre} "
+                                f"de la solicitud."
+                            )
 
                         else:
 
                             detalle.cantidad -= cantidad
 
                             if detalle.cantidad <= 0:
+
                                 detalle.delete()
+
+                                cambios_realizados.append(
+                                    f"Quité {producto.nombre} "
+                                    f"de la solicitud."
+                                )
+
                             else:
+
                                 detalle.save()
 
+                                cambios_realizados.append(
+                                    f"Quité {cantidad} "
+                                    f"{'pieza' if cantidad == 1 else 'piezas'} "
+                                    f"de {producto.nombre}. "
+                                    f"Ahora quedan "
+                                    f"{detalle.cantidad} "
+                                    f"{'pieza' if detalle.cantidad == 1 else 'piezas'}."
+                                )
+
         # ==========================================================
-        # 12. CONFIRMACIÓN FINAL
+        # 14. CONFIRMACIÓN FINAL
         # ==========================================================
 
         if confirmado:
 
             if solicitud_actual:
 
-                detalles_finales = solicitud_actual.detalles.select_related(
-                    "producto"
-                ).all()
+                detalles_finales = (
+                    solicitud_actual.detalles
+                    .select_related("producto")
+                    .all()
+                )
 
                 productos_finales = []
 
+                resumen_productos = []
+
                 for detalle in detalles_finales:
+
+                    imagen_url = ""
+
+                    try:
+
+                        imagen = (
+                            detalle.producto.imagenes.first()
+                        )
+
+                        if imagen and imagen.imagen:
+                            imagen_url = imagen.imagen.url
+
+                    except Exception:
+
+                        imagen_url = ""
 
                     productos_finales.append({
                         "producto_id": detalle.producto.id,
                         "nombre": detalle.producto.nombre,
                         "cantidad": detalle.cantidad,
-                        "imagen": (
-                            detalle.producto.imagenes.first().imagen.url
-                            if detalle.producto.imagenes.first()
-                            else ""
-                        )
+                        "imagen": imagen_url
                     })
+
+                    resumen_productos.append(
+                        f"{detalle.cantidad} "
+                        f"{'pieza' if detalle.cantidad == 1 else 'piezas'} "
+                        f"de {detalle.producto.nombre}"
+                    )
+
+                if resumen_productos:
+
+                    respuesta_confirmacion = (
+                        "Perfecto. Tu solicitud quedó preparada "
+                        "con "
+                        + ", ".join(resumen_productos)
+                        + ". Los precios se determinarán mediante "
+                          "cotización. Te llevaré a la solicitud "
+                          "para que puedas revisarla antes de enviarla."
+                    )
+
+                else:
+
+                    respuesta_confirmacion = (
+                        "Tu solicitud no tiene productos. "
+                        "Puedes agregar alguno antes de enviarla."
+                    )
 
                 return JsonResponse({
                     "ok": True,
-                    "respuesta": respuesta_texto,
+                    "respuesta": respuesta_confirmacion,
                     "confirmado": True,
                     "accion": accion,
                     "productos": productos_finales,
@@ -3097,27 +3410,34 @@ Pregunta del usuario:
                 })
 
         # ==========================================================
-        # 13. RESPUESTA NORMAL DE SOLICITUD
+        # 15. RESPUESTA NORMAL DE SOLICITUD
         # ==========================================================
 
         productos_actualizados = []
 
         if solicitud_actual:
 
-            detalles_actualizados = solicitud_actual.detalles.select_related(
-                "producto"
-            ).all()
+            detalles_actualizados = (
+                solicitud_actual.detalles
+                .select_related("producto")
+                .all()
+            )
 
             for detalle in detalles_actualizados:
 
                 imagen_url = ""
 
                 try:
-                    imagen = detalle.producto.imagenes.first()
+
+                    imagen = (
+                        detalle.producto.imagenes.first()
+                    )
 
                     if imagen and imagen.imagen:
                         imagen_url = imagen.imagen.url
+
                 except Exception:
+
                     imagen_url = ""
 
                 productos_actualizados.append({
@@ -3126,6 +3446,15 @@ Pregunta del usuario:
                     "cantidad": detalle.cantidad,
                     "imagen": imagen_url
                 })
+
+        # Si el servidor hizo el cambio, usamos nuestro propio
+        # mensaje para evitar que la IA diga IDs o precios.
+
+        if cambios_realizados:
+
+            respuesta_texto = " ".join(
+                cambios_realizados
+            )
 
         return JsonResponse({
             "ok": True,
@@ -3139,7 +3468,10 @@ Pregunta del usuario:
 
         return JsonResponse({
             "ok": False,
-            "respuesta": "La solicitud enviada no tiene un formato válido."
+            "respuesta": (
+                "La solicitud enviada no tiene "
+                "un formato válido."
+            )
         }, status=400)
 
     except Exception as e:
@@ -3151,5 +3483,8 @@ Pregunta del usuario:
 
         return JsonResponse({
             "ok": False,
-            "respuesta": "Ocurrió un problema al procesar tu solicitud."
+            "respuesta": (
+                "Ocurrió un problema al procesar "
+                "tu solicitud."
+            )
         }, status=500)
