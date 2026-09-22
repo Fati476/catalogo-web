@@ -2654,11 +2654,9 @@ def chatbot_ia(request):
         cliente = genai.Client(
             api_key=os.getenv("GEMINI_API_KEY"),
             http_options=types.HttpOptions(
-                timeout=25000,
+                timeout=10000,
                 retry_options=types.HttpRetryOptions(
                     attempts=1,
-                    initial_delay=1.0,
-                    max_delay=1.0,
                     http_status_codes=[]
                 )
             )
@@ -2710,7 +2708,8 @@ CATÁLOGO ACTUAL:
                     system_instruction=instrucciones,
                     generation_config={
                         "thinking_level": "low"
-                    }
+                    },
+                    timeout=10000
                 )
 
             except Exception as e:
@@ -3098,7 +3097,8 @@ MENSAJE DEL CLIENTE:
                     system_instruction=instrucciones,
                     generation_config={
                         "thinking_level": "low"
-                    }
+                    },
+                    timeout=10000
                 )
 
             except Exception as e:
