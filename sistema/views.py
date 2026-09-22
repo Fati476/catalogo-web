@@ -2699,6 +2699,11 @@ CATÁLOGO ACTUAL:
                 system_instruction=instrucciones,
                 generation_config={
                     "thinking_level": "low"
+                },
+                config={
+                    "retry_config": {
+                        "max_retries": 0
+                    }
                 }
             )
 
@@ -2999,6 +3004,11 @@ SOLICITUD ACTUAL DEL CLIENTE:
                 system_instruction=instrucciones,
                 generation_config={
                     "thinking_level": "low"
+                },
+                config={
+                    "retry_config": {
+                        "max_retries": 0
+                    }
                 }
             )
 
