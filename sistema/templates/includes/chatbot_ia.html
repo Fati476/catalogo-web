@@ -1628,7 +1628,6 @@ document.addEventListener(
             );
 
             return;
-
         }
 
 
@@ -1645,7 +1644,8 @@ document.addEventListener(
         let reconocimiento =
             null;
 
-        let solicitudConfirmada = false;
+        let solicitudConfirmada =
+            false;
 
 
         /* ========================================= */
@@ -1715,12 +1715,14 @@ document.addEventListener(
                     ? claveConversacionConsulta
                     : claveConversacionSolicitud;
 
+
             sessionStorage.setItem(
                 claveActual,
                 JSON.stringify(
                     mensajes
                 )
             );
+
         }
 
 
@@ -1736,13 +1738,11 @@ document.addEventListener(
                     claveActual
                 );
 
-
             if (!guardada) {
 
                 return;
 
             }
-
 
             try {
 
@@ -1750,7 +1750,6 @@ document.addEventListener(
                     JSON.parse(
                         guardada
                     );
-
 
                 mensajesGuardados.forEach(
                     function (mensaje) {
@@ -1777,10 +1776,8 @@ document.addEventListener(
                     }
                 );
 
-
                 messages.scrollTop =
                     messages.scrollHeight;
-
 
             } catch (error) {
 
@@ -1789,9 +1786,8 @@ document.addEventListener(
                     error
                 );
 
-
                 sessionStorage.removeItem(
-                    claveConversacion
+                    claveActual
                 );
 
             }
@@ -1807,7 +1803,9 @@ document.addEventListener(
 
             modoActual =
                 modo;
+
             messages.innerHTML = "";
+
             cargarConversacion();
 
 
@@ -1831,7 +1829,6 @@ document.addEventListener(
 
                 helpText.textContent =
                     "Puedes consultar productos, categorías, características o precios.";
-
 
             } else {
 
@@ -2447,6 +2444,36 @@ document.addEventListener(
                 1;
 
 
+            mensaje.onstart =
+                function () {
+
+                    speakButton.style.display =
+                        "inline-block";
+
+                    speakButton.innerHTML =
+                        "⏸ Pausar respuesta";
+
+                };
+
+
+            mensaje.onend =
+                function () {
+
+                    speakButton.innerHTML =
+                        "🔊 Escuchar respuesta";
+
+                };
+
+
+            mensaje.onerror =
+                function () {
+
+                    speakButton.innerHTML =
+                        "🔊 Escuchar respuesta";
+
+                };
+
+
             window.speechSynthesis.speak(
                 mensaje
             );
@@ -2454,13 +2481,56 @@ document.addEventListener(
         }
 
 
+        /* ========================================= */
+        /* BOTÓN PAUSAR / REANUDAR / ESCUCHAR */
+        /* ========================================= */
+
         speakButton.addEventListener(
             "click",
             function () {
 
                 if (
-                    ultimaRespuesta
+                    !(
+                        "speechSynthesis"
+                        in window
+                    )
                 ) {
+
+                    return;
+
+                }
+
+
+                if (
+                    window.speechSynthesis.speaking
+                ) {
+
+                    if (
+                        window.speechSynthesis.paused
+                    ) {
+
+                        window.speechSynthesis.resume();
+
+
+                        speakButton.innerHTML =
+                            "⏸ Pausar respuesta";
+
+                    } else {
+
+                        window.speechSynthesis.pause();
+
+
+                        speakButton.innerHTML =
+                            "▶ Reanudar respuesta";
+
+                    }
+
+                    return;
+
+                }
+
+
+                if (ultimaRespuesta) {
 
                     hablarRespuesta(
                         ultimaRespuesta
@@ -2489,7 +2559,9 @@ document.addEventListener(
             }
 
 
-            /* Mostrar usuario */
+            /* ========================================= */
+            /* MOSTRAR MENSAJE DEL USUARIO */
+            /* ========================================= */
 
             agregarMensajeUsuario(
                 pregunta
@@ -2525,7 +2597,6 @@ document.addEventListener(
                     await fetch(
                         "/api/chatbot/",
                         {
-
                             method:
                                 "POST",
 
@@ -2561,29 +2632,38 @@ document.addEventListener(
                 quitarEscribiendo();
 
 
+                /* ========================================= */
+                /* RESPUESTA DE PIROIA */
+                /* ========================================= */
+
                 if (datos.ok) {
 
                     ultimaRespuesta =
                         datos.respuesta ||
                         "Listo.";
 
-                    solicitudConfirmada = datos.confirmado === true;
+
+                    solicitudConfirmada =
+                        datos.confirmado === true;
+
+
                     agregarMensajeBot(
                         ultimaRespuesta
                     );
 
 
-                    /* Mostrar escuchar */
-
-                    /* Hablar automáticamente */
+                    /* ========================================= */
+                    /* HABLAR AUTOMÁTICAMENTE */
+                    /* ========================================= */
 
                     if (
                         "speechSynthesis"
                         in window
-                    )                     {
+                    ) {
 
                         speakButton.style.display =
                             "inline-block";
+
 
                         hablarRespuesta(
                             ultimaRespuesta
@@ -2592,21 +2672,32 @@ document.addEventListener(
                     }
 
 
-                    /* ================================= */
-                    /* REDIRECCIÓN A SOLICITUD */
-                    /* ================================= */
+                    /* ========================================= */
+                    /* REDIRECCIÓN */
+                    /* ========================================= */
 
-                    if (datos.redirect_url) {
+                    if (
+                        datos.redirect_url
+                    ) {
 
                         if (
                             modoActual === "solicitud" &&
                             !solicitudConfirmada
                         ) {
 
-                            // Todavía no se redirige.
-                            // PiroIA seguirá conversando con el usuario.
+                            /*
+                             * No se redirige todavía.
+                             *
+                             * PiroIA seguirá conversando
+                             * con el usuario.
+                             */
 
                         } else {
+
+                            /*
+                             * Esperamos un poco para que
+                             * el usuario escuche la respuesta.
+                             */
 
                             setTimeout(
                                 function () {
@@ -2615,7 +2706,7 @@ document.addEventListener(
                                         datos.redirect_url;
 
                                 },
-                                                    1200
+                                1200
                             );
 
                         }
@@ -2652,6 +2743,10 @@ document.addEventListener(
 
             }
 
+
+            /* ========================================= */
+            /* REACTIVAR CONTROLES */
+            /* ========================================= */
 
             input.disabled =
                 false;
@@ -2701,11 +2796,6 @@ document.addEventListener(
 
             }
         );
-
-
-        /* ========================================= */
-        /* CARGAR CONVERSACIÓN */
-        /* ========================================= */
 
 
         /* ========================================= */

@@ -2543,12 +2543,14 @@ def revertir_cambio_correo(request, token):
 def chatbot_ia(request):
 
     try:
+
         data = json.loads(request.body)
 
         pregunta = data.get("mensaje", "").strip()
         modo = data.get("modo", "consulta").strip().lower()
 
         if not pregunta:
+
             return JsonResponse({
                 "ok": False,
                 "respuesta": "Escribe una pregunta para poder ayudarte."
@@ -2568,6 +2570,9 @@ def chatbot_ia(request):
         catalogo = []
 
         for producto in productos:
+
+            imagen = producto.imagenes.first()
+
             catalogo.append({
                 "id": producto.id,
                 "producto": producto.nombre,
@@ -2578,6 +2583,11 @@ def chatbot_ia(request):
                     if producto.precio is not None
                     else "Consultar"
                 ),
+                "imagen_url": (
+                    imagen.imagen.url
+                    if imagen and imagen.imagen
+                    else ""
+                )
             })
 
         contexto_catalogo = json.dumps(
@@ -2598,12 +2608,44 @@ def chatbot_ia(request):
         solicitud = None
 
         if solicitud_id:
+
             solicitud = SolicitudCotizacion.objects.filter(
                 id=solicitud_id,
                 usuario=request.user,
                 enviada=False,
                 estado="revision"
             ).first()
+
+        # ==========================================================
+        # DETECTAR SI QUIERE EDITAR UNA SOLICITUD
+        # ==========================================================
+
+        pregunta_lower = pregunta.lower()
+
+        frases_edicion = [
+            "editar mi solicitud",
+            "editar la solicitud",
+            "editar solicitud",
+            "modificar mi solicitud",
+            "modificar la solicitud",
+            "modificar solicitud",
+            "cambiar mi solicitud",
+            "cambiar la solicitud",
+            "cambiar solicitud",
+            "ayúdame a editar",
+            "ayudame a editar",
+            "ayúdame a modificar",
+            "ayudame a modificar",
+            "quiero editar",
+            "quiero modificar",
+            "quiero cambiar mi solicitud",
+            "quiero cambiar la solicitud"
+        ]
+
+        quiere_editar = any(
+            frase in pregunta_lower
+            for frase in frases_edicion
+        )
 
         # ==========================================================
         # CLIENTE GEMINI
@@ -2626,6 +2668,7 @@ Tu función es ayudar al cliente a consultar información real
 del catálogo.
 
 Puedes responder sobre:
+
 - productos
 - categorías
 - características
@@ -2671,9 +2714,205 @@ CATÁLOGO ACTUAL:
 
         if modo == "solicitud":
 
+            # ======================================================
+            # EL USUARIO QUIERE EDITAR SU SOLICITUD
+            # ======================================================
+
+            if quiere_editar:
+
+                # --------------------------------------------------
+                # SI YA EXISTE UNA SOLICITUD EN EDICIÓN
+                # --------------------------------------------------
+
+                if solicitud:
+
+                    productos_actuales = []
+
+                    for detalle in solicitud.detalles.select_related(
+                        "producto"
+                    ).all():
+
+                        imagen = detalle.producto.imagenes.first()
+
+                        productos_actuales.append({
+                            "producto_id": detalle.producto.id,
+                            "producto": detalle.producto.nombre,
+                            "cantidad": detalle.cantidad,
+                            "imagen_url": (
+                                imagen.imagen.url
+                                if imagen and imagen.imagen
+                                else ""
+                            )
+                        })
+
+                    if productos_actuales:
+
+                        lista_productos = ", ".join(
+                            f"{item['producto']} ({item['cantidad']})"
+                            for item in productos_actuales
+                        )
+
+                        respuesta_edicion = (
+                            "Claro, con gusto te ayudo a editar tu solicitud. "
+                            "Actualmente tienes: "
+                            + lista_productos
+                            + ". Puedes decirme qué producto quieres agregar, "
+                              "quitar o qué cantidad deseas cambiar."
+                        )
+
+                    else:
+
+                        respuesta_edicion = (
+                            "Claro, con gusto te ayudo a editar tu solicitud. "
+                            "Actualmente no tiene productos. "
+                            "Puedes decirme qué productos deseas agregar."
+                        )
+
+                    return JsonResponse({
+                        "ok": True,
+                        "respuesta": respuesta_edicion,
+                        "modo": "solicitud",
+                        "editando": True,
+                        "productos": productos_actuales,
+                        "confirmado": False
+                    })
+
+                # --------------------------------------------------
+                # BUSCAR LA ÚLTIMA SOLICITUD EN REVISIÓN
+                # --------------------------------------------------
+
+                solicitud_existente = (
+                    SolicitudCotizacion.objects
+                    .filter(
+                        usuario=request.user,
+                        enviada=True,
+                        estado="revision"
+                    )
+                    .order_by("-fecha")
+                    .first()
+                )
+
+                # --------------------------------------------------
+                # NO EXISTE UNA SOLICITUD
+                # --------------------------------------------------
+
+                if not solicitud_existente:
+
+                    return JsonResponse({
+                        "ok": True,
+                        "respuesta": (
+                            "Claro, con gusto te ayudo. "
+                            "Por el momento no tienes una solicitud "
+                            "disponible para editar. "
+                            "Puedes crear una nueva solicitud desde aquí."
+                        ),
+                        "modo": "solicitud",
+                        "editando": False,
+                        "confirmado": False
+                    })
+
+                # --------------------------------------------------
+                # EL ADMINISTRADOR YA LA ESTÁ REVISANDO
+                # --------------------------------------------------
+
+                if solicitud_existente.bloqueada:
+
+                    return JsonResponse({
+                        "ok": True,
+                        "respuesta": (
+                            "Claro, con gusto te ayudaría a editarla, "
+                            "pero por el momento no puedo modificar esta "
+                            "solicitud porque el administrador ya la está "
+                            "revisando. Cuando termine la revisión podrás "
+                            "realizar cambios nuevamente."
+                        ),
+                        "modo": "solicitud",
+                        "editando": False,
+                        "edicion_bloqueada": True,
+                        "confirmado": False
+                    })
+
+                # --------------------------------------------------
+                # PASAR LA SOLICITUD EXISTENTE A EDICIÓN
+                # --------------------------------------------------
+
+                solicitud = solicitud_existente
+
+                solicitud.enviada = False
+                solicitud.bloqueada = False
+
+                solicitud.save(
+                    update_fields=[
+                        "enviada",
+                        "bloqueada"
+                    ]
+                )
+
+                request.session["solicitud_editando_id"] = solicitud.id
+                request.session.pop(
+                    "piroia_solicitud_id",
+                    None
+                )
+
+                productos_actuales = []
+
+                for detalle in solicitud.detalles.select_related(
+                    "producto"
+                ).all():
+
+                    imagen = detalle.producto.imagenes.first()
+
+                    productos_actuales.append({
+                        "producto_id": detalle.producto.id,
+                        "producto": detalle.producto.nombre,
+                        "cantidad": detalle.cantidad,
+                        "imagen_url": (
+                            imagen.imagen.url
+                            if imagen and imagen.imagen
+                            else ""
+                        )
+                    })
+
+                if productos_actuales:
+
+                    lista_productos = ", ".join(
+                        f"{item['producto']} ({item['cantidad']})"
+                        for item in productos_actuales
+                    )
+
+                    respuesta_edicion = (
+                        "Claro, con gusto. Ya puse tu solicitud en edición. "
+                        "Actualmente tienes: "
+                        + lista_productos
+                        + ". Puedes decirme qué producto quieres agregar, "
+                          "quitar o qué cantidad deseas cambiar."
+                    )
+
+                else:
+
+                    respuesta_edicion = (
+                        "Claro, con gusto. Ya puse tu solicitud en edición. "
+                        "Actualmente no tiene productos. "
+                        "Puedes decirme qué productos deseas agregar."
+                    )
+
+                return JsonResponse({
+                    "ok": True,
+                    "respuesta": respuesta_edicion,
+                    "modo": "solicitud",
+                    "editando": True,
+                    "productos": productos_actuales,
+                    "confirmado": False
+                })
+
+            # ======================================================
+            # DETALLES ACTUALES DE LA SOLICITUD
+            # ======================================================
+
             detalles_actuales = []
 
             if solicitud:
+
                 for detalle in solicitud.detalles.select_related(
                     "producto"
                 ).all():
@@ -2683,7 +2922,7 @@ CATÁLOGO ACTUAL:
                         "producto_id": detalle.producto.id,
                         "producto": detalle.producto.nombre,
                         "cantidad": detalle.cantidad,
-                        "seleccionado": detalle.seleccionado,
+                        "seleccionado": detalle.seleccionado
                     })
 
             contexto_solicitud = json.dumps(
@@ -2691,6 +2930,10 @@ CATÁLOGO ACTUAL:
                 ensure_ascii=False,
                 indent=2
             )
+
+            # ======================================================
+            # PRIMERA IA
+            # ======================================================
 
             instrucciones = f"""
 Eres PiroIA, un asistente inteligente para crear y modificar
@@ -2762,8 +3005,7 @@ SOLICITUD ACTUAL DEL CLIENTE:
             texto_respuesta = respuesta.output_text
 
             # ======================================================
-            # SEGUNDA FASE:
-            # INTERPRETAR LA RESPUESTA DE LA IA
+            # SEGUNDA IA: INTERPRETAR ACCIÓN
             # ======================================================
 
             instrucciones_accion = f"""
@@ -2796,12 +3038,14 @@ Devuelve ÚNICAMENTE un JSON válido con esta estructura:
 }}
 
 Valores permitidos para "accion":
+
 - "agregar"
 - "quitar"
 - "cambiar"
 - "ninguna"
 
 El campo "confirmado" debe ser:
+
 - false si el cliente todavía quiere agregar, quitar o cambiar productos.
 - true si el cliente confirma que ya no desea realizar ninguna modificación.
 
@@ -2815,6 +3059,7 @@ usa exactamente:
 }}
 
 Ejemplos de confirmación:
+
 - "Sí, esos son todos"
 - "Eso es todo"
 - "No quiero cambiar nada"
@@ -2832,6 +3077,7 @@ Si el cliente todavía está solicitando cambios, usa:
 }}
 
 o la acción correspondiente:
+
 - "quitar"
 - "cambiar"
 
@@ -2859,36 +3105,115 @@ No agregues explicaciones fuera del JSON.
             texto_json = interpretacion.output_text.strip()
 
             # Limpiar posibles bloques markdown
+
             if texto_json.startswith("```"):
-                texto_json = texto_json.replace("```json", "")
-                texto_json = texto_json.replace("```", "")
+
+                texto_json = texto_json.replace(
+                    "```json",
+                    ""
+                )
+
+                texto_json = texto_json.replace(
+                    "```",
+                    ""
+                )
+
                 texto_json = texto_json.strip()
 
             try:
-                accion_data = json.loads(texto_json)
+
+                accion_data = json.loads(
+                    texto_json
+                )
+
             except json.JSONDecodeError:
 
                 return JsonResponse({
                     "ok": True,
                     "respuesta": texto_respuesta,
-                    "modo": "solicitud"
+                    "modo": "solicitud",
+                    "confirmado": False
                 })
 
-            accion = accion_data.get("accion", "ninguna")
-            confirmado = accion_data.get("confirmado", False)
-            productos_accion = accion_data.get("productos", [])
+            accion = accion_data.get(
+                "accion",
+                "ninguna"
+            )
+
+            confirmado = accion_data.get(
+                "confirmado",
+                False
+            )
+
+            productos_accion = accion_data.get(
+                "productos",
+                []
+            )
 
             # ======================================================
-            # SI NO HAY UNA ACCIÓN CLARA
+            # CONFIRMACIÓN FINAL
             # ======================================================
 
             if accion == "ninguna" or not productos_accion:
 
+                respuesta_confirmacion = texto_respuesta
+
+                productos_finales = []
+
+                if solicitud:
+
+                    for detalle in solicitud.detalles.select_related(
+                        "producto"
+                    ).all():
+
+                        imagen = detalle.producto.imagenes.first()
+
+                        productos_finales.append({
+                            "producto_id": detalle.producto.id,
+                            "producto": detalle.producto.nombre,
+                            "cantidad": detalle.cantidad,
+                            "imagen_url": (
+                                imagen.imagen.url
+                                if imagen and imagen.imagen
+                                else ""
+                            )
+                        })
+
+                if confirmado and solicitud:
+
+                    if productos_finales:
+
+                        resumen = ", ".join(
+                            f"{item['producto']} ({item['cantidad']})"
+                            for item in productos_finales
+                        )
+
+                        respuesta_confirmacion = (
+                            "Perfecto. Tu solicitud quedó preparada. "
+                            "Actualmente contiene: "
+                            + resumen
+                            + ". Te llevaré a la solicitud para que "
+                              "puedas revisarla antes de enviarla."
+                        )
+
+                    else:
+
+                        respuesta_confirmacion = (
+                            "Tu solicitud no tiene productos. "
+                            "Puedes agregar alguno antes de enviarla."
+                        )
+
                 return JsonResponse({
                     "ok": True,
-                    "respuesta": texto_respuesta,
+                    "respuesta": respuesta_confirmacion,
                     "modo": "solicitud",
-                    "confirmado": confirmado
+                    "confirmado": confirmado,
+                    "productos": productos_finales,
+                    "redirect_url": (
+                        reverse("solicitudes")
+                        if confirmado and solicitud
+                        else None
+                    )
                 })
 
             # ======================================================
@@ -2916,13 +3241,26 @@ No agregues explicaciones fuera del JSON.
 
                 for item in productos_accion:
 
-                    producto_id = item.get("producto_id")
-                    cantidad = item.get("cantidad")
+                    producto_id = item.get(
+                        "producto_id"
+                    )
+
+                    cantidad = item.get(
+                        "cantidad"
+                    )
 
                     try:
-                        producto_id = int(producto_id)
-                        cantidad = int(cantidad)
+
+                        producto_id = int(
+                            producto_id
+                        )
+
+                        cantidad = int(
+                            cantidad
+                        )
+
                     except (TypeError, ValueError):
+
                         continue
 
                     if cantidad <= 0:
@@ -2936,16 +3274,19 @@ No agregues explicaciones fuera del JSON.
                     if not producto:
                         continue
 
-                    detalle, creado = DetalleSolicitud.objects.get_or_create(
-                        solicitud=solicitud,
-                        producto=producto,
-                        defaults={
-                            "cantidad": cantidad,
-                            "seleccionado": True
-                        }
+                    detalle, creado = (
+                        DetalleSolicitud.objects.get_or_create(
+                            solicitud=solicitud,
+                            producto=producto,
+                            defaults={
+                                "cantidad": cantidad,
+                                "seleccionado": True
+                            }
+                        )
                     )
 
                     if not creado:
+
                         detalle.cantidad += cantidad
                         detalle.seleccionado = True
                         detalle.save()
@@ -2956,17 +3297,16 @@ No agregues explicaciones fuera del JSON.
 
                 if cambios:
 
-                    respuesta_final = (
-                        "Perfecto. Agregué a tu solicitud: "
-                        + ", ".join(cambios)
-                        + ". ¿Son esos todos los productos que deseas o "
-                          "quieres agregar, quitar o modificar alguna cantidad?"
-                    )
-
                     return JsonResponse({
                         "ok": True,
-                        "respuesta": respuesta_final,
+                        "respuesta": (
+                            "Perfecto. Agregué a tu solicitud: "
+                            + ", ".join(cambios)
+                            + ". ¿Son esos todos los productos que deseas "
+                              "o quieres agregar, quitar o modificar alguna cantidad?"
+                        ),
                         "modo": "solicitud",
+                        "confirmado": False,
                         "redirect_url": reverse("solicitudes")
                     })
 
@@ -2980,36 +3320,59 @@ No agregues explicaciones fuera del JSON.
 
                 for item in productos_accion:
 
-                    producto_id = item.get("producto_id")
-                    cantidad = item.get("cantidad")
+                    producto_id = item.get(
+                        "producto_id"
+                    )
+
+                    cantidad = item.get(
+                        "cantidad"
+                    )
 
                     try:
-                        producto_id = int(producto_id)
-                        cantidad = int(cantidad)
+
+                        producto_id = int(
+                            producto_id
+                        )
+
+                        cantidad = int(
+                            cantidad
+                        )
+
                     except (TypeError, ValueError):
+
                         continue
 
                     if cantidad <= 0:
                         continue
 
-                    detalle = DetalleSolicitud.objects.filter(
-                        solicitud=solicitud,
-                        producto_id=producto_id
-                    ).first()
+                    detalle = (
+                        DetalleSolicitud.objects
+                        .filter(
+                            solicitud=solicitud,
+                            producto_id=producto_id
+                        )
+                        .first()
+                    )
 
                     if not detalle:
                         continue
 
                     if detalle.cantidad > cantidad:
+
                         detalle.cantidad -= cantidad
                         detalle.save()
 
                         cambios.append(
-                            f"se quitaron {cantidad} de {detalle.producto.nombre}"
+                            f"se quitaron {cantidad} de "
+                            f"{detalle.producto.nombre}"
                         )
 
                     else:
-                        nombre = detalle.producto.nombre
+
+                        nombre = (
+                            detalle.producto.nombre
+                        )
+
                         detalle.delete()
 
                         cambios.append(
@@ -3023,9 +3386,11 @@ No agregues explicaciones fuera del JSON.
                         "respuesta": (
                             "Listo. "
                             + ", ".join(cambios)
-                            + "."
+                            + ". ¿Quieres agregar otro producto, "
+                              "quitar alguno más o modificar otra cantidad?"
                         ),
                         "modo": "solicitud",
+                        "confirmado": False,
                         "redirect_url": reverse("solicitudes")
                     })
 
@@ -3039,32 +3404,51 @@ No agregues explicaciones fuera del JSON.
 
                 for item in productos_accion:
 
-                    producto_id = item.get("producto_id")
-                    cantidad = item.get("cantidad")
+                    producto_id = item.get(
+                        "producto_id"
+                    )
+
+                    cantidad = item.get(
+                        "cantidad"
+                    )
 
                     try:
-                        producto_id = int(producto_id)
-                        cantidad = int(cantidad)
+
+                        producto_id = int(
+                            producto_id
+                        )
+
+                        cantidad = int(
+                            cantidad
+                        )
+
                     except (TypeError, ValueError):
+
                         continue
 
                     if cantidad <= 0:
                         continue
 
-                    detalle = DetalleSolicitud.objects.filter(
-                        solicitud=solicitud,
-                        producto_id=producto_id
-                    ).first()
+                    detalle = (
+                        DetalleSolicitud.objects
+                        .filter(
+                            solicitud=solicitud,
+                            producto_id=producto_id
+                        )
+                        .first()
+                    )
 
                     if not detalle:
                         continue
 
                     detalle.cantidad = cantidad
                     detalle.seleccionado = True
+
                     detalle.save()
 
                     cambios.append(
-                        f"{detalle.producto.nombre} ahora tiene {cantidad}"
+                        f"{detalle.producto.nombre} "
+                        f"ahora tiene {cantidad}"
                     )
 
                 if cambios:
@@ -3074,9 +3458,11 @@ No agregues explicaciones fuera del JSON.
                         "respuesta": (
                             "Listo. Actualicé tu solicitud: "
                             + ", ".join(cambios)
-                            + "."
+                            + ". ¿Quieres hacer algún otro cambio "
+                              "o ya está lista?"
                         ),
                         "modo": "solicitud",
+                        "confirmado": False,
                         "redirect_url": reverse("solicitudes")
                     })
 
@@ -3087,12 +3473,16 @@ No agregues explicaciones fuera del JSON.
             return JsonResponse({
                 "ok": True,
                 "respuesta": texto_respuesta,
-                "modo": "solicitud"
+                "modo": "solicitud",
+                "confirmado": False
             })
 
     except Exception as e:
 
-        print("Error en PiroIA:", e)
+        print(
+            "Error en PiroIA:",
+            e
+        )
 
         return JsonResponse({
             "ok": False,
