@@ -2693,13 +2693,15 @@ CATÁLOGO ACTUAL:
 
             try:
 
-                respuesta = cliente.interactions.create(
+                respuesta = cliente.models.generate_content(
                     model="gemini-3.6-flash",
-                    input=pregunta,
-                    system_instruction=instrucciones,
-                    generation_config={
-                        "thinking_level": "low"
-                    }
+                    contents=pregunta,
+                    config=types.GenerateContentConfig(
+                        system_instruction=instrucciones,
+                        thinking_config=types.ThinkingConfig(
+                            thinking_level="low"
+                        )
+                    )
                 )
 
             except Exception as e:
@@ -2998,13 +3000,15 @@ MENSAJE:
 
             try:
 
-                respuesta = cliente.interactions.create(
+                respuesta = cliente.models.generate_content(
                     model="gemini-3.6-flash",
-                    input=pregunta,
-                    system_instruction=instrucciones,
-                    generation_config={
-                        "thinking_level": "low"
-                    }
+                    contents=pregunta,
+                    config=types.GenerateContentConfig(
+                        system_instruction=instrucciones,
+                        thinking_config=types.ThinkingConfig(
+                            thinking_level="low"
+                       )
+                    )
                 )
 
             except Exception as e:
