@@ -3128,19 +3128,107 @@ document.addEventListener(
                 /* RESPUESTA DE PIROIA */
                 /* ========================================= */
 
-                if (datos.ok) {
+                if (datos.ok === true) {
 
-                    ultimaRespuesta =
+                    /*
+                     * El backend debe enviar la respuesta en:
+                     * datos.respuesta
+                     *
+                     * Si por alguna razón OpenRouter devolvió
+                     * un JSON dentro de "respuesta", lo
+                     * convertimos para mostrar únicamente
+                     * el texto al usuario.
+                     */
+
+                    let respuestaLimpia =
                         datos.respuesta ||
                         "Listo.";
+
+
+                    if (
+                        typeof respuestaLimpia ===
+                        "string"
+                    ) {
+
+                        const texto = respuestaLimpia.trim();
+
+
+                        /*
+                         * Detectar si "respuesta" contiene
+                         * accidentalmente un objeto JSON.
+                         */
+
+                        if (
+                            (
+                                texto.startsWith("{") &&
+                                texto.endsWith("}")
+                            ) ||
+                            (
+                                texto.startsWith("[") &&
+                                texto.endsWith("]")
+                            )
+                        ) {
+
+                            try {
+
+                                const respuestaJSON =
+                                    JSON.parse(texto);
+
+
+                                if (
+                                    respuestaJSON &&
+                                    typeof respuestaJSON ===
+                                    "object"
+                                ) {
+
+                                    respuestaLimpia =
+                                        respuestaJSON.respuesta ||
+                                        respuestaJSON.message ||
+                                        respuestaJSON.texto ||
+                                        "Listo.";
+
+                                }
+
+                            } catch (errorJSON) {
+
+                                console.warn(
+                                    "PiroIA: la respuesta no era JSON válido.",
+                                    errorJSON
+                                );
+
+                            }
+
+                        }
+
+                    }
+
+
+                    respuestaLimpia =
+                        String(
+                            respuestaLimpia ||
+                            "Listo."
+                        ).trim();
+
+
+                    /*
+                     * Guardar solamente el texto limpio.
+                     */
+
+                    ultimaRespuesta =
+                        respuestaLimpia;
 
 
                     solicitudConfirmada =
                         datos.confirmado === true;
 
 
+                    /*
+                     * Mostrar SOLO el mensaje de PiroIA.
+                     * Nunca mostrar el JSON completo.
+                     */
+
                     agregarMensajeBot(
-                        ultimaRespuesta
+                        respuestaLimpia
                     );
 
 
@@ -3150,7 +3238,8 @@ document.addEventListener(
 
                     if (
                         "speechSynthesis"
-                        in window
+                        in window &&
+                        respuestaLimpia
                     ) {
 
                         speakButton.style.display =
@@ -3158,34 +3247,49 @@ document.addEventListener(
 
 
                         hablarRespuesta(
-                            ultimaRespuesta
+                            respuestaLimpia
                         );
 
                     }
 
 
                     /* ========================================= */
-                    /* REDIRECCIÓN */
-                    /* ========================================= */
-
-                    /* ========================================= */
                     /* REDIRECCIÓN A SOLICITUDES */
                     /* ========================================= */
 
-                    if (datos.confirmado === true) {
+                    if (
+                        datos.confirmado === true
+                    ) {
 
                         console.log(
                             "PiroIA: solicitud confirmada."
                         );
 
+
+                        /*
+                         * Django normalmente envía:
+                         * /solicitudes/
+                         *
+                         * Si no viene la URL, usamos
+                         * directamente la ruta de solicitudes.
+                         */
+
                         const destino =
                             datos.redirect_url ||
                             "/solicitudes/";
+
 
                         console.log(
                             "PiroIA: redirigiendo a:",
                             destino
                         );
+
+
+                        /*
+                         * Esperamos un momento para que
+                         * el usuario pueda leer/escuchar
+                         * la confirmación.
+                         */
 
                         setTimeout(
                             function () {
@@ -3198,6 +3302,7 @@ document.addEventListener(
                             1200
                         );
 
+
                     } else {
 
                         console.log(
@@ -3209,11 +3314,65 @@ document.addEventListener(
 
                 } else {
 
-                    agregarMensajeBot(
+                    /*
+                     * Error devuelto por Django.
+                     */
 
+                    let mensajeError =
                         datos.respuesta ||
-                        "No pude procesar tu solicitud."
+                        datos.error ||
+                        "No pude procesar tu solicitud.";
 
+
+                    /*
+                     * Evitar mostrar un JSON de error
+                     * completo al usuario.
+                     */
+
+                    if (
+                        typeof mensajeError ===
+                        "string"
+                    ) {
+
+                        const textoError =
+                            mensajeError.trim();
+
+
+                        if (
+                            textoError.startsWith("{") &&
+                            textoError.endsWith("}")
+                        ) {
+
+                            try {
+
+                                const errorJSON =
+                                    JSON.parse(textoError);
+
+
+                                mensajeError =
+                                    errorJSON.respuesta ||
+                                    errorJSON.error ||
+                                    errorJSON.message ||
+                                    "No pude procesar tu solicitud.";
+
+                            } catch (errorJSON) {
+
+                                console.warn(
+                                    "PiroIA: no se pudo interpretar el error JSON.",
+                                    errorJSON
+                                );
+
+                            }
+
+                        }
+
+                    }
+
+
+                    agregarMensajeBot(
+                        String(
+                            mensajeError
+                        )
                     );
 
                 }
