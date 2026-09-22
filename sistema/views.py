@@ -2956,7 +2956,7 @@ Pregunta del usuario:
         }
 
         payload = {
-            "model": "qwen/qwen3-30b-a3b:free",
+            "model": "openrouter/free",
             "messages": [
                 {
                     "role": "user",
@@ -2965,7 +2965,6 @@ Pregunta del usuario:
             ],
             "temperature": 0.2,
             "max_tokens": 500,
-            "reasoning_effort": "none"
         }
 
         print("====================================")
