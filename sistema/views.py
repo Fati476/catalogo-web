@@ -2956,7 +2956,7 @@ Pregunta del usuario:
         }
 
         payload = {
-            "model": "openrouter/free",
+            "model": "nvidia/nemotron-3.5-lightning:free",
             "messages": [
                 {
                     "role": "user",
@@ -2964,7 +2964,7 @@ Pregunta del usuario:
                 }
             ],
             "temperature": 0.2,
-            "max_tokens": 1500
+            "max_tokens": 700
         }
 
         print("====================================")
@@ -2979,7 +2979,7 @@ Pregunta del usuario:
                 url,
                 headers=headers,
                 json=payload,
-                timeout=20
+                timeout=12
             )
 
         except requests.exceptions.Timeout:
