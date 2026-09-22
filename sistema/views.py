@@ -2764,6 +2764,26 @@ IMPORTANTE SOBRE EL CONTEXTO DE LA CONVERSACIÓN:
   pero la información real de productos y cantidades debe validarse
   contra la solicitud y el catálogo.
 
+REGLA ESPECIAL PARA CONVERSACIONES DE SOLICITUD:
+
+- Si el usuario primero menciona un producto y después indica solamente
+  una cantidad, relaciona esa cantidad con el producto mencionado.
+- Por ejemplo, si el usuario dijo "Pachanga Plus" y después dice
+  "quiero tres unidades", debes interpretar "tres unidades" como
+  "3 piezas de Pachanga Plus".
+- Cuando ya tengas producto + cantidad, NO pidas nuevamente el nombre
+  del producto.
+- En ese caso devuelve accion="agregar" y el producto con la cantidad
+  correspondiente.
+- La primera indicación de producto + cantidad prepara el borrador.
+- Después de preparar el borrador, el sistema preguntará si desea
+  agregar o modificar algo.
+- Si el usuario responde "no", "no quiero modificaciones",
+  "así está bien", "está bien", "eso es todo", "déjalo así" o una
+  expresión equivalente, devuelve confirmado=true.
+- Si el usuario responde que sí quiere modificar, NO confirmes todavía:
+  continúa trabajando sobre la misma solicitud activa.
+
 Si el usuario quiere crear una solicitud nueva, identifica los
 productos del catálogo y las cantidades.
 
@@ -3042,8 +3062,6 @@ Pregunta del usuario:
                 .get("content")
             )
 
-            # Algunos modelos gratuitos de OpenRouter pueden terminar
-            # su respuesta por límite de tokens y devolver content como None.
             if contenido is None:
 
                 print("OPENROUTER DEVOLVIÓ CONTENT = NONE")
@@ -3059,9 +3077,7 @@ Pregunta del usuario:
                     "ok": True,
                     "respuesta": (
                         "PiroIA necesitó más tiempo para interpretar "
-                        "la solicitud. Intenta escribirla nuevamente "
-                        "de forma breve, por ejemplo: "
-                        "\"quiero crear una solicitud\"."
+                        "la solicitud. Intenta nuevamente de forma breve."
                     ),
                     "confirmado": False,
                     "accion": "ninguna",
@@ -3246,7 +3262,9 @@ Pregunta del usuario:
         # 12. CREAR SOLICITUD NUEVA
         # ==========================================================
 
-        if confirmado and not solicitud_actual:
+        if (accion in ["agregar", "quitar", "cambiar"]
+                and productos
+                and not solicitud_actual):
 
             solicitud_actual = SolicitudCotizacion.objects.create(
                 usuario=request.user,
@@ -3490,12 +3508,13 @@ Pregunta del usuario:
                 if resumen_productos:
 
                     respuesta_confirmacion = (
-                        "Perfecto. Tu solicitud quedó preparada "
-                        "con "
+                        "Perfecto. Tu solicitud quedó preparada con "
                         + ", ".join(resumen_productos)
                         + ". Los precios se determinarán mediante "
-                          "cotización. Te llevaré a la solicitud "
-                          "para que puedas revisarla antes de enviarla."
+                          "cotización. No se ha enviado todavía. "
+                          "Te llevaré al apartado de Solicitudes para "
+                          "que puedas revisarla y, si todo está correcto, "
+                          "presiones Enviar solicitud."
                     )
 
                 else:
@@ -3513,6 +3532,67 @@ Pregunta del usuario:
                     "productos": productos_finales,
                     "redirect_url": reverse("solicitudes")
                 })
+
+        # ==========================================================
+        # 15. SOLICITUD PREPARADA, PENDIENTE DE MODIFICACIONES
+        # ==========================================================
+
+        if (
+            solicitud_actual
+            and cambios_realizados
+            and not confirmado
+            and accion in ["agregar", "quitar", "cambiar"]
+        ):
+
+            detalles_preparados = (
+                solicitud_actual.detalles
+                .select_related("producto")
+                .all()
+            )
+
+            resumen_preparado = []
+
+            for detalle in detalles_preparados:
+
+                resumen_preparado.append(
+                    f"{detalle.cantidad} "
+                    f"{'pieza' if detalle.cantidad == 1 else 'piezas'} "
+                    f"de {detalle.producto.nombre}"
+                )
+
+            if resumen_preparado:
+
+                respuesta_preparada = (
+                    "Perfecto. Preparé tu solicitud con "
+                    + ", ".join(resumen_preparado)
+                    + ". ¿Deseas agregar o modificar algún "
+                      "producto o cantidad?"
+                )
+
+            else:
+
+                respuesta_preparada = (
+                    "La solicitud quedó sin productos. "
+                    "¿Deseas agregar algún producto?"
+                )
+
+            productos_preparados = []
+
+            for detalle in detalles_preparados:
+
+                productos_preparados.append({
+                    "producto_id": detalle.producto.id,
+                    "nombre": detalle.producto.nombre,
+                    "cantidad": detalle.cantidad
+                })
+
+            return JsonResponse({
+                "ok": True,
+                "respuesta": respuesta_preparada,
+                "confirmado": False,
+                "accion": accion,
+                "productos": productos_preparados
+            })
 
         # ==========================================================
         # 15. RESPUESTA NORMAL DE SOLICITUD
