@@ -1652,8 +1652,11 @@ document.addEventListener(
         /* MEMORIA */
         /* ========================================= */
 
-        const claveConversacion =
-            "piroia_conversacion";
+        const claveConversacionConsulta =
+            "piroia_conversacion_consulta";
+
+        const claveConversacionSolicitud =
+            "piroia_conversacion_solicitud";
 
 
         function guardarConversacion() {
@@ -1707,24 +1710,30 @@ document.addEventListener(
             );
 
 
+            const claveActual =
+                modoActual === "consulta"
+                    ? claveConversacionConsulta
+                    : claveConversacionSolicitud;
+
             sessionStorage.setItem(
-
-                claveConversacion,
-
+                claveActual,
                 JSON.stringify(
                     mensajes
                 )
-
             );
-
         }
 
 
         function cargarConversacion() {
 
+            const claveActual =
+                modoActual === "consulta"
+                    ? claveConversacionConsulta
+                    : claveConversacionSolicitud;
+
             const guardada =
                 sessionStorage.getItem(
-                    claveConversacion
+                    claveActual
                 );
 
 
@@ -1798,6 +1807,8 @@ document.addEventListener(
 
             modoActual =
                 modo;
+            messages.innerHTML = "";
+            cargarConversacion();
 
 
             if (
@@ -2695,8 +2706,6 @@ document.addEventListener(
         /* ========================================= */
         /* CARGAR CONVERSACIÓN */
         /* ========================================= */
-
-        cargarConversacion();
 
 
         /* ========================================= */
