@@ -2944,7 +2944,7 @@ Pregunta del usuario:
                 }
             ],
             "temperature": 0.2,
-            "max_tokens": 1000
+            "max_tokens": 1500
         }
 
         print("====================================")
@@ -3037,8 +3037,36 @@ Pregunta del usuario:
             resultado = respuesta_ia.json()
 
             contenido = (
-                resultado["choices"][0]["message"]["content"]
+                resultado.get("choices", [{}])[0]
+                .get("message", {})
+                .get("content")
             )
+
+            # Algunos modelos gratuitos de OpenRouter pueden terminar
+            # su respuesta por límite de tokens y devolver content como None.
+            if contenido is None:
+
+                print("OPENROUTER DEVOLVIÓ CONTENT = NONE")
+
+                razon = (
+                    resultado.get("choices", [{}])[0]
+                    .get("finish_reason")
+                )
+
+                print("FINISH REASON:", razon)
+
+                return JsonResponse({
+                    "ok": True,
+                    "respuesta": (
+                        "PiroIA necesitó más tiempo para interpretar "
+                        "la solicitud. Intenta escribirla nuevamente "
+                        "de forma breve, por ejemplo: "
+                        "\"quiero crear una solicitud\"."
+                    ),
+                    "confirmado": False,
+                    "accion": "ninguna",
+                    "productos": []
+                })
 
         except Exception as e:
 
@@ -3055,7 +3083,20 @@ Pregunta del usuario:
                 )
             })
 
-        contenido = contenido.strip()
+        contenido = str(contenido).strip()
+
+        if not contenido:
+
+            return JsonResponse({
+                "ok": True,
+                "respuesta": (
+                    "No pude interpretar la respuesta de PiroIA. "
+                    "Intenta nuevamente."
+                ),
+                "confirmado": False,
+                "accion": "ninguna",
+                "productos": []
+            })
 
         # ==========================================================
         # 9. MODO CONSULTA
