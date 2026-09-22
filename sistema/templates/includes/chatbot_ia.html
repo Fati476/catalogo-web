@@ -3168,40 +3168,41 @@ document.addEventListener(
                     /* REDIRECCIÓN */
                     /* ========================================= */
 
-                    if (
-                        datos.redirect_url
-                    ) {
+                    /* ========================================= */
+                    /* REDIRECCIÓN A SOLICITUDES */
+                    /* ========================================= */
 
-                        if (
-                            modoActual === "solicitud" &&
-                            !solicitudConfirmada
-                        ) {
+                    if (datos.confirmado === true) {
 
-                            /*
-                             * No se redirige todavía.
-                             *
-                             * PiroIA seguirá conversando
-                             * con el usuario.
-                             */
+                        console.log(
+                            "PiroIA: solicitud confirmada."
+                        );
 
-                        } else {
+                        const destino =
+                            datos.redirect_url ||
+                            "/solicitudes/";
 
-                            /*
-                             * Esperamos un poco para que
-                             * el usuario escuche la respuesta.
-                             */
+                        console.log(
+                            "PiroIA: redirigiendo a:",
+                            destino
+                        );
 
-                            setTimeout(
-                                function () {
+                        setTimeout(
+                            function () {
 
-                                    window.location.href =
-                                        datos.redirect_url;
+                                window.location.assign(
+                                    destino
+                                );
 
-                                },
-                                1200
-                            );
+                            },
+                            1200
+                        );
 
-                        }
+                    } else {
+
+                        console.log(
+                            "PiroIA: solicitud todavía en revisión."
+                        );
 
                     }
 
