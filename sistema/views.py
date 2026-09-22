@@ -2544,7 +2544,6 @@ def revertir_cambio_correo(request, token):
 def chatbot_ia(request):
 
     try:
-
         data = json.loads(request.body)
 
         pregunta = data.get("mensaje", "").strip()
@@ -2597,7 +2596,7 @@ def chatbot_ia(request):
         )
 
         # ==========================================================
-        # SOLICITUD ACTIVA DEL USUARIO
+        # SOLICITUD ACTIVA
         # ==========================================================
 
         solicitud_id = (
@@ -2608,7 +2607,6 @@ def chatbot_ia(request):
         solicitud = None
 
         if solicitud_id:
-
             solicitud = SolicitudCotizacion.objects.filter(
                 id=solicitud_id,
                 usuario=request.user,
@@ -2652,14 +2650,7 @@ def chatbot_ia(request):
         # ==========================================================
 
         cliente = genai.Client(
-            api_key=os.getenv("GEMINI_API_KEY"),
-            http_options=types.HttpOptions(
-                timeout=10000,
-                retry_options=types.HttpRetryOptions(
-                    attempts=1,
-                    http_status_codes=[]
-                )
-            )
+            api_key=os.getenv("GEMINI_API_KEY")
         )
 
         # ==========================================================
@@ -2708,40 +2699,22 @@ CATÁLOGO ACTUAL:
                     system_instruction=instrucciones,
                     generation_config={
                         "thinking_level": "low"
-                    },
-                    timeout=10000
+                    }
                 )
 
             except Exception as e:
 
-                mensaje_error = str(e)
-
-                print(
-                    "Error Gemini modo consulta:",
-                    mensaje_error
-                )
-
-                if "429" in mensaje_error or "Too Many Requests" in mensaje_error:
-
-                    return JsonResponse({
-                        "ok": True,
-                        "respuesta": (
-                            "En este momento PiroIA está recibiendo "
-                            "muchas solicitudes. Espera unos segundos "
-                            "e inténtalo nuevamente."
-                        ),
-                        "modo": "consulta",
-                        "limitado": True
-                    })
+                print("Error Gemini consulta:", e)
 
                 return JsonResponse({
-                    "ok": False,
+                    "ok": True,
                     "respuesta": (
-                        "No pude comunicarme con PiroIA en este momento. "
-                        "Intenta nuevamente."
+                        "En este momento PiroIA no pudo comunicarse "
+                        "con el servicio de inteligencia artificial. "
+                        "Espera unos segundos e inténtalo nuevamente."
                     ),
                     "modo": "consulta"
-                }, status=503)
+                })
 
             return JsonResponse({
                 "ok": True,
@@ -2756,14 +2729,10 @@ CATÁLOGO ACTUAL:
         if modo == "solicitud":
 
             # ======================================================
-            # EL USUARIO QUIERE EDITAR
+            # EDITAR SOLICITUD
             # ======================================================
 
             if quiere_editar:
-
-                # --------------------------------------------------
-                # YA EXISTE UNA SOLICITUD EN EDICIÓN
-                # --------------------------------------------------
 
                 if solicitud:
 
@@ -2818,10 +2787,6 @@ CATÁLOGO ACTUAL:
                         "confirmado": False
                     })
 
-                # --------------------------------------------------
-                # BUSCAR ÚLTIMA SOLICITUD EN REVISIÓN
-                # --------------------------------------------------
-
                 solicitud_existente = (
                     SolicitudCotizacion.objects
                     .filter(
@@ -2848,30 +2813,19 @@ CATÁLOGO ACTUAL:
                         "confirmado": False
                     })
 
-                # --------------------------------------------------
-                # SOLICITUD BLOQUEADA
-                # --------------------------------------------------
-
                 if solicitud_existente.bloqueada:
 
                     return JsonResponse({
                         "ok": True,
                         "respuesta": (
-                            "Claro, con gusto te ayudaría a editarla, "
-                            "pero por el momento no puedo modificar esta "
-                            "solicitud porque el administrador ya la está "
-                            "revisando. Cuando termine la revisión podrás "
-                            "realizar cambios nuevamente."
+                            "No puedo modificar esta solicitud porque "
+                            "el administrador ya la está revisando."
                         ),
                         "modo": "solicitud",
                         "editando": False,
                         "edicion_bloqueada": True,
                         "confirmado": False
                     })
-
-                # --------------------------------------------------
-                # PASAR SOLICITUD A EDICIÓN
-                # --------------------------------------------------
 
                 solicitud = solicitud_existente
 
@@ -2886,7 +2840,6 @@ CATÁLOGO ACTUAL:
                 )
 
                 request.session["solicitud_editando_id"] = solicitud.id
-
                 request.session.pop(
                     "piroia_solicitud_id",
                     None
@@ -2911,28 +2864,22 @@ CATÁLOGO ACTUAL:
                         )
                     })
 
-                if productos_actuales:
+                lista_productos = ", ".join(
+                    f"{item['producto']} ({item['cantidad']})"
+                    for item in productos_actuales
+                )
 
-                    lista_productos = ", ".join(
-                        f"{item['producto']} ({item['cantidad']})"
-                        for item in productos_actuales
+                respuesta_edicion = (
+                    "Claro, con gusto. Ya puse tu solicitud en edición. "
+                    "Actualmente tienes: "
+                    + (
+                        lista_productos
+                        if lista_productos
+                        else "ningún producto"
                     )
-
-                    respuesta_edicion = (
-                        "Claro, con gusto. Ya puse tu solicitud en edición. "
-                        "Actualmente tienes: "
-                        + lista_productos
-                        + ". Puedes decirme qué producto quieres agregar, "
-                          "quitar o qué cantidad deseas cambiar."
-                    )
-
-                else:
-
-                    respuesta_edicion = (
-                        "Claro, con gusto. Ya puse tu solicitud en edición. "
-                        "Actualmente no tiene productos. "
-                        "Puedes decirme qué productos deseas agregar."
-                    )
+                    + ". Puedes decirme qué producto quieres agregar, "
+                      "quitar o qué cantidad deseas cambiar."
+                )
 
                 return JsonResponse({
                     "ok": True,
@@ -2944,7 +2891,7 @@ CATÁLOGO ACTUAL:
                 })
 
             # ======================================================
-            # DETALLES ACTUALES
+            # SOLICITUD ACTUAL
             # ======================================================
 
             detalles_actuales = []
@@ -2977,55 +2924,30 @@ CATÁLOGO ACTUAL:
 Eres PiroIA, un asistente inteligente para crear y modificar
 solicitudes de cotización.
 
-Tu función es interpretar lo que el cliente necesita utilizando
-ÚNICAMENTE los productos existentes en el catálogo.
+Utiliza únicamente los productos existentes en el catálogo.
 
-El cliente puede expresar su solicitud de manera natural.
+El cliente puede pedir:
 
-Ejemplos:
+- agregar productos
+- quitar productos
+- cambiar cantidades
+- confirmar su solicitud
 
-"Necesito 5 cajas del producto X"
+No inventes productos ni IDs.
 
-"Quiero 10 piezas de X y 3 de Y"
+No inventes cantidades.
 
-"Agrega 2 unidades de X"
+No proporciones instrucciones para fabricar,
+modificar, combinar o manipular productos pirotécnicos.
 
-"Quita 3 unidades de Y"
+Tu función es comercial y de gestión de solicitudes.
 
-"Cambia X a 8 piezas"
+Responde ÚNICAMENTE con JSON válido.
 
-REGLAS:
-
-1. Utiliza únicamente productos existentes en el catálogo.
-2. No inventes productos.
-3. Identifica el producto y la cantidad solicitada.
-4. Si la cantidad no está clara, no inventes una cantidad.
-5. Si el nombre no coincide claramente con un producto,
-   no inventes un producto.
-6. No inventes precios.
-7. No proporciones instrucciones para fabricar, modificar,
-   combinar o manipular productos pirotécnicos.
-8. Tu función es comercial y de gestión de solicitudes.
-9. Responde siempre en español.
-10. Sé breve y claro.
-11. Si el cliente confirma que ya no desea modificaciones,
-    confirmado debe ser true.
-12. Si el cliente todavía quiere realizar cambios,
-    confirmado debe ser false.
-13. Si el cliente solicita agregar, quitar o cambiar productos,
-    la acción debe corresponder a esa solicitud.
-14. Si el cliente solamente está conversando y no solicita
-    ningún cambio, usa accion "ninguna" y confirmado false.
-15. No inventes IDs. Utiliza únicamente los IDs del catálogo.
-
-IMPORTANTE:
-
-Debes devolver ÚNICAMENTE un JSON válido.
-
-ESTRUCTURA:
+FORMATO:
 
 {{
-    "respuesta": "respuesta breve para el cliente",
+    "respuesta": "respuesta breve",
     "accion": "agregar",
     "confirmado": false,
     "productos": [
@@ -3036,26 +2958,14 @@ ESTRUCTURA:
     ]
 }}
 
-ACCIONES PERMITIDAS:
+ACCIONES:
 
-- agregar
-- quitar
-- cambiar
-- ninguna
+agregar
+quitar
+cambiar
+ninguna
 
-CONFIRMACIÓN FINAL:
-
-Si el cliente dice algo como:
-
-"Sí, esos son todos"
-"Eso es todo"
-"No quiero cambiar nada"
-"Está bien así"
-"Correcto"
-"Ya quedó"
-"Esos son los productos que necesito"
-
-usa:
+Si el cliente confirma que ya no quiere hacer cambios:
 
 {{
     "respuesta": "Perfecto, tu solicitud está lista.",
@@ -3064,13 +2974,10 @@ usa:
     "productos": []
 }}
 
-Si solicita cambios, confirmado debe ser false.
-
-Si no puedes identificar claramente el producto o cantidad,
-usa:
+Si no hay una modificación clara:
 
 {{
-    "respuesta": "Necesito que me indiques con más claridad el producto y la cantidad.",
+    "respuesta": "Necesito que me indiques el producto y la cantidad.",
     "accion": "ninguna",
     "confirmado": false,
     "productos": []
@@ -3084,7 +2991,7 @@ SOLICITUD ACTUAL:
 
 {contexto_solicitud}
 
-MENSAJE DEL CLIENTE:
+MENSAJE:
 
 {pregunta}
 """
@@ -3097,46 +3004,23 @@ MENSAJE DEL CLIENTE:
                     system_instruction=instrucciones,
                     generation_config={
                         "thinking_level": "low"
-                    },
-                    timeout=10000
+                    }
                 )
 
             except Exception as e:
 
-                mensaje_error = str(e)
-
-                print(
-                    "Error Gemini modo solicitud:",
-                    mensaje_error
-                )
-
-                if "429" in mensaje_error or "Too Many Requests" in mensaje_error:
-
-                    return JsonResponse({
-                        "ok": True,
-                        "respuesta": (
-                            "En este momento PiroIA está recibiendo "
-                            "muchas solicitudes. Espera unos segundos "
-                            "e inténtalo nuevamente."
-                        ),
-                        "modo": "solicitud",
-                        "confirmado": False,
-                        "limitado": True
-                    })
+                print("Error Gemini solicitud:", e)
 
                 return JsonResponse({
-                    "ok": False,
+                    "ok": True,
                     "respuesta": (
-                        "No pude comunicarme con PiroIA en este momento. "
-                        "Intenta nuevamente."
+                        "En este momento PiroIA no pudo comunicarse "
+                        "con el servicio de inteligencia artificial. "
+                        "Espera unos segundos e inténtalo nuevamente."
                     ),
                     "modo": "solicitud",
                     "confirmado": False
-                }, status=503)
-
-            # ======================================================
-            # LEER JSON DE GEMINI
-            # ======================================================
+                })
 
             texto_json = respuesta.output_text.strip()
 
@@ -3162,24 +3046,15 @@ MENSAJE DEL CLIENTE:
 
             except json.JSONDecodeError:
 
-                print(
-                    "PiroIA devolvió JSON inválido:",
-                    texto_json
-                )
-
                 return JsonResponse({
                     "ok": True,
                     "respuesta": (
-                        "Entendí tu solicitud, pero necesito que me "
-                        "la confirmes nuevamente de forma más clara."
+                        "No pude interpretar correctamente la solicitud. "
+                        "Intenta indicarme nuevamente el producto y la cantidad."
                     ),
                     "modo": "solicitud",
                     "confirmado": False
                 })
-
-            # ======================================================
-            # DATOS DE LA IA
-            # ======================================================
 
             texto_respuesta = accion_data.get(
                 "respuesta",
@@ -3204,24 +3079,7 @@ MENSAJE DEL CLIENTE:
             )
 
             # ======================================================
-            # VALIDAR ACCIÓN
-            # ======================================================
-
-            acciones_validas = [
-                "agregar",
-                "quitar",
-                "cambiar",
-                "ninguna"
-            ]
-
-            if accion not in acciones_validas:
-
-                accion = "ninguna"
-                confirmado = False
-                productos_accion = []
-
-            # ======================================================
-            # CONFIRMACIÓN FINAL
+            # CONFIRMACIÓN
             # ======================================================
 
             if accion == "ninguna" and confirmado:
@@ -3247,41 +3105,36 @@ MENSAJE DEL CLIENTE:
                             )
                         })
 
-                if productos_finales:
+                if not productos_finales:
 
-                    resumen = ", ".join(
-                        f"{item['producto']} ({item['cantidad']})"
-                        for item in productos_finales
-                    )
+                    return JsonResponse({
+                        "ok": True,
+                        "respuesta": (
+                            "Tu solicitud no tiene productos. "
+                            "Puedes agregar alguno antes de enviarla."
+                        ),
+                        "modo": "solicitud",
+                        "confirmado": False
+                    })
 
-                    texto_respuesta = (
-                        "Perfecto. Tu solicitud quedó preparada. "
-                        "Actualmente contiene: "
-                        + resumen
-                        + ". Te llevaré a la solicitud para que puedas "
-                          "revisarla antes de enviarla."
-                    )
-
-                else:
-
-                    texto_respuesta = (
-                        "Tu solicitud no tiene productos. "
-                        "Puedes agregar alguno antes de enviarla."
-                    )
-
-                    confirmado = False
+                resumen = ", ".join(
+                    f"{item['producto']} ({item['cantidad']})"
+                    for item in productos_finales
+                )
 
                 return JsonResponse({
                     "ok": True,
-                    "respuesta": texto_respuesta,
+                    "respuesta": (
+                        "Perfecto. Tu solicitud quedó preparada. "
+                        "Actualmente contiene: "
+                        + resumen
+                        + ". Te llevaré a la solicitud para que "
+                          "puedas revisarla antes de enviarla."
+                    ),
                     "modo": "solicitud",
-                    "confirmado": confirmado,
+                    "confirmado": True,
                     "productos": productos_finales,
-                    "redirect_url": (
-                        reverse("solicitudes")
-                        if confirmado and solicitud
-                        else None
-                    )
+                    "redirect_url": reverse("solicitudes")
                 })
 
             # ======================================================
@@ -3367,15 +3220,12 @@ MENSAJE DEL CLIENTE:
                         "ok": True,
                         "respuesta": (
                             texto_respuesta
-                            or (
-                                "Perfecto. Agregué a tu solicitud: "
-                                + ", ".join(cambios)
-                            )
+                            + " ¿Quieres agregar, quitar o modificar "
+                              "algún otro producto?"
                         ),
                         "modo": "solicitud",
                         "confirmado": False,
-                        "productos": cambios,
-                        "redirect_url": reverse("solicitudes")
+                        "productos": cambios
                     })
 
             # ======================================================
@@ -3449,19 +3299,15 @@ MENSAJE DEL CLIENTE:
                         "ok": True,
                         "respuesta": (
                             texto_respuesta
-                            or (
-                                "Listo. "
-                                + ", ".join(cambios)
-                            )
+                            + " ¿Quieres hacer algún otro cambio?"
                         ),
                         "modo": "solicitud",
                         "confirmado": False,
-                        "productos": cambios,
-                        "redirect_url": reverse("solicitudes")
+                        "productos": cambios
                     })
 
             # ======================================================
-            # CAMBIAR CANTIDAD
+            # CAMBIAR
             # ======================================================
 
             elif accion == "cambiar":
@@ -3520,15 +3366,11 @@ MENSAJE DEL CLIENTE:
                         "ok": True,
                         "respuesta": (
                             texto_respuesta
-                            or (
-                                "Listo. Actualicé tu solicitud: "
-                                + ", ".join(cambios)
-                            )
+                            + " ¿Quieres hacer algún otro cambio?"
                         ),
                         "modo": "solicitud",
                         "confirmado": False,
-                        "productos": cambios,
-                        "redirect_url": reverse("solicitudes")
+                        "productos": cambios
                     })
 
             # ======================================================
@@ -3542,18 +3384,10 @@ MENSAJE DEL CLIENTE:
                 "confirmado": False
             })
 
-        # ==========================================================
-        # MODO NO RECONOCIDO
-        # ==========================================================
-
         return JsonResponse({
             "ok": False,
             "respuesta": "No reconocí el modo de PiroIA."
         }, status=400)
-
-    # ==========================================================
-    # ERROR GENERAL
-    # ==========================================================
 
     except Exception as e:
 
