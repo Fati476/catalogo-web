@@ -1658,6 +1658,13 @@ document.addEventListener(
         const claveConversacionSolicitud =
             "piroia_conversacion_solicitud";
 
+        /*
+         * El historial visual se conserva durante 3 días.
+         * Esto NO elimina la solicitud de cotización en Django.
+         */
+        const DURACION_CONVERSACION =
+            3 * 24 * 60 * 60 * 1000;
+
 
         function guardarConversacion() {
 
@@ -1718,9 +1725,10 @@ document.addEventListener(
 
             sessionStorage.setItem(
                 claveActual,
-                JSON.stringify(
-                    mensajes
-                )
+                JSON.stringify({
+                    fecha: Date.now(),
+                    mensajes: mensajes
+                })
             );
 
         }
@@ -1746,10 +1754,66 @@ document.addEventListener(
 
             try {
 
-                const mensajesGuardados =
+                const datosGuardados =
                     JSON.parse(
                         guardada
                     );
+
+                let mensajesGuardados = [];
+                let fechaGuardado = Date.now();
+
+                /*
+                 * Formato nuevo:
+                 * {
+                 *   fecha: ...,
+                 *   mensajes: [...]
+                 * }
+                 *
+                 * Si existe un historial antiguo guardado
+                 * como arreglo, lo aceptamos una vez y lo
+                 * convertimos al formato nuevo.
+                 */
+
+                if (
+                    Array.isArray(
+                        datosGuardados
+                    )
+                ) {
+
+                    mensajesGuardados =
+                        datosGuardados;
+
+                } else {
+
+                    fechaGuardado =
+                        datosGuardados.fecha ||
+                        Date.now();
+
+                    mensajesGuardados =
+                        datosGuardados.mensajes ||
+                        [];
+
+                }
+
+                /*
+                 * Después de 3 días se elimina solamente
+                 * el historial visual del navegador.
+                 *
+                 * La solicitud de cotización NO se elimina.
+                 */
+
+                if (
+                    Date.now() - fechaGuardado >
+                    DURACION_CONVERSACION
+                ) {
+
+                    sessionStorage.removeItem(
+                        claveActual
+                    );
+
+                    return;
+
+                }
 
                 mensajesGuardados.forEach(
                     function (mensaje) {
@@ -1778,6 +1842,27 @@ document.addEventListener(
 
                 messages.scrollTop =
                     messages.scrollHeight;
+
+                /*
+                 * Si era un historial antiguo,
+                 * lo guardamos con el nuevo formato.
+                 */
+
+                if (
+                    Array.isArray(
+                        datosGuardados
+                    )
+                ) {
+
+                    sessionStorage.setItem(
+                        claveActual,
+                        JSON.stringify({
+                            fecha: Date.now(),
+                            mensajes: mensajesGuardados
+                        })
+                    );
+
+                }
 
             } catch (error) {
 
@@ -2311,7 +2396,7 @@ document.addEventListener(
                     ) {
 
                         input.placeholder =
-                            "Pregunta sobre productos, categorías o precios...";
+                            "Pregunta sobre productos, categorías o características...";
 
                     } else {
 
@@ -2352,7 +2437,7 @@ document.addEventListener(
                     input.placeholder =
                         modoActual ===
                         "consulta"
-                            ? "Pregunta sobre productos, categorías o precios..."
+                            ? "Pregunta sobre productos, categorías o características..."
                             : "Describe los productos y cantidades que necesitas...";
 
                 };
@@ -2543,6 +2628,67 @@ document.addEventListener(
 
 
         /* ========================================= */
+        /* HISTORIAL PARA PIROIA */
+        /* ========================================= */
+
+        function obtenerHistorialActual() {
+
+            const historial = [];
+
+            messages.querySelectorAll(
+                ".piroia-message-user, .piroia-message-bot"
+            ).forEach(
+                function (mensaje) {
+
+                    if (
+                        mensaje.id ===
+                        "piroiaTyping"
+                    ) {
+
+                        return;
+
+                    }
+
+                    const burbuja =
+                        mensaje.querySelector(
+                            ".piroia-bubble"
+                        );
+
+                    if (!burbuja) {
+
+                        return;
+
+                    }
+
+                    historial.push({
+
+                        tipo:
+                            mensaje.classList.contains(
+                                "piroia-message-user"
+                            )
+                                ? "usuario"
+                                : "piroia",
+
+                        texto:
+                            burbuja.textContent
+
+                    });
+
+                }
+            );
+
+            /*
+             * Limitamos el contexto enviado a PiroIA
+             * para evitar que la conversación crezca
+             * indefinidamente.
+             */
+
+            return historial.slice(-12);
+
+        }
+
+
+        /* ========================================= */
         /* ENVIAR MENSAJE */
         /* ========================================= */
 
@@ -2617,7 +2763,20 @@ document.addEventListener(
                                         pregunta,
 
                                     modo:
-                                        modoActual
+                                        modoActual,
+
+                                    /*
+                                     * Enviamos las últimas
+                                     * intervenciones para que
+                                     * PiroIA pueda entender
+                                     * expresiones como:
+                                     * "tres de cada una",
+                                     * "sí por favor",
+                                     * "quita uno", etc.
+                                     */
+
+                                    historial:
+                                        obtenerHistorialActual()
 
                                 })
 

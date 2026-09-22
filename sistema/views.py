@@ -2557,6 +2557,18 @@ def chatbot_ia(request):
         pregunta = data.get("mensaje", "").strip()
         modo = data.get("modo", "consulta").strip().lower()
 
+        # Historial reciente enviado por el frontend.
+        # Sirve para que PiroIA entienda referencias como
+        # "tres de cada una", "sí por favor", "quita uno", etc.
+        historial = data.get("historial", [])
+
+        if not isinstance(historial, list):
+            historial = []
+
+        # Solo usamos las últimas 12 intervenciones para no hacer
+        # crecer demasiado el contexto enviado a OpenRouter.
+        historial_reciente = historial[-12:]
+
         if not pregunta:
             return JsonResponse({
                 "ok": False,
@@ -2626,8 +2638,16 @@ def chatbot_ia(request):
         if solicitud_id:
             solicitud_actual = SolicitudCotizacion.objects.filter(
                 id=solicitud_id,
-                usuario=request.user
+                usuario=request.user,
+                enviada=False,
+                estado="revision",
+                bloqueada=False
             ).first()
+
+            # Si la solicitud guardada en sesión ya fue enviada,
+            # cancelada o bloqueada, dejamos de considerarla activa.
+            if solicitud_actual is None:
+                request.session.pop("piroia_solicitud_id", None)
 
         productos_solicitud = []
 
@@ -2654,6 +2674,11 @@ def chatbot_ia(request):
 
         solicitud_texto = json.dumps(
             productos_solicitud,
+            ensure_ascii=False
+        )
+
+        historial_texto = json.dumps(
+            historial_reciente,
             ensure_ascii=False
         )
 
@@ -2715,6 +2740,29 @@ CATÁLOGO REAL:
 SOLICITUD ACTUAL DEL USUARIO:
 
 {solicitud_texto}
+
+CONVERSACIÓN RECIENTE:
+
+{historial_texto}
+
+IMPORTANTE SOBRE EL CONTEXTO DE LA CONVERSACIÓN:
+
+- Utiliza la conversación reciente para entender referencias como
+  "cada una", "los dos", "ese producto", "agrega otro", "quita uno",
+  "sí", "sí por favor", "créala", "esa está bien" y expresiones similares.
+- Nunca trates el mensaje actual como una conversación aislada.
+- Si el usuario dice "tres de cada una", identifica los productos
+  mencionados inmediatamente antes en la conversación.
+- Si el usuario dice "sí", "sí por favor", "confirmo" o una expresión
+  equivalente, utiliza la solicitud que se acaba de construir en la
+  conversación para determinar qué debe confirmarse.
+- Si existe una solicitud activa, trabaja siempre sobre ESA solicitud.
+- No cambies automáticamente a otra solicitud.
+- La solicitud activa permanece vigente hasta que el usuario la envíe
+  o la cancele.
+- El historial de conversación sirve para interpretar la intención,
+  pero la información real de productos y cantidades debe validarse
+  contra la solicitud y el catálogo.
 
 Si el usuario quiere crear una solicitud nueva, identifica los
 productos del catálogo y las cantidades.
@@ -2794,6 +2842,14 @@ REGLAS DE ACCIONES:
 
 5. "confirmado" debe ser true SOLO cuando el usuario confirme
    claramente que desea crear o actualizar la solicitud.
+
+6. Si el mensaje actual es una confirmación breve como "sí",
+   "sí por favor", "confirmo", "esa está bien", "créala" o
+   "ya quedó", revisa la conversación reciente para recuperar
+   los productos y cantidades que se estaban confirmando.
+
+7. Si en la conversación reciente el usuario ya indicó cantidades
+   concretas y después confirma, conserva esas cantidades.
 
 Si el usuario dice:
 
@@ -3038,7 +3094,11 @@ Pregunta del usuario:
 
             return JsonResponse({
                 "ok": True,
-                "respuesta": contenido,
+                "respuesta": (
+                    "Necesito un poco más de información para "
+                    "entender tu solicitud. ¿Qué producto y cuántas "
+                    "piezas necesitas?"
+                ),
                 "confirmado": False,
                 "accion": "ninguna",
                 "productos": []
@@ -3157,6 +3217,10 @@ Pregunta del usuario:
             request.session[
                 "piroia_solicitud_id"
             ] = solicitud_actual.id
+
+            # Conservamos esta solicitud como la única solicitud
+            # activa de PiroIA hasta que se envíe o cancele.
+            request.session.modified = True
 
             solicitud_id = solicitud_actual.id
 
