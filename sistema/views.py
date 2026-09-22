@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
 from django.core.paginator import Paginator
+import requests
 
 from .forms import RegistroForm
 from .models import DetalleSolicitud, Favorito, Producto, Perfil
@@ -2544,6 +2545,10 @@ def revertir_cambio_correo(request, token):
 def chatbot_ia(request):
 
     try:
+        # ==========================================================
+        # RECIBIR MENSAJE
+        # ==========================================================
+
         data = json.loads(request.body)
 
         pregunta = data.get("mensaje", "").strip()
@@ -2552,858 +2557,238 @@ def chatbot_ia(request):
         if not pregunta:
             return JsonResponse({
                 "ok": False,
-                "respuesta": "Escribe una pregunta para poder ayudarte."
+                "respuesta": "Escribe un mensaje para PiroIA."
             }, status=400)
 
         # ==========================================================
-        # CATÁLOGO ACTUAL
+        # OBTENER API KEY DE GEMINI
         # ==========================================================
 
-        productos = (
-            Producto.objects
-            .filter(estado=True)
-            .select_related("categoria")
-            .order_by("categoria__nombre", "nombre")
-        )
+        api_key = os.getenv("GEMINI_API_KEY")
 
-        catalogo = []
+        if not api_key:
 
-        for producto in productos:
-
-            imagen = producto.imagenes.first()
-
-            catalogo.append({
-                "id": producto.id,
-                "producto": producto.nombre,
-                "categoria": producto.categoria.nombre,
-                "descripcion": producto.descripcion or "",
-                "precio": (
-                    str(producto.precio)
-                    if producto.precio is not None
-                    else "Consultar"
-                ),
-                "imagen_url": (
-                    imagen.imagen.url
-                    if imagen and imagen.imagen
-                    else ""
-                )
-            })
-
-        contexto_catalogo = json.dumps(
-            catalogo,
-            ensure_ascii=False,
-            indent=2
-        )
-
-        # ==========================================================
-        # SOLICITUD ACTIVA
-        # ==========================================================
-
-        solicitud_id = (
-            request.session.get("piroia_solicitud_id")
-            or request.session.get("solicitud_editando_id")
-        )
-
-        solicitud = None
-
-        if solicitud_id:
-            solicitud = SolicitudCotizacion.objects.filter(
-                id=solicitud_id,
-                usuario=request.user,
-                enviada=False,
-                estado="revision"
-            ).first()
-
-        # ==========================================================
-        # DETECTAR EDICIÓN
-        # ==========================================================
-
-        pregunta_lower = pregunta.lower()
-
-        frases_edicion = [
-            "editar mi solicitud",
-            "editar la solicitud",
-            "editar solicitud",
-            "modificar mi solicitud",
-            "modificar la solicitud",
-            "modificar solicitud",
-            "cambiar mi solicitud",
-            "cambiar la solicitud",
-            "cambiar solicitud",
-            "ayúdame a editar",
-            "ayudame a editar",
-            "ayúdame a modificar",
-            "ayudame a modificar",
-            "quiero editar",
-            "quiero modificar",
-            "quiero cambiar mi solicitud",
-            "quiero cambiar la solicitud"
-        ]
-
-        quiere_editar = any(
-            frase in pregunta_lower
-            for frase in frases_edicion
-        )
-
-        # ==========================================================
-        # CLIENTE GEMINI
-        # ==========================================================
-
-        cliente = genai.Client(
-            api_key=os.getenv("GEMINI_API_KEY")
-        )
-
-        # ==========================================================
-        # MODO CONSULTA
-        # ==========================================================
-
-        if modo == "consulta":
-
-            instrucciones = f"""
-Eres PiroIA, el asistente virtual del catálogo de productos.
-
-Tu función es ayudar al cliente a consultar información real
-del catálogo.
-
-Puedes responder sobre:
-
-- productos
-- categorías
-- características
-- descripciones
-- precios
-- información disponible del catálogo
-
-REGLAS:
-
-1. Utiliza únicamente la información proporcionada en el catálogo.
-2. No inventes productos, precios ni características.
-3. Si un producto no aparece en el catálogo, indícalo claramente.
-4. Responde siempre en español.
-5. Sé amable, claro y breve.
-6. No proporciones instrucciones para fabricar, modificar,
-   combinar o manipular productos pirotécnicos.
-7. Tu función es únicamente informativa y comercial.
-8. No agregues productos a una solicitud en este modo.
-
-CATÁLOGO ACTUAL:
-
-{contexto_catalogo}
-"""
-
-            try:
-
-                respuesta = cliente.models.generate_content(
-                    model="gemini-3.6-flash",
-                    contents=pregunta,
-                    config=types.GenerateContentConfig(
-                        system_instruction=instrucciones,
-                        thinking_config=types.ThinkingConfig(
-                            thinking_level="low"
-                        )
-                    )
-                )
-
-            except Exception as e:
-
-                print("Error Gemini consulta:", e)
-
-                return JsonResponse({
-                    "ok": True,
-                    "respuesta": (
-                        "En este momento PiroIA no pudo comunicarse "
-                        "con el servicio de inteligencia artificial. "
-                        "Espera unos segundos e inténtalo nuevamente."
-                    ),
-                    "modo": "consulta"
-                })
+            print("====================================")
+            print("ERROR: GEMINI_API_KEY NO ENCONTRADA")
+            print("====================================")
 
             return JsonResponse({
-                "ok": True,
-                "respuesta": respuesta.output_text,
-                "modo": "consulta"
-            })
-
-        # ==========================================================
-        # MODO SOLICITUD
-        # ==========================================================
-
-        if modo == "solicitud":
-
-            # ======================================================
-            # EDITAR SOLICITUD
-            # ======================================================
-
-            if quiere_editar:
-
-                if solicitud:
-
-                    productos_actuales = []
-
-                    for detalle in solicitud.detalles.select_related(
-                        "producto"
-                    ).all():
-
-                        imagen = detalle.producto.imagenes.first()
-
-                        productos_actuales.append({
-                            "producto_id": detalle.producto.id,
-                            "producto": detalle.producto.nombre,
-                            "cantidad": detalle.cantidad,
-                            "imagen_url": (
-                                imagen.imagen.url
-                                if imagen and imagen.imagen
-                                else ""
-                            )
-                        })
-
-                    if productos_actuales:
-
-                        lista_productos = ", ".join(
-                            f"{item['producto']} ({item['cantidad']})"
-                            for item in productos_actuales
-                        )
-
-                        respuesta_edicion = (
-                            "Claro, con gusto te ayudo a editar tu solicitud. "
-                            "Actualmente tienes: "
-                            + lista_productos
-                            + ". Puedes decirme qué producto quieres agregar, "
-                              "quitar o qué cantidad deseas cambiar."
-                        )
-
-                    else:
-
-                        respuesta_edicion = (
-                            "Claro, con gusto te ayudo a editar tu solicitud. "
-                            "Actualmente no tiene productos. "
-                            "Puedes decirme qué productos deseas agregar."
-                        )
-
-                    return JsonResponse({
-                        "ok": True,
-                        "respuesta": respuesta_edicion,
-                        "modo": "solicitud",
-                        "editando": True,
-                        "productos": productos_actuales,
-                        "confirmado": False
-                    })
-
-                solicitud_existente = (
-                    SolicitudCotizacion.objects
-                    .filter(
-                        usuario=request.user,
-                        enviada=True,
-                        estado="revision"
-                    )
-                    .order_by("-fecha")
-                    .first()
+                "ok": False,
+                "respuesta": (
+                    "No se encontró la configuración de Gemini "
+                    "en el servidor."
                 )
+            }, status=500)
 
-                if not solicitud_existente:
+        # ==========================================================
+        # PRUEBA DIRECTA CON GEMINI
+        # ==========================================================
 
-                    return JsonResponse({
-                        "ok": True,
-                        "respuesta": (
-                            "Claro, con gusto te ayudo. "
-                            "Por el momento no tienes una solicitud "
-                            "disponible para editar. "
-                            "Puedes crear una nueva solicitud desde aquí."
-                        ),
-                        "modo": "solicitud",
-                        "editando": False,
-                        "confirmado": False
-                    })
+        print("====================================")
+        print("PRUEBA DIRECTA DE GEMINI")
+        print("Pregunta:", pregunta)
+        print("Modo:", modo)
+        print("API KEY encontrada: SI")
+        print("====================================")
 
-                if solicitud_existente.bloqueada:
+        url = (
+            "https://generativelanguage.googleapis.com/"
+            "v1beta/models/gemini-3.6-flash:generateContent"
+        )
 
-                    return JsonResponse({
-                        "ok": True,
-                        "respuesta": (
-                            "No puedo modificar esta solicitud porque "
-                            "el administrador ya la está revisando."
-                        ),
-                        "modo": "solicitud",
-                        "editando": False,
-                        "edicion_bloqueada": True,
-                        "confirmado": False
-                    })
+        headers = {
+            "x-goog-api-key": api_key,
+            "Content-Type": "application/json"
+        }
 
-                solicitud = solicitud_existente
-
-                solicitud.enviada = False
-                solicitud.bloqueada = False
-
-                solicitud.save(
-                    update_fields=[
-                        "enviada",
-                        "bloqueada"
+        payload = {
+            "contents": [
+                {
+                    "parts": [
+                        {
+                            "text": (
+                                "Eres PiroIA, un asistente virtual "
+                                "de un catálogo de productos. "
+                                "Responde siempre en español, "
+                                "de forma clara y breve. "
+                                "No proporciones instrucciones para "
+                                "fabricar, modificar, combinar o "
+                                "manipular productos pirotécnicos. "
+                                "Tu función es informativa y comercial.\n\n"
+                                "Mensaje del usuario:\n"
+                                + pregunta
+                            )
+                        }
                     ]
-                )
+                }
+            ]
+        }
 
-                request.session["solicitud_editando_id"] = solicitud.id
-                request.session.pop(
-                    "piroia_solicitud_id",
-                    None
-                )
+        try:
 
-                productos_actuales = []
-
-                for detalle in solicitud.detalles.select_related(
-                    "producto"
-                ).all():
-
-                    imagen = detalle.producto.imagenes.first()
-
-                    productos_actuales.append({
-                        "producto_id": detalle.producto.id,
-                        "producto": detalle.producto.nombre,
-                        "cantidad": detalle.cantidad,
-                        "imagen_url": (
-                            imagen.imagen.url
-                            if imagen and imagen.imagen
-                            else ""
-                        )
-                    })
-
-                lista_productos = ", ".join(
-                    f"{item['producto']} ({item['cantidad']})"
-                    for item in productos_actuales
-                )
-
-                respuesta_edicion = (
-                    "Claro, con gusto. Ya puse tu solicitud en edición. "
-                    "Actualmente tienes: "
-                    + (
-                        lista_productos
-                        if lista_productos
-                        else "ningún producto"
-                    )
-                    + ". Puedes decirme qué producto quieres agregar, "
-                      "quitar o qué cantidad deseas cambiar."
-                )
-
-                return JsonResponse({
-                    "ok": True,
-                    "respuesta": respuesta_edicion,
-                    "modo": "solicitud",
-                    "editando": True,
-                    "productos": productos_actuales,
-                    "confirmado": False
-                })
-
-            # ======================================================
-            # SOLICITUD ACTUAL
-            # ======================================================
-
-            detalles_actuales = []
-
-            if solicitud:
-
-                for detalle in solicitud.detalles.select_related(
-                    "producto"
-                ).all():
-
-                    detalles_actuales.append({
-                        "id_detalle": detalle.id,
-                        "producto_id": detalle.producto.id,
-                        "producto": detalle.producto.nombre,
-                        "cantidad": detalle.cantidad,
-                        "seleccionado": detalle.seleccionado
-                    })
-
-            contexto_solicitud = json.dumps(
-                detalles_actuales,
-                ensure_ascii=False,
-                indent=2
+            respuesta_gemini = requests.post(
+                url,
+                headers=headers,
+                json=payload,
+                timeout=8
             )
 
-            # ======================================================
-            # UNA SOLA LLAMADA A GEMINI
-            # ======================================================
+        except requests.exceptions.Timeout:
 
-            instrucciones = f"""
-Eres PiroIA, un asistente inteligente para crear y modificar
-solicitudes de cotización.
+            print("====================================")
+            print("GEMINI TIMEOUT")
+            print("Gemini tardó más de 8 segundos.")
+            print("====================================")
 
-Utiliza únicamente los productos existentes en el catálogo.
+            return JsonResponse({
+                "ok": False,
+                "respuesta": (
+                    "La API de Gemini tardó demasiado "
+                    "en responder."
+                ),
+                "gemini_timeout": True
+            })
 
-El cliente puede pedir:
+        except requests.exceptions.RequestException as e:
 
-- agregar productos
-- quitar productos
-- cambiar cantidades
-- confirmar su solicitud
+            print("====================================")
+            print("ERROR DE CONEXIÓN CON GEMINI")
+            print("ERROR:", str(e))
+            print("====================================")
 
-No inventes productos ni IDs.
+            return JsonResponse({
+                "ok": False,
+                "respuesta": (
+                    "No se pudo establecer conexión "
+                    "con la API de Gemini."
+                ),
+                "gemini_error": str(e)
+            })
 
-No inventes cantidades.
+        # ==========================================================
+        # MOSTRAR RESPUESTA DE GEMINI EN LOS LOGS
+        # ==========================================================
 
-No proporciones instrucciones para fabricar,
-modificar, combinar o manipular productos pirotécnicos.
+        print("====================================")
+        print("RESPUESTA DIRECTA DE GEMINI")
+        print("STATUS:", respuesta_gemini.status_code)
+        print("BODY:")
+        print(respuesta_gemini.text[:5000])
+        print("====================================")
 
-Tu función es comercial y de gestión de solicitudes.
+        # ==========================================================
+        # GEMINI RESPONDIÓ CORRECTAMENTE
+        # ==========================================================
 
-Responde ÚNICAMENTE con JSON válido.
-
-FORMATO:
-
-{{
-    "respuesta": "respuesta breve",
-    "accion": "agregar",
-    "confirmado": false,
-    "productos": [
-        {{
-            "producto_id": 1,
-            "cantidad": 2
-        }}
-    ]
-}}
-
-ACCIONES:
-
-agregar
-quitar
-cambiar
-ninguna
-
-Si el cliente confirma que ya no quiere hacer cambios:
-
-{{
-    "respuesta": "Perfecto, tu solicitud está lista.",
-    "accion": "ninguna",
-    "confirmado": true,
-    "productos": []
-}}
-
-Si no hay una modificación clara:
-
-{{
-    "respuesta": "Necesito que me indiques el producto y la cantidad.",
-    "accion": "ninguna",
-    "confirmado": false,
-    "productos": []
-}}
-
-CATÁLOGO:
-
-{contexto_catalogo}
-
-SOLICITUD ACTUAL:
-
-{contexto_solicitud}
-
-MENSAJE:
-
-{pregunta}
-"""
+        if respuesta_gemini.status_code == 200:
 
             try:
 
-                respuesta = cliente.models.generate_content(
-                    model="gemini-3.6-flash",
-                    contents=pregunta,
-                    config=types.GenerateContentConfig(
-                        system_instruction=instrucciones,
-                        thinking_config=types.ThinkingConfig(
-                            thinking_level="low"
-                       )
-                    )
+                datos_gemini = respuesta_gemini.json()
+
+                candidatos = datos_gemini.get(
+                    "candidates",
+                    []
                 )
+
+                if not candidatos:
+
+                    return JsonResponse({
+                        "ok": False,
+                        "respuesta": (
+                            "Gemini respondió pero "
+                            "no devolvió contenido."
+                        ),
+                        "gemini_status": 200,
+                        "gemini_respuesta": (
+                            respuesta_gemini.text[:3000]
+                        )
+                    })
+
+                contenido = candidatos[0].get(
+                    "content",
+                    {}
+                )
+
+                partes = contenido.get(
+                    "parts",
+                    []
+                )
+
+                texto = ""
+
+                for parte in partes:
+
+                    if parte.get("text"):
+
+                        texto += parte["text"]
+
+                if not texto:
+
+                    texto = (
+                        "Gemini respondió correctamente, "
+                        "pero no se encontró texto en la respuesta."
+                    )
+
+                return JsonResponse({
+                    "ok": True,
+                    "respuesta": texto,
+                    "modo": modo,
+                    "prueba_gemini": True
+                })
 
             except Exception as e:
 
-                print("Error Gemini solicitud:", e)
+                print("====================================")
+                print("ERROR PROCESANDO RESPUESTA GEMINI")
+                print("ERROR:", str(e))
+                print("====================================")
 
                 return JsonResponse({
-                    "ok": True,
+                    "ok": False,
                     "respuesta": (
-                        "En este momento PiroIA no pudo comunicarse "
-                        "con el servicio de inteligencia artificial. "
-                        "Espera unos segundos e inténtalo nuevamente."
+                        "Gemini respondió, pero no pude "
+                        "interpretar su respuesta."
                     ),
-                    "modo": "solicitud",
-                    "confirmado": False
+                    "gemini_status": 200,
+                    "error": str(e)
                 })
 
-            texto_json = respuesta.output_text.strip()
-
-            if texto_json.startswith("```"):
-
-                texto_json = texto_json.replace(
-                    "```json",
-                    ""
-                )
-
-                texto_json = texto_json.replace(
-                    "```",
-                    ""
-                )
-
-                texto_json = texto_json.strip()
-
-            try:
-
-                accion_data = json.loads(
-                    texto_json
-                )
-
-            except json.JSONDecodeError:
-
-                return JsonResponse({
-                    "ok": True,
-                    "respuesta": (
-                        "No pude interpretar correctamente la solicitud. "
-                        "Intenta indicarme nuevamente el producto y la cantidad."
-                    ),
-                    "modo": "solicitud",
-                    "confirmado": False
-                })
-
-            texto_respuesta = accion_data.get(
-                "respuesta",
-                "Entendido."
-            )
-
-            accion = accion_data.get(
-                "accion",
-                "ninguna"
-            )
-
-            confirmado = bool(
-                accion_data.get(
-                    "confirmado",
-                    False
-                )
-            )
-
-            productos_accion = accion_data.get(
-                "productos",
-                []
-            )
-
-            # ======================================================
-            # CONFIRMACIÓN
-            # ======================================================
-
-            if accion == "ninguna" and confirmado:
-
-                productos_finales = []
-
-                if solicitud:
-
-                    for detalle in solicitud.detalles.select_related(
-                        "producto"
-                    ).all():
-
-                        imagen = detalle.producto.imagenes.first()
-
-                        productos_finales.append({
-                            "producto_id": detalle.producto.id,
-                            "producto": detalle.producto.nombre,
-                            "cantidad": detalle.cantidad,
-                            "imagen_url": (
-                                imagen.imagen.url
-                                if imagen and imagen.imagen
-                                else ""
-                            )
-                        })
-
-                if not productos_finales:
-
-                    return JsonResponse({
-                        "ok": True,
-                        "respuesta": (
-                            "Tu solicitud no tiene productos. "
-                            "Puedes agregar alguno antes de enviarla."
-                        ),
-                        "modo": "solicitud",
-                        "confirmado": False
-                    })
-
-                resumen = ", ".join(
-                    f"{item['producto']} ({item['cantidad']})"
-                    for item in productos_finales
-                )
-
-                return JsonResponse({
-                    "ok": True,
-                    "respuesta": (
-                        "Perfecto. Tu solicitud quedó preparada. "
-                        "Actualmente contiene: "
-                        + resumen
-                        + ". Te llevaré a la solicitud para que "
-                          "puedas revisarla antes de enviarla."
-                    ),
-                    "modo": "solicitud",
-                    "confirmado": True,
-                    "productos": productos_finales,
-                    "redirect_url": reverse("solicitudes")
-                })
-
-            # ======================================================
-            # CREAR SOLICITUD
-            # ======================================================
-
-            if solicitud is None:
-
-                solicitud = SolicitudCotizacion.objects.create(
-                    usuario=request.user,
-                    enviada=False,
-                    estado="revision",
-                    bloqueada=False
-                )
-
-                request.session["piroia_solicitud_id"] = solicitud.id
-
-            # ======================================================
-            # AGREGAR
-            # ======================================================
-
-            if accion == "agregar":
-
-                cambios = []
-
-                for item in productos_accion:
-
-                    try:
-
-                        producto_id = int(
-                            item.get("producto_id")
-                        )
-
-                        cantidad = int(
-                            item.get("cantidad")
-                        )
-
-                    except (TypeError, ValueError):
-
-                        continue
-
-                    if producto_id <= 0 or cantidad <= 0:
-                        continue
-
-                    producto = Producto.objects.filter(
-                        id=producto_id,
-                        estado=True
-                    ).first()
-
-                    if not producto:
-                        continue
-
-                    detalle, creado = (
-                        DetalleSolicitud.objects.get_or_create(
-                            solicitud=solicitud,
-                            producto=producto,
-                            defaults={
-                                "cantidad": cantidad,
-                                "seleccionado": True
-                            }
-                        )
-                    )
-
-                    if not creado:
-
-                        detalle.cantidad += cantidad
-                        detalle.seleccionado = True
-
-                        detalle.save(
-                            update_fields=[
-                                "cantidad",
-                                "seleccionado"
-                            ]
-                        )
-
-                    cambios.append(
-                        f"{producto.nombre} ({cantidad})"
-                    )
-
-                if cambios:
-
-                    return JsonResponse({
-                        "ok": True,
-                        "respuesta": (
-                            texto_respuesta
-                            + " ¿Quieres agregar, quitar o modificar "
-                              "algún otro producto?"
-                        ),
-                        "modo": "solicitud",
-                        "confirmado": False,
-                        "productos": cambios
-                    })
-
-            # ======================================================
-            # QUITAR
-            # ======================================================
-
-            elif accion == "quitar":
-
-                cambios = []
-
-                for item in productos_accion:
-
-                    try:
-
-                        producto_id = int(
-                            item.get("producto_id")
-                        )
-
-                        cantidad = int(
-                            item.get("cantidad")
-                        )
-
-                    except (TypeError, ValueError):
-
-                        continue
-
-                    if producto_id <= 0 or cantidad <= 0:
-                        continue
-
-                    detalle = (
-                        DetalleSolicitud.objects
-                        .filter(
-                            solicitud=solicitud,
-                            producto_id=producto_id
-                        )
-                        .select_related("producto")
-                        .first()
-                    )
-
-                    if not detalle:
-                        continue
-
-                    if detalle.cantidad > cantidad:
-
-                        detalle.cantidad -= cantidad
-
-                        detalle.save(
-                            update_fields=[
-                                "cantidad"
-                            ]
-                        )
-
-                        cambios.append(
-                            f"se quitaron {cantidad} de "
-                            f"{detalle.producto.nombre}"
-                        )
-
-                    else:
-
-                        nombre = detalle.producto.nombre
-
-                        detalle.delete()
-
-                        cambios.append(
-                            f"se eliminó {nombre}"
-                        )
-
-                if cambios:
-
-                    return JsonResponse({
-                        "ok": True,
-                        "respuesta": (
-                            texto_respuesta
-                            + " ¿Quieres hacer algún otro cambio?"
-                        ),
-                        "modo": "solicitud",
-                        "confirmado": False,
-                        "productos": cambios
-                    })
-
-            # ======================================================
-            # CAMBIAR
-            # ======================================================
-
-            elif accion == "cambiar":
-
-                cambios = []
-
-                for item in productos_accion:
-
-                    try:
-
-                        producto_id = int(
-                            item.get("producto_id")
-                        )
-
-                        cantidad = int(
-                            item.get("cantidad")
-                        )
-
-                    except (TypeError, ValueError):
-
-                        continue
-
-                    if producto_id <= 0 or cantidad <= 0:
-                        continue
-
-                    detalle = (
-                        DetalleSolicitud.objects
-                        .filter(
-                            solicitud=solicitud,
-                            producto_id=producto_id
-                        )
-                        .select_related("producto")
-                        .first()
-                    )
-
-                    if not detalle:
-                        continue
-
-                    detalle.cantidad = cantidad
-                    detalle.seleccionado = True
-
-                    detalle.save(
-                        update_fields=[
-                            "cantidad",
-                            "seleccionado"
-                        ]
-                    )
-
-                    cambios.append(
-                        f"{detalle.producto.nombre} ahora tiene {cantidad}"
-                    )
-
-                if cambios:
-
-                    return JsonResponse({
-                        "ok": True,
-                        "respuesta": (
-                            texto_respuesta
-                            + " ¿Quieres hacer algún otro cambio?"
-                        ),
-                        "modo": "solicitud",
-                        "confirmado": False,
-                        "productos": cambios
-                    })
-
-            # ======================================================
-            # RESPUESTA NORMAL
-            # ======================================================
-
-            return JsonResponse({
-                "ok": True,
-                "respuesta": texto_respuesta,
-                "modo": "solicitud",
-                "confirmado": False
-            })
-
-        return JsonResponse({
-            "ok": False,
-            "respuesta": "No reconocí el modo de PiroIA."
-        }, status=400)
-
-    except Exception as e:
-
-        print(
-            "Error en PiroIA:",
-            e
-        )
+        # ==========================================================
+        # ERROR DE GEMINI
+        # ==========================================================
 
         return JsonResponse({
             "ok": False,
             "respuesta": (
-                "No pude procesar tu solicitud en este momento. "
-                "Intenta nuevamente."
-            )
+                "Gemini respondió con un error."
+            ),
+            "gemini_status": respuesta_gemini.status_code,
+            "gemini_error": respuesta_gemini.text[:5000]
+        })
+
+    # ==============================================================
+    # ERROR GENERAL DE DJANGO
+    # ==============================================================
+
+    except json.JSONDecodeError:
+
+        return JsonResponse({
+            "ok": False,
+            "respuesta": "La solicitud enviada no tiene un formato válido."
+        }, status=400)
+
+    except Exception as e:
+
+        print("====================================")
+        print("ERROR GENERAL EN PIROIA")
+        print("ERROR:", str(e))
+        print("====================================")
+
+        return JsonResponse({
+            "ok": False,
+            "respuesta": (
+                "Ocurrió un error al procesar la solicitud."
+            ),
+            "error": str(e)
         }, status=500)
