@@ -1946,6 +1946,189 @@ document.addEventListener(
                 "piroiaHelp"
             );
 
+        /*
+         * Estado visible de la solicitud.
+         * Sirve para que el usuario sepa qué está editando PiroIA.
+         */
+        let estadoSolicitud = null;
+
+        function crearEstadoSolicitud() {
+
+            if (estadoSolicitud || !chat || !messages) {
+                return;
+            }
+
+            estadoSolicitud =
+                document.createElement("div");
+
+            estadoSolicitud.id =
+                "piroiaEstadoSolicitud";
+
+            estadoSolicitud.className =
+                "piroia-estado-solicitud";
+
+            estadoSolicitud.setAttribute(
+                "role",
+                "status"
+            );
+
+            estadoSolicitud.style.display =
+                "none";
+
+            chat.insertBefore(
+                estadoSolicitud,
+                messages
+            );
+        }
+
+        function actualizarEstadoSolicitud(
+            productos,
+            confirmado = false
+        ) {
+
+            crearEstadoSolicitud();
+
+            if (
+                modoActual !== "solicitud" ||
+                !Array.isArray(productos) ||
+                productos.length === 0
+            ) {
+                estadoSolicitud.style.display =
+                    "none";
+                return;
+            }
+
+            const resumen =
+                productos
+                    .map(function (producto) {
+                        const cantidad =
+                            Number(producto.cantidad) || 0;
+
+                        return (
+                            cantidad +
+                            " " +
+                            (cantidad === 1 ? "pieza" : "piezas") +
+                            " de " +
+                            String(
+                                producto.nombre || "producto"
+                            )
+                        );
+                    })
+                    .join(" · ");
+
+            estadoSolicitud.textContent =
+                confirmado
+                    ? "✓ Solicitud preparada: " + resumen
+                    : "✏️ Editando solicitud: " + resumen;
+
+            estadoSolicitud.style.display =
+                "block";
+        }
+
+        /*
+         * Ajustes propios para pantallas pequeñas.
+         * Se inyectan aquí para que PiroIA no dependa de que
+         * otro CSS haya cargado correctamente.
+         */
+        if (!document.getElementById("piroiaResponsiveFix")) {
+
+            const estiloResponsive =
+                document.createElement("style");
+
+            estiloResponsive.id =
+                "piroiaResponsiveFix";
+
+            estiloResponsive.textContent = `
+                .piroia-estado-solicitud {
+                    margin: 8px 14px 0;
+                    padding: 8px 12px;
+                    border: 1px solid rgba(212,175,55,.35);
+                    border-radius: 10px;
+                    background: rgba(212,175,55,.08);
+                    color: #ead78a;
+                    font-size: 12px;
+                    line-height: 1.35;
+                    word-break: break-word;
+                }
+
+                #piroiaSpeak {
+                    min-height: 36px;
+                    cursor: pointer;
+                    touch-action: manipulation;
+                    -webkit-tap-highlight-color: transparent;
+                }
+
+                #piroiaVoice,
+                #piroiaSend,
+                #piroiaClose,
+                #piroiaModoConsulta,
+                #piroiaModoSolicitud {
+                    touch-action: manipulation;
+                    -webkit-tap-highlight-color: transparent;
+                }
+
+                @media (max-width: 700px) {
+                    #piroiaChat {
+                        position: fixed !important;
+                        inset: 8px !important;
+                        width: calc(100vw - 16px) !important;
+                        max-width: none !important;
+                        height: calc(100dvh - 16px) !important;
+                        max-height: none !important;
+                        border-radius: 22px !important;
+                        overflow: hidden !important;
+                    }
+
+                    #piroiaMessages {
+                        min-height: 0 !important;
+                        flex: 1 1 auto !important;
+                        overflow-y: auto !important;
+                        -webkit-overflow-scrolling: touch;
+                        padding-bottom: 8px !important;
+                    }
+
+                    .piroia-message-user,
+                    .piroia-message-bot {
+                        max-width: 92% !important;
+                    }
+
+                    .piroia-bubble {
+                        max-width: 100% !important;
+                        overflow-wrap: anywhere !important;
+                        word-break: break-word !important;
+                    }
+
+                    #piroiaInput {
+                        min-width: 0 !important;
+                        width: 100% !important;
+                        font-size: 16px !important;
+                    }
+
+                    #piroiaSend,
+                    #piroiaVoice {
+                        flex: 0 0 auto !important;
+                    }
+
+                    #piroiaSpeak {
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
+                        min-height: 38px;
+                        padding: 8px 12px;
+                    }
+
+                    .piroia-estado-solicitud {
+                        margin: 6px 10px 0;
+                        font-size: 11px;
+                    }
+                }
+            `;
+
+            document.head.appendChild(
+                estiloResponsive
+            );
+        }
+
 
         if (
             !button ||
@@ -1992,11 +2175,14 @@ document.addEventListener(
             "piroia_conversacion_solicitud";
 
         /*
-         * El historial visual se conserva durante 3 días.
+         * El historial visual se conserva durante 1 día.
+         * Se usa localStorage para que NO desaparezca al cerrar
+         * sesión o cerrar la pestaña.
+         *
          * Esto NO elimina la solicitud de cotización en Django.
          */
         const DURACION_CONVERSACION =
-            3 * 24 * 60 * 60 * 1000;
+            24 * 60 * 60 * 1000;
 
 
         function guardarConversacion() {
@@ -2056,10 +2242,39 @@ document.addEventListener(
                     : claveConversacionSolicitud;
 
 
-            sessionStorage.setItem(
+            let fechaInicio =
+                Date.now();
+
+            try {
+                const anterior =
+                    localStorage.getItem(
+                        claveActual
+                    );
+
+                if (anterior) {
+                    const datosAnteriores =
+                        JSON.parse(anterior);
+
+                    if (
+                        datosAnteriores &&
+                        !Array.isArray(datosAnteriores) &&
+                        datosAnteriores.fecha
+                    ) {
+                        fechaInicio =
+                            datosAnteriores.fecha;
+                    }
+                }
+            } catch (error) {
+                console.warn(
+                    "PiroIA: no se pudo conservar la fecha del historial.",
+                    error
+                );
+            }
+
+            localStorage.setItem(
                 claveActual,
                 JSON.stringify({
-                    fecha: Date.now(),
+                    fecha: fechaInicio,
                     mensajes: mensajes
                 })
             );
@@ -2075,7 +2290,7 @@ document.addEventListener(
                     : claveConversacionSolicitud;
 
             const guardada =
-                sessionStorage.getItem(
+                localStorage.getItem(
                     claveActual
                 );
 
@@ -2129,7 +2344,7 @@ document.addEventListener(
                 }
 
                 /*
-                 * Después de 3 días se elimina solamente
+                 * Después de 1 día se elimina solamente
                  * el historial visual del navegador.
                  *
                  * La solicitud de cotización NO se elimina.
@@ -2140,7 +2355,7 @@ document.addEventListener(
                     DURACION_CONVERSACION
                 ) {
 
-                    sessionStorage.removeItem(
+                    localStorage.removeItem(
                         claveActual
                     );
 
@@ -2187,7 +2402,7 @@ document.addEventListener(
                     )
                 ) {
 
-                    sessionStorage.setItem(
+                    localStorage.setItem(
                         claveActual,
                         JSON.stringify({
                             fecha: Date.now(),
@@ -2204,7 +2419,7 @@ document.addEventListener(
                     error
                 );
 
-                sessionStorage.removeItem(
+                localStorage.removeItem(
                     claveActual
                 );
 
@@ -2222,7 +2437,12 @@ document.addEventListener(
             modoActual =
                 modo;
 
+            crearEstadoSolicitud();
+
             messages.innerHTML = "";
+
+            estadoSolicitud.style.display =
+                "none";
 
             cargarConversacion();
 
@@ -2849,13 +3069,30 @@ document.addEventListener(
                     texto
                 );
 
-
             mensaje.lang =
                 "es-MX";
 
+            /*
+             * En Android/iPhone algunas voces no se cargan
+             * inmediatamente. Elegimos una voz en español si existe.
+             */
+            const voces =
+                window.speechSynthesis.getVoices();
+
+            const vozEspanol =
+                voces.find(function (voz) {
+                    return /^es(-|_)/i.test(
+                        voz.lang || ""
+                    );
+                });
+
+            if (vozEspanol) {
+                mensaje.voice =
+                    vozEspanol;
+            }
 
             mensaje.rate =
-                1;
+                0.95;
 
 
             mensaje.pitch =
@@ -2898,6 +3135,16 @@ document.addEventListener(
 
         }
 
+
+        if (
+            "speechSynthesis" in window &&
+            "onvoiceschanged" in window.speechSynthesis
+        ) {
+            window.speechSynthesis.onvoiceschanged =
+                function () {
+                    window.speechSynthesis.getVoices();
+                };
+        }
 
         /* ========================================= */
         /* BOTÓN PAUSAR / REANUDAR / ESCUCHAR */
@@ -2949,6 +3196,15 @@ document.addEventListener(
 
 
                 if (ultimaRespuesta) {
+
+                    try {
+                        window.speechSynthesis.resume();
+                    } catch (error) {
+                        console.warn(
+                            "PiroIA: no se pudo reanudar el audio.",
+                            error
+                        );
+                    }
 
                     hablarRespuesta(
                         ultimaRespuesta
@@ -3221,6 +3477,15 @@ document.addEventListener(
                     solicitudConfirmada =
                         datos.confirmado === true;
 
+                    /*
+                     * Mostrar visualmente qué solicitud está editando.
+                     */
+                    if (modoActual === "solicitud") {
+                        actualizarEstadoSolicitud(
+                            datos.productos || [],
+                            solicitudConfirmada
+                        );
+                    }
 
                     /*
                      * Mostrar SOLO el mensaje de PiroIA.
@@ -3233,7 +3498,7 @@ document.addEventListener(
 
 
                     /* ========================================= */
-                    /* HABLAR AUTOMÁTICAMENTE */
+                    /* VOZ DE RESPUESTA */
                     /* ========================================= */
 
                     if (
@@ -3242,13 +3507,33 @@ document.addEventListener(
                         respuestaLimpia
                     ) {
 
+                        /*
+                         * El botón queda visible siempre.
+                         * En teléfonos no forzamos el audio después
+                         * del fetch porque Safari/Chrome móvil pueden
+                         * bloquear esa reproducción por no estar dentro
+                         * de la pulsación original del usuario.
+                         */
                         speakButton.style.display =
-                            "inline-block";
+                            "inline-flex";
 
+                        const esMovil =
+                            /Android|iPhone|iPad|iPod/i.test(
+                                navigator.userAgent
+                            );
 
-                        hablarRespuesta(
-                            respuestaLimpia
-                        );
+                        if (!esMovil) {
+
+                            hablarRespuesta(
+                                respuestaLimpia
+                            );
+
+                        } else {
+
+                            speakButton.innerHTML =
+                                "🔊 Escuchar respuesta";
+
+                        }
 
                     }
 

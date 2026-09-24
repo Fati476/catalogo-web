@@ -2575,14 +2575,6 @@ def chatbot_ia(request):
                 "respuesta": "Escribe o di algo para que pueda ayudarte."
             })
 
-        api_key = os.getenv("OPENROUTER_API_KEY")
-
-        if not api_key:
-            return JsonResponse({
-                "ok": False,
-                "respuesta": "No se encontró la configuración de PiroIA."
-            }, status=500)
-
         # ==========================================================
         # 1. OBTENER CATÁLOGO REAL
         # ==========================================================
@@ -2623,6 +2615,144 @@ def chatbot_ia(request):
                 ),
                 "imagen": imagen_url,
             })
+
+        # ==========================================================
+        # 1.1 CONSULTAS BÁSICAS SIN IA
+        # ==========================================================
+        #
+        # Estas consultas se responden directamente con Django.
+        # Así PiroIA no consume una llamada de OpenRouter para algo
+        # que el catálogo ya puede contestar y evitamos esperas.
+        #
+        if modo != "solicitud":
+
+            pregunta_lower = pregunta.lower().strip()
+
+            palabras_precio = [
+                "precio",
+                "precios",
+                "costo",
+                "costos",
+                "cuánto cuesta",
+                "cuanto cuesta",
+                "cuánto vale",
+                "cuanto vale"
+            ]
+
+            if any(
+                palabra in pregunta_lower
+                for palabra in palabras_precio
+            ):
+                return JsonResponse({
+                    "ok": True,
+                    "respuesta": (
+                        "El precio de los productos se determina "
+                        "mediante cotización. Si deseas, puedo ayudarte "
+                        "a preparar una solicitud con la cantidad "
+                        "que necesitas."
+                    ),
+                    "confirmado": False,
+                    "accion": "ninguna",
+                    "productos": []
+                })
+
+            consulta_productos = any(
+                frase in pregunta_lower
+                for frase in [
+                    "qué productos hay",
+                    "que productos hay",
+                    "qué productos tienen",
+                    "que productos tienen",
+                    "productos del catálogo",
+                    "productos del catalogo",
+                    "lista de productos",
+                    "listar productos",
+                    "qué tienen",
+                    "que tienen",
+                    "qué venden",
+                    "que venden",
+                    "muéstrame los productos",
+                    "muestrame los productos"
+                ]
+            )
+
+            if consulta_productos:
+
+                nombres = [
+                    producto.nombre
+                    for producto in productos_catalogo
+                ]
+
+                if nombres:
+                    respuesta_productos = (
+                        "Estos son los productos disponibles en el catálogo:\n\n"
+                        + "\n".join(
+                            "• " + nombre
+                            for nombre in nombres
+                        )
+                    )
+                else:
+                    respuesta_productos = (
+                        "Actualmente no hay productos disponibles "
+                        "en el catálogo."
+                    )
+
+                return JsonResponse({
+                    "ok": True,
+                    "respuesta": respuesta_productos,
+                    "confirmado": False,
+                    "accion": "ninguna",
+                    "productos": []
+                })
+
+            consulta_categorias = any(
+                frase in pregunta_lower
+                for frase in [
+                    "qué categorías hay",
+                    "que categorias hay",
+                    "categorías del catálogo",
+                    "categorias del catalogo",
+                    "lista de categorías",
+                    "lista de categorias"
+                ]
+            )
+
+            if consulta_categorias:
+
+                categorias = sorted({
+                    producto.categoria.nombre
+                    for producto in productos_catalogo
+                    if producto.categoria
+                })
+
+                if categorias:
+                    respuesta_categorias = (
+                        "Estas son las categorías disponibles:\n\n"
+                        + "\n".join(
+                            "• " + categoria
+                            for categoria in categorias
+                        )
+                    )
+                else:
+                    respuesta_categorias = (
+                        "Actualmente no hay categorías disponibles."
+                    )
+
+                return JsonResponse({
+                    "ok": True,
+                    "respuesta": respuesta_categorias,
+                    "confirmado": False,
+                    "accion": "ninguna",
+                    "productos": []
+                })
+
+        api_key = os.getenv("OPENROUTER_API_KEY")
+
+        if not api_key:
+            return JsonResponse({
+                "ok": False,
+                "respuesta": "No se encontró la configuración de PiroIA."
+            }, status=500)
 
         # ==========================================================
         # 2. SOLICITUD ACTIVA DE PIROIA
@@ -2963,8 +3093,11 @@ Pregunta del usuario:
                     "content": instrucciones
                 }
             ],
-            "temperature": 0.2,
-            "max_tokens": 500,
+            "temperature": 0.1,
+            "max_tokens": 350,
+            "response_format": {
+                "type": "json_object"
+            },
         }
 
         print("====================================")
@@ -2979,7 +3112,7 @@ Pregunta del usuario:
                 url,
                 headers=headers,
                 json=payload,
-                timeout=12
+                timeout=(3, 8)
             )
 
         except requests.exceptions.Timeout:
@@ -2991,8 +3124,7 @@ Pregunta del usuario:
                 "respuesta": (
                     "PiroIA tardó demasiado en responder. "
                     "Intenta nuevamente."
-                ),
-                "gemini_timeout": False
+                )
             })
 
         except requests.exceptions.RequestException as e:
@@ -3120,10 +3252,8 @@ Pregunta del usuario:
 
         if modo != "solicitud":
 
-            # Protección adicional:
-            # nunca devolver al frontend una respuesta que contenga
-            # información monetaria o identificadores internos.
-
+            # En modo CONSULTA PiroIA solamente responde preguntas
+            # del catálogo. Nunca crea ni modifica solicitudes.
             palabras_precio = [
                 "precio",
                 "precios",
@@ -3151,11 +3281,7 @@ Pregunta del usuario:
 
             return JsonResponse({
                 "ok": True,
-                "respuesta": (
-                    "Necesito un poco más de información para "
-                    "entender tu solicitud. ¿Qué producto y cuántas "
-                    "piezas necesitas?"
-                ),
+                "respuesta": contenido,
                 "confirmado": False,
                 "accion": "ninguna",
                 "productos": []
@@ -3165,21 +3291,22 @@ Pregunta del usuario:
         # 10. INTERPRETAR JSON DE LA IA
         # ==========================================================
 
-        contenido_json = contenido
+        contenido_json = contenido.strip()
 
+        # Algunos modelos agregan bloques Markdown o texto antes/después
+        # del JSON. Intentamos limpiarlo antes de descartarlo.
         if contenido_json.startswith("```"):
 
             contenido_json = contenido_json.replace(
                 "```json",
-                ""
+                "",
+                1
             )
 
             contenido_json = contenido_json.replace(
                 "```",
                 ""
-            )
-
-            contenido_json = contenido_json.strip()
+            ).strip()
 
         try:
 
@@ -3189,19 +3316,61 @@ Pregunta del usuario:
 
         except json.JSONDecodeError:
 
-            print(
-                "LA IA NO DEVOLVIÓ JSON VÁLIDO:"
-            )
+            inicio_json = contenido_json.find("{")
+            fin_json = contenido_json.rfind("}")
 
-            print(contenido)
+            if (
+                inicio_json != -1
+                and fin_json > inicio_json
+            ):
 
-            return JsonResponse({
-                "ok": True,
-                "respuesta": contenido,
-                "confirmado": False,
-                "accion": "ninguna",
-                "productos": []
-            })
+                posible_json = contenido_json[
+                    inicio_json:fin_json + 1
+                ]
+
+                try:
+                    resultado_ia = json.loads(
+                        posible_json
+                    )
+                except json.JSONDecodeError:
+
+                    print(
+                        "LA IA NO DEVOLVIÓ JSON VÁLIDO:"
+                    )
+
+                    print(contenido)
+
+                    return JsonResponse({
+                        "ok": True,
+                        "respuesta": (
+                            "No pude interpretar correctamente la "
+                            "respuesta de PiroIA. Intenta decirlo de "
+                            "otra forma y lo intento nuevamente."
+                        ),
+                        "confirmado": False,
+                        "accion": "ninguna",
+                        "productos": []
+                    })
+
+            else:
+
+                print(
+                    "LA IA NO DEVOLVIÓ JSON VÁLIDO:"
+                )
+
+                print(contenido)
+
+                return JsonResponse({
+                    "ok": True,
+                    "respuesta": (
+                        "No pude interpretar correctamente la "
+                        "respuesta de PiroIA. Intenta decirlo de "
+                        "otra forma y lo intento nuevamente."
+                    ),
+                    "confirmado": False,
+                    "accion": "ninguna",
+                    "productos": []
+                })
 
         respuesta_texto = resultado_ia.get(
             "respuesta",
