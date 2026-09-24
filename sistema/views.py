@@ -3086,7 +3086,9 @@ Pregunta del usuario:
         }
 
         payload = {
-            "model": "openrouter/free",
+            # Modelo gratuito fijo para evitar que openrouter/free cambie
+            # entre modelos con comportamientos distintos de razonamiento/JSON.
+            "model": "google/gemma-4-31b-it:free",
             "messages": [
                 {
                     "role": "user",
@@ -3094,7 +3096,12 @@ Pregunta del usuario:
                 }
             ],
             "temperature": 0.1,
-            "max_tokens": 350,
+            "max_tokens": 700,
+            # Evita que el modelo gaste todo el límite pensando y deje
+            # content = null, como ocurrió con North Mini Code.
+            "reasoning": {
+                "effort": "none"
+            },
             "response_format": {
                 "type": "json_object"
             },
@@ -3198,23 +3205,30 @@ Pregunta del usuario:
 
                 print("OPENROUTER DEVOLVIÓ CONTENT = NONE")
 
-                razon = (
-                    resultado.get("choices", [{}])[0]
-                    .get("finish_reason")
-                )
+                eleccion = resultado.get("choices", [{}])[0] or {}
+                razon = eleccion.get("finish_reason")
+                mensaje = eleccion.get("message", {}) or {}
 
                 print("FINISH REASON:", razon)
 
-                return JsonResponse({
-                    "ok": True,
-                    "respuesta": (
-                        "PiroIA necesitó más tiempo para interpretar "
-                        "la solicitud. Intenta nuevamente de forma breve."
-                    ),
-                    "confirmado": False,
-                    "accion": "ninguna",
-                    "productos": []
-                })
+                # Algunos modelos entregan el texto en otro campo cuando
+                # terminan por límite de tokens. Nunca mostramos el
+                # razonamiento interno al usuario.
+                contenido_alterno = mensaje.get("content")
+
+                if contenido_alterno:
+                    contenido = contenido_alterno
+                else:
+                    return JsonResponse({
+                        "ok": True,
+                        "respuesta": (
+                            "PiroIA no pudo terminar de interpretar el mensaje. "
+                            "Dime qué producto deseas agregar o modificar y cuántas piezas necesitas."
+                        ),
+                        "confirmado": False,
+                        "accion": "ninguna",
+                        "productos": []
+                    })
 
         except Exception as e:
 
@@ -3252,8 +3266,8 @@ Pregunta del usuario:
 
         if modo != "solicitud":
 
-            # En modo CONSULTA PiroIA solamente responde preguntas
-            # del catálogo. Nunca crea ni modifica solicitudes.
+            # En CONSULTAR PiroIA SOLO informa del catálogo.
+            # Nunca crea, modifica ni confirma solicitudes.
             palabras_precio = [
                 "precio",
                 "precios",
