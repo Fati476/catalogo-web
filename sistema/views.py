@@ -3091,7 +3091,8 @@ Pregunta del usuario:
                     "content": (
                         "Eres PiroIA, asistente inteligente de un catálogo "
                         "web. Debes seguir exactamente las instrucciones "
-                        "proporcionadas por el sistema."
+                        "proporcionadas por el sistema. "
+                        "Debes responder siempre usando JSON válido."
                     )
                 },
                 {
