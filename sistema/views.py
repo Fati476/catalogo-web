@@ -2566,7 +2566,7 @@ def chatbot_ia(request):
             historial = []
 
         # Solo usamos las últimas 12 intervenciones para no hacer
-        # crecer demasiado el contexto enviado a OpenRouter.
+        # crecer demasiado el contexto enviado a Groq.
         historial_reciente = historial[-12:]
 
         if not pregunta:
@@ -2621,7 +2621,7 @@ def chatbot_ia(request):
         # ==========================================================
         #
         # Estas consultas se responden directamente con Django.
-        # Así PiroIA no consume una llamada de OpenRouter para algo
+        # Así PiroIA no consume una llamada de Groq para algo
         # que el catálogo ya puede contestar y evitamos esperas.
         #
         if modo != "solicitud":
@@ -2746,7 +2746,7 @@ def chatbot_ia(request):
                     "productos": []
                 })
 
-        api_key = os.getenv("OPENROUTER_API_KEY")
+        api_key = os.getenv("GROQ_API_KEY")
 
         if not api_key:
             return JsonResponse({
@@ -3073,23 +3073,27 @@ Pregunta del usuario:
 """
 
         # ==========================================================
-        # 6. LLAMADA A OPENROUTER
+        # 6. LLAMADA A GROQ
         # ==========================================================
 
-        url = "https://openrouter.ai/api/v1/chat/completions"
+        url = "https://api.groq.com/openai/v1/chat/completions"
 
         headers = {
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json",
-            "HTTP-Referer": "https://catalogo-web-s5um.onrender.com",
-            "X-Title": "PiroIA - Catalogo Web",
         }
 
         payload = {
-            # Modelo gratuito fijo para evitar que openrouter/free cambie
-            # entre modelos con comportamientos distintos de razonamiento/JSON.
-            "model": "google/gemma-4-31b-it:free",
+            "model": "openai/gpt-oss-120b",
             "messages": [
+                {
+                    "role": "system",
+                    "content": (
+                        "Eres PiroIA, asistente inteligente de un catálogo "
+                        "web. Debes seguir exactamente las instrucciones "
+                        "proporcionadas por el sistema."
+                    )
+                },
                 {
                     "role": "user",
                     "content": instrucciones
@@ -3097,18 +3101,14 @@ Pregunta del usuario:
             ],
             "temperature": 0.1,
             "max_tokens": 700,
-            # Evita que el modelo gaste todo el límite pensando y deje
-            # content = null, como ocurrió con North Mini Code.
-            "reasoning": {
-                "effort": "none"
-            },
+            "reasoning_effort": "low",
             "response_format": {
                 "type": "json_object"
             },
         }
 
         print("====================================")
-        print("PIROIA - OPENROUTER")
+        print("PIROIA - GROQ")
         print("Pregunta:", pregunta)
         print("Modo:", modo)
         print("API KEY:", "SI" if api_key else "NO")
@@ -3124,7 +3124,7 @@ Pregunta del usuario:
 
         except requests.exceptions.Timeout:
 
-            print("OPENROUTER TIMEOUT")
+            print("GROQ TIMEOUT")
 
             return JsonResponse({
                 "ok": False,
@@ -3137,7 +3137,7 @@ Pregunta del usuario:
         except requests.exceptions.RequestException as e:
 
             print(
-                "ERROR DE CONEXIÓN OPENROUTER:",
+                "ERROR DE CONEXIÓN GROQ:",
                 str(e)
             )
 
@@ -3150,17 +3150,17 @@ Pregunta del usuario:
             })
 
         print(
-            "STATUS OPENROUTER:",
+            "STATUS GROQ:",
             respuesta_ia.status_code
         )
 
         print(
-            "RESPUESTA OPENROUTER:",
+            "RESPUESTA GROQ:",
             respuesta_ia.text[:2000]
         )
 
         # ==========================================================
-        # 7. ERROR DE OPENROUTER
+        # 7. ERROR DE GROQ
         # ==========================================================
 
         if respuesta_ia.status_code != 200:
@@ -3170,13 +3170,13 @@ Pregunta del usuario:
 
                 error_mensaje = (
                     error_data.get("error", {}).get("message")
-                    or "Error desconocido de OpenRouter."
+                    or "Error desconocido de Groq."
                 )
 
             except Exception:
 
                 error_mensaje = (
-                    "OpenRouter no pudo procesar la solicitud."
+                    "Groq no pudo procesar la solicitud."
                 )
 
             return JsonResponse({
@@ -3203,7 +3203,7 @@ Pregunta del usuario:
 
             if contenido is None:
 
-                print("OPENROUTER DEVOLVIÓ CONTENT = NONE")
+                print("GROQ DEVOLVIÓ CONTENT = NONE")
 
                 eleccion = resultado.get("choices", [{}])[0] or {}
                 razon = eleccion.get("finish_reason")
