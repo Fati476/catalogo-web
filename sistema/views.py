@@ -2577,15 +2577,27 @@ def chatbot_ia(request):
         # 0. DATOS RECIBIDOS DEL FRONTEND
         # ==========================================================
         data = json.loads(request.body)
+
         pregunta = (
             data.get("mensaje", "")
             .strip()
         )
+
         modo = (
             data.get("modo", "consulta")
             .strip()
             .lower()
         )
+
+        pagina_actual = (
+            data.get("pagina_actual", "")
+            .strip()
+        )
+
+        en_solicitudes = (
+            pagina_actual.rstrip("/") == "/solicitudes"
+        )
+
         historial = data.get(
             "historial",
             []
@@ -3064,75 +3076,177 @@ def chatbot_ia(request):
         # ----------------------------------------------------------
         # ENVIAR SOLICITUD
         # ----------------------------------------------------------
-        # PiroIA NO realiza el envío definitivo. Aunque el usuario diga
-        # "envíala" o "manda mi solicitud", primero debe pasar por
-        # Solicitudes para que pueda revisar y utilizar el botón
-        # "Enviar solicitud".
+        # PiroIA puede realizar el envío definitivo SOLAMENTE
+        # cuando el usuario ya se encuentra en Solicitudes.
+        #
+        # Si todavía está preparando la solicitud desde otro lugar,
+        # "ya quedó" solamente la lleva a Solicitudes para revisión.
+        # El botón "Enviar solicitud" sigue funcionando normalmente.
+        # ----------------------------------------------------------
+
         palabras_enviar = [
-            "envía mi solicitud", "enviar mi solicitud",
-            "envía la solicitud", "enviar la solicitud",
-            "quiero enviar mi solicitud", "quiero enviar la solicitud",
-            "manda mi solicitud", "mandar mi solicitud",
-            "puedes enviarla", "envíala", "enviála",
-            "ya puedes enviarla", "quiero enviarla"
+            "envía mi solicitud",
+            "enviar mi solicitud",
+            "envía la solicitud",
+            "enviar la solicitud",
+            "quiero enviar mi solicitud",
+            "quiero enviar la solicitud",
+            "manda mi solicitud",
+            "mandar mi solicitud",
+            "puedes enviarla",
+            "envíala",
+            "enviála",
+            "ya puedes enviarla",
+            "quiero enviarla",
+            "ya quedó, envíala",
+            "ya quedo, enviala"
         ]
+
+        frases_confirmacion = [
+            "ya quedó",
+            "ya quedo",
+            "así está bien",
+            "asi esta bien",
+            "está bien",
+            "esta bien",
+            "eso es todo",
+            "confirmo"
+        ]
+
+        quiere_enviar = any(
+            palabra in pregunta_lower
+            for palabra in palabras_enviar
+        )
+
+        confirma_en_solicitudes = any(
+            frase in pregunta_lower
+            for frase in frases_confirmacion
+        )
+
+        # ==========================================================
+        # SI YA ESTÁ EN SOLICITUDES Y QUIERE ENVIAR
+        # ==========================================================
+
         if (
             modo == "solicitud"
-            and any(
-                palabra in pregunta_lower
-                for palabra in palabras_enviar
+            and solicitud_actual is not None
+            and en_solicitudes
+            and (
+                quiere_enviar
+                or confirma_en_solicitudes
             )
         ):
+
+            # Utilizamos EXACTAMENTE la misma función que usa
+            # el botón "Enviar solicitud".
+            resultado_envio = enviar_solicitud(request)
+
+            try:
+                datos_envio = json.loads(
+                    resultado_envio.content.decode("utf-8")
+                )
+            except Exception:
+                datos_envio = {
+                    "ok": False,
+                    "mensaje": "No fue posible procesar el envío."
+                }
+
+            if not datos_envio.get("ok"):
+                return JsonResponse({
+                    "ok": False,
+                    "respuesta": datos_envio.get(
+                        "mensaje",
+                        "No fue posible enviar la solicitud."
+                    ),
+                    "confirmado": False,
+                    "accion": "ninguna",
+                    "productos": []
+                })
+
+            return JsonResponse({
+                "ok": True,
+                "respuesta": (
+                    "Perfecto. Tu solicitud fue enviada correctamente. "
+                    "Puedes consultar su estado en Mis cotizaciones."
+                ),
+                "confirmado": True,
+                "accion": "enviar",
+                "productos": [],
+                "redirect_url": reverse(
+                    "mis_cotizaciones"
+                )
+            })
+
+        # ==========================================================
+        # SI TODAVÍA NO ESTÁ EN SOLICITUDES
+        # ==========================================================
+
+        if (
+            modo == "solicitud"
+            and quiere_enviar
+        ):
+
             if solicitud_actual is None:
                 return JsonResponse({
                     "ok": True,
                     "respuesta": (
-                        "No tienes una solicitud activa para revisar. "
+                        "No tienes una solicitud activa para enviar. "
                         "Si deseas, puedo ayudarte a preparar una."
                     ),
                     "confirmado": False,
                     "accion": "ninguna",
                     "productos": []
                 })
+
             productos_revision = []
             resumen_revision = []
+
             detalles_revision = (
                 solicitud_actual.detalles
                 .select_related("producto")
                 .all()
             )
+
             for detalle in detalles_revision:
+
                 productos_revision.append({
                     "producto_id": detalle.producto.id,
                     "nombre": detalle.producto.nombre,
-                    "cantidad": detalle.cantidad
+                   "cantidad": detalle.cantidad
                 })
+
                 resumen_revision.append(
                     f"{detalle.cantidad} "
                     f"{'pieza' if detalle.cantidad == 1 else 'piezas'} "
                     f"de {detalle.producto.nombre}"
                 )
+
             if resumen_revision:
+
                 respuesta_revision = (
-                    "Tu solicitud está preparada con "
+                    "Perfecto. Tu solicitud quedó preparada con "
                     + ", ".join(resumen_revision)
-                    + ". No la he enviado todavía. "
-                    "Te llevaré al apartado de Solicitudes para que "
-                    "puedas revisarla y enviarla con el botón "
-                    "\"Enviar solicitud\"."
+                    + ". Te llevaré al apartado de Solicitudes "
+                    "para que puedas revisarla antes de enviarla."
                 )
+
             else:
+
                 respuesta_revision = (
-                    "Tu solicitud está vacía. Te llevaré al apartado "
-                    "de Solicitudes para que puedas revisarla."
+                    "Tu solicitud está vacía. "
+                    "Te llevaré al apartado de Solicitudes "
+                    "para que puedas revisarla."
                 )
+
             return JsonResponse({
                 "ok": True,
                 "respuesta": respuesta_revision,
                 "confirmado": True,
                 "accion": "revisar",
                 "productos": productos_revision,
-                "redirect_url": reverse("solicitudes")
+                "redirect_url": reverse(
+                    "solicitudes"
+                )
             })
 
         # ==========================================================
