@@ -2560,7 +2560,7 @@ def revertir_cambio_correo(request, token):
     )
 
 
-
+@login_required
 def chatbot_ia(request):
     """
     PiroIA:
@@ -3330,7 +3330,7 @@ Pregunta:
         # 10. GROQ
         # ==========================================================
         url = (
-            "https\://api.groq.com/openai/v1/chat/completions"
+            "https://api.groq.com/openai/v1/chat/completions"
         )
         headers = {
             "Authorization": (
