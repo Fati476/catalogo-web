@@ -3359,6 +3359,27 @@ def chatbot_ia(request):
 
             ] = False
 
+            # Guardar una copia de los productos originales
+            # por si el usuario cancela la edición.
+            productos_originales = []
+
+            for detalle in (
+                solicitud_editar.detalles
+                .select_related("producto")
+                .all()
+            ):
+                productos_originales.append({
+                    "producto_id": detalle.producto.id,
+                    "cantidad": detalle.cantidad,
+                    "seleccionado": detalle.seleccionado
+                })
+
+            request.session[
+                "piroia_productos_originales"
+            ] = productos_originales
+
+            request.session.modified = True
+
             request.session.modified = True
 
             resumen_editar = []
@@ -3555,28 +3576,72 @@ def chatbot_ia(request):
 
             if es_nueva_piroia:
 
+                # Si PiroIA creó una solicitud nueva,
+                # al cancelarla se elimina el borrador.
                 solicitud_actual.delete()
 
             else:
 
-                # Si era una solicitud existente que
+                # Si era una solicitud que ya existía,
+                # restauramos exactamente los productos
+                # y cantidades que tenía antes de comenzar la edición.
 
-                # estaba siendo editada, vuelve a enviada.
+                productos_originales = request.session.get(
+                    "piroia_productos_originales",
+                    []
+                )
 
+                # Eliminar los detalles actuales de la solicitud.
+                # Esto quita productos agregados durante la edición
+                # y elimina cambios de cantidades.
+                solicitud_actual.detalles.all().delete()
+
+                # Volver a crear los detalles originales.
+                for producto_original in productos_originales:
+
+                    producto_id = producto_original.get(
+                        "producto_id"
+                    )
+
+                    cantidad_original = producto_original.get(
+                        "cantidad",
+                        1
+                    )
+
+                    seleccionado_original = producto_original.get(
+                        "seleccionado",
+                        True
+                    )
+
+                    producto = (
+                        Producto.objects
+                        .filter(
+                            id=producto_id,
+                            estado=True
+                        )
+                        .first()
+                    )
+
+                    if not producto:
+                        continue
+
+                    DetalleSolicitud.objects.create(
+                        solicitud=solicitud_actual,
+                        producto=producto,
+                        cantidad=cantidad_original,
+                        seleccionado=seleccionado_original
+                    )
+
+                # La solicitud vuelve a quedar como estaba
+                # antes de comenzar la edición.
                 solicitud_actual.enviada = True
-
                 solicitud_actual.bloqueada = False
 
                 solicitud_actual.save(
-
                     update_fields=[
-
                         "enviada",
-
                         "bloqueada"
-
                     ]
-
                 )
 
             request.session.pop(
@@ -3601,6 +3666,11 @@ def chatbot_ia(request):
 
                 None
 
+            )
+
+            request.session.pop(
+                "piroia_productos_originales",
+                None
             )
 
             request.session.modified = True
