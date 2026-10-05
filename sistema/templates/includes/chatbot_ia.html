@@ -3499,6 +3499,41 @@ document.addEventListener(
                         respuestaLimpia
                     );
 
+                    /* ========================================= */
+                    /* ACTUALIZAR SOLICITUD EN PANTALLA */
+                    /* ========================================= */
+
+                    const accionesQueModificanSolicitud = [
+                        "agregar",
+                        "quitar",
+                        "cambiar"
+                    ];
+
+                    const huboCambioSolicitud =
+                        modoActual === "solicitud" &&
+                        accionesQueModificanSolicitud.includes(
+                            String(datos.accion || "").toLowerCase()
+                        );
+
+                    const solicitudCancelada =
+                        modoActual === "solicitud" &&
+                        datos.cancelada === true;
+
+                    if (
+                        huboCambioSolicitud ||
+                        solicitudCancelada
+                    ) {
+                        console.log(
+                            "PiroIA: cambio detectado en la solicitud. Recargando pantalla..."
+                        );
+
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 700);
+
+                        return;
+                    }
+
 
                     /* ========================================= */
                     /* VOZ DE RESPUESTA */

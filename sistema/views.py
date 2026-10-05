@@ -3642,79 +3642,75 @@ def chatbot_ia(request):
 
 
         palabras_enviar = [
-
             "envía mi solicitud",
-
             "enviar mi solicitud",
-
             "envía la solicitud",
-
             "enviar la solicitud",
-
             "quiero enviar mi solicitud",
-
             "quiero enviar la solicitud",
-
             "manda mi solicitud",
-
             "mandar mi solicitud",
-
             "puedes enviarla",
-
             "envíala",
-
             "enviála",
-
+            "enviala",
             "ya puedes enviarla",
-
             "quiero enviarla",
-
             "ya quedó, envíala",
-
-            "ya quedo, enviala"
-
+            "ya quedo, enviala",
+            "enviar a cotización",
+            "enviar a cotizacion",
+            "manda a cotización",
+            "manda a cotizacion",
+            "enviar la cotización",
+            "enviar la cotizacion"
         ]
-
-
 
         frases_confirmacion = [
-
             "ya quedó",
-
             "ya quedo",
-
             "así está bien",
-
             "asi esta bien",
-
             "está bien",
-
             "esta bien",
-
             "eso es todo",
-
             "confirmo"
-
         ]
 
-
-
         quiere_enviar = any(
-
             palabra in pregunta_lower
-
             for palabra in palabras_enviar
-
         )
 
-
+        # Detectar frases como:
+        # "sí, ya quedó, ya envíala a cotización"
+        # "ya quedó, mándala a cotización"
+        # "sí, ya está bien, envíala"
+        quiere_enviar = (
+            quiere_enviar
+            or (
+                (
+                    "ya quedo" in pregunta_lower
+                    or "ya quedó" in pregunta_lower
+                    or "ya esta bien" in pregunta_lower
+                    or "ya está bien" in pregunta_lower
+                )
+                and
+                (
+                    "envia" in pregunta_lower
+                    or "envía" in pregunta_lower
+                    or "enviar" in pregunta_lower
+                    or "manda" in pregunta_lower
+                    or "mandar" in pregunta_lower
+                    or "cotizacion" in pregunta_lower
+                    or "cotización" in pregunta_lower
+                )
+            )
+        )
 
         confirma_en_solicitudes = any(
-
             frase in pregunta_lower
-
             for frase in frases_confirmacion
-
         )
 
 
