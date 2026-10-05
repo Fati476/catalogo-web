@@ -4361,7 +4361,7 @@ Pregunta:
 
         url = (
 
-            "https\://api.groq.com/openai/v1/chat/completions"
+            "https://api.groq.com/openai/v1/chat/completions"
 
         )
 
@@ -5440,58 +5440,26 @@ Pregunta:
                         if primer_producto_id is not None and producto.id != primer_producto_id:
                             continue
 
-
-
                     # --------------------------------------------------
-
                     # AGREGAR PRODUCTO
-
                     # --------------------------------------------------
-
-
-
                     if detalle:
 
-
-
                         detalle.cantidad += (
-
                             cantidad_agregada
-
                         )
-
-
-
                         detalle.seleccionado = True
-
-
-
                         detalle.save()
-
-
-
                         cantidad_actual = (
-
                             detalle.cantidad
 
                         )
-
-
-
                     else:
-
-
-
                         DetalleSolicitud.objects.create(
-
                             solicitud=solicitud_actual,
-
                             producto=producto,
-
                             cantidad=cantidad_agregada,
-
                             seleccionado=True
-
                         )
 
 
