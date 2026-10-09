@@ -182,9 +182,10 @@ def panel_admin(request):
 
 
 
+
 @login_required
 def seguridad_admin(request):
-    if not request.user.is_staff:
+    if not request.user.groups.filter(name='Administrador').exists():
         from django.core.exceptions import PermissionDenied
         raise PermissionDenied
 
