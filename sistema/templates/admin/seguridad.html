@@ -5,7 +5,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Seguridad del sistema</title>
+
+    <title>Seguridad | Panel Admin</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -13,117 +14,280 @@
     <link rel="stylesheet" href="{% static 'css/admin.css' %}">
 
     <style>
-        body {
+        * {
             font-family: 'Montserrat', sans-serif;
+            box-sizing: border-box;
+        }
+
+        body {
             background: #f3f1ec;
             color: #111827;
             min-height: 100vh;
-            padding-top: 115px;
         }
 
-        .security-header {
-            background: linear-gradient(120deg, #111827, #273449);
+        /* BANNER PRINCIPAL */
+
+        .security-page {
+            width: 100%;
+            margin: 0 auto 70px;
+        }
+
+        .security-hero {
+            position: relative;
+            min-height: 350px;
+            overflow: hidden;
+            background:
+                linear-gradient(
+                    90deg,
+                    rgba(17,24,39,.97),
+                    rgba(17,24,39,.76),
+                    rgba(17,24,39,.28)
+                ),
+                url("{% static 'img/banner_productos.png' %}");
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            padding: 65px 60px 80px;
+            margin-top: -95px;
+        }
+
+        .security-hero-content {
+            max-width: 800px;
             color: white;
-            padding: 42px;
-            border-radius: 28px;
-            margin-bottom: 28px;
-            box-shadow: 0 15px 35px rgba(17,24,39,.16);
+            position: relative;
+            z-index: 2;
+            padding-top: 105px;
         }
 
-        .security-header h1 {
+        .security-hero h1 {
+            font-size: 3rem;
             font-weight: 900;
-            margin-bottom: 10px;
+            line-height: 1.15;
+            margin-bottom: 14px;
+            text-shadow: 0 5px 25px rgba(0,0,0,.45);
         }
 
-        .security-header h1 span {
-            color: #D4AF37;
+        .security-hero h1 span {
+            color: #C9A227;
         }
 
-        .security-header p {
+        .security-hero p {
+            max-width: 700px;
             color: rgba(255,255,255,.75);
-            margin: 0;
+            font-size: 1.05rem;
+            line-height: 1.7;
+            margin-bottom: 0;
         }
 
-        .security-icon {
+        .security-hero-icon {
             width: 76px;
             height: 76px;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(201,162,39,.15);
-            border: 1px solid rgba(201,162,39,.4);
-            color: #D4AF37;
-            border-radius: 22px;
-            font-size: 2.5rem;
             flex-shrink: 0;
+            border-radius: 22px;
+            background: rgba(201,162,39,.15);
+            border: 1px solid rgba(201,162,39,.40);
+            color: #D4AF37;
+            font-size: 2.5rem;
         }
+
+        /* ONDA INFERIOR */
+
+        .hero-wave {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: -1px;
+            line-height: 0;
+        }
+
+        .hero-wave svg {
+            width: 100%;
+            height: 55px;
+            display: block;
+        }
+
+        /* CONTENIDO */
 
         .security-container {
-            width: min(1180px, calc(100% - 36px));
-            margin: 0 auto 60px;
+            width: min(1450px, calc(100% - 48px));
+            margin: 32px auto 70px;
         }
 
+        .security-section-title {
+            margin-bottom: 28px;
+        }
+
+        .security-section-title h2 {
+            font-size: 1.8rem;
+            font-weight: 900;
+            margin-bottom: 8px;
+        }
+
+        .security-section-title p {
+            color: #6B7280;
+            margin-bottom: 0;
+            line-height: 1.7;
+        }
+
+        /* TARJETAS */
+
         .security-card {
+            position: relative;
             background: white;
             border: 1px solid rgba(17,24,39,.08);
-            border-radius: 24px;
-            padding: 25px;
+            border-radius: 28px;
+            padding: 27px;
             height: 100%;
-            box-shadow: 0 10px 28px rgba(17,24,39,.06);
-            transition: .25s;
+            box-shadow: 0 18px 40px rgba(17,24,39,.08);
+            transition: transform .28s ease, box-shadow .28s ease;
         }
 
         .security-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 16px 35px rgba(17,24,39,.10);
+            transform: translateY(-6px);
+            box-shadow: 0 25px 48px rgba(17,24,39,.13);
+        }
+
+        .security-card::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 24px;
+            width: 65px;
+            height: 4px;
+            border-radius: 10px;
+            background: #C9A227;
         }
 
         .card-icon {
-            width: 52px;
-            height: 52px;
+            width: 60px;
+            height: 60px;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(201,162,39,.15);
+            background: rgba(201,162,39,.14);
             color: #A78312;
-            border-radius: 16px;
-            font-size: 1.6rem;
-            margin-bottom: 18px;
+            border-radius: 19px;
+            font-size: 1.8rem;
+            margin-bottom: 22px;
         }
 
-        .security-card h2 {
-            font-size: 1.1rem;
-            font-weight: 800;
+        .security-card h3 {
+            font-size: 1.15rem;
+            font-weight: 900;
+            margin-bottom: 12px;
         }
 
         .security-card p {
             color: #6B7280;
-            line-height: 1.6;
-            margin-bottom: 0;
+            font-size: .94rem;
+            line-height: 1.75;
+            margin-bottom: 18px;
         }
+
+        .security-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #FEF3C7;
+            color: #92400E;
+            border-radius: 999px;
+            padding: 7px 12px;
+            font-size: .75rem;
+            font-weight: 800;
+        }
+
+        /* AVISO */
 
         .security-note {
-            background: #fff;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            background: white;
+            border: 1px solid rgba(17,24,39,.07);
             border-left: 4px solid #C9A227;
-            border-radius: 12px;
-            padding: 18px 20px;
+            border-radius: 16px;
+            padding: 20px 22px;
             color: #4B5563;
-            box-shadow: 0 5px 18px rgba(17,24,39,.04);
+            line-height: 1.7;
+            box-shadow: 0 8px 25px rgba(17,24,39,.04);
         }
 
-        @media(max-width: 576px) {
-            .security-header {
-                padding: 28px 22px;
+        .security-note i {
+            color: #B8860B;
+            font-size: 1.25rem;
+            margin-top: 2px;
+        }
+
+        /* RESPONSIVE */
+
+        @media(max-width: 991px) {
+            .security-container {
+                width: calc(100% - 36px);
             }
 
-            .security-header h1 {
-                font-size: 1.8rem;
+            .security-hero {
+                padding-left: 32px;
+                padding-right: 32px;
             }
 
-            .security-icon {
-                width: 58px;
-                height: 58px;
+            .security-hero h1 {
+                font-size: 2.5rem;
+            }
+        }
+
+        @media(max-width: 768px) {
+            .security-hero {
+                min-height: 430px;
+                padding: 35px 24px 70px;
+                margin-top: -80px;
+                align-items: flex-start;
+            }
+
+            .security-hero-content {
+                padding-top: 95px;
+            }
+
+            .security-hero h1 {
+                font-size: 2.2rem;
+            }
+
+            .security-hero-icon {
+                width: 60px;
+                height: 60px;
                 font-size: 1.9rem;
+                border-radius: 18px;
+            }
+
+            .security-container {
+                width: calc(100% - 24px);
+                margin-top: 28px;
+            }
+
+            .security-section-title h2 {
+                font-size: 1.5rem;
+            }
+
+            .security-card {
+                padding: 23px;
+            }
+        }
+
+        @media(max-width: 480px) {
+            .security-hero {
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+
+            .security-hero h1 {
+                font-size: 1.9rem;
+            }
+
+            .security-hero p {
+                font-size: .95rem;
             }
         }
     </style>
@@ -133,82 +297,147 @@
 
 {% include 'admin/components/navbar_admin.html' %}
 
-<main class="security-container">
+<main class="security-page">
 
-    <section class="security-header">
-        <div class="d-flex align-items-center gap-4 flex-wrap">
-            <div class="security-icon">
-                <i class="bi bi-shield-lock"></i>
+    <!-- BANNER PRINCIPAL -->
+
+    <section class="security-hero">
+
+        <div class="security-hero-content">
+
+            <div class="d-flex align-items-center gap-4 flex-wrap">
+
+                <div class="security-hero-icon">
+                    <i class="bi bi-shield-lock"></i>
+                </div>
+
+                <div>
+                    <h1>
+                        Seguridad del <span>sistema</span>
+                    </h1>
+
+                    <p>
+                        Consulta y fortalece la protección de la Cooperativa Pirotécnica.
+                    </p>
+                </div>
+
             </div>
 
-            <div>
-                <h1>Seguridad del <span>sistema</span></h1>
-                <p>
-                    Consulta y fortalece la protección de la Cooperativa Pirotécnica.
-                </p>
-            </div>
         </div>
+
+        <div class="hero-wave">
+            <svg viewBox="0 0 1440 80" preserveAspectRatio="none">
+                <path fill="#f3f1ec"
+                      d="M0,58 C260,78 470,80 720,65 C960,50 1180,48 1440,62 L1440,80 L0,80 Z">
+                </path>
+            </svg>
+        </div>
+
     </section>
 
-    <div class="mb-4">
-        <h2 class="fw-bold">Centro de seguridad</h2>
-        <p class="text-secondary">
-            Desde aquí podrás revisar la actividad y las medidas de protección del sistema.
-        </p>
-    </div>
+    <!-- CONTENIDO DEL MÓDULO -->
 
-    <div class="row g-4">
+    <section class="security-container">
 
-        <div class="col-md-6 col-lg-4">
-            <section class="security-card">
-                <div class="card-icon">
-                    <i class="bi bi-clock-history"></i>
-                </div>
-                <h2>Historial de actividad</h2>
-                <p>
-                    Consultar las acciones importantes realizadas por los usuarios,
-                    como modificaciones y cancelaciones de solicitudes.
-                </p>
-                <span class="badge text-bg-secondary mt-3">En preparación</span>
-            </section>
+        <div class="security-section-title">
+            <h2>Centro de seguridad</h2>
+            <p>
+                Desde aquí podrás revisar la actividad y las medidas de protección del sistema.
+            </p>
         </div>
 
-        <div class="col-md-6 col-lg-4">
-            <section class="security-card">
-                <div class="card-icon">
-                    <i class="bi bi-shield-exclamation"></i>
-                </div>
-                <h2>Intentos de acceso</h2>
-                <p>
-                    Revisar los intentos fallidos de inicio de sesión para detectar
-                    posibles accesos no autorizados.
-                </p>
-                <span class="badge text-bg-secondary mt-3">En preparación</span>
-            </section>
+        <div class="row g-4">
+
+            <!-- HISTORIAL DE ACTIVIDAD -->
+
+            <div class="col-md-6 col-lg-4">
+                <article class="security-card">
+
+                    <div class="card-icon">
+                        <i class="bi bi-clock-history"></i>
+                    </div>
+
+                    <h3>Historial de actividad</h3>
+
+                    <p>
+                        Consultar las acciones importantes realizadas por los usuarios,
+                        como modificaciones y cancelaciones de solicitudes.
+                    </p>
+
+                    <span class="security-badge">
+                        <i class="bi bi-hourglass-split"></i>
+                        En preparación
+                    </span>
+
+                </article>
+            </div>
+
+            <!-- INTENTOS DE ACCESO -->
+
+            <div class="col-md-6 col-lg-4">
+                <article class="security-card">
+
+                    <div class="card-icon">
+                        <i class="bi bi-shield-exclamation"></i>
+                    </div>
+
+                    <h3>Intentos de acceso</h3>
+
+                    <p>
+                        Revisar los intentos fallidos de inicio de sesión para detectar
+                        posibles accesos no autorizados.
+                    </p>
+
+                    <span class="security-badge">
+                        <i class="bi bi-hourglass-split"></i>
+                        En preparación
+                    </span>
+
+                </article>
+            </div>
+
+            <!-- CONTROL DE PERMISOS -->
+
+            <div class="col-md-6 col-lg-4">
+                <article class="security-card">
+
+                    <div class="card-icon">
+                        <i class="bi bi-person-lock"></i>
+                    </div>
+
+                    <h3>Control de permisos</h3>
+
+                    <p>
+                        Proteger las funciones administrativas y evitar que los usuarios
+                        accedan a solicitudes que no les pertenecen.
+                    </p>
+
+                    <span class="security-badge">
+                        <i class="bi bi-hourglass-split"></i>
+                        En preparación
+                    </span>
+
+                </article>
+            </div>
+
         </div>
 
-        <div class="col-md-6 col-lg-4">
-            <section class="security-card">
-                <div class="card-icon">
-                    <i class="bi bi-person-lock"></i>
-                </div>
-                <h2>Control de permisos</h2>
-                <p>
-                    Proteger las funciones administrativas y evitar que los usuarios
-                    accedan a solicitudes que no les pertenecen.
+        <!-- AVISO -->
+
+        <div class="security-note mt-4">
+            <i class="bi bi-info-circle-fill"></i>
+
+            <div>
+                <strong>Estado del módulo</strong>
+                <p class="mb-0">
+                    Esta es la estructura inicial de Seguridad. Los registros de actividad
+                    y los intentos de acceso se incorporarán cuando conectemos cada función
+                    con Django y la base de datos.
                 </p>
-                <span class="badge text-bg-secondary mt-3">En preparación</span>
-            </section>
+            </div>
         </div>
 
-    </div>
-
-    <div class="security-note mt-4">
-        <i class="bi bi-info-circle me-2"></i>
-        <strong>Importante:</strong>
-        este panel es la estructura inicial. Los registros y las alertas se mostrarán
-        cuando conectemos cada función con Django y la base de datos.
-    </div>
+    </section>
 
 </main>
 
