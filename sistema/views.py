@@ -180,6 +180,20 @@ def panel_admin(request):
         'total_usuarios': total_usuarios,
     })
 
+
+
+@login_required
+def seguridad_admin(request):
+    if not request.user.is_staff:
+        from django.core.exceptions import PermissionDenied
+        raise PermissionDenied
+
+    return render(
+        request,
+        'admin/seguridad.html'
+    )
+
+
 from django.core.paginator import Paginator
 
 @login_required

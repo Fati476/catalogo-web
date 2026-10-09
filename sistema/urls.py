@@ -49,6 +49,14 @@ urlpatterns = [
         name='panel_admin'
     ),
 
+    
+    path(
+        'panel/seguridad/',
+        views.seguridad_admin,
+        name='seguridad_admin'
+    ),
+
+
     path(
         'inicio/',
         views.inicio,
