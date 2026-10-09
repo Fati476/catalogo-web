@@ -238,3 +238,31 @@ class CambioCorreo(models.Model):
             f"{self.usuario.username} | "
             f"{self.correo_anterior} → {self.correo_nuevo}"
         )
+
+
+
+class RegistroActividad(models.Model):
+    usuario = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='registros_actividad'
+    )
+
+    accion = models.CharField(max_length=100)
+    descripcion = models.TextField()
+    fecha = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-fecha']
+        verbose_name = 'Registro de actividad'
+        verbose_name_plural = 'Registros de actividad'
+
+    def __str__(self):
+        nombre_usuario = (
+            self.usuario.username
+            if self.usuario
+            else 'Usuario desconocido'
+        )
+        return f'{nombre_usuario} - {self.accion} - {self.fecha}'

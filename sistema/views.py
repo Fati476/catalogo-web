@@ -16,6 +16,8 @@ from .models import Categoria
 from .forms_imagen import ProductoImagenForm
 from .models import ProductoImagen
 
+from .models import RegistroActividad
+
 
 from .models import ProductoImagen
 
@@ -183,16 +185,25 @@ def panel_admin(request):
 
 
 
+
 @login_required
 def seguridad_admin(request):
     if not request.user.groups.filter(name='Administrador').exists():
         from django.core.exceptions import PermissionDenied
         raise PermissionDenied
 
+    registros = RegistroActividad.objects.select_related(
+        'usuario'
+    ).all()
+
     return render(
         request,
-        'admin/seguridad.html'
+        'admin/seguridad.html',
+        {
+            'registros': registros,
+        }
     )
+
 
 
 from django.core.paginator import Paginator

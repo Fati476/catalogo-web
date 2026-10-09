@@ -297,14 +297,13 @@
 
 {% include 'admin/components/navbar_admin.html' %}
 
+
 <main class="security-page">
 
     <!-- BANNER PRINCIPAL -->
-
     <section class="security-hero">
 
         <div class="security-hero-content">
-
             <div class="d-flex align-items-center gap-4 flex-wrap">
 
                 <div class="security-hero-icon">
@@ -322,7 +321,6 @@
                 </div>
 
             </div>
-
         </div>
 
         <div class="hero-wave">
@@ -336,20 +334,19 @@
     </section>
 
     <!-- CONTENIDO DEL MÓDULO -->
-
     <section class="security-container">
 
         <div class="security-section-title">
             <h2>Centro de seguridad</h2>
             <p>
-                Desde aquí podrás revisar la actividad y las medidas de protección del sistema.
+                Revisa la actividad registrada y las medidas de protección del sistema.
             </p>
         </div>
 
+        <!-- TARJETAS DE SEGURIDAD -->
         <div class="row g-4">
 
-            <!-- HISTORIAL DE ACTIVIDAD -->
-
+            <!-- HISTORIAL -->
             <div class="col-md-6 col-lg-4">
                 <article class="security-card">
 
@@ -360,20 +357,19 @@
                     <h3>Historial de actividad</h3>
 
                     <p>
-                        Consultar las acciones importantes realizadas por los usuarios,
+                        Consulta las acciones importantes realizadas por los usuarios,
                         como modificaciones y cancelaciones de solicitudes.
                     </p>
 
                     <span class="security-badge">
-                        <i class="bi bi-hourglass-split"></i>
-                        En preparación
+                        <i class="bi bi-database-check"></i>
+                        Historial disponible
                     </span>
 
                 </article>
             </div>
 
             <!-- INTENTOS DE ACCESO -->
-
             <div class="col-md-6 col-lg-4">
                 <article class="security-card">
 
@@ -384,20 +380,19 @@
                     <h3>Intentos de acceso</h3>
 
                     <p>
-                        Revisar los intentos fallidos de inicio de sesión para detectar
-                        posibles accesos no autorizados.
+                        En esta sección se podrán consultar los intentos fallidos
+                        de inicio de sesión para identificar posibles accesos no autorizados.
                     </p>
 
                     <span class="security-badge">
                         <i class="bi bi-hourglass-split"></i>
-                        En preparación
+                        Pendiente de implementar
                     </span>
 
                 </article>
             </div>
 
-            <!-- CONTROL DE PERMISOS -->
-
+            <!-- PERMISOS -->
             <div class="col-md-6 col-lg-4">
                 <article class="security-card">
 
@@ -408,13 +403,13 @@
                     <h3>Control de permisos</h3>
 
                     <p>
-                        Proteger las funciones administrativas y evitar que los usuarios
-                        accedan a solicitudes que no les pertenecen.
+                        Protege las funciones administrativas y limita el acceso
+                        según los permisos de cada usuario.
                     </p>
 
                     <span class="security-badge">
-                        <i class="bi bi-hourglass-split"></i>
-                        En preparación
+                        <i class="bi bi-shield-check"></i>
+                        Validación de acceso
                     </span>
 
                 </article>
@@ -422,17 +417,132 @@
 
         </div>
 
-        <!-- AVISO -->
+        <!-- HISTORIAL DE ACTIVIDAD -->
+        <div class="security-section-title mt-5">
+            <h2>Actividad reciente</h2>
+            <p>
+                Consulta quién realizó una acción, qué hizo y cuándo ocurrió.
+            </p>
+        </div>
 
-        <div class="security-note mt-4">
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+
+            <div class="card-header bg-white border-0 p-4">
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+
+                    <div>
+                        <h5 class="fw-bold mb-1">
+                            <i class="bi bi-journal-text me-2"
+                               style="color: #C9A227;"></i>
+                            Registro de actividad
+                        </h5>
+
+                        <small class="text-muted">
+                            Información consultada desde la base de datos.
+                        </small>
+                    </div>
+
+                    <span class="badge rounded-pill px-3 py-2"
+                          style="background: #f5edcf; color: #806515;">
+                        <i class="bi bi-database me-1"></i>
+                        Registro del sistema
+                    </span>
+
+                </div>
+            </div>
+
+            <div class="card-body p-0">
+                <div class="table-responsive">
+
+                    <table class="table align-middle mb-0">
+
+                        <thead style="background: #f8f7f3;">
+                            <tr>
+                                <th class="px-4 py-3">Usuario</th>
+                                <th class="py-3">Acción</th>
+                                <th class="py-3">Descripción</th>
+                                <th class="py-3">Fecha y hora</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for registro in registros %}
+                            <tr>
+
+                                <td class="px-4">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="rounded-circle d-flex align-items-center justify-content-center"
+                                             style="width: 36px; height: 36px; background: #f5edcf; color: #806515;">
+                                            <i class="bi bi-person"></i>
+                                        </div>
+
+                                        <span class="fw-semibold">
+                                            {% if registro.usuario %}
+                                                {{ registro.usuario.username }}
+                                            {% else %}
+                                                Usuario desconocido
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <span class="badge rounded-pill px-3 py-2"
+                                          style="background: #f5edcf; color: #806515;">
+                                        {{ registro.accion }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    {{ registro.descripcion }}
+                                </td>
+
+                                <td class="text-nowrap">
+                                    <i class="bi bi-calendar3 me-1 text-muted"></i>
+                                    {{ registro.fecha|date:"d/m/Y H:i" }}
+                                </td>
+
+                            </tr>
+
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-5">
+
+                                    <i class="bi bi-journal-x text-muted"
+                                       style="font-size: 2.5rem;"></i>
+
+                                    <h6 class="fw-bold mt-3">
+                                        Aún no hay actividades registradas
+                                    </h6>
+
+                                    <p class="text-muted small mb-0">
+                                        Cuando conectemos las acciones del sistema
+                                        con el historial, aparecerán aquí.
+                                    </p>
+
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+
+                    </table>
+
+                </div>
+            </div>
+
+        </div>
+
+        <!-- AVISO -->
+        <div class="security-note mt-4 mb-5">
             <i class="bi bi-info-circle-fill"></i>
 
             <div>
-                <strong>Estado del módulo</strong>
+                <strong>Protección del sistema</strong>
+
                 <p class="mb-0">
-                    Esta es la estructura inicial de Seguridad. Los registros de actividad
-                    y los intentos de acceso se incorporarán cuando conectemos cada función
-                    con Django y la base de datos.
+                    El historial consulta los registros guardados en la base de datos.
+                    Para que se complete automáticamente, debemos conectar las acciones
+                    importantes del sistema con el registro de actividad.
                 </p>
             </div>
         </div>
