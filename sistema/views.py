@@ -188,41 +188,50 @@ from django.db.models import Q
 
 
 
+
+
 @login_required
 def seguridad_admin(request):
+    from datetime import datetime, timedelta
+    from django.contrib.auth import get_user_model
+    from django.core.exceptions import PermissionDenied
+    from django.utils import timezone
+
+    # Verificar permisos de administrador
     if not request.user.groups.filter(name='Administrador').exists():
-        from django.core.exceptions import PermissionDenied
         raise PermissionDenied
 
-    from django.contrib.auth import get_user_model
-
-    # Obtener todos los registros de actividad
+    # Obtener los registros de actividad
     registros = RegistroActividad.objects.select_related(
         'usuario'
     ).all()
 
-    # Búsqueda por usuario, acción o descripción
+    # Obtener los filtros del formulario
     busqueda = request.GET.get('buscar', '').strip()
+    tipo = request.GET.get('tipo', 'todos')
+    fecha_inicio = request.GET.get('fecha_inicio', '').strip()
+    fecha_fin = request.GET.get('fecha_fin', '').strip()
 
-    
+    fecha_inicio_valida = True
+    fecha_fin_valida = True
+
+    # Búsqueda por usuario, acción o descripción
     if busqueda:
-        registros = registros.filter(
-            Q(usuario__username__icontains=busqueda)
-            | Q(accion__icontains=busqueda)
-            | Q(descripcion__icontains=busqueda)
-            | Q(usuario__isnull=True, accion__icontains='Inicio de sesión fallido')
-            if busqueda.lower() in ['no identificado', 'no identificada']
-            else (
+        if busqueda.lower() in [
+            'no identificado',
+            'no identificada'
+        ]:
+            registros = registros.filter(
+                usuario__isnull=True
+            )
+        else:
+            registros = registros.filter(
                 Q(usuario__username__icontains=busqueda)
                 | Q(accion__icontains=busqueda)
                 | Q(descripcion__icontains=busqueda)
             )
-        )
-
 
     # Filtro por tipo de actividad
-    tipo = request.GET.get('tipo', 'todos')
-
     if tipo == 'correcto':
         registros = registros.filter(
             accion='Inicio de sesión'
@@ -231,16 +240,71 @@ def seguridad_admin(request):
         registros = registros.filter(
             accion='Inicio de sesión fallido'
         )
+    else:
+        tipo = 'todos'
 
-    # Ordenar los registros del más reciente al más antiguo
+    # Filtro por fecha inicial
+    if fecha_inicio:
+        try:
+            fecha_inicio_obj = datetime.strptime(
+                fecha_inicio, '%Y-%m-%d'
+            ).date()
+
+            inicio = datetime.combine(
+                fecha_inicio_obj,
+                datetime.min.time()
+            )
+
+            if timezone.is_aware(timezone.now()):
+                inicio = timezone.make_aware(
+                    inicio,
+                    timezone.get_current_timezone()
+                )
+
+            registros = registros.filter(
+                fecha__gte=inicio
+            )
+
+        except ValueError:
+            fecha_inicio = ''
+            fecha_inicio_valida = False
+
+    # Filtro por fecha final: incluye todo el día
+    if fecha_fin:
+        try:
+            fecha_fin_obj = datetime.strptime(
+                fecha_fin, '%Y-%m-%d'
+            ).date()
+
+            dia_siguiente = fecha_fin_obj + timedelta(days=1)
+
+            fin_exclusivo = datetime.combine(
+                dia_siguiente,
+                datetime.min.time()
+            )
+
+            if timezone.is_aware(timezone.now()):
+                fin_exclusivo = timezone.make_aware(
+                    fin_exclusivo,
+                    timezone.get_current_timezone()
+                )
+
+            registros = registros.filter(
+                fecha__lt=fin_exclusivo
+            )
+
+        except ValueError:
+            fecha_fin = ''
+            fecha_fin_valida = False
+
+    # Ordenar del más reciente al más antiguo
     registros = registros.order_by('-fecha')
 
     # Paginación: 10 registros por página
     paginador = Paginator(registros, 10)
-    pagina_actual = request.GET.get('page')
-    pagina = paginador.get_page(pagina_actual)
+    pagina = paginador.get_page(request.GET.get('page'))
 
-    # Indicadores generales: no dependen de los filtros
+    # Indicadores generales, sin aplicar los filtros
     total_accesos = RegistroActividad.objects.filter(
         accion='Inicio de sesión'
     ).count()
@@ -259,11 +323,16 @@ def seguridad_admin(request):
         'pagina': pagina,
         'busqueda': busqueda,
         'tipo': tipo,
+        'fecha_inicio': fecha_inicio,
+        'fecha_fin': fecha_fin,
+        'fecha_inicio_valida': fecha_inicio_valida,
+        'fecha_fin_valida': fecha_fin_valida,
         'total_accesos': total_accesos,
         'intentos_fallidos': intentos_fallidos,
         'total_actividades': total_actividades,
         'total_usuarios': total_usuarios,
     })
+
 
 
 

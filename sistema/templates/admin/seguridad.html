@@ -709,6 +709,40 @@
                         >
                     </div>
 
+                    
+                    <!-- FECHA INICIAL -->
+                    <div class="col-12 col-md-3">
+                        <label for="fecha_inicio" class="form-label fw-bold">
+                            <i class="bi bi-calendar-event me-1"></i>
+                            Fecha inicial
+                        </label>
+
+                        <input
+                            type="date"
+                            name="fecha_inicio"
+                            id="fecha_inicio"
+                            class="form-control"
+                            value="{{ fecha_inicio }}"
+                        >
+                    </div>
+
+                    <!-- FECHA FINAL -->
+                    <div class="col-12 col-md-3">
+                        <label for="fecha_fin" class="form-label fw-bold">
+                            <i class="bi bi-calendar-check me-1"></i>
+                            Fecha final
+                        </label>
+
+                        <input
+                            type="date"
+                            name="fecha_fin"
+                            id="fecha_fin"
+                            class="form-control"
+                            value="{{ fecha_fin }}"
+                        >
+                    </div>
+
+
                     <div class="col-12 col-md-4">
                         <label for="tipo" class="form-label fw-bold">
                             Tipo de actividad
@@ -865,10 +899,12 @@
 
                             <li class="page-item {% if not pagina.has_previous %}disabled{% endif %}">
                                 {% if pagina.has_previous %}
-                                    <a class="page-link"
-                                       href="?buscar={{ busqueda|urlencode }}&tipo={{ tipo }}&page={{ pagina.previous_page_number }}">
-                                        Anterior
-                                    </a>
+                                    
+                                <a class="page-link"
+                                   href="?buscar={{ busqueda|urlencode }}&tipo={{ tipo }}&fecha_inicio={{ fecha_inicio|urlencode }}&fecha_fin={{ fecha_fin|urlencode }}&page={{ pagina.previous_page_number }}">
+                                    Anterior
+                                </a>
+
                                 {% else %}
                                     <span class="page-link">Anterior</span>
                                 {% endif %}
@@ -876,19 +912,23 @@
 
                             {% for numero in pagina.paginator.page_range %}
                                 <li class="page-item {% if pagina.number == numero %}active{% endif %}">
-                                    <a class="page-link"
-                                       href="?buscar={{ busqueda|urlencode }}&tipo={{ tipo }}&page={{ numero }}">
-                                        {{ numero }}
-                                    </a>
+                                    
+                                <a class="page-link"
+                                   href="?buscar={{ busqueda|urlencode }}&tipo={{ tipo }}&fecha_inicio={{ fecha_inicio|urlencode }}&fecha_fin={{ fecha_fin|urlencode }}&page={{ numero }}">
+                                    {{ numero }}
+                                </a>
+
                                 </li>
                             {% endfor %}
 
                             <li class="page-item {% if not pagina.has_next %}disabled{% endif %}">
                                 {% if pagina.has_next %}
-                                    <a class="page-link"
-                                       href="?buscar={{ busqueda|urlencode }}&tipo={{ tipo }}&page={{ pagina.next_page_number }}">
-                                        Siguiente
-                                    </a>
+                                    
+                                <a class="page-link"
+                                   href="?buscar={{ busqueda|urlencode }}&tipo={{ tipo }}&fecha_inicio={{ fecha_inicio|urlencode }}&fecha_fin={{ fecha_fin|urlencode }}&page={{ pagina.next_page_number }}">
+                                    Siguiente
+                                </a>
+
                                 {% else %}
                                     <span class="page-link">Siguiente</span>
                                 {% endif %}
