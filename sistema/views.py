@@ -6130,3 +6130,15 @@ Pregunta:
             )
 
         }, status=500)
+
+
+def registrar_actividad(usuario, accion, descripcion):
+    RegistroActividad.objects.create(
+        usuario=(
+            usuario
+            if usuario and usuario.is_authenticated
+            else None
+        ),
+        accion=accion,
+        descripcion=descripcion
+    )
