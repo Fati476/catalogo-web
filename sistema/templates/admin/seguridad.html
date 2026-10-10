@@ -688,6 +688,69 @@
                 </div>
             </div>
 
+            
+            <!-- BÚSQUEDA Y FILTROS -->
+            <div class="px-4 py-3 border-top border-bottom bg-white">
+                <form method="get" class="row g-3 align-items-end">
+
+                    <div class="col-12 col-md-6">
+                        <label for="buscar" class="form-label fw-bold">
+                            <i class="bi bi-search me-1"></i>
+                            Buscar actividad
+                        </label>
+
+                        <input
+                            type="text"
+                            name="buscar"
+                            id="buscar"
+                            class="form-control"
+                            placeholder="Usuario, acción o descripción..."
+                            value="{{ busqueda }}"
+                        >
+                    </div>
+
+                    <div class="col-12 col-md-4">
+                        <label for="tipo" class="form-label fw-bold">
+                            Tipo de actividad
+                        </label>
+
+                        <select name="tipo" id="tipo" class="form-select">
+                            <option value="todos"
+                                {% if tipo == 'todos' %}selected{% endif %}>
+                                Todas las actividades
+                            </option>
+
+                            <option value="correcto"
+                                {% if tipo == 'correcto' %}selected{% endif %}>
+                                Inicios de sesión correctos
+                            </option>
+
+                            <option value="fallido"
+                                {% if tipo == 'fallido' %}selected{% endif %}>
+                                Intentos fallidos
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="col-12 col-md-2 d-flex gap-2">
+                        <button type="submit" class="btn btn-dark w-100">
+                            <i class="bi bi-search me-1"></i>
+                            Buscar
+                        </button>
+                    </div>
+
+                    <div class="col-12">
+                        <a href="{% url 'seguridad_admin' %}"
+                           class="btn btn-outline-secondary btn-sm">
+                            <i class="bi bi-arrow-counterclockwise me-1"></i>
+                            Limpiar filtros
+                        </a>
+                    </div>
+
+                </form>
+            </div>
+
+
             <div class="card-body p-0">
 
                 <div class="security-history-scroll">
@@ -785,6 +848,57 @@
                     </table>
 
                 </div>
+                
+                <!-- PAGINACIÓN -->
+                {% if pagina.paginator.num_pages > 1 %}
+                <div class="d-flex flex-wrap justify-content-between
+                            align-items-center gap-3 p-3 border-top bg-white">
+
+                    <small class="text-muted">
+                        Página {{ pagina.number }} de
+                        {{ pagina.paginator.num_pages }}
+                        · {{ pagina.paginator.count }} registros
+                    </small>
+
+                    <nav aria-label="Paginación del historial">
+                        <ul class="pagination pagination-sm mb-0">
+
+                            <li class="page-item {% if not pagina.has_previous %}disabled{% endif %}">
+                                {% if pagina.has_previous %}
+                                    <a class="page-link"
+                                       href="?buscar={{ busqueda|urlencode }}&tipo={{ tipo }}&page={{ pagina.previous_page_number }}">
+                                        Anterior
+                                    </a>
+                                {% else %}
+                                    <span class="page-link">Anterior</span>
+                                {% endif %}
+                            </li>
+
+                            {% for numero in pagina.paginator.page_range %}
+                                <li class="page-item {% if pagina.number == numero %}active{% endif %}">
+                                    <a class="page-link"
+                                       href="?buscar={{ busqueda|urlencode }}&tipo={{ tipo }}&page={{ numero }}">
+                                        {{ numero }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+
+                            <li class="page-item {% if not pagina.has_next %}disabled{% endif %}">
+                                {% if pagina.has_next %}
+                                    <a class="page-link"
+                                       href="?buscar={{ busqueda|urlencode }}&tipo={{ tipo }}&page={{ pagina.next_page_number }}">
+                                        Siguiente
+                                    </a>
+                                {% else %}
+                                    <span class="page-link">Siguiente</span>
+                                {% endif %}
+                            </li>
+
+                        </ul>
+                    </nav>
+                </div>
+                {% endif %}
+
 
             </div>
 

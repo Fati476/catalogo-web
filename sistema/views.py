@@ -184,6 +184,7 @@ def panel_admin(request):
 
 
 
+from django.db.models import Q
 
 
 
@@ -195,10 +196,51 @@ def seguridad_admin(request):
 
     from django.contrib.auth import get_user_model
 
+    # Obtener todos los registros de actividad
     registros = RegistroActividad.objects.select_related(
         'usuario'
     ).all()
 
+    # Búsqueda por usuario, acción o descripción
+    busqueda = request.GET.get('buscar', '').strip()
+
+    
+    if busqueda:
+        registros = registros.filter(
+            Q(usuario__username__icontains=busqueda)
+            | Q(accion__icontains=busqueda)
+            | Q(descripcion__icontains=busqueda)
+            | Q(usuario__isnull=True, accion__icontains='Inicio de sesión fallido')
+            if busqueda.lower() in ['no identificado', 'no identificada']
+            else (
+                Q(usuario__username__icontains=busqueda)
+                | Q(accion__icontains=busqueda)
+                | Q(descripcion__icontains=busqueda)
+            )
+        )
+
+
+    # Filtro por tipo de actividad
+    tipo = request.GET.get('tipo', 'todos')
+
+    if tipo == 'correcto':
+        registros = registros.filter(
+            accion='Inicio de sesión'
+        )
+    elif tipo == 'fallido':
+        registros = registros.filter(
+            accion='Inicio de sesión fallido'
+        )
+
+    # Ordenar los registros del más reciente al más antiguo
+    registros = registros.order_by('-fecha')
+
+    # Paginación: 10 registros por página
+    paginador = Paginator(registros, 10)
+    pagina_actual = request.GET.get('page')
+    pagina = paginador.get_page(pagina_actual)
+
+    # Indicadores generales: no dependen de los filtros
     total_accesos = RegistroActividad.objects.filter(
         accion='Inicio de sesión'
     ).count()
@@ -212,17 +254,16 @@ def seguridad_admin(request):
     Usuario = get_user_model()
     total_usuarios = Usuario.objects.count()
 
-    return render(
-        request,
-        'admin/seguridad.html',
-        {
-            'registros': registros,
-            'total_accesos': total_accesos,
-            'intentos_fallidos': intentos_fallidos,
-            'total_actividades': total_actividades,
-            'total_usuarios': total_usuarios,
-        }
-    )
+    return render(request, 'admin/seguridad.html', {
+        'registros': pagina,
+        'pagina': pagina,
+        'busqueda': busqueda,
+        'tipo': tipo,
+        'total_accesos': total_accesos,
+        'intentos_fallidos': intentos_fallidos,
+        'total_actividades': total_actividades,
+        'total_usuarios': total_usuarios,
+    })
 
 
 
