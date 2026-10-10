@@ -186,23 +186,44 @@ def panel_admin(request):
 
 
 
+
 @login_required
 def seguridad_admin(request):
     if not request.user.groups.filter(name='Administrador').exists():
         from django.core.exceptions import PermissionDenied
         raise PermissionDenied
 
+    from django.contrib.auth import get_user_model
+
     registros = RegistroActividad.objects.select_related(
         'usuario'
     ).all()
+
+    total_accesos = RegistroActividad.objects.filter(
+        accion='Inicio de sesión'
+    ).count()
+
+    intentos_fallidos = RegistroActividad.objects.filter(
+        accion='Inicio de sesión fallido'
+    ).count()
+
+    total_actividades = RegistroActividad.objects.count()
+
+    Usuario = get_user_model()
+    total_usuarios = Usuario.objects.count()
 
     return render(
         request,
         'admin/seguridad.html',
         {
             'registros': registros,
+            'total_accesos': total_accesos,
+            'intentos_fallidos': intentos_fallidos,
+            'total_actividades': total_actividades,
+            'total_usuarios': total_usuarios,
         }
     )
+
 
 
 
