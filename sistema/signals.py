@@ -14,6 +14,7 @@ def registrar_inicio_sesion(sender, request, user, **kwargs):
     )
 
 
+
 @receiver(user_login_failed)
 def registrar_intento_fallido(sender, credentials, request, **kwargs):
     identificador = credentials.get('username', 'No identificado')
@@ -22,7 +23,8 @@ def registrar_intento_fallido(sender, credentials, request, **kwargs):
         usuario=None,
         accion='Inicio de sesión fallido',
         descripcion=(
-            f'Intento de acceso fallido con el identificador: '
-            f'{identificador}'
+            f'Credenciales incorrectas. '
+            f'Identificador utilizado: {identificador}'
         )
     )
+
