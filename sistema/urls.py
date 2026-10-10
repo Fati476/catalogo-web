@@ -321,5 +321,17 @@ urlpatterns = [
         name='chatbot_ia'
     ),
 
+    path(
+        'panel/seguridad/exportar/excel/',
+        views.exportar_seguridad_excel,
+        name='exportar_seguridad_excel'
+    ),
+    path(
+        'panel/seguridad/exportar/pdf/',
+        views.exportar_seguridad_pdf,
+        name='exportar_seguridad_pdf'
+    ),
+
+
 
 ]

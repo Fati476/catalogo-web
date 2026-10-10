@@ -694,6 +694,29 @@
                             Buscar
                         </button>
                     </div>
+                    
+                    <div class="col-12 col-md-3 d-flex gap-2 flex-wrap">
+                        <button
+                            type="submit"
+                            formaction="{% url 'exportar_seguridad_excel' %}"
+                            class="btn btn-success"
+                            formmethod="get"
+                        >
+                            <i class="bi bi-file-earmark-excel me-1"></i>
+                            Excel
+                        </button>
+
+                        <button
+                            type="submit"
+                            formaction="{% url 'exportar_seguridad_pdf' %}"
+                            class="btn btn-danger"
+                            formmethod="get"
+                        >
+                            <i class="bi bi-file-earmark-pdf me-1"></i>
+                            PDF
+                        </button>
+                    </div>
+
 
                     <div class="col-12">
                         <a href="{% url 'seguridad_admin' %}"

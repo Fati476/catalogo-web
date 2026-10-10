@@ -52,6 +52,19 @@ import os
 
 from .utils import enviar_correo
 
+
+from io import BytesIO
+
+from openpyxl import Workbook
+from openpyxl.styles import Font, PatternFill, Alignment
+
+from reportlab.lib.pagesizes import landscape
+
+from xml.sax.saxutils import escape
+
+from django.db.models import Q
+
+
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
 from .forms import CustomSetPasswordForm
@@ -334,6 +347,233 @@ def seguridad_admin(request):
     })
 
 
+
+def obtener_registros_para_exportar(request):
+    from datetime import datetime, timedelta
+    from django.core.exceptions import PermissionDenied
+    from django.utils import timezone
+
+    if not request.user.groups.filter(
+        name='Administrador'
+    ).exists():
+        raise PermissionDenied
+
+    registros = RegistroActividad.objects.select_related(
+        'usuario'
+    ).all()
+
+    busqueda = request.GET.get('buscar', '').strip()
+    tipo = request.GET.get('tipo', 'todos')
+    fecha_inicio = request.GET.get('fecha_inicio', '').strip()
+    fecha_fin = request.GET.get('fecha_fin', '').strip()
+
+    if busqueda:
+        if busqueda.lower() in ['no identificado', 'no identificada']:
+            registros = registros.filter(usuario__isnull=True)
+        else:
+            registros = registros.filter(
+                Q(usuario__username__icontains=busqueda)
+                | Q(accion__icontains=busqueda)
+                | Q(descripcion__icontains=busqueda)
+            )
+
+    if tipo == 'correcto':
+        registros = registros.filter(accion='Inicio de sesión')
+    elif tipo == 'fallido':
+        registros = registros.filter(
+            accion='Inicio de sesión fallido'
+        )
+
+    if fecha_inicio:
+        try:
+            fecha = datetime.strptime(
+                fecha_inicio, '%Y-%m-%d'
+            ).date()
+            inicio = datetime.combine(fecha, datetime.min.time())
+
+            if timezone.is_aware(timezone.now()):
+                inicio = timezone.make_aware(
+                    inicio, timezone.get_current_timezone()
+                )
+
+            registros = registros.filter(fecha__gte=inicio)
+        except ValueError:
+            pass
+
+    if fecha_fin:
+        try:
+            fecha = datetime.strptime(
+                fecha_fin, '%Y-%m-%d'
+            ).date()
+            fin = datetime.combine(
+                fecha + timedelta(days=1), datetime.min.time()
+            )
+
+            if timezone.is_aware(timezone.now()):
+                fin = timezone.make_aware(
+                    fin, timezone.get_current_timezone()
+                )
+
+            registros = registros.filter(fecha__lt=fin)
+        except ValueError:
+            pass
+
+    return registros.order_by('-fecha')
+
+
+@login_required
+def exportar_seguridad_excel(request):
+    registros = obtener_registros_para_exportar(request)
+
+    libro = Workbook()
+    hoja = libro.active
+    hoja.title = 'Historial de seguridad'
+
+    hoja.append([
+        'Usuario', 'Tipo de actividad', 'Descripción', 'Fecha y hora'
+    ])
+
+    for celda in hoja[1]:
+        celda.font = Font(bold=True, color='FFFFFF')
+        celda.fill = PatternFill(
+            fill_type='solid', fgColor='172554'
+        )
+        celda.alignment = Alignment(
+            horizontal='center', vertical='center'
+        )
+
+    for registro in registros:
+        fecha = registro.fecha
+
+        if fecha and fecha.tzinfo:
+            from django.utils import timezone
+            fecha = timezone.localtime(fecha).replace(tzinfo=None)
+
+        hoja.append([
+            registro.usuario.username if registro.usuario else 'No identificado',
+            registro.accion,
+            registro.descripcion,
+            fecha,
+        ])
+
+    hoja.freeze_panes = 'A2'
+    hoja.auto_filter.ref = hoja.dimensions
+
+    for columna, ancho in {
+        'A': 22, 'B': 28, 'C': 65, 'D': 22
+    }.items():
+        hoja.column_dimensions[columna].width = ancho
+
+    for fila in hoja.iter_rows(min_row=2):
+        for celda in fila:
+            celda.alignment = Alignment(
+                vertical='top', wrap_text=True
+            )
+
+    for celda in hoja['D'][1:]:
+        celda.number_format = 'dd/mm/yyyy hh:mm:ss'
+
+    salida = BytesIO()
+    libro.save(salida)
+    salida.seek(0)
+
+    respuesta = HttpResponse(
+        salida.getvalue(),
+        content_type=(
+            'application/vnd.openxmlformats-officedocument.'
+            'spreadsheetml.sheet'
+        )
+    )
+    respuesta['Content-Disposition'] = (
+        'attachment; filename="historial_seguridad.xlsx"'
+    )
+    return respuesta
+
+
+@login_required
+def exportar_seguridad_pdf(request):
+    registros = obtener_registros_para_exportar(request)
+
+    salida = BytesIO()
+    documento = SimpleDocTemplate(
+        salida,
+        pagesize=landscape(letter),
+        rightMargin=25,
+        leftMargin=25,
+        topMargin=30,
+        bottomMargin=30,
+    )
+
+    estilos = getSampleStyleSheet()
+    estilo_celda = estilos['BodyText']
+    estilo_celda.fontSize = 7
+    estilo_celda.leading = 9
+
+    elementos = [
+        Paragraph('Historial de seguridad', estilos['Title']),
+        Spacer(1, 12),
+    ]
+
+    datos = [[
+        'Usuario', 'Tipo de actividad', 'Descripción', 'Fecha y hora'
+    ]]
+
+    from django.utils import timezone
+
+    for registro in registros:
+        fecha = registro.fecha
+
+        if fecha:
+            if timezone.is_aware(fecha):
+                fecha = timezone.localtime(fecha)
+            fecha_texto = fecha.strftime('%d/%m/%Y %H:%M:%S')
+        else:
+            fecha_texto = ''
+
+        datos.append([
+            Paragraph(
+                escape(registro.usuario.username if registro.usuario else 'No identificado'),
+                estilo_celda
+            ),
+            Paragraph(escape(registro.accion or ''), estilo_celda),
+            Paragraph(escape(registro.descripcion or ''), estilo_celda),
+            Paragraph(fecha_texto, estilo_celda),
+        ])
+
+    tabla = Table(
+        datos,
+        colWidths=[100, 125, 390, 105],
+        repeatRows=1,
+    )
+
+    tabla.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#172554')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 7),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ('LEFTPADDING', (0, 0), (-1, -1), 5),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 5),
+        ('TOPPADDING', (0, 0), (-1, -1), 5),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 5),
+        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [
+            colors.white, colors.HexColor('#F1F5F9')
+        ]),
+    ]))
+
+    elementos.append(tabla)
+    documento.build(elementos)
+    salida.seek(0)
+
+    respuesta = HttpResponse(
+        salida.getvalue(),
+        content_type='application/pdf'
+    )
+    respuesta['Content-Disposition'] = (
+        'attachment; filename="historial_seguridad.pdf"'
+    )
+    return respuesta
 
 
 
