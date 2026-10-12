@@ -490,90 +490,316 @@ def exportar_seguridad_excel(request):
     return respuesta
 
 
+
 @login_required
 def exportar_seguridad_pdf(request):
+    from reportlab.lib.pagesizes import letter
+    from reportlab.pdfgen import canvas
+    from django.conf import settings
+    from django.utils import timezone
+    import os
+    from xml.sax.saxutils import escape
+
     registros = obtener_registros_para_exportar(request)
 
-    salida = BytesIO()
-    documento = SimpleDocTemplate(
-        salida,
-        pagesize=landscape(letter),
-        rightMargin=25,
-        leftMargin=25,
-        topMargin=30,
-        bottomMargin=30,
-    )
-
-    estilos = getSampleStyleSheet()
-    estilo_celda = estilos['BodyText']
-    estilo_celda.fontSize = 7
-    estilo_celda.leading = 9
-
-    elementos = [
-        Paragraph('Historial de seguridad', estilos['Title']),
-        Spacer(1, 12),
-    ]
-
-    datos = [[
-        'Usuario', 'Tipo de actividad', 'Descripción', 'Fecha y hora'
-    ]]
-
-    from django.utils import timezone
-
-    for registro in registros:
-        fecha = registro.fecha
-
-        if fecha:
-            if timezone.is_aware(fecha):
-                fecha = timezone.localtime(fecha)
-            fecha_texto = fecha.strftime('%d/%m/%Y %H:%M:%S')
-        else:
-            fecha_texto = ''
-
-        datos.append([
-            Paragraph(
-                escape(registro.usuario.username if registro.usuario else 'No identificado'),
-                estilo_celda
-            ),
-            Paragraph(escape(registro.accion or ''), estilo_celda),
-            Paragraph(escape(registro.descripcion or ''), estilo_celda),
-            Paragraph(fecha_texto, estilo_celda),
-        ])
-
-    tabla = Table(
-        datos,
-        colWidths=[100, 125, 390, 105],
-        repeatRows=1,
-    )
-
-    tabla.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#172554')),
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
-        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-        ('FONTSIZE', (0, 0), (-1, -1), 7),
-        ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
-        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-        ('LEFTPADDING', (0, 0), (-1, -1), 5),
-        ('RIGHTPADDING', (0, 0), (-1, -1), 5),
-        ('TOPPADDING', (0, 0), (-1, -1), 5),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 5),
-        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [
-            colors.white, colors.HexColor('#F1F5F9')
-        ]),
-    ]))
-
-    elementos.append(tabla)
-    documento.build(elementos)
-    salida.seek(0)
-
-    respuesta = HttpResponse(
-        salida.getvalue(),
-        content_type='application/pdf'
-    )
-    respuesta['Content-Disposition'] = (
+    response = HttpResponse(content_type="application/pdf")
+    response["Content-Disposition"] = (
         'attachment; filename="historial_seguridad.pdf"'
     )
-    return respuesta
+
+    pdf = canvas.Canvas(response, pagesize=letter)
+    width, height = letter
+
+    logo_path = os.path.join(
+        settings.BASE_DIR,
+        "static",
+        "img",
+        "logo_cooperativa.png"
+    )
+
+    # ENCABEZADO Y LOGO
+    if os.path.exists(logo_path):
+        pdf.drawImage(
+            logo_path,
+            30,
+            height - 100,
+            width=90,
+            height=90,
+            mask="auto",
+            preserveAspectRatio=True
+        )
+
+    pdf.setFont("Helvetica-Bold", 15)
+    pdf.drawCentredString(
+        width / 2 + 40,
+        height - 45,
+        "Comercializadora Cooperativa de Sustancias Químicas"
+    )
+    pdf.drawCentredString(
+        width / 2 + 40,
+        height - 65,
+        "para uso del Artesano Pirotécnico, S.A. de C.V."
+    )
+
+    pdf.setFont("Helvetica", 9)
+    pdf.drawCentredString(
+        width / 2 + 40,
+        height - 82,
+        "Venta de Sustancias Químicas para la Pirotecnia"
+    )
+    pdf.drawCentredString(
+        width / 2 + 40,
+        height - 95,
+        "Venta de Artificios Pirotécnicos y Transporte Especializado"
+    )
+
+    pdf.setStrokeColor(colors.HexColor("#C9A227"))
+    pdf.setLineWidth(2)
+    pdf.line(30, height - 105, width - 30, height - 105)
+
+    # TÍTULO
+    pdf.setFillColorRGB(0, 0, 0)
+    pdf.setFont("Helvetica-Bold", 18)
+    pdf.drawCentredString(
+        width / 2,
+        height - 145,
+        "HISTORIAL DE SEGURIDAD"
+    )
+
+    pdf.setFont("Helvetica", 10)
+    pdf.drawString(
+        40,
+        height - 175,
+        f"Fecha de exportación: "
+        f"{timezone.localtime(timezone.now()).strftime('%d/%m/%Y %H:%M')}"
+    )
+
+    pdf.drawString(
+        40,
+        height - 192,
+        f"Total de registros: {registros.count()}"
+    )
+
+    # TABLA
+    margen_izquierdo = 30
+    margen_derecho = width - 30
+    ancho_tabla = margen_derecho - margen_izquierdo
+
+    x_usuario = 38
+    x_accion = 145
+    x_descripcion = 270
+    x_fecha = 500
+
+    ancho_usuario = 100
+    ancho_accion = 120
+    ancho_descripcion = 220
+    ancho_fecha = 75
+
+    alto_fila = 30
+    y = height - 230
+
+    def dibujar_encabezado(y_actual):
+        pdf.setFillColor(colors.HexColor("#F3F4F6"))
+        pdf.rect(
+            margen_izquierdo,
+            y_actual - alto_fila + 5,
+            ancho_tabla,
+            alto_fila,
+            fill=1,
+            stroke=0
+        )
+
+        pdf.setFillColorRGB(0, 0, 0)
+        pdf.setFont("Helvetica-Bold", 8)
+
+        pdf.drawString(x_usuario, y_actual - 12, "Usuario")
+        pdf.drawString(x_accion, y_actual - 12, "Actividad")
+        pdf.drawString(x_descripcion, y_actual - 12, "Descripción")
+        pdf.drawString(x_fecha, y_actual - 12, "Fecha y hora")
+
+        pdf.setStrokeColor(colors.HexColor("#C9A227"))
+        pdf.setLineWidth(1)
+        pdf.line(
+            margen_izquierdo,
+            y_actual - alto_fila + 5,
+            margen_derecho,
+            y_actual - alto_fila + 5
+        )
+
+    def ajustar_texto(texto, max_caracteres):
+        texto = str(texto or "")
+        palabras = texto.split()
+        lineas = []
+        linea = ""
+
+        for palabra in palabras:
+            if len(linea) + len(palabra) + 1 > max_caracteres:
+                if linea:
+                    lineas.append(linea)
+                linea = palabra
+            else:
+                linea = f"{linea} {palabra}".strip()
+
+        if linea:
+            lineas.append(linea)
+
+        return lineas or [""]
+
+    dibujar_encabezado(y)
+    y -= alto_fila
+
+    for registro in registros:
+        usuario = (
+            registro.usuario.username
+            if registro.usuario
+            else "No identificado"
+        )
+
+        fecha = registro.fecha
+        if fecha and timezone.is_aware(fecha):
+            fecha = timezone.localtime(fecha)
+
+        fecha_texto = (
+            fecha.strftime("%d/%m/%Y %H:%M")
+            if fecha else ""
+        )
+
+        columnas = [
+            (x_usuario, ajustar_texto(usuario, 16)),
+            (x_accion, ajustar_texto(registro.accion, 18)),
+            (x_descripcion, ajustar_texto(registro.descripcion, 34)),
+            (x_fecha, ajustar_texto(fecha_texto, 13)),
+        ]
+
+        max_lineas = max(len(lineas) for _, lineas in columnas)
+        alto_real = max(24, max_lineas * 10 + 10)
+
+        # Crear una página nueva cuando no haya espacio suficiente.
+        if y - alto_real < 85:
+            pdf.setStrokeColor(colors.HexColor("#C9A227"))
+            pdf.line(30, 65, width - 30, 65)
+
+            pdf.setFont("Helvetica", 8)
+            pdf.drawString(
+                30,
+                48,
+                "San Mateo Tlalchichilpan, Almoloya de Juárez, Edo. de México"
+            )
+            pdf.drawString(30, 34, "C.P. 50900")
+            pdf.drawRightString(width - 30, 48, "Tel. 725 136 07 31")
+            pdf.drawRightString(
+                width - 30, 34, "comer_coop_2013@live.com.mx"
+            )
+
+            pdf.showPage()
+
+            # Repetir el encabezado institucional en cada página.
+            if os.path.exists(logo_path):
+                pdf.drawImage(
+                    logo_path,
+                    30,
+                    height - 100,
+                    width=90,
+                    height=90,
+                    mask="auto",
+                    preserveAspectRatio=True
+                )
+
+            pdf.setFont("Helvetica-Bold", 15)
+            pdf.drawCentredString(
+                width / 2 + 40,
+                height - 45,
+                "Comercializadora Cooperativa de Sustancias Químicas"
+            )
+            pdf.drawCentredString(
+                width / 2 + 40,
+                height - 65,
+                "para uso del Artesano Pirotécnico, S.A. de C.V."
+            )
+
+            pdf.setFont("Helvetica", 9)
+            pdf.drawCentredString(
+                width / 2 + 40,
+                height - 82,
+                "Venta de Sustancias Químicas para la Pirotecnia"
+            )
+            pdf.drawCentredString(
+                width / 2 + 40,
+                height - 95,
+                "Venta de Artificios Pirotécnicos y Transporte Especializado"
+            )
+
+            pdf.setStrokeColor(colors.HexColor("#C9A227"))
+            pdf.setLineWidth(2)
+            pdf.line(30, height - 105, width - 30, height - 105)
+
+            pdf.setFont("Helvetica-Bold", 16)
+            pdf.drawCentredString(
+                width / 2,
+                height - 145,
+                "HISTORIAL DE SEGURIDAD"
+            )
+
+            y = height - 190
+            dibujar_encabezado(y)
+            y -= alto_fila
+
+        # Filas alternadas en blanco y gris claro.
+        if registros.count() and (registro.id % 2 == 0):
+            pdf.setFillColor(colors.HexColor("#F9FAFB"))
+            pdf.rect(
+                margen_izquierdo,
+                y - alto_real + 5,
+                ancho_tabla,
+                alto_real,
+                fill=1,
+                stroke=0
+            )
+
+        pdf.setFillColorRGB(0, 0, 0)
+        pdf.setFont("Helvetica", 7)
+
+        for x, lineas in columnas:
+            for indice, linea in enumerate(lineas):
+                pdf.drawString(
+                    x,
+                    y - 10 - (indice * 10),
+                    linea[:100]
+                )
+
+        pdf.setStrokeColor(colors.HexColor("#E5E7EB"))
+        pdf.setLineWidth(0.5)
+        pdf.line(
+            margen_izquierdo,
+            y - alto_real + 5,
+            margen_derecho,
+            y - alto_real + 5
+        )
+
+        y -= alto_real
+
+    # PIE DE PÁGINA
+    pdf.setStrokeColor(colors.HexColor("#C9A227"))
+    pdf.setLineWidth(1)
+    pdf.line(30, 65, width - 30, 65)
+
+    pdf.setFont("Helvetica", 8)
+    pdf.drawString(
+        30,
+        48,
+        "San Mateo Tlalchichilpan, Almoloya de Juárez, Edo. de México"
+    )
+    pdf.drawString(30, 34, "C.P. 50900")
+    pdf.drawRightString(width - 30, 48, "Tel. 725 136 07 31")
+    pdf.drawRightString(
+        width - 30,
+        34,
+        "comer_coop_2013@live.com.mx"
+    )
+
+    pdf.save()
+    return response
+
 
 
 
