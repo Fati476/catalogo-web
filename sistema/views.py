@@ -50,6 +50,10 @@ from reportlab.pdfgen import canvas
 from django.conf import settings
 import os
 
+from .models import MedicionIoT
+from django.views.decorators.csrf import csrf_exempt
+from django.core.cache import cache
+
 from .utils import enviar_correo
 
 
@@ -6738,4 +6742,182 @@ def registrar_actividad(usuario, accion, descripcion):
         ),
         accion=accion,
         descripcion=descripcion
+    )
+
+
+
+
+@csrf_exempt
+def recibir_medicion_iot(request):
+    if request.method != 'POST':
+        return JsonResponse(
+            {'error': 'Método no permitido'},
+            status=405
+        )
+
+    try:
+        datos = json.loads(request.body)
+
+        dispositivo = datos.get(
+            'dispositivo',
+            'Sensor IoT de demostración'
+        )
+        temperatura = float(datos['temperatura'])
+        humedad = float(datos['humedad'])
+
+        if not (-40 <= temperatura <= 100):
+            return JsonResponse(
+                {'error': 'Temperatura fuera de rango'},
+                status=400
+            )
+
+        if not (0 <= humedad <= 100):
+            return JsonResponse(
+                {'error': 'Humedad fuera de rango'},
+                status=400
+            )
+
+        # Guardar la medición recibida
+        medicion = MedicionIoT.objects.create(
+            dispositivo=dispositivo,
+            temperatura=temperatura,
+            humedad=humedad
+        )
+
+        alertas = []
+
+        # Solo la temperatura crítica genera correo.
+        # Este umbral es únicamente para pruebas.
+        temperatura_critica = settings.IOT_TEMPERATURA_CRITICA
+        clave_alerta = f'iot_alerta_critica_{dispositivo}'
+
+        if temperatura >= temperatura_critica:
+            alertas.append('Temperatura crítica')
+
+            # Evitar repetir el correo mientras la alerta siga activa
+            if not cache.get(clave_alerta, False):
+                asunto = (
+                    f'ALERTA CRÍTICA DE TEMPERATURA - {dispositivo}'
+                )
+
+                contenido = f"""
+                <div style="font-family:Arial,sans-serif; max-width:650px;
+                    margin:auto; border-radius:18px; overflow:hidden;
+                    border:1px solid #e5e7eb;">
+
+                    <div style="background:#111827; padding:30px;
+                        text-align:center;">
+                        <h1 style="color:#D4AF37; margin:0;">
+                            Cooperativa Pirotécnica
+                        </h1>
+                        <p style="color:white; margin-top:8px;">
+                            Catálogo Web · Monitoreo IoT
+                        </p>
+                    </div>
+
+                    <div style="padding:35px;">
+                        <h2 style="color:#b91c1c;">
+                            ¡Alerta crítica de temperatura!
+                        </h2>
+
+                        <p style="font-size:16px; color:#4b5563;
+                            line-height:1.7;">
+                            El dispositivo <strong>{dispositivo}</strong>
+                            registró una temperatura igual o superior
+                            al umbral crítico configurado.
+                        </p>
+
+                        <div style="background:#fff7ed;
+                            border-left:5px solid #D4AF37;
+                            padding:18px; margin:25px 0;">
+                            <strong>Datos de la medición</strong>
+                            <ul style="line-height:1.9;">
+                                <li>Temperatura:
+                                    <strong>{temperatura} °C</strong>
+                                </li>
+                                <li>Umbral configurado:
+                                    {temperatura_critica} °C
+                                </li>
+                                <li>Humedad: {humedad}%</li>
+                                <li>Fecha: {medicion.fecha}</li>
+                            </ul>
+                        </div>
+
+                        <p style="color:#4b5563; line-height:1.7;">
+                            Revisa el estado del dispositivo y sigue
+                            los procedimientos de seguridad establecidos
+                            para las instalaciones.
+                        </p>
+
+                        <p style="font-size:13px; color:#6b7280;">
+                            Esta alerta es una función de apoyo del
+                            sistema y no sustituye los equipos de
+                            seguridad ni los procedimientos de emergencia.
+                        </p>
+                    </div>
+
+                    <div style="background:#111827; color:white;
+                        text-align:center; padding:18px;">
+                        © Cooperativa Pirotécnica · Catálogo Web
+                    </div>
+                </div>
+                """
+
+                enviado = enviar_correo(
+                    settings.IOT_ALERT_EMAIL,
+                    asunto,
+                    contenido
+                )
+
+                if enviado:
+                    # La alerta no se repite mientras siga activa.
+                    cache.set(clave_alerta, True, timeout=None)
+
+        else:
+            # Permitir una nueva alerta si vuelve a ser crítica
+            cache.delete(clave_alerta)
+
+        return JsonResponse({
+            'mensaje': 'Medición recibida correctamente',
+            'id': medicion.id,
+            'dispositivo': medicion.dispositivo,
+            'temperatura': medicion.temperatura,
+            'humedad': medicion.humedad,
+            'alertas': alertas,
+            'fecha': medicion.fecha.isoformat()
+        }, status=201)
+
+    except (json.JSONDecodeError, KeyError, TypeError, ValueError):
+        return JsonResponse(
+            {'error': 'Los datos enviados no son válidos'},
+            status=400
+        )
+
+
+
+
+@login_required
+def monitoreo_iot(request):
+    if not request.user.groups.filter(name='Administrador').exists():
+        return redirect('inicio')
+
+    mediciones = MedicionIoT.objects.all()[:20]
+    ultima_medicion = mediciones.first()
+
+    contexto = {
+        'mediciones': mediciones,
+        'ultima_medicion': ultima_medicion,
+        'total_mediciones': MedicionIoT.objects.count(),
+
+        'temperatura_min': settings.IOT_TEMPERATURA_MIN,
+        'temperatura_max': settings.IOT_TEMPERATURA_MAX,
+        'temperatura_critica': settings.IOT_TEMPERATURA_CRITICA,
+        'humedad_min': settings.IOT_HUMEDAD_MIN,
+        'humedad_max': settings.IOT_HUMEDAD_MAX,
+    }
+
+    return render(
+        request,
+        'admin/monitoreo_iot.html',
+        contexto
     )

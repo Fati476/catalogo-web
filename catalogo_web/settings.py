@@ -133,7 +133,7 @@ DATABASES = {
 SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY")
 #print("API KEY:", SENDGRID_API_KEY)
 
-DEFAULT_FROM_EMAIL = "catalogowebempresa@gmail.com" 
+DEFAULT_FROM_EMAIL = "macf061127mmcrbta7@gmail.com" 
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
@@ -192,3 +192,16 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 CLOUDINARY_STORAGE = {
     'SECURE': True
 }
+
+
+# Límites de demostración para el monitoreo IoT
+IOT_TEMPERATURA_MIN = 15
+IOT_TEMPERATURA_MAX = 35
+# Umbral crítico de demostración, no de seguridad real
+IOT_TEMPERATURA_CRITICA = 40
+IOT_HUMEDAD_MIN = 30
+IOT_HUMEDAD_MAX = 80
+
+# Correo que recibirá las alertas
+
+IOT_ALERT_EMAIL = "catalogowebempresa@gmail.com"

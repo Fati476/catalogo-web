@@ -332,6 +332,18 @@ urlpatterns = [
         name='exportar_seguridad_pdf'
     ),
 
+    path(
+        'api/iot/medicion/',
+        views.recibir_medicion_iot,
+        name='recibir_medicion_iot'
+    ),
+
+    path(
+        'panel/monitoreo-iot/',
+        views.monitoreo_iot,
+        name='monitoreo_iot'
+    ),
+
 
 
 ]

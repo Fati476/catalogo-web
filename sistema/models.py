@@ -266,3 +266,26 @@ class RegistroActividad(models.Model):
             else 'Usuario desconocido'
         )
         return f'{nombre_usuario} - {self.accion} - {self.fecha}'
+
+
+
+class MedicionIoT(models.Model):
+    dispositivo = models.CharField(
+        max_length=100,
+        default='Sensor IoT de demostración'
+    )
+    temperatura = models.FloatField()
+    humedad = models.FloatField()
+    fecha = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-fecha']
+        verbose_name = 'Medición IoT'
+        verbose_name_plural = 'Mediciones IoT'
+
+    def __str__(self):
+        return (
+            f'{self.dispositivo} - '
+            f'{self.temperatura} °C - '
+            f'{self.fecha}'
+        )
