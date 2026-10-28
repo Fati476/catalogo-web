@@ -2637,9 +2637,9 @@ def descargar_cotizacion_pdf(request, id):
     return response
 
 
+
 @login_required
 def descargar_preorden_pdf(request):
-    # Obtener la solicitud activa de PiroIA o la que se está editando.
     solicitud_id = (
         request.session.get("piroia_solicitud_id")
         or request.session.get("solicitud_editando_id")
@@ -2647,18 +2647,17 @@ def descargar_preorden_pdf(request):
 
     if not solicitud_id:
         return HttpResponse(
-            "No tienes una preorden activa para descargar.",
+            "No tienes una preorden activa.",
             status=404
         )
 
-    # Solo se permite descargar la preorden propia y sin cotizar.
     solicitud = get_object_or_404(
         SolicitudCotizacion,
         id=solicitud_id,
         usuario=request.user,
         enviada=False,
         estado="revision",
-        bloqueada=False,
+        bloqueada=False
     )
 
     detalles = list(
@@ -2679,108 +2678,175 @@ def descargar_preorden_pdf(request):
     pdf = canvas.Canvas(response, pagesize=letter)
     width, height = letter
 
-    # Encabezado
-    pdf.setFillColor(colors.HexColor("#101C35"))
-    pdf.rect(0, height - 125, width, 125, fill=1, stroke=0)
+    # LOGOTIPO
+    logo_path = os.path.join(
+        settings.BASE_DIR,
+        "static", "img", "logo_cooperativa.png"
+    )
 
-    pdf.setFillColor(colors.HexColor("#E2C875"))
-    pdf.setFont("Helvetica-Bold", 12)
-    pdf.drawCentredString(width / 2, height - 38, "CATÁLOGO WEB")
+    # Compatibilidad con el nombre alternativo del archivo
+    if not os.path.exists(logo_path):
+        logo_path = os.path.join(
+            settings.BASE_DIR,
+            "static", "img", "logo_cooperativa.png.png"
+        )
 
-    pdf.setFillColor(colors.white)
-    pdf.setFont("Helvetica-Bold", 22)
-    pdf.drawCentredString(width / 2, height - 70, "PREORDEN")
+    if os.path.exists(logo_path):
+        pdf.drawImage(
+            logo_path,
+            30, height - 100,
+            width=90, height=90,
+            preserveAspectRatio=True,
+            mask="auto"
+        )
 
-    pdf.setFont("Helvetica", 10)
+    # ENCABEZADO DE LA COOPERATIVA
+    pdf.setFillColor(colors.black)
+    pdf.setFont("Helvetica-Bold", 15)
+
+    pdf.drawCentredString(
+        width / 2 + 40,
+        height - 45,
+        "Comercializadora Cooperativa de Sustancias Químicas"
+    )
+    pdf.drawCentredString(
+        width / 2 + 40,
+        height - 65,
+        "para uso del Artesano Pirotécnico, S.A. de C.V."
+    )
+
+    pdf.setFont("Helvetica", 9)
+    pdf.drawCentredString(
+        width / 2 + 40,
+        height - 82,
+        "Venta de Sustancias Químicas para la Pirotecnia,"
+    )
+    pdf.drawCentredString(
+        width / 2 + 40,
+        height - 95,
+        "Venta de Artificios Pirotécnicos y Transporte Especializado"
+    )
+
+    pdf.setStrokeColor(colors.HexColor("#C9A227"))
+    pdf.setLineWidth(2)
+    pdf.line(30, height - 105, width - 30, height - 105)
+
+    # TÍTULO
+    pdf.setFont("Helvetica-Bold", 18)
     pdf.drawCentredString(
         width / 2,
-        height - 94,
+        height - 145,
+        "PREORDEN"
+    )
+
+    pdf.setFont("Helvetica-Bold", 9)
+    pdf.setFillColor(colors.HexColor("#8A6415"))
+    pdf.drawCentredString(
+        width / 2,
+        height - 163,
         "DOCUMENTO INFORMATIVO - NO ES UNA COTIZACIÓN"
     )
 
-    # Datos del usuario y solicitud
-    y = height - 160
+    # DATOS
     nombre = (
         request.user.get_full_name()
         or request.user.username
     )
 
+    fecha = (
+        solicitud.fecha.strftime("%d/%m/%Y")
+        if solicitud.fecha
+        else "No disponible"
+    )
+
     pdf.setFillColor(colors.black)
     pdf.setFont("Helvetica", 10)
-    pdf.drawString(40, y, f"Folio de preorden: PRE-{solicitud.id:04d}")
-    y -= 20
-    pdf.drawString(40, y, f"Usuario: {nombre[:70]}")
-    y -= 20
+
     pdf.drawString(
-        40,
-        y,
-        f"Fecha: {solicitud.fecha.strftime('%d/%m/%Y')}"
+        40, height - 195,
+        f"Folio interno: PRE-{solicitud.id:04d}"
     )
-    y -= 35
+    pdf.drawString(
+        40, height - 215,
+        f"Cliente: {nombre[:65]}"
+    )
+    pdf.drawString(
+        40, height - 235,
+        f"Fecha: {fecha}"
+    )
 
-    # Tabla de productos
-    def dibujar_encabezado_tabla(pos_y):
-        pdf.setFillColor(colors.HexColor("#F3F4F6"))
-        pdf.rect(35, pos_y - 5, 540, 24, fill=1, stroke=0)
+    # TABLA CON DETALLES DORADOS
+    y = height - 270
 
-        pdf.setFillColor(colors.HexColor("#101C35"))
+    def encabezado_tabla(y_actual):
+        pdf.setStrokeColor(colors.HexColor("#C9A227"))
+        pdf.setLineWidth(1.5)
+        pdf.rect(
+            35, y_actual - 5,
+            540, 25,
+            fill=0, stroke=1
+        )
+
+        pdf.setFillColor(colors.black)
         pdf.setFont("Helvetica-Bold", 10)
-        pdf.drawString(45, pos_y + 3, "Producto")
-        pdf.drawRightString(555, pos_y + 3, "Cantidad")
+        pdf.drawString(45, y_actual + 3, "Producto")
+        pdf.drawRightString(555, y_actual + 3, "Cantidad")
 
-    dibujar_encabezado_tabla(y)
+    encabezado_tabla(y)
     y -= 28
 
     for detalle in detalles:
-        if y < 100:
+        if y < 90:
             pdf.showPage()
             y = height - 60
-            dibujar_encabezado_tabla(y)
+            encabezado_tabla(y)
             y -= 28
 
         nombre_producto = detalle.producto.nombre
+
         pdf.setFillColor(colors.black)
         pdf.setFont("Helvetica", 9)
-        pdf.drawString(45, y, nombre_producto[:75])
+        pdf.drawString(45, y, nombre_producto[:78])
         pdf.drawRightString(555, y, str(detalle.cantidad))
 
-        pdf.setStrokeColor(colors.HexColor("#E5E7EB"))
+        pdf.setStrokeColor(colors.HexColor("#DDDDDD"))
+        pdf.setLineWidth(0.5)
         pdf.line(40, y - 8, 570, y - 8)
+
         y -= 24
 
-    # Aviso final
+    # AVISO INFORMATIVO
     if y < 100:
         pdf.showPage()
         y = height - 60
 
-    y -= 10
-    pdf.setFillColor(colors.HexColor("#8A6415"))
-    pdf.setFont("Helvetica-Bold", 10)
-    pdf.drawString(40, y, "IMPORTANTE")
+    y -= 8
 
-    y -= 18
+    pdf.setFillColor(colors.HexColor("#8A6415"))
+    pdf.setFont("Helvetica-Bold", 11)
+    pdf.drawString(40, y, "Observaciones generales")
+
+    y -= 24
     pdf.setFillColor(colors.black)
     pdf.setFont("Helvetica", 9)
-    pdf.drawString(
-        40,
-        y,
-        "Este documento es evidencia de los productos solicitados."
-    )
-    y -= 15
-    pdf.drawString(
-        40,
-        y,
-        "No contiene precios oficiales ni confirma disponibilidad."
-    )
-    y -= 15
-    pdf.drawString(
-        40,
-        y,
+
+    avisos = [
+        "Este documento es evidencia de los productos solicitados.",
+        "No contiene precios oficiales ni confirma disponibilidad.",
         "La cotización deberá ser elaborada y confirmada por el personal."
-    )
+    ]
+
+    for aviso in avisos:
+        if y < 45:
+            pdf.showPage()
+            y = height - 60
+
+        pdf.drawString(45, y, f"- {aviso}")
+        y -= 17
 
     pdf.save()
     return response
+
 
 
 @login_required
