@@ -3824,24 +3824,79 @@ def chatbot_ia(request):
 
         pregunta_lower = pregunta.lower()
 
+        
+        
+        # ==========================================================
+        # DETECTAR IDIOMA DE PIROIA
+        # ==========================================================
+        import re
+
+        palabras_ingles = [
+            "hello", "hi", "please", "i want", "i need",
+            "i would like", "can you", "could you",
+            "show me", "what", "how", "where",
+            "add", "remove", "change", "cancel",
+            "my request", "my order", "quotation",
+            "quote", "generate", "download", "pre-order",
+            "products", "categories", "price", "cost",
+            "available", "pieces", "help"
+        ]
+
+        palabras_espanol = [
+            "hola", "buenos días", "buenas tardes",
+            "buenas noches", "por favor", "quiero",
+            "necesito", "me gustaría", "puedes",
+            "podrías", "muéstrame", "qué", "que",
+            "cuánto", "cuanto", "dónde", "donde",
+            "agrega", "añade", "quita", "cambia",
+            "cancelar", "mi solicitud", "mi pedido",
+            "cotización", "cotizacion", "preorden",
+            "descargar", "productos", "categorías",
+            "categorias", "precio", "costo",
+            "disponibles", "piezas", "ayuda"
+        ]
+
+        coincidencias_ingles = sum(
+            1 for palabra in palabras_ingles
+            if re.search(
+                r"\b" + re.escape(palabra) + r"\b",
+                pregunta_lower
+            )
+        )
+
+        coincidencias_espanol = sum(
+            1 for palabra in palabras_espanol
+            if re.search(
+                r"\b" + re.escape(palabra) + r"\b",
+                pregunta_lower
+            )
+        )
+
+        idioma_piroia = (
+            "en"
+            if coincidencias_ingles > coincidencias_espanol
+            else "es"
+        )
+
+
+
         palabras_precio = [
 
             "precio",
-
             "precios",
-
             "costo",
-
             "costos",
-
             "cuánto cuesta",
-
             "cuanto cuesta",
-
             "cuánto vale",
-
-            "cuanto vale"
-
+            "cuanto vale",
+            "price",
+            "prices",
+            "cost",
+            "costs",
+            "how much",
+            "how much does it cost",
+            "how much is"
         ]
 
         # ----------------------------------------------------------
@@ -3888,99 +3943,88 @@ def chatbot_ia(request):
 
         # ----------------------------------------------------------
 
+        
+        # ----------------------------------------------------------
+        # LISTA DE PRODUCTOS EN ESPAÑOL E INGLÉS
+        # ----------------------------------------------------------
         if modo != "solicitud":
 
             consulta_productos = any(
-
                 frase in pregunta_lower
-
                 for frase in [
-
+                    # Español
                     "qué productos hay",
-
                     "que productos hay",
-
                     "qué productos tienen",
-
                     "que productos tienen",
-
                     "productos del catálogo",
-
                     "productos del catalogo",
-
                     "lista de productos",
-
                     "listar productos",
-
                     "qué tienen",
-
                     "que tienen",
-
                     "qué venden",
-
                     "que venden",
-
                     "muéstrame los productos",
+                    "muestrame los productos",
 
-                    "muestrame los productos"
-
+                    # Inglés
+                    "what products are available",
+                    "what products do you have",
+                    "show me the products",
+                    "show me your products",
+                    "list of products",
+                    "list the products",
+                    "what do you sell",
+                    "available products"
                 ]
-
             )
 
             if consulta_productos:
-
                 nombres = [
-
                     producto.nombre
-
                     for producto in productos_catalogo
-
                 ]
 
                 if nombres:
-
-                    respuesta_productos = (
-
-                        "Estos son los productos "
-
-                        "disponibles en el catálogo:\n\n"
-
-                        +
-
-                        "\n".join(
-
-                            "• " + nombre
-
-                            for nombre in nombres
-
+                    if idioma_piroia == "en":
+                        respuesta_productos = (
+                            "These are the products available "
+                            "in the catalog:\n\n"
+                            + "\n".join(
+                                "• " + nombre
+                                for nombre in nombres
+                            )
+                        )
+                    else:
+                        respuesta_productos = (
+                            "Estos son los productos disponibles "
+                            "en el catálogo:\n\n"
+                            + "\n".join(
+                                "• " + nombre
+                                for nombre in nombres
+                            )
+                        )
+                else:
+                    if idioma_piroia == "en":
+                        respuesta_productos = (
+                            "There are currently no products "
+                            "available in the catalog."
+                        )
+                    else:
+                        respuesta_productos = (
+                            "Actualmente no hay productos "
+                            "disponibles en el catálogo."
                         )
 
-                    )
-
-                else:
-
-                    respuesta_productos = (
-
-                        "Actualmente no hay productos "
-
-                        "disponibles en el catálogo."
-
-                    )
-
                 return JsonResponse({
-
                     "ok": True,
-
                     "respuesta": respuesta_productos,
-
                     "confirmado": False,
-
                     "accion": "ninguna",
-
                     "productos": []
-
                 })
+
 
         # ----------------------------------------------------------
 
@@ -3988,81 +4032,75 @@ def chatbot_ia(request):
 
         # ----------------------------------------------------------
 
+        
+        # ----------------------------------------------------------
+        # CATEGORÍAS EN ESPAÑOL E INGLÉS
+        # ----------------------------------------------------------
         if modo != "solicitud":
 
             consulta_categorias = any(
-
                 frase in pregunta_lower
-
                 for frase in [
-
+                    # Español
                     "qué categorías hay",
-
                     "que categorias hay",
-
                     "categorías del catálogo",
-
                     "categorias del catalogo",
-
                     "lista de categorías",
+                    "lista de categorias",
 
-                    "lista de categorias"
-
+                    # Inglés
+                    "what categories are available",
+                    "what categories do you have",
+                    "show me the categories",
+                    "list of categories",
+                    "list the categories",
+                    "available categories"
                 ]
-
             )
 
             if consulta_categorias:
-
                 categorias = sorted({
-
                     producto.categoria.nombre
-
                     for producto in productos_catalogo
-
                     if producto.categoria
-
                 })
 
                 if categorias:
-
-                    respuesta_categorias = (
-
-                        "Estas son las categorías disponibles:\n\n"
-
-                        +
-
-                        "\n".join(
-
-                            "• " + categoria
-
-                            for categoria in categorias
-
+                    if idioma_piroia == "en":
+                        respuesta_categorias = (
+                            "These are the available categories:\n\n"
+                            + "\n".join(
+                                "• " + categoria
+                                for categoria in categorias
+                            )
+                        )
+                    else:
+                        respuesta_categorias = (
+                            "Estas son las categorías disponibles:\n\n"
+                            + "\n".join(
+                                "• " + categoria
+                                for categoria in categorias
+                            )
+                        )
+                else:
+                    if idioma_piroia == "en":
+                        respuesta_categorias = (
+                            "There are currently no categories available."
+                        )
+                    else:
+                        respuesta_categorias = (
+                            "Actualmente no hay categorías disponibles."
                         )
 
-                    )
-
-                else:
-
-                    respuesta_categorias = (
-
-                        "Actualmente no hay categorías disponibles."
-
-                    )
-
                 return JsonResponse({
-
                     "ok": True,
-
                     "respuesta": respuesta_categorias,
-
                     "confirmado": False,
-
                     "accion": "ninguna",
-
                     "productos": []
-
                 })
+
 
         # ==========================================================
 
@@ -5098,101 +5136,74 @@ def chatbot_ia(request):
 
         # ==========================================================
 
-        reglas_piroia = """
-
+        
+        reglas_piroia = f"""
 REGLAS OBLIGATORIAS:
 
-\\- Responde siempre en español.
+- Idioma detectado del usuario: {idioma_piroia}.
+- Si el idioma es "es", responde siempre en español.
+- Si el idioma es "en", responde siempre en inglés.
+- Mantén el mismo idioma durante toda la respuesta.
+- Sé natural, claro y breve.
 
-\\- Sé natural, claro y breve.
+- Nunca muestres IDs de productos.
+- Nunca muestres identificadores internos.
+- Nunca muestres precios.
+- Nunca muestres costos.
+- Nunca muestres importes monetarios.
+- El precio se determina mediante cotización.
 
-\\- Nunca muestres IDs de productos.
+- Utiliza siempre "pieza" o "piezas" cuando respondas en español.
+- Cuando respondas en inglés, utiliza "piece" o "pieces".
 
-\\- Nunca muestres identificadores internos.
-
-\\- Nunca muestres precios.
-
-\\- Nunca muestres costos.
-
-\\- Nunca muestres importes monetarios.
-
-\\- El precio se determina mediante cotización.
-
-\\- Utiliza siempre "pieza" o "piezas".
-
-\\- Ejemplo correcto:
-
+- Ejemplo correcto en español:
   "Agregué 3 piezas de Pachanga Plus."
 
-\\- Ejemplo incorrecto:
+- Ejemplo correcto en inglés:
+  "I added 3 pieces of Pachanga Plus."
 
+- Ejemplo incorrecto:
   "Agregué ID 33 cantidad 3."
 
-\\- No inventes productos.
+- No inventes productos.
+- No inventes cantidades.
+- Utiliza únicamente productos existentes en el catálogo.
+- Si no estás seguro del producto, pide aclaración.
 
-\\- No inventes cantidades.
-
-\\- Utiliza únicamente productos existentes en el catálogo.
-
-\\- Si no estás seguro del producto, pide aclaración.
-
-\\- No proporciones instrucciones para fabricar, modificar,
-
+- No proporciones instrucciones para fabricar, modificar,
   combinar, manipular, encender o utilizar productos pirotécnicos.
+- Tu función se limita al catálogo y solicitudes de cotización.
 
-\\- Tu función se limita al catálogo y solicitudes de cotización.
-
-\- En "productos" incluye SOLAMENTE los productos que el usuario
-
+- En "productos" incluye SOLAMENTE los productos que el usuario
   menciona, agrega, quita o modifica EN EL MENSAJE ACTUAL.
 
-
-
-\- NO vuelvas a incluir productos que ya estaban en la solicitud
-
+- NO vuelvas a incluir productos que ya estaban en la solicitud
   si el usuario no los está modificando en este mensaje.
 
-
-
-\- Si el usuario dice "agrega 2 de Pachanga Plus", devuelve solamente
-
+- Si el usuario dice "agrega 2 de Pachanga Plus", devuelve solamente
   Pachanga Plus dentro de "productos".
 
-
-
-\- Si el usuario dice "agrega 2 de Pachanga Plus y 3 de otro producto",
-
+- Si el usuario dice "agrega 2 de Pachanga Plus y 3 de otro producto",
   devuelve únicamente esos productos.
 
-
-
-\- Si el usuario indica una cantidad sin repetir el nombre del producto,
-
+- Si el usuario indica una cantidad sin repetir el nombre del producto,
   utiliza el contexto de la conversación para identificar el producto
-
   al que se refiere.
 
-
-
-\- NO devuelvas nuevamente todos los productos de la solicitud activa
-
+- NO devuelvas nuevamente todos los productos de la solicitud activa
   solamente porque ya forman parte de ella.
 
-
-
-\- La cantidad de un producto en "productos" representa SOLAMENTE
-
+- La cantidad de un producto en "productos" representa SOLAMENTE
   la cantidad que el usuario está agregando o modificando en el
-
   mensaje actual. No representa la cantidad total que ya existe.
 
-
-
-\- Si el usuario dice "agrega 2 piezas", interpreta esas 2 piezas
-
+- Si el usuario dice "agrega 2 piezas", interpreta esas 2 piezas
   como una cantidad nueva que debe sumarse a la cantidad existente.
 
+- Conserva los nombres comerciales originales de los productos.
+- No traduzcas los nombres de los productos del catálogo.
 """
+
 
         # ==========================================================
         # 9. PROMPT
@@ -5899,39 +5910,36 @@ Pregunta:
 
         if modo != "solicitud":
 
+            
+        # ----------------------------------------------------------
+        # PRECIOS: NO MOSTRAR IMPORTES
+        # ----------------------------------------------------------
             if any(
-
                 palabra in pregunta_lower
-
                 for palabra in palabras_precio
-
             ):
+                if idioma_piroia == "en":
+                    respuesta_precio = (
+                        "Product prices are provided through a quotation. "
+                        "I can help you prepare a quotation request "
+                        "for the products and quantities you need."
+                    )
+                else:
+                    respuesta_precio = (
+                        "El precio de los productos se determina "
+                        "mediante cotización. Puedo ayudarte a preparar "
+                        "una solicitud con los productos y las cantidades "
+                        "que necesitas."
+                    )
 
-                contenido = (
+                return JsonResponse({
+                    "ok": True,
+                    "respuesta": respuesta_precio,
+                    "confirmado": False,
+                    "accion": "ninguna",
+                    "productos": []
+                })
 
-                    "El precio de los productos se determina "
-
-                    "mediante cotización. Si deseas, puedo ayudarte "
-
-                    "a preparar una solicitud con la cantidad "
-
-                    "que necesitas."
-
-                )
-
-            return JsonResponse({
-
-                "ok": True,
-
-                "respuesta": contenido,
-
-                "confirmado": False,
-
-                "accion": "ninguna",
-
-                "productos": []
-
-            })
 
         # ==========================================================
 
