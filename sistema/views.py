@@ -4644,7 +4644,20 @@ def chatbot_ia(request):
 
             "anula la solicitud",
 
-            "anular la solicitud"
+            "anular la solicitud",
+            "cancel my request",
+            "cancel the request",
+            "cancel this request",
+            "cancel that request",
+            "i want to cancel my request",
+            "i want to cancel the request",
+            "cancel my quotation",
+            "cancel the quotation",
+            "i want to cancel",
+            "i don't want it anymore",
+            "i no longer want the request",
+            "delete my request",
+            "withdraw my request"
 
         ]
 
@@ -4857,7 +4870,26 @@ def chatbot_ia(request):
             "manda a cotización",
             "manda a cotizacion",
             "enviar la cotización",
-            "enviar la cotizacion"
+            "enviar la cotizacion",
+                        # Inglés
+            "send my request",
+            "send the request",
+            "submit my request",
+            "submit the request",
+            "i want to submit my request",
+            "i want to send my request",
+            "send my quotation",
+            "submit my quotation",
+            "send it for quotation",
+            "submit it for quotation",
+            "you can send it",
+            "send it",
+            "submit it",
+            "go ahead and send it",
+            "it's ready, send it",
+            "it is ready, send it",
+            "that's fine, send it",
+            "that is fine, send it"
         ]
 
         frases_confirmacion = [
@@ -4868,7 +4900,17 @@ def chatbot_ia(request):
             "está bien",
             "esta bien",
             "eso es todo",
-            "confirmo"
+            "confirmo",
+            # Inglés
+            "it's ready",
+            "it is ready",
+            "that's fine",
+            "that is fine",
+            "looks good",
+            "that's all",
+            "that is all",
+            "i confirm",
+            "confirmed"
         ]
 
         quiere_enviar = any(
