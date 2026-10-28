@@ -23,7 +23,7 @@ from .models import ProductoImagen
 
 from django.contrib import messages
 
-from django.db.models import Count, Max
+from django.db.models import Count, Max, Sum
 
 from django.contrib.auth.models import User
 
@@ -39,7 +39,7 @@ import json
 
 from .models import Perfil
 
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_GET, require_POST
 from django.http import HttpResponse
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 from reportlab.lib import colors
@@ -55,6 +55,16 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core.cache import cache
 
 from .utils import enviar_correo
+
+
+from datetime import timedelta
+from django.db.models.functions import TruncMonth
+from .models import (
+    Producto,
+    Categoria,
+    SolicitudCotizacion,
+    DetalleSolicitud,
+)
 
 
 from io import BytesIO
@@ -203,16 +213,15 @@ def panel_admin(request):
 
 from django.db.models import Q
 
-
+from datetime import datetime, timedelta
+from django.contrib.auth import get_user_model
+from django.core.exceptions import PermissionDenied
+from django.utils import timezone
 
 
 
 @login_required
 def seguridad_admin(request):
-    from datetime import datetime, timedelta
-    from django.contrib.auth import get_user_model
-    from django.core.exceptions import PermissionDenied
-    from django.utils import timezone
 
     # Verificar permisos de administrador
     if not request.user.groups.filter(name='Administrador').exists():
@@ -1051,34 +1060,236 @@ def eliminar_categoria(request, id):
     return redirect('lista_categorias')
 
 
+
+
+
 @login_required
 def dashboard(request):
+    if not request.user.groups.filter(name="Administrador").exists():
+        raise PermissionDenied
 
+    hoy = timezone.localdate()
+    inicio_semana = hoy - timedelta(days=hoy.weekday())
+
+    # Filtros de fechas y estado
+    fecha_inicio = request.GET.get(
+        "fecha_inicio", inicio_semana.isoformat()
+    )
+    fecha_fin = request.GET.get(
+        "fecha_fin", hoy.isoformat()
+    )
+    estado = request.GET.get("estado", "todos")
+
+    # Validar fechas
+    try:
+        desde = datetime.strptime(fecha_inicio, "%Y-%m-%d").date()
+        hasta = datetime.strptime(fecha_fin, "%Y-%m-%d").date()
+
+        if desde > hasta:
+            raise ValueError
+
+    except (ValueError, TypeError):
+        desde = inicio_semana
+        hasta = hoy
+        fecha_inicio = desde.isoformat()
+        fecha_fin = hasta.isoformat()
+
+    # Solicitudes enviadas dentro del periodo seleccionado
+    solicitudes = SolicitudCotizacion.objects.filter(
+        enviada=True,
+        fecha__date__gte=desde,
+        fecha__date__lte=hasta,
+    )
+
+    if estado in ("revision", "cotizada", "rechazada"):
+        solicitudes = solicitudes.filter(estado=estado)
+    else:
+        estado = "todos"
+
+    # Indicadores generales
     total_productos = Producto.objects.count()
-
     total_categorias = Categoria.objects.count()
+    productos_activos = Producto.objects.filter(estado=True).count()
+    productos_inactivos = Producto.objects.filter(estado=False).count()
+    total_usuarios = User.objects.count()
 
-    productos_activos = Producto.objects.filter(
-        estado=True
+    ultimos_productos = Producto.objects.order_by("-id")[:5]
+
+    total_solicitudes = solicitudes.count()
+    solicitudes_revision = solicitudes.filter(
+        estado="revision"
+    ).count()
+    solicitudes_cotizadas = solicitudes.filter(
+        estado="cotizada"
+    ).count()
+    solicitudes_rechazadas = solicitudes.filter(
+        estado="rechazada"
     ).count()
 
-    productos_inactivos = Producto.objects.filter(
-        estado=False
-    ).count()
+    # Gráfica de solicitudes por estado
+    grafica_estados = {
+        "labels": ["En revisión", "Cotizadas", "Rechazadas"],
+        "valores": [
+            solicitudes_revision,
+            solicitudes_cotizadas,
+            solicitudes_rechazadas,
+        ],
+    }
 
-    ultimos_productos = Producto.objects.order_by('-id')[:5]
+    # Gráfica mensual: últimos seis meses, incluido el actual
+    primer_dia_mes = hoy.replace(day=1)
+    meses = []
+
+    cursor = primer_dia_mes
+
+    for _ in range(6):
+        meses.append(cursor)
+
+        if cursor.month == 1:
+            cursor = cursor.replace(
+                year=cursor.year - 1,
+                month=12,
+            )
+        else:
+            cursor = cursor.replace(month=cursor.month - 1)
+
+    meses.reverse()
+
+    nombres_meses = [
+        "Ene", "Feb", "Mar", "Abr", "May", "Jun",
+        "Jul", "Ago", "Sep", "Oct", "Nov", "Dic",
+    ]
+
+    etiquetas_meses = []
+    valores_meses = []
+
+    for mes in meses:
+        if mes.month == 12:
+            siguiente_mes = mes.replace(
+                year=mes.year + 1,
+                month=1,
+            )
+        else:
+            siguiente_mes = mes.replace(
+                month=mes.month + 1,
+            )
+
+        # Límites en la zona horaria local para contar
+        # las fechas que corresponden a cada mes local.
+        inicio_periodo = timezone.make_aware(
+            datetime.combine(mes, datetime.min.time())
+        )
+        fin_periodo = timezone.make_aware(
+            datetime.combine(
+                siguiente_mes,
+                datetime.min.time(),
+            )
+        )
+
+        cantidad = SolicitudCotizacion.objects.filter(
+            enviada=True,
+            fecha__gte=inicio_periodo,
+            fecha__lt=fin_periodo,
+        ).count()
+
+        etiquetas_meses.append(
+            f"{nombres_meses[mes.month - 1]} {mes.year}"
+        )
+        valores_meses.append(cantidad)
+
+    grafica_meses = {
+        "labels": etiquetas_meses,
+        "valores": valores_meses,
+    }
+
+    # Gráfica de productos por categoría
+    productos_categoria = (
+        Categoria.objects
+        .annotate(total=Count("producto"))
+        .order_by("-total")[:8]
+    )
+
+    grafica_categorias = {
+        "labels": [
+            categoria.nombre
+            for categoria in productos_categoria
+        ],
+        "valores": [
+            categoria.total
+            for categoria in productos_categoria
+        ],
+    }
+
+    # Productos más cotizados de todo el historial
+    productos_mas_cotizados = list(
+        DetalleSolicitud.objects
+        .filter(
+            solicitud__enviada=True,
+            seleccionado=True,
+        )
+        .values("producto_id", "producto__nombre")
+        .annotate(
+            total_solicitudes=Count(
+                "solicitud_id",
+                distinct=True,
+            ),
+            total_unidades=Sum("cantidad"),
+        )
+        .order_by(
+            "-total_solicitudes",
+            "-total_unidades",
+        )[:5]
+    )
+
+    grafica_productos = {
+        "labels": [
+            producto["producto__nombre"]
+            for producto in productos_mas_cotizados
+        ],
+        "solicitudes": [
+            producto["total_solicitudes"]
+            for producto in productos_mas_cotizados
+        ],
+        "unidades": [
+            producto["total_unidades"] or 0
+            for producto in productos_mas_cotizados
+        ],
+    }
+
+    # Datos enviados al HTML
+    contexto = {
+        "total_productos": total_productos,
+        "total_categorias": total_categorias,
+        "productos_activos": productos_activos,
+        "productos_inactivos": productos_inactivos,
+        "total_usuarios": total_usuarios,
+        "ultimos_productos": ultimos_productos,
+
+        "total_solicitudes": total_solicitudes,
+        "solicitudes_revision": solicitudes_revision,
+        "solicitudes_cotizadas": solicitudes_cotizadas,
+        "solicitudes_rechazadas": solicitudes_rechazadas,
+
+        "productos_mas_cotizados": productos_mas_cotizados,
+
+        "grafica_estados_json": grafica_estados,
+        "grafica_meses_json": grafica_meses,
+        "grafica_categorias_json": grafica_categorias,
+        "grafica_productos_json": grafica_productos,
+
+        "fecha_inicio": fecha_inicio,
+        "fecha_fin": fecha_fin,
+        "estado_seleccionado": estado,
+    }
 
     return render(
         request,
-        'admin/dashboard/dashboard.html',
-        {
-            'total_productos': total_productos,
-            'total_categorias': total_categorias,
-            'productos_activos': productos_activos,
-            'productos_inactivos': productos_inactivos,
-            'ultimos_productos': ultimos_productos
-        }
+        "admin/dashboard/dashboard.html",
+        contexto,
     )
+
+
+
 
 
 @login_required
@@ -1491,12 +1702,11 @@ def disminuir_cantidad(request, id):
         'cantidad': detalle.cantidad
     })
 
+import logging
 
 @login_required
 def enviar_solicitud(request):
-
     solicitud_id = request.session.get("solicitud_editando_id")
-
     solicitud = None
 
     if solicitud_id:
@@ -1517,7 +1727,7 @@ def enviar_solicitud(request):
         return JsonResponse({
             "ok": False,
             "mensaje": "No existe una solicitud activa."
-        })
+        }, status=400)
 
     detalles_seleccionados = solicitud.detalles.filter(
         seleccionado=True
@@ -1527,7 +1737,7 @@ def enviar_solicitud(request):
         return JsonResponse({
             "ok": False,
             "mensaje": "Debes seleccionar al menos un producto."
-        })
+        }, status=400)
 
     detalles_no_seleccionados = solicitud.detalles.filter(
         seleccionado=False
@@ -1536,7 +1746,6 @@ def enviar_solicitud(request):
     numero_usuario = solicitud.numero_usuario
 
     if numero_usuario is None:
-
         ultimo_numero = SolicitudCotizacion.objects.filter(
             usuario=request.user,
             numero_usuario__isnull=False
@@ -1547,7 +1756,6 @@ def enviar_solicitud(request):
         numero_usuario = ultimo_numero + 1
 
     if detalles_no_seleccionados.exists():
-
         nueva_solicitud = SolicitudCotizacion.objects.create(
             usuario=request.user,
             enviada=True,
@@ -1557,7 +1765,6 @@ def enviar_solicitud(request):
         )
 
         for detalle in detalles_seleccionados:
-
             DetalleSolicitud.objects.create(
                 solicitud=nueva_solicitud,
                 producto=detalle.producto,
@@ -1568,40 +1775,43 @@ def enviar_solicitud(request):
         detalles_seleccionados.delete()
 
     else:
-
         solicitud.enviada = True
         solicitud.estado = "revision"
         solicitud.bloqueada = False
         solicitud.numero_usuario = numero_usuario
 
-        solicitud.save(
-            update_fields=[
-                "enviada",
-                "estado",
-                "bloqueada",
-                "numero_usuario"
-            ]
-        )
+        solicitud.save(update_fields=[
+            "enviada",
+            "estado",
+            "bloqueada",
+            "numero_usuario"
+        ])
 
         nueva_solicitud = solicitud
 
-    request.session.pop(
-        "solicitud_editando_id",
-        None
-    )
+    # Enviar correo al administrador sin impedir el envío
+    # de la solicitud si ocurre un error con el correo.
+    try:
+        notificar_nueva_solicitud(nueva_solicitud)
+    except Exception:
+        logging.exception(
+            "Error al enviar la notificación por correo "
+            "de la solicitud #%s",
+            nueva_solicitud.id
+        )
 
-    request.session.pop(
-        "piroia_solicitud_id",
-        None
-    )
+    request.session.pop("solicitud_editando_id", None)
+    request.session.pop("piroia_solicitud_id", None)
 
     messages.success(
         request,
-        "Tu solicitud fue enviada correctamente. Puedes consultar su estado aquí."
+        "Tu solicitud fue enviada correctamente. "
+        "Puedes consultar su estado aquí."
     )
 
     return JsonResponse({
         "ok": True,
+        "mensaje": "Solicitud enviada correctamente.",
         "solicitud_id": nueva_solicitud.id,
         "numero_usuario": nueva_solicitud.numero_usuario,
         "redirect_url": reverse("mis_cotizaciones")
@@ -2425,6 +2635,153 @@ def descargar_cotizacion_pdf(request, id):
     pdf.save()
 
     return response
+
+
+@login_required
+def descargar_preorden_pdf(request):
+    # Obtener la solicitud activa de PiroIA o la que se está editando.
+    solicitud_id = (
+        request.session.get("piroia_solicitud_id")
+        or request.session.get("solicitud_editando_id")
+    )
+
+    if not solicitud_id:
+        return HttpResponse(
+            "No tienes una preorden activa para descargar.",
+            status=404
+        )
+
+    # Solo se permite descargar la preorden propia y sin cotizar.
+    solicitud = get_object_or_404(
+        SolicitudCotizacion,
+        id=solicitud_id,
+        usuario=request.user,
+        enviada=False,
+        estado="revision",
+        bloqueada=False,
+    )
+
+    detalles = list(
+        solicitud.detalles.select_related("producto").all()
+    )
+
+    if not detalles:
+        return HttpResponse(
+            "La preorden no contiene productos.",
+            status=400
+        )
+
+    response = HttpResponse(content_type="application/pdf")
+    response["Content-Disposition"] = (
+        f'attachment; filename="PRE-{solicitud.id:04d}.pdf"'
+    )
+
+    pdf = canvas.Canvas(response, pagesize=letter)
+    width, height = letter
+
+    # Encabezado
+    pdf.setFillColor(colors.HexColor("#101C35"))
+    pdf.rect(0, height - 125, width, 125, fill=1, stroke=0)
+
+    pdf.setFillColor(colors.HexColor("#E2C875"))
+    pdf.setFont("Helvetica-Bold", 12)
+    pdf.drawCentredString(width / 2, height - 38, "CATÁLOGO WEB")
+
+    pdf.setFillColor(colors.white)
+    pdf.setFont("Helvetica-Bold", 22)
+    pdf.drawCentredString(width / 2, height - 70, "PREORDEN")
+
+    pdf.setFont("Helvetica", 10)
+    pdf.drawCentredString(
+        width / 2,
+        height - 94,
+        "DOCUMENTO INFORMATIVO - NO ES UNA COTIZACIÓN"
+    )
+
+    # Datos del usuario y solicitud
+    y = height - 160
+    nombre = (
+        request.user.get_full_name()
+        or request.user.username
+    )
+
+    pdf.setFillColor(colors.black)
+    pdf.setFont("Helvetica", 10)
+    pdf.drawString(40, y, f"Folio de preorden: PRE-{solicitud.id:04d}")
+    y -= 20
+    pdf.drawString(40, y, f"Usuario: {nombre[:70]}")
+    y -= 20
+    pdf.drawString(
+        40,
+        y,
+        f"Fecha: {solicitud.fecha.strftime('%d/%m/%Y')}"
+    )
+    y -= 35
+
+    # Tabla de productos
+    def dibujar_encabezado_tabla(pos_y):
+        pdf.setFillColor(colors.HexColor("#F3F4F6"))
+        pdf.rect(35, pos_y - 5, 540, 24, fill=1, stroke=0)
+
+        pdf.setFillColor(colors.HexColor("#101C35"))
+        pdf.setFont("Helvetica-Bold", 10)
+        pdf.drawString(45, pos_y + 3, "Producto")
+        pdf.drawRightString(555, pos_y + 3, "Cantidad")
+
+    dibujar_encabezado_tabla(y)
+    y -= 28
+
+    for detalle in detalles:
+        if y < 100:
+            pdf.showPage()
+            y = height - 60
+            dibujar_encabezado_tabla(y)
+            y -= 28
+
+        nombre_producto = detalle.producto.nombre
+        pdf.setFillColor(colors.black)
+        pdf.setFont("Helvetica", 9)
+        pdf.drawString(45, y, nombre_producto[:75])
+        pdf.drawRightString(555, y, str(detalle.cantidad))
+
+        pdf.setStrokeColor(colors.HexColor("#E5E7EB"))
+        pdf.line(40, y - 8, 570, y - 8)
+        y -= 24
+
+    # Aviso final
+    if y < 100:
+        pdf.showPage()
+        y = height - 60
+
+    y -= 10
+    pdf.setFillColor(colors.HexColor("#8A6415"))
+    pdf.setFont("Helvetica-Bold", 10)
+    pdf.drawString(40, y, "IMPORTANTE")
+
+    y -= 18
+    pdf.setFillColor(colors.black)
+    pdf.setFont("Helvetica", 9)
+    pdf.drawString(
+        40,
+        y,
+        "Este documento es evidencia de los productos solicitados."
+    )
+    y -= 15
+    pdf.drawString(
+        40,
+        y,
+        "No contiene precios oficiales ni confirma disponibilidad."
+    )
+    y -= 15
+    pdf.drawString(
+        40,
+        y,
+        "La cotización deberá ser elaborada y confirmada por el personal."
+    )
+
+    pdf.save()
+    return response
+
 
 @login_required
 def detalle_producto(request, id):
@@ -3733,8 +4090,44 @@ def chatbot_ia(request):
 
                 )
 
-                request.session.modified = True        # ESTADO DE LA SOLICITUD ACTIVA
-        # ==========================================================
+                request.session.modified = True 
+
+       
+        frases_preorden_pdf = [
+            "genera el pdf de mi preorden",
+            "generar pdf de preorden",
+            "descargar mi preorden",
+            "genera mi preorden",
+            "descarga la preorden",
+            "generate my pre-order pdf",
+            "generate a pre-order pdf",
+            "download my pre-order",
+            "download the pre-order",
+            "create my pre-order pdf",
+        ]
+
+        quiere_pdf_preorden = any(
+            frase in pregunta_lower
+            for frase in frases_preorden_pdf
+        )
+
+        if quiere_pdf_preorden:
+            if solicitud_actual is None:
+                return JsonResponse({
+                    "ok": False,
+                    "respuesta": "No tienes una preorden activa para descargar."
+                }, status=400)
+
+            return JsonResponse({
+                "ok": True,
+                "respuesta": "Tu PDF de preorden está listo para descargar.",
+                "descargar_pdf_url": reverse("descargar_preorden_pdf"),
+                "confirmado": False,
+                "accion": "ninguna",
+                "productos": []
+            })
+       
+        
 
         es_nueva_piroia = bool(
             request.session.get("piroia_creando_solicitud", False)
@@ -6921,3 +7314,246 @@ def monitoreo_iot(request):
         'admin/monitoreo_iot.html',
         contexto
     )
+
+
+
+from django.core.mail import EmailMultiAlternatives
+from django.utils.html import escape
+
+
+
+
+def notificar_nueva_solicitud(solicitud):
+    usuario = solicitud.usuario
+
+    nombre_usuario = escape(
+        usuario.get_full_name() or usuario.username
+    )
+    correo_usuario = escape(usuario.email or "No proporcionado")
+    numero_usuario = escape(str(solicitud.numero_usuario or "No asignado"))
+    estado = escape(solicitud.get_estado_display())
+    fecha = solicitud.fecha.strftime("%d/%m/%Y a las %H:%M")
+
+    asunto = f"Nueva solicitud de cotización #{solicitud.id}"
+
+    # Versión de texto por si el correo no admite HTML.
+    mensaje_texto = (
+        "CATÁLOGO WEB\n\n"
+        "Nueva solicitud de cotización\n\n"
+        f"Solicitud: #{solicitud.id}\n"
+        f"Número del usuario: {numero_usuario}\n"
+        f"Usuario: {nombre_usuario}\n"
+        f"Correo: {correo_usuario}\n"
+        f"Estado: {estado}\n"
+        f"Fecha: {fecha}\n\n"
+        "Ingresa al sistema para revisar la solicitud."
+    )
+
+    # Versión HTML del correo.
+    html = f"""
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Nueva solicitud de cotización</title>
+    </head>
+    <body style="margin:0; padding:0; background-color:#f1f4f8;
+                 font-family:Arial,Helvetica,sans-serif; color:#243047;">
+
+        <table role="presentation" width="100%" cellspacing="0"
+               cellpadding="0" border="0"
+               style="background-color:#f1f4f8; padding:30px 12px;">
+            <tr>
+                <td align="center">
+
+                    <table role="presentation" width="600" cellspacing="0"
+                           cellpadding="0" border="0"
+                           style="width:100%; max-width:600px; background:#ffffff;
+                                  border-radius:14px; overflow:hidden;">
+
+                        <tr>
+                            <td style="background:#101c35; padding:28px 24px;
+                                       text-align:center; border-bottom:4px solid #c9a64b;">
+                                <div style="font-size:13px; letter-spacing:3px;
+                                            color:#e2c875; font-weight:bold;">
+                                    CATÁLOGO WEB
+                                </div>
+                                <h1 style="margin:14px 0 6px; font-size:24px;
+                                           line-height:1.3; color:#ffffff;">
+                                    Nueva solicitud de cotización
+                                </h1>
+                                <p style="margin:0; font-size:14px; color:#d8deea;">
+                                    Se ha recibido una nueva solicitud en el sistema
+                                </p>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td style="padding:28px 24px 12px;">
+                                <p style="margin:0 0 8px; font-size:15px;">
+                                    Hola, administrador:
+                                </p>
+                                <p style="margin:0; color:#647087;
+                                          font-size:14px; line-height:1.7;">
+                                    Un usuario acaba de enviar una solicitud de
+                                    cotización. Estos son los datos para identificarla.
+                                </p>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td style="padding:16px 24px;">
+                                <table role="presentation" width="100%"
+                                       cellspacing="0" cellpadding="0" border="0"
+                                       style="background:#f8f7f2; border:1px solid #eee7d4;
+                                              border-radius:10px;">
+                                    <tr>
+                                        <td style="padding:18px;">
+                                            <p style="margin:0 0 5px; color:#7b8494;
+                                                      font-size:12px; text-transform:uppercase;
+                                                      letter-spacing:1px;">
+                                                Número de solicitud
+                                            </p>
+                                            <p style="margin:0; font-size:27px;
+                                                      font-weight:bold; color:#101c35;">
+                                                #{solicitud.id}
+                                            </p>
+                                        </td>
+                                        <td align="right" style="padding:18px;">
+                                            <span style="display:inline-block;
+                                                         background:#fff0c2; color:#76570b;
+                                                         padding:8px 12px; border-radius:20px;
+                                                         font-size:12px; font-weight:bold;">
+                                                {estado}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td style="padding:0 24px 24px;">
+                                <table role="presentation" width="100%"
+                                       cellspacing="0" cellpadding="0" border="0">
+                                    <tr>
+                                        <td style="padding:13px 0; border-bottom:1px solid #edf0f4;
+                                                   color:#778196; font-size:13px; width:42%;">
+                                            Número del usuario
+                                        </td>
+                                        <td style="padding:13px 0; border-bottom:1px solid #edf0f4;
+                                                   color:#243047; font-size:14px; font-weight:bold;">
+                                            {numero_usuario}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding:13px 0; border-bottom:1px solid #edf0f4;
+                                                   color:#778196; font-size:13px;">
+                                            Nombre del usuario
+                                        </td>
+                                        <td style="padding:13px 0; border-bottom:1px solid #edf0f4;
+                                                   color:#243047; font-size:14px;">
+                                            {nombre_usuario}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding:13px 0; border-bottom:1px solid #edf0f4;
+                                                   color:#778196; font-size:13px;">
+                                            Correo electrónico
+                                        </td>
+                                        <td style="padding:13px 0; border-bottom:1px solid #edf0f4;
+                                                   color:#243047; font-size:14px; overflow-wrap:anywhere;">
+                                            {correo_usuario}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding:13px 0; color:#778196; font-size:13px;">
+                                            Fecha de envío
+                                        </td>
+                                        <td style="padding:13px 0; color:#243047; font-size:14px;">
+                                            {fecha}
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td style="padding:20px 24px; background:#f7f8fb;
+                                       border-top:1px solid #edf0f4; text-align:center;">
+                                <p style="margin:0 0 7px; font-size:13px;
+                                          color:#46516a;">
+                                    Ingresa a Catálogo Web para revisar los detalles
+                                    y continuar con la solicitud.
+                                </p>
+                                <p style="margin:0; font-size:12px; color:#8a93a3;">
+                                    Notificación automática del sistema Catálogo Web
+                                </p>
+                            </td>
+                        </tr>
+
+                    </table>
+
+                </td>
+            </tr>
+        </table>
+    </body>
+    </html>
+    """
+
+    correo = EmailMultiAlternatives(
+        subject=asunto,
+        body=mensaje_texto,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to=[settings.IOT_ALERT_EMAIL],
+    )
+    correo.attach_alternative(html, "text/html")
+    correo.send(fail_silently=False)
+
+
+
+
+@login_required
+@require_GET
+def api_notificaciones_cotizaciones(request):
+    # Solo el personal administrativo puede consultar la API.
+    if not request.user.is_staff:
+        return JsonResponse({
+            "ok": False,
+            "mensaje": "No tienes permiso para consultar las notificaciones."
+        }, status=403)
+
+    solicitudes = (
+        SolicitudCotizacion.objects
+        .filter(enviada=True)
+        .select_related("usuario")
+        .order_by("-fecha")[:20]
+    )
+
+    notificaciones = []
+
+    for solicitud in solicitudes:
+        notificaciones.append({
+            "solicitud_id": solicitud.id,
+            "numero_usuario": solicitud.numero_usuario,
+            "usuario": (
+                solicitud.usuario.get_full_name()
+                or solicitud.usuario.username
+            ),
+            "correo": solicitud.usuario.email,
+            "fecha": solicitud.fecha.isoformat(),
+            "estado": solicitud.estado,
+            "estado_texto": solicitud.get_estado_display(),
+            "mensaje": (
+                f"Se recibió la solicitud de cotización "
+                f"#{solicitud.id}."
+            )
+        })
+
+    return JsonResponse({
+        "ok": True,
+        "total": len(notificaciones),
+        "notificaciones": notificaciones
+    })
+

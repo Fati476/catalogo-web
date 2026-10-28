@@ -1,282 +1,1006 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <meta charset="UTF-8">
+    <title>Dashboard de indicadores</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
 
-<title>Dashboard</title>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-      rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap"
+          rel="stylesheet">
 
-<link rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="{% static 'css/admin.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Montserrat', sans-serif;
+            box-sizing: border-box;
+        }
 
-<style>
+        body {
+            background: #f3f1ec;
+            color: #111827;
+        }
 
-*{
-    font-family:'Poppins',sans-serif;
-}
+        .dashboard-page {
+            width: 100%;
+            margin: 0 auto 70px;
+        }
 
-body{
-    background:#F1F5F9;
-}
+        .dashboard-hero {
+            position: relative;
+            min-height: 330px;
+            overflow: hidden;
+            background:
+                linear-gradient(90deg, rgba(17,24,39,.97),
+                rgba(17,24,39,.78), rgba(17,24,39,.35)),
+                url("{% static 'img/banner_productos.png' %}");
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            padding: 65px 60px 75px;
+            margin-top: -95px;
+        }
 
-.navbar-custom{
-    background:white;
-    padding:18px 40px;
-    box-shadow:0 5px 20px rgba(0,0,0,.05);
-}
+        .dashboard-hero-content {
+            max-width: 850px;
+            color: white;
+            position: relative;
+            z-index: 2;
+            padding-top: 100px;
+        }
 
-.logo{
-    font-size:26px;
-    font-weight:700;
-    color:#2563EB;
-}
+        .dashboard-hero h1 {
+            font-size: clamp(2rem, 4vw, 3.2rem);
+            font-weight: 900;
+            margin-bottom: 14px;
+        }
 
-.contenido{
-    padding:50px;
-}
+        .dashboard-hero h1 span {
+            color: #D4AF37;
+        }
 
-.titulo{
-    font-size:38px;
-    font-weight:700;
-    color:#0F172A;
-}
+        .dashboard-hero p {
+            max-width: 700px;
+            color: rgba(255,255,255,.75);
+            line-height: 1.7;
+        }
 
-.subtitulo{
-    color:#64748B;
-}
+        .hero-wave {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: -1px;
+            line-height: 0;
+        }
 
-.card-dashboard{
-    border:none;
-    border-radius:25px;
-    padding:30px;
-    color:white;
-    transition:.3s;
-}
+        .hero-wave svg {
+            width: 100%;
+            height: 55px;
+            display: block;
+        }
 
-.card-dashboard:hover{
-    transform:translateY(-5px);
-}
+        .dashboard-content {
+            width: min(1500px, calc(100% - 48px));
+            margin: 30px auto 70px;
+        }
 
-.card-dashboard i{
-    font-size:45px;
-}
+        .section-heading {
+            font-size: 1.45rem;
+            font-weight: 900;
+            margin-bottom: 7px;
+        }
 
-.card-dashboard h2{
-    font-size:40px;
-    font-weight:700;
-}
+        .section-description {
+            color: #6B7280;
+            margin-bottom: 22px;
+        }
 
-.card-dashboard p{
-    margin:0;
-    font-size:15px;
-}
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 22px;
+            margin-bottom: 38px;
+        }
 
-</style>
+        .indicator-card {
+            background: white;
+            border: 1px solid rgba(17,24,39,.07);
+            border-radius: 24px;
+            padding: 25px;
+            box-shadow: 0 15px 35px rgba(17,24,39,.07);
+            transition: .25s;
+        }
 
+        .indicator-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 23px 42px rgba(17,24,39,.12);
+        }
+
+        .indicator-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 22px;
+        }
+
+        .indicator-icon {
+            width: 52px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 17px;
+            background: rgba(201,162,39,.14);
+            color: #B8860B;
+            font-size: 1.55rem;
+        }
+
+        .indicator-label {
+            color: #6B7280;
+            font-size: .9rem;
+            font-weight: 700;
+        }
+
+        .indicator-value {
+            font-size: clamp(1.8rem, 2.5vw, 2.5rem);
+            font-weight: 900;
+            margin: 0;
+            overflow-wrap: anywhere;
+        }
+
+        .indicator-note {
+            color: #9CA3AF;
+            font-size: .8rem;
+            margin-top: 7px;
+        }
+
+        .dashboard-panel {
+            background: white;
+            border: 1px solid rgba(17,24,39,.07);
+            border-radius: 25px;
+            padding: 26px;
+            box-shadow: 0 15px 35px rgba(17,24,39,.07);
+            height: 100%;
+        }
+
+        .panel-title {
+            font-size: 1.1rem;
+            font-weight: 900;
+            margin-bottom: 6px;
+        }
+
+        .panel-subtitle {
+            color: #6B7280;
+            font-size: .88rem;
+            margin-bottom: 22px;
+        }
+
+        .dashboard-filter {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+            gap: 15px;
+            align-items: end;
+        }
+
+        .dashboard-filter label {
+            display: block;
+            font-size: .85rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .dashboard-filter input,
+        .dashboard-filter select {
+            width: 100%;
+            min-height: 48px;
+            border: 1px solid #E5E7EB;
+            border-radius: 13px;
+            padding: 10px 12px;
+            background: #FAFAF9;
+            color: #111827;
+        }
+
+        .btn-gold {
+            border: 0;
+            border-radius: 999px;
+            min-height: 48px;
+            padding: 12px 23px;
+            background: #C9A227;
+            color: #111827;
+            font-weight: 900;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            transition: .25s;
+            white-space: nowrap;
+        }
+
+        .btn-gold:hover {
+            background: #B8860B;
+            color: #111827;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline-gold {
+            border: 1px solid #C9A227;
+            border-radius: 999px;
+            padding: 10px 18px;
+            color: #8A6D12;
+            font-weight: 800;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .btn-outline-gold:hover {
+            background: #C9A227;
+            color: #111827;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 300px;
+        }
+
+        .chart-container.chart-doughnut {
+            height: 280px;
+        }
+
+        .dashboard-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .dashboard-table th {
+            background: #F9F7F0;
+            color: #6B7280;
+            font-size: .78rem;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+            padding: 14px 12px;
+            white-space: nowrap;
+        }
+
+        .dashboard-table td {
+            padding: 15px 12px;
+            border-bottom: 1px solid #F0EEE8;
+            font-size: .9rem;
+        }
+
+        .dashboard-table tbody tr:hover {
+            background: #FCFAF4;
+        }
+
+        .product-name {
+            font-weight: 800;
+        }
+
+        .rank-number {
+            width: 34px;
+            height: 34px;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(201,162,39,.16);
+            color: #8A6D12;
+            font-weight: 900;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            padding: 7px 12px;
+            border-radius: 999px;
+            font-size: .78rem;
+            font-weight: 800;
+            background: #F3F4F6;
+            color: #374151;
+        }
+
+        .status-quoted {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .status-rejected {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 35px 15px;
+            color: #6B7280;
+        }
+
+        .empty-state i {
+            font-size: 2.5rem;
+            color: #C9A227;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        @media(max-width: 1200px) {
+            .dashboard-cards {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .dashboard-filter {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media(max-width: 768px) {
+            .dashboard-hero {
+                min-height: 400px;
+                padding: 35px 24px 70px;
+                margin-top: -80px;
+                align-items: flex-start;
+            }
+
+            .dashboard-hero-content {
+                padding-top: 95px;
+            }
+
+            .dashboard-content {
+                width: calc(100% - 24px);
+                margin-top: 25px;
+            }
+
+            .dashboard-cards {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .dashboard-filter {
+                grid-template-columns: 1fr;
+            }
+
+            .dashboard-filter .btn-gold,
+            .dashboard-filter .btn-outline-gold {
+                width: 100%;
+            }
+
+            .dashboard-panel {
+                padding: 20px 15px;
+            }
+
+            .chart-container {
+                height: 260px;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-custom">
+{% include 'admin/components/navbar_admin.html' %}
 
-    <div class="container-fluid">
+<main class="dashboard-page">
 
-        <a class="navbar-brand logo">
-            Catálogo Admin
-        </a>
-
-        <ul class="navbar-nav mx-auto">
-
-            <li class="nav-item">
-                <a class="nav-link"
-                   href="{% url 'panel_admin' %}">
-                    Inicio
-                </a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link active"
-                   href="{% url 'dashboard' %}">
-                    Dashboard
-                </a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link"
-                   href="{% url 'lista_productos' %}">
-                    Productos
-                </a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link"
-                   href="{% url 'lista_categorias' %}">
-                    Categorías
-                </a>
-            </li>
-
-            <li class="nav-item">
-
-                <a class="nav-link"
-                    href="{% url 'lista_solicitudes' %}">
-
-                    Cotizaciones
-
-                </a>
-
-            </li>
-
-            <li class="nav-item">
-
-                <a class="nav-link"
-                    href="{% url 'lista_usuarios' %}">
-
-                    Usuarios
-
-                </a>
-
-            </li>
-
-        </ul>
-
-        <div class="dropdown">
-
-            <button class="btn d-flex align-items-center gap-3"
-                    type="button"
-                    data-bs-toggle="dropdown"
-                    style="border:none; background:none;">
-
-                <i class="bi bi-bell fs-5"></i>
-
-                <i class="bi bi-person-circle perfil"></i>
-
-            </button>
-
-            <ul class="dropdown-menu dropdown-menu-end shadow border-0 p-2">
-
-                <li>
-
-                    <span class="dropdown-item-text fw-bold">
-
-                        {{ request.user.username }}
-
-                    </span>
-
-                </li>
-
-                <li>
-                    <hr class="dropdown-divider">
-                </li>
-
-                <li>
-
-                    <form method="POST"
-                            action="/accounts/logout/">
-
-                        {% csrf_token %}
-
-                        <button type="submit"
-                                class="dropdown-item text-danger">
-
-                            <i class="bi bi-box-arrow-right"></i>
-                            Cerrar sesión
-
-                        </button>
-
-                    </form>
-
-                </li>
-
-            </ul>
-
+    <section class="dashboard-hero">
+        <div class="dashboard-hero-content">
+            <h1>Dashboard de <span>indicadores</span></h1>
+            <p>
+                Consulta el movimiento del catálogo, revisa las solicitudes
+                de cotización y conoce cuáles son los productos más solicitados
+                por los clientes.
+            </p>
         </div>
+
+        <div class="hero-wave">
+            <svg viewBox="0 0 1440 80" preserveAspectRatio="none">
+                <path fill="#f3f1ec"
+                      d="M0,58 C260,78 470,80 720,65 C960,50 1180,48 1440,62 L1440,80 L0,80 Z">
+                </path>
+            </svg>
+        </div>
+    </section>
+
+    <div class="dashboard-content">
+
+        <section class="mb-5">
+            <h2 class="section-heading">Resumen general</h2>
+            <p class="section-description">
+                Estado actual de los productos, categorías y usuarios registrados.
+            </p>
+
+            <div class="dashboard-cards">
+
+                <article class="indicator-card">
+                    <div class="indicator-top">
+                        <span class="indicator-label">Total de productos</span>
+                        <span class="indicator-icon"><i class="bi bi-box-seam"></i></span>
+                    </div>
+                    <h3 class="indicator-value">{{ total_productos }}</h3>
+                    <p class="indicator-note">Productos registrados en el catálogo</p>
+                </article>
+
+                <article class="indicator-card">
+                    <div class="indicator-top">
+                        <span class="indicator-label">Categorías</span>
+                        <span class="indicator-icon"><i class="bi bi-tags"></i></span>
+                    </div>
+                    <h3 class="indicator-value">{{ total_categorias }}</h3>
+                    <p class="indicator-note">Categorías registradas</p>
+                </article>
+
+                <article class="indicator-card">
+                    <div class="indicator-top">
+                        <span class="indicator-label">Productos activos</span>
+                        <span class="indicator-icon"><i class="bi bi-check-circle"></i></span>
+                    </div>
+                    <h3 class="indicator-value">{{ productos_activos }}</h3>
+                    <p class="indicator-note">Disponibles en el catálogo</p>
+                </article>
+
+                <article class="indicator-card">
+                    <div class="indicator-top">
+                        <span class="indicator-label">Productos inactivos</span>
+                        <span class="indicator-icon"><i class="bi bi-x-circle"></i></span>
+                    </div>
+                    <h3 class="indicator-value">{{ productos_inactivos }}</h3>
+                    <p class="indicator-note">Desactivados en el catálogo</p>
+                </article>
+
+                <article class="indicator-card">
+                    <div class="indicator-top">
+                        <span class="indicator-label">Usuarios registrados</span>
+                        <span class="indicator-icon"><i class="bi bi-people"></i></span>
+                    </div>
+                    <h3 class="indicator-value">{{ total_usuarios }}</h3>
+                    <p class="indicator-note">Cuentas registradas en el sistema</p>
+                </article>
+
+                <article class="indicator-card">
+                    <div class="indicator-top">
+                        <span class="indicator-label">Solicitudes del periodo</span>
+                        <span class="indicator-icon"><i class="bi bi-file-earmark-text"></i></span>
+                    </div>
+                    <h3 class="indicator-value">{{ total_solicitudes }}</h3>
+                    <p class="indicator-note">Solicitudes enviadas en el periodo seleccionado</p>
+                </article>
+
+                <article class="indicator-card">
+                    <div class="indicator-top">
+                        <span class="indicator-label">Cotizadas</span>
+                        <span class="indicator-icon"><i class="bi bi-check2-circle"></i></span>
+                    </div>
+                    <h3 class="indicator-value">{{ solicitudes_cotizadas }}</h3>
+                    <p class="indicator-note">Solicitudes cotizadas en el periodo</p>
+                </article>
+
+                <article class="indicator-card">
+                    <div class="indicator-top">
+                        <span class="indicator-label">En revisión</span>
+                        <span class="indicator-icon"><i class="bi bi-hourglass-split"></i></span>
+                    </div>
+                    <h3 class="indicator-value">{{ solicitudes_revision }}</h3>
+                    <p class="indicator-note">Solicitudes pendientes de revisión</p>
+                </article>
+
+            </div>
+        </section>
+
+        <section class="dashboard-panel mb-5">
+            <h2 class="panel-title">
+                <i class="bi bi-funnel me-2" style="color:#C9A227;"></i>
+                Filtrar indicadores
+            </h2>
+            <p class="panel-subtitle">
+                Selecciona un periodo y, si lo necesitas, filtra por estado.
+            </p>
+
+            <form method="GET" class="dashboard-filter">
+                <div>
+                    <label for="fecha_inicio">Fecha inicial</label>
+                    <input type="date"
+                           id="fecha_inicio"
+                           name="fecha_inicio"
+                           value="{{ fecha_inicio }}"
+                           required>
+                </div>
+
+                <div>
+                    <label for="fecha_fin">Fecha final</label>
+                    <input type="date"
+                           id="fecha_fin"
+                           name="fecha_fin"
+                           value="{{ fecha_fin }}"
+                           required>
+                </div>
+
+                <div>
+                    <label for="estado">Estado de solicitud</label>
+                    <select id="estado" name="estado">
+                        <option value="todos" {% if estado_seleccionado == 'todos' %}selected{% endif %}>
+                            Todos los estados
+                        </option>
+                        <option value="revision" {% if estado_seleccionado == 'revision' %}selected{% endif %}>
+                            En revisión
+                        </option>
+                        <option value="cotizada" {% if estado_seleccionado == 'cotizada' %}selected{% endif %}>
+                            Cotizadas
+                        </option>
+                        <option value="rechazada" {% if estado_seleccionado == 'rechazada' %}selected{% endif %}>
+                            Rechazadas
+                        </option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn-gold">
+                    <i class="bi bi-search"></i>
+                    Aplicar filtros
+                </button>
+            </form>
+
+            <div class="mt-3">
+                <a href="{% url 'dashboard' %}" class="btn-outline-gold">
+                    <i class="bi bi-arrow-counterclockwise"></i>
+                    Restablecer filtros
+                </a>
+            </div>
+        </section>
+
+        <section class="mb-5">
+            <h2 class="section-heading">Análisis de cotizaciones</h2>
+            <p class="section-description">
+                Revisa la distribución de solicitudes y su evolución mensual.
+            </p>
+
+            <div class="row g-4">
+
+                <div class="col-lg-5">
+                    <div class="dashboard-panel">
+                        <h3 class="panel-title">Solicitudes por estado</h3>
+                        <p class="panel-subtitle">
+                            Distribución de las solicitudes del periodo filtrado.
+                        </p>
+                        <div class="chart-container chart-doughnut">
+                            <canvas id="graficaEstados"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-7">
+                    <div class="dashboard-panel">
+                        <h3 class="panel-title">Solicitudes por mes</h3>
+                        <p class="panel-subtitle">
+                            Evolución de las solicitudes enviadas durante los últimos meses.
+                        </p>
+                        <div class="chart-container">
+                            <canvas id="graficaMeses"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section class="mb-5">
+            <div class="dashboard-panel">
+                <h2 class="panel-title">Productos por categoría</h2>
+                <p class="panel-subtitle">
+                    Categorías con mayor cantidad de productos registrados.
+                </p>
+                <div class="chart-container">
+                    <canvas id="graficaCategorias"></canvas>
+                </div>
+            </div>
+        </section>
+
+        
+        <section class="mb-5">
+            <div class="dashboard-panel">
+                <h2 class="panel-title">
+                    <i class="bi bi-trophy me-2" style="color:#C9A227;"></i>
+                    Productos más cotizados
+                </h2>
+
+                <p class="panel-subtitle">
+                    Los cinco productos que aparecen en más solicitudes del periodo seleccionado.
+                </p>
+
+                <!-- Gráfica de productos más cotizados -->
+                <div class="chart-container mb-4">
+                    <canvas id="graficaProductos"></canvas>
+                </div>
+
+                <!-- Tabla de productos más cotizados -->
+                <div class="table-responsive">
+                    <table class="dashboard-table">
+                        <thead>
+                            <tr>
+                                <th>Posición</th>
+                                <th>Producto</th>
+                                <th>Solicitudes</th>
+                                <th>Unidades solicitadas</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for producto in productos_mas_cotizados %}
+                            <tr>
+                                <td>
+                                    <span class="rank-number">{{ forloop.counter }}</span>
+                                </td>
+                                <td class="product-name">
+                                    {{ producto.producto__nombre }}
+                                </td>
+                                <td>{{ producto.total_solicitudes }}</td>
+                                <td>{{ producto.total_unidades }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4">
+                                    <div class="empty-state">
+                                        <i class="bi bi-inbox"></i>
+                                        <strong>No hay productos cotizados en este periodo</strong>
+                                        <p class="mb-0 mt-2">
+                                            Prueba con otras fechas o cambia el estado del filtro.
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+
+        <section>
+            <div class="dashboard-panel">
+                <h2 class="panel-title">Productos agregados recientemente</h2>
+                <p class="panel-subtitle">
+                    Últimos productos registrados en el catálogo.
+                </p>
+
+                <div class="table-responsive">
+                    <table class="dashboard-table">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Categoría</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for producto in ultimos_productos %}
+                            <tr>
+                                <td class="product-name">{{ producto.nombre }}</td>
+                                <td>{{ producto.categoria.nombre }}</td>
+                                <td>
+                                    {% if producto.estado %}
+                                        <span class="status-pill status-quoted">Activo</span>
+                                    {% else %}
+                                        <span class="status-pill status-rejected">Inactivo</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3">
+                                    <div class="empty-state">
+                                        <i class="bi bi-box"></i>
+                                        No hay productos registrados todavía.
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
 
     </div>
+</main>
 
-</nav>
+{{ grafica_estados_json|json_script:"datos-estados" }}
+{{ grafica_meses_json|json_script:"datos-meses" }}
+{{ grafica_categorias_json|json_script:"datos-categorias" }}
+{{ grafica_productos_json|json_script:"datos-productos" }}
 
-<div class="contenido">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-    <h1 class="titulo">
-        Dashboard
-    </h1>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
 
-    <p class="subtitulo mb-5">
-        Resumen general del sistema
-    </p>
+    // Leer los datos enviados desde Django
+    function obtenerDatos(id) {
+        const elemento = document.getElementById(id);
 
-    <div class="row g-4">
+        if (!elemento) {
+            console.error("No se encontró el elemento:", id);
+            return null;
+        }
 
-        <div class="col-md-3">
+        try {
+            return JSON.parse(elemento.textContent);
+        } catch (error) {
+            console.error("Error al leer los datos de " + id, error);
+            return null;
+        }
+    }
 
-            <div class="card-dashboard shadow"
-                 style="background:#2563EB;">
+    // Obtener los datos de las cuatro gráficas
+    const datosEstados = obtenerDatos("datos-estados");
+    const datosMeses = obtenerDatos("datos-meses");
+    const datosCategorias = obtenerDatos("datos-categorias");
+    const datosProductos = obtenerDatos("datos-productos");
 
-                <i class="bi bi-box-seam"></i>
+    // Comprobar que Chart.js esté cargado
+    if (typeof Chart === "undefined") {
+        console.error("Chart.js no se ha cargado correctamente.");
+        return;
+    }
 
-                <h2>{{ total_productos }}</h2>
+    Chart.defaults.font.family = "Montserrat, sans-serif";
+    Chart.defaults.color = "#6B7280";
 
-                <p>Total de productos</p>
+    // Función para crear las gráficas de forma segura
+    function crearGrafica(idCanvas, datos, configuracion) {
+        const canvas = document.getElementById(idCanvas);
 
-            </div>
+        if (!canvas) {
+            console.error("No se encontró el canvas:", idCanvas);
+            return;
+        }
 
-        </div>
+        if (!(canvas instanceof HTMLCanvasElement)) {
+            console.error("El elemento no es un canvas válido:", idCanvas);
+            return;
+        }
 
-        <div class="col-md-3">
+        if (!datos) {
+            console.warn("No hay datos disponibles para:", idCanvas);
+            return;
+        }
 
-            <div class="card-dashboard shadow"
-                 style="background:#14B8A6;">
+        try {
+            // Evitar duplicar una gráfica existente
+            const graficaExistente = Chart.getChart(canvas);
 
-                <i class="bi bi-tags"></i>
+            if (graficaExistente) {
+                graficaExistente.destroy();
+            }
 
-                <h2>{{ total_categorias }}</h2>
+            new Chart(canvas, configuracion);
 
-                <p>Total categorías</p>
+        } catch (error) {
+            console.error("Error al crear la gráfica " + idCanvas + ":", error);
+        }
+    }
 
-            </div>
+    // 1. SOLICITUDES POR ESTADO
+    if (datosEstados) {
+        crearGrafica("graficaEstados", datosEstados, {
+            type: "doughnut",
 
-        </div>
+            data: {
+                labels: datosEstados.labels || [],
 
-        <div class="col-md-3">
+                datasets: [{
+                    label: "Solicitudes",
+                    data: datosEstados.valores || [],
 
-            <div class="card-dashboard shadow"
-                 style="background:#16A34A;">
+                    backgroundColor: [
+                        "#C9A227",
+                        "#16A34A",
+                        "#DC2626"
+                    ],
 
-                <i class="bi bi-check-circle"></i>
+                    borderWidth: 0,
+                    hoverOffset: 8
+                }]
+            },
 
-                <h2>{{ productos_activos }}</h2>
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: "65%",
 
-                <p>Productos activos</p>
+                plugins: {
+                    legend: {
+                        position: "bottom",
 
-            </div>
+                        labels: {
+                            usePointStyle: true,
+                            padding: 18
+                        }
+                    },
 
-        </div>
+                    tooltip: {
+                        enabled: true
+                    }
+                }
+            }
+        });
+    }
 
-        <div class="col-md-3">
+    // 2. SOLICITUDES POR MES
+    if (datosMeses) {
+        crearGrafica("graficaMeses", datosMeses, {
+            type: "line",
 
-            <div class="card-dashboard shadow"
-                 style="background:#DC2626;">
+            data: {
+                labels: datosMeses.labels || [],
 
-                <i class="bi bi-x-circle"></i>
+                datasets: [{
+                    label: "Solicitudes enviadas",
+                    data: datosMeses.valores || [],
 
-                <h2>{{ productos_inactivos }}</h2>
+                    borderColor: "#C9A227",
+                    backgroundColor: "rgba(201, 162, 39, 0.15)",
 
-                <p>Productos inactivos</p>
+                    fill: true,
+                    tension: 0.35,
+                    pointRadius: 5,
+                    pointHoverRadius: 7,
+                    pointBackgroundColor: "#C9A227",
+                    borderWidth: 3
+                }]
+            },
 
-            </div>
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
 
-        </div>
+                scales: {
+                    y: {
+                        beginAtZero: true,
 
-    </div>
+                        ticks: {
+                            precision: 0
+                        }
+                    },
 
-</div>
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                },
+
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+    }
+
+    // 3. PRODUCTOS POR CATEGORÍA
+    if (datosCategorias) {
+        crearGrafica("graficaCategorias", datosCategorias, {
+            type: "bar",
+
+            data: {
+                labels: datosCategorias.labels || [],
+
+                datasets: [{
+                    label: "Productos registrados",
+                    data: datosCategorias.valores || [],
+
+                    backgroundColor: "#C9A227",
+                    borderRadius: 8,
+                    maxBarThickness: 45
+                }]
+            },
+
+            options: {
+                indexAxis: "y",
+                responsive: true,
+                maintainAspectRatio: false,
+
+                scales: {
+                    x: {
+                        beginAtZero: true,
+
+                        ticks: {
+                            precision: 0
+                        }
+                    },
+
+                    y: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                },
+
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+    }
+
+    // 4. PRODUCTOS MÁS COTIZADOS
+    if (datosProductos) {
+        crearGrafica("graficaProductos", datosProductos, {
+            type: "bar",
+
+            data: {
+                labels: datosProductos.labels || [],
+
+                datasets: [
+                    {
+                        label: "Solicitudes",
+
+                        data: datosProductos.solicitudes || [],
+
+                        backgroundColor: "#C9A227",
+                        borderRadius: 6
+                    },
+
+                    {
+                        label: "Unidades solicitadas",
+
+                        data: datosProductos.unidades || [],
+
+                        backgroundColor: "#374151",
+                        borderRadius: 6
+                    }
+                ]
+            },
+
+            options: {
+                indexAxis: "y",
+                responsive: true,
+                maintainAspectRatio: false,
+
+                scales: {
+                    x: {
+                        beginAtZero: true,
+
+                        ticks: {
+                            precision: 0
+                        }
+                    },
+
+                    y: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                },
+
+                plugins: {
+                    legend: {
+                        position: "bottom",
+
+                        labels: {
+                            usePointStyle: true,
+                            padding: 18
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+});
+</script>
 
 </body>
 </html>

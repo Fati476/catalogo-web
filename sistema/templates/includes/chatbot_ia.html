@@ -3499,6 +3499,25 @@ document.addEventListener(
                         respuestaLimpia
                     );
 
+                    
+                    if (datos.descargar_pdf_url) {
+                        const enlace = document.createElement("a");
+
+                        enlace.href = datos.descargar_pdf_url;
+                        enlace.textContent = "📄 Descargar PDF de preorden";
+                        enlace.target = "_blank";
+                        enlace.rel = "noopener";
+                        enlace.className = "piroia-descargar-preorden";
+
+                        const contenedor = document.createElement("div");
+                        contenedor.className = "piroia-message piroia-message-bot";
+                        contenedor.appendChild(enlace);
+
+                        messages.appendChild(contenedor);
+                        messages.scrollTop = messages.scrollHeight;
+                    }
+
+
                     /* ========================================= */
                     /* ACTUALIZAR SOLICITUD EN PANTALLA */
                     /* ========================================= */

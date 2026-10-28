@@ -343,6 +343,19 @@ urlpatterns = [
         views.monitoreo_iot,
         name='monitoreo_iot'
     ),
+    path(
+        "api/notificaciones/cotizaciones/",
+        views.api_notificaciones_cotizaciones,
+        name="api_notificaciones_cotizaciones"
+    ),
+
+    
+    path(
+        "solicitud/preorden/pdf/",
+        views.descargar_preorden_pdf,
+        name="descargar_preorden_pdf",
+    ),
+
 
 
 

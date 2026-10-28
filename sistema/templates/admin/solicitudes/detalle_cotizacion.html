@@ -1,0 +1,30 @@
+<h2>Solicitud #{{ solicitud.id }}</h2>
+
+<p><strong>Cliente:</strong> {{ solicitud.usuario.username }}</p>
+<p><strong>Fecha:</strong> {{ solicitud.fecha|date:"d/m/Y H:i" }}</p>
+
+<hr>
+
+<h4>Productos solicitados</h4>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Producto</th>
+            <th>Cantidad</th>
+            <th>Precio San Mateo</th>
+            <th>Precio Fuera</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for detalle in solicitud.detalles.all %}
+        <tr>
+            <td>{{ detalle.producto.nombre }}</td>
+            <td>{{ detalle.cantidad }}</td>
+            <td>${{ detalle.producto.precio_san_mateo }}</td>
+            <td>${{ detalle.producto.precio_fuera }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

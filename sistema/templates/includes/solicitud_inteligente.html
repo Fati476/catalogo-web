@@ -1,0 +1,445 @@
+<div id="solicitudInteligente" class="solicitud-inteligente">
+
+    <div class="si-header">
+        <div>
+            <span class="si-icono">✨</span>
+            <strong>Solicitud Inteligente</strong>
+        </div>
+
+        <button type="button"
+                class="si-cerrar"
+                onclick="cerrarSolicitudInteligente()">
+            ×
+        </button>
+    </div>
+
+    <div class="si-body">
+
+        <p class="si-descripcion">
+            Describe lo que necesitas y te ayudaré a preparar
+            tu solicitud.
+        </p>
+
+        <textarea
+            id="siDescripcion"
+            class="si-textarea"
+            placeholder="Ejemplo: Necesito productos para una celebración de aproximadamente 30 personas y tengo un presupuesto de $1,500..."
+            rows="5"></textarea>
+
+        <div class="si-acciones">
+
+            <button type="button"
+                    id="siBtnVoz"
+                    class="si-btn si-btn-voz">
+                🎤 Hablar
+            </button>
+
+            <button type="button"
+                    id="siBtnCrear"
+                    class="si-btn si-btn-crear">
+                ✨ Crear solicitud
+            </button>
+
+        </div>
+
+        <div id="siEstado"
+             class="si-estado"
+             style="display: none;">
+        </div>
+
+        <div id="siRespuesta"
+             class="si-respuesta"
+             style="display: none;">
+
+            <div class="si-respuesta-titulo">
+                🤖 Solicitud Inteligente
+            </div>
+
+            <div id="siTextoRespuesta"></div>
+
+            <button type="button"
+                    id="siBtnEscuchar"
+                    class="si-btn si-btn-escuchar">
+                🔊 Escuchar
+            </button>
+
+        </div>
+
+    </div>
+</div>
+
+<button type="button"
+        id="btnAbrirSolicitudInteligente"
+        class="si-flotante"
+        onclick="abrirSolicitudInteligente()">
+    ✨
+</button>
+
+
+<style>
+
+.solicitud-inteligente {
+    position: fixed;
+    right: 25px;
+    bottom: 90px;
+    width: 390px;
+    max-width: calc(100vw - 30px);
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 15px 45px rgba(0,0,0,.20);
+    overflow: hidden;
+    z-index: 9998;
+    display: none;
+}
+
+.si-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 18px;
+    background: #171717;
+    color: white;
+}
+
+.si-header strong {
+    font-size: 16px;
+}
+
+.si-icono {
+    margin-right: 7px;
+}
+
+.si-cerrar {
+    border: none;
+    background: transparent;
+    color: white;
+    font-size: 25px;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.si-body {
+    padding: 20px;
+}
+
+.si-descripcion {
+    margin-bottom: 12px;
+    color: #555;
+    font-size: 14px;
+}
+
+.si-textarea {
+    width: 100%;
+    min-height: 120px;
+    resize: vertical;
+    border: 1px solid #ddd;
+    border-radius: 13px;
+    padding: 13px;
+    font-size: 14px;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.si-textarea:focus {
+    border-color: #C9A227;
+    box-shadow: 0 0 0 3px rgba(201,162,39,.12);
+}
+
+.si-acciones {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.si-btn {
+    border: none;
+    border-radius: 11px;
+    padding: 10px 13px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: .2s;
+}
+
+.si-btn:hover {
+    transform: translateY(-1px);
+}
+
+.si-btn-voz {
+    background: #f1f1f1;
+    color: #333;
+}
+
+.si-btn-crear {
+    flex: 1;
+    background: #C9A227;
+    color: white;
+}
+
+.si-btn-escuchar {
+    margin-top: 14px;
+    background: #f1f1f1;
+    color: #333;
+}
+
+.si-estado {
+    margin-top: 12px;
+    padding: 10px;
+    border-radius: 10px;
+    background: #f7f7f7;
+    font-size: 13px;
+    color: #555;
+}
+
+.si-respuesta {
+    margin-top: 16px;
+    padding: 14px;
+    background: #fafafa;
+    border-radius: 13px;
+    border: 1px solid #eee;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.si-respuesta-titulo {
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.si-flotante {
+    position: fixed;
+    right: 25px;
+    bottom: 25px;
+    width: 55px;
+    height: 55px;
+    border: none;
+    border-radius: 50%;
+    background: #C9A227;
+    color: white;
+    font-size: 22px;
+    cursor: pointer;
+    box-shadow: 0 8px 25px rgba(0,0,0,.20);
+    z-index: 9997;
+}
+
+@media (max-width: 576px) {
+
+    .solicitud-inteligente {
+        right: 15px;
+        bottom: 85px;
+    }
+
+    .si-acciones {
+        flex-direction: column;
+    }
+
+}
+
+</style>
+
+
+<script>
+
+function abrirSolicitudInteligente() {
+
+    const ventana = document.getElementById(
+        "solicitudInteligente"
+    );
+
+    const boton = document.getElementById(
+        "btnAbrirSolicitudInteligente"
+    );
+
+    ventana.style.display = "block";
+    boton.style.display = "none";
+}
+
+
+function cerrarSolicitudInteligente() {
+
+    const ventana = document.getElementById(
+        "solicitudInteligente"
+    );
+
+    const boton = document.getElementById(
+        "btnAbrirSolicitudInteligente"
+    );
+
+    ventana.style.display = "none";
+    boton.style.display = "block";
+}
+
+
+document.getElementById("siBtnCrear")
+    .addEventListener("click", async function () {
+
+        const textarea = document.getElementById(
+            "siDescripcion"
+        );
+
+        const estado = document.getElementById(
+            "siEstado"
+        );
+
+        const respuesta = document.getElementById(
+            "siRespuesta"
+        );
+
+        const textoRespuesta = document.getElementById(
+            "siTextoRespuesta"
+        );
+
+        const descripcion = textarea.value.trim();
+
+        if (!descripcion) {
+
+            estado.style.display = "block";
+            estado.textContent =
+                "Escribe o describe lo que necesitas.";
+
+            return;
+        }
+
+        estado.style.display = "block";
+        estado.textContent =
+            "✨ Analizando tu solicitud...";
+
+        respuesta.style.display = "none";
+
+        try {
+
+            const csrfToken = document.querySelector(
+                "[name=csrfmiddlewaretoken]"
+            )?.value;
+
+            const response = await fetch(
+                "{% url 'solicitud_inteligente' %}",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": csrfToken
+                    },
+
+                    body: JSON.stringify({
+                        descripcion: descripcion
+                    })
+                }
+            );
+
+            const data = await response.json();
+
+            if (!data.ok) {
+                throw new Error(
+                    data.error || "Ocurrió un error."
+                );
+            }
+
+            estado.style.display = "none";
+
+            respuesta.style.display = "block";
+
+            textoRespuesta.textContent =
+                data.resultado.mensaje ||
+                "He analizado tu solicitud.";
+
+        } catch (error) {
+
+            estado.style.display = "block";
+
+            estado.textContent =
+                "❌ " + error.message;
+        }
+
+    });
+
+
+document.getElementById("siBtnEscuchar")
+    .addEventListener("click", function () {
+
+        const texto = document.getElementById(
+            "siTextoRespuesta"
+        ).textContent;
+
+        if (!texto) return;
+
+        if ("speechSynthesis" in window) {
+
+            window.speechSynthesis.cancel();
+
+            const voz = new SpeechSynthesisUtterance(texto);
+
+            voz.lang = "es-MX";
+
+            window.speechSynthesis.speak(voz);
+        }
+
+    });
+
+
+function iniciarReconocimientoVoz() {
+
+    const SpeechRecognition =
+        window.SpeechRecognition ||
+        window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+
+        alert(
+            "Tu navegador no permite reconocimiento de voz."
+        );
+
+        return;
+    }
+
+    const reconocimiento =
+        new SpeechRecognition();
+
+    reconocimiento.lang = "es-MX";
+
+    reconocimiento.continuous = false;
+
+    reconocimiento.interimResults = false;
+
+    reconocimiento.onstart = function () {
+
+        document.getElementById(
+            "siBtnVoz"
+        ).textContent = "🎙️ Escuchando...";
+    };
+
+    reconocimiento.onresult = function (event) {
+
+        const texto =
+            event.results[0][0].transcript;
+
+        document.getElementById(
+            "siDescripcion"
+        ).value = texto;
+    };
+
+    reconocimiento.onerror = function () {
+
+        document.getElementById(
+            "siBtnVoz"
+        ).textContent = "🎤 Hablar";
+    };
+
+    reconocimiento.onend = function () {
+
+        document.getElementById(
+            "siBtnVoz"
+        ).textContent = "🎤 Hablar";
+    };
+
+    reconocimiento.start();
+}
+
+
+document.getElementById("siBtnVoz")
+    .addEventListener(
+        "click",
+        iniciarReconocimientoVoz
+    );
+
+</script>

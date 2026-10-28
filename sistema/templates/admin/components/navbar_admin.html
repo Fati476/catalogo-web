@@ -15,28 +15,30 @@
         <button class="navbar-toggler"
                 type="button"
                 data-bs-toggle="collapse"
-                data-bs-target="#menuAdmin">
+                data-bs-target="#menuAdmin"
+                aria-controls="menuAdmin"
+                aria-expanded="false"
+                aria-label="Abrir menú de navegación">
             <span class="navbar-toggler-icon"></span>
         </button>
 
         <div class="collapse navbar-collapse" id="menuAdmin">
 
-            <ul class="navbar-nav mx-auto gap-xl-2">
+            <ul class="navbar-nav mx-auto gap-xl-1">
 
                 <li class="nav-item">
                     <a class="nav-link {% if request.resolver_match.url_name == 'panel_admin' %}active{% endif %}"
                        href="{% url 'panel_admin' %}">
                         <i class="bi bi-house-door"></i>
-                        Inicio
+                        <span>Inicio</span>
                     </a>
                 </li>
-
 
                 <li class="nav-item">
                     <a class="nav-link {% if request.resolver_match.url_name == 'lista_productos' %}active{% endif %}"
                        href="{% url 'lista_productos' %}">
                         <i class="bi bi-box-seam"></i>
-                        Productos
+                        <span>Productos</span>
                     </a>
                 </li>
 
@@ -44,7 +46,7 @@
                     <a class="nav-link {% if request.resolver_match.url_name == 'lista_categorias' %}active{% endif %}"
                        href="{% url 'lista_categorias' %}">
                         <i class="bi bi-tags"></i>
-                        Categorías
+                        <span>Categorías</span>
                     </a>
                 </li>
 
@@ -52,7 +54,7 @@
                     <a class="nav-link {% if request.resolver_match.url_name == 'lista_solicitudes' %}active{% endif %}"
                        href="{% url 'lista_solicitudes' %}">
                         <i class="bi bi-file-earmark-text"></i>
-                        Cotizaciones
+                        <span>Cotizaciones</span>
                     </a>
                 </li>
 
@@ -60,16 +62,15 @@
                     <a class="nav-link {% if request.resolver_match.url_name == 'lista_usuarios' %}active{% endif %}"
                        href="{% url 'lista_usuarios' %}">
                         <i class="bi bi-people"></i>
-                        Usuarios
+                        <span>Usuarios</span>
                     </a>
                 </li>
-
 
                 <li class="nav-item">
                     <a class="nav-link {% if request.resolver_match.url_name == 'seguridad_admin' %}active{% endif %}"
                        href="{% url 'seguridad_admin' %}">
                         <i class="bi bi-shield-lock"></i>
-                        Seguridad
+                        <span>Seguridad</span>
                     </a>
                 </li>
 
@@ -77,26 +78,33 @@
                     <a class="nav-link {% if request.resolver_match.url_name == 'monitoreo_iot' %}active{% endif %}"
                        href="{% url 'monitoreo_iot' %}">
                         <i class="bi bi-cpu"></i>
-                        Monitoreo IoT
+                        <span>Monitoreo IoT</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"
+                       href="{% url 'dashboard' %}">
+                        <i class="bi bi-speedometer2"></i>
+                        <span>Dashboard</span>
                     </a>
                 </li>
 
             </ul>
 
-            <div class="dropdown ms-xl-4">
+            <div class="dropdown ms-xl-2">
 
                 <button class="btn-admin-user"
                         type="button"
-                        data-bs-toggle="dropdown">
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false">
 
                     <div class="avatar-admin">
                         {{ request.user.first_name|first|default:request.user.username|first|upper }}
                     </div>
 
                     <div class="user-info">
-                        <strong>
-                            {{ request.user.first_name|default:request.user.username }}
-                        </strong>
+                        <strong>{{ request.user.first_name|default:request.user.username }}</strong>
                         <small>Administrador</small>
                     </div>
 
