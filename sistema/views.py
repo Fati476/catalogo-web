@@ -1095,10 +1095,17 @@ def dashboard(request):
         fecha_fin = hasta.isoformat()
 
     # Solicitudes enviadas dentro del periodo seleccionado
+    desde_dt = timezone.make_aware(
+        datetime.combine(desde, datetime.min.time())
+    )
+    hasta_dt = timezone.make_aware(
+        datetime.combine(hasta + timedelta(days=1), datetime.min.time())
+    )
+
     solicitudes = SolicitudCotizacion.objects.filter(
         enviada=True,
-        fecha__date__gte=desde,
-        fecha__date__lte=hasta,
+        fecha__gte=desde_dt,
+        fecha__lt=hasta_dt,
     )
 
     if estado in ("revision", "cotizada", "rechazada"):
@@ -1225,8 +1232,8 @@ def dashboard(request):
         DetalleSolicitud.objects.filter(
             solicitud__enviada=True,
             solicitud__estado="cotizada",
-            solicitud__fecha__date__gte=desde,
-            solicitud__fecha__date__lte=hasta,
+            solicitud__fecha__gte=desde_dt,
+            solicitud__fecha__lt=hasta_dt,
             seleccionado=True,
         )
         .values("producto_id", "producto__nombre")
