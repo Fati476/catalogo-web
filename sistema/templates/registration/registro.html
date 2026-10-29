@@ -461,6 +461,10 @@ body{
                 <small id="especial" class="d-block">
                     ❌ Un carácter especial
                 </small>
+
+                <small class="d-block mt-2">
+                    Caracteres especiales permitidos: @ # $ ! % & * ? _ - .
+                </small>
             </div>
         </div>
 
@@ -603,7 +607,11 @@ function validarFormulario(){
     const tiene8 = password.length >= 8;
     const tieneMayuscula = /[A-Z]/.test(password);
     const tieneNumero = /[0-9]/.test(password);
-    const tieneEspecial = /[\W_]/.test(password);
+
+    const caracteresPermitidos = /^[A-Za-z0-9@#$!%&*?_.-]+$/;
+    const tieneCaracteresValidos = caracteresPermitidos.test(password);
+    const tieneEspecial = /[@#$!%&*?_.-]/.test(password);
+
     const coinciden = password === confirmacion && confirmacion.length > 0;
 
     caracteres.innerHTML = tiene8
@@ -636,7 +644,8 @@ function validarFormulario(){
         tiene8 &&
         tieneMayuscula &&
         tieneNumero &&
-        tieneEspecial
+        tieneEspecial &&
+        tieneCaracteresValidos
     );
 }
 
