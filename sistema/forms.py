@@ -1,4 +1,4 @@
-
+from django.contrib.staticfiles import finders
 from django.contrib.auth.forms import UserCreationForm, SetPasswordForm
 from django.contrib.auth.models import User
 from django import forms
@@ -102,19 +102,20 @@ class RegistroForm(UserCreationForm):
 
     @staticmethod
     def obtener_municipios():
-        ruta_json = (
-            Path(__file__).resolve().parent
-            / 'static'
-            / 'json'
-            / 'municipios.json'
-        )
+        ruta_json = finders.find('json/municipios.json')
+
+        if not ruta_json:
+            raise forms.ValidationError(
+                "No se encontró el archivo de estados y municipios."
+            )
 
         try:
-            with ruta_json.open(encoding='utf-8') as archivo:
+            with open(ruta_json, encoding='utf-8') as archivo:
                 return json.load(archivo)
+
         except (OSError, json.JSONDecodeError):
             raise forms.ValidationError(
-                "No fue posible validar los estados y municipios. Intenta más tarde."
+                "No fue posible leer el archivo de estados y municipios."
             )
 
     def clean_password1(self):
