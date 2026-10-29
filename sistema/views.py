@@ -1220,11 +1220,36 @@ def dashboard(request):
         ],
     }
 
-    # Productos más cotizados de todo el historial
+    # Productos más cotizados en el periodo seleccionado
     productos_mas_cotizados = list(
-        DetalleSolicitud.objects
-        .filter(
+        DetalleSolicitud.objects.filter(
             solicitud__enviada=True,
+            solicitud__estado="cotizada",
+            solicitud__fecha__date__gte=desde,
+            solicitud__fecha__date__lte=hasta,
+            seleccionado=True,
+        )
+        .values("producto_id", "producto__nombre")
+        .annotate(
+            total_solicitudes=Count(
+                "solicitud_id",
+                distinct=True,
+            ),
+            total_unidades=Sum("cantidad"),
+        )
+        .order_by(
+            "-total_solicitudes",
+            "-total_unidades",
+        )[:5]
+    )
+
+    # Productos más cotizados de la semana actual
+    productos_mas_cotizados_semana = list(
+        DetalleSolicitud.objects.filter(
+            solicitud__enviada=True,
+            solicitud__estado="cotizada",
+            solicitud__fecha__date__gte=inicio_semana,
+            solicitud__fecha__date__lte=hoy,
             seleccionado=True,
         )
         .values("producto_id", "producto__nombre")
@@ -1271,6 +1296,7 @@ def dashboard(request):
         "solicitudes_rechazadas": solicitudes_rechazadas,
 
         "productos_mas_cotizados": productos_mas_cotizados,
+        "productos_mas_cotizados_semana": productos_mas_cotizados_semana,
 
         "grafica_estados_json": grafica_estados,
         "grafica_meses_json": grafica_meses,
