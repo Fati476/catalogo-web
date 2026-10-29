@@ -606,6 +606,70 @@
         
         <section class="mb-5">
             <div class="dashboard-panel">
+                <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-3">
+                    <div>
+                        <h2 class="panel-title">
+                            <i class="bi bi-trophy-fill me-2" style="color:#C9A227;"></i>
+                            Top 5 de la semana
+                        </h2>
+                        <p class="panel-subtitle mb-0">
+                            Productos con más solicitudes cotizadas desde el lunes hasta hoy.
+                        </p>
+                    </div>
+
+                    <span class="status-pill"
+                          style="background:#F5E8B5;color:#8A6D12;">
+                        <i class="bi bi-calendar-week me-1"></i>
+                        Semana actual
+                    </span>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="dashboard-table">
+                        <thead>
+                            <tr>
+                                <th>Posición</th>
+                                <th>Producto</th>
+                                <th>Solicitudes cotizadas</th>
+                                <th>Unidades solicitadas</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for producto in productos_mas_cotizados_semana %}
+                            <tr>
+                                <td>
+                                    <span class="rank-number">{{ forloop.counter }}</span>
+                                </td>
+                                <td class="product-name">
+                                    {{ producto.producto__nombre }}
+                                </td>
+                                <td>{{ producto.total_solicitudes }}</td>
+                                <td>{{ producto.total_unidades|default_if_none:0 }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4">
+                                    <div class="empty-state">
+                                        <i class="bi bi-inbox"></i>
+                                        <strong>Aún no hay productos cotizados esta semana</strong>
+                                        <p class="mb-0 mt-2">
+                                            Cuando se coticen solicitudes, aparecerán aquí los productos más solicitados.
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+
+        
+        <section class="mb-5">
+            <div class="dashboard-panel">
                 <h2 class="panel-title">
                     <i class="bi bi-trophy me-2" style="color:#C9A227;"></i>
                     Productos más cotizados
