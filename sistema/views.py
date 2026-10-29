@@ -143,9 +143,9 @@ def registro(request):
 
             usuario.save()
 
-            municipio = request.POST.get('municipio')
-            estado = request.POST.get('estado')
-            telefono = request.POST.get('telefono')
+            municipio = form.cleaned_data['municipio']
+            estado = form.cleaned_data['estado']
+            telefono = form.cleaned_data['telefono']
 
             Perfil.objects.create(
                 usuario=usuario,
