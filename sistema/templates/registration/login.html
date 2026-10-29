@@ -332,7 +332,12 @@ body{
             Accede al catálogo de productos y cotizaciones.
         </p>
 
-        {% if form.errors %}
+        {% if failure_limit %}
+            <div class="mensaje">
+                Has superado los 5 intentos permitidos.
+                Por seguridad, espera 15 minutos antes de volver a intentarlo.
+            </div>
+        {% elif form.errors %}
             <div class="mensaje">
                 Usuario o contraseña incorrectos
             </div>

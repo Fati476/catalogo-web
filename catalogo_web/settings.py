@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'axes',
     'sistema.apps.SistemaConfig',
     'cloudinary',
     'cloudinary_storage',
@@ -66,9 +67,9 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'axes.middleware.AxesMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-
 ROOT_URLCONF = 'catalogo_web.urls'
 
 TEMPLATES = [
@@ -183,6 +184,7 @@ LOGOUT_REDIRECT_URL = '/accounts/login/'
 LOGIN_URL = '/accounts/login/'
 
 AUTHENTICATION_BACKENDS = [
+    'axes.backends.AxesStandaloneBackend',
     'sistema.authentication.EmailBackend',
     'django.contrib.auth.backends.ModelBackend',
 ]
@@ -205,3 +207,13 @@ IOT_HUMEDAD_MAX = 80
 # Correo que recibirá las alertas
 
 IOT_ALERT_EMAIL = "catalogowebempresa@gmail.com"
+
+
+from datetime import timedelta
+
+# Protección contra intentos fallidos de inicio de sesión
+AXES_FAILURE_LIMIT = 5
+AXES_COOLOFF_TIME = timedelta(minutes=15)
+AXES_LOCKOUT_PARAMETERS = [["username", "ip_address"]]
+AXES_RESET_ON_SUCCESS = True
+AXES_LOCKOUT_TEMPLATE = "registration/login.html"
