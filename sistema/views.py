@@ -1251,27 +1251,27 @@ def dashboard(request):
     )
 
     # Productos más cotizados de la semana actual
+    
+    inicio_semana_dt = timezone.make_aware(
+        datetime.combine(inicio_semana, datetime.min.time())
+    )
+    fin_semana_dt = timezone.make_aware(
+        datetime.combine(hoy + timedelta(days=1), datetime.min.time())
+    )
+
     productos_mas_cotizados_semana = list(
         DetalleSolicitud.objects.filter(
             solicitud__enviada=True,
             solicitud__estado="cotizada",
-            solicitud__fecha__date__gte=inicio_semana,
-            solicitud__fecha__date__lte=hoy,
+            solicitud__fecha__gte=inicio_semana_dt,
+            solicitud__fecha__lt=fin_semana_dt,
             seleccionado=True,
-        )
-        .values("producto_id", "producto__nombre")
-        .annotate(
-            total_solicitudes=Count(
-                "solicitud_id",
-                distinct=True,
-            ),
+        ).values("producto_id", "producto__nombre").annotate(
+            total_solicitudes=Count("solicitud_id", distinct=True),
             total_unidades=Sum("cantidad"),
-        )
-        .order_by(
-            "-total_solicitudes",
-            "-total_unidades",
-        )[:5]
+        ).order_by("-total_solicitudes", "-total_unidades")[:5]
     )
+
 
     grafica_productos = {
         "labels": [
