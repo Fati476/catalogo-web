@@ -1114,7 +1114,7 @@
 document.addEventListener("DOMContentLoaded", function () {
 
     // ==========================================
-    // 1. LEER DATOS ENVIADOS DESDE DJANGO
+    // 1. LEER DATOS DE DJANGO
     // ==========================================
 
     function obtenerDatos(id) {
@@ -1151,10 +1151,15 @@ document.addEventListener("DOMContentLoaded", function () {
     Chart.defaults.color = "#6B7280";
 
     // ==========================================
-    // 3. CREAR GRÁFICAS
+    // 3. ALMACENAR LAS GRÁFICAS
     // ==========================================
 
     const graficas = {};
+    const configuracionesOriginales = {};
+
+    function copiarConfiguracion(configuracion) {
+        return JSON.parse(JSON.stringify(configuracion));
+    }
 
     function crearGrafica(idCanvas, datos, configuracion) {
         const canvas = document.getElementById(idCanvas);
@@ -1175,6 +1180,9 @@ document.addEventListener("DOMContentLoaded", function () {
             if (existente) {
                 existente.destroy();
             }
+
+            configuracionesOriginales[idCanvas] =
+                copiarConfiguracion(configuracion);
 
             const grafica = new Chart(canvas, configuracion);
 
@@ -1227,7 +1235,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 animation: {
                     animateRotate: true,
                     animateScale: true,
-                    duration: 1000
+                    duration: 700
                 },
 
                 interaction: {
@@ -1247,11 +1255,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     tooltip: {
                         enabled: true
                     }
-                },
-
-                onHover: function (evento, elementos) {
-                    evento.native.target.style.cursor =
-                        elementos.length ? "pointer" : "default";
                 }
             }
         });
@@ -1296,7 +1299,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 maintainAspectRatio: false,
 
                 animation: {
-                    duration: 1000,
+                    duration: 700,
                     easing: "easeOutQuart"
                 },
 
@@ -1308,7 +1311,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 scales: {
                     y: {
                         beginAtZero: true,
-
                         ticks: {
                             precision: 0
                         }
@@ -1329,11 +1331,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     tooltip: {
                         enabled: true
                     }
-                },
-
-                onHover: function (evento, elementos) {
-                    evento.native.target.style.cursor =
-                        elementos.length ? "pointer" : "default";
                 }
             }
         });
@@ -1371,8 +1368,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 maintainAspectRatio: false,
 
                 animation: {
-                    duration: 900,
-                    easing: "easeOutBounce"
+                    duration: 700,
+                    easing: "easeOutQuart"
                 },
 
                 interaction: {
@@ -1383,7 +1380,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 scales: {
                     x: {
                         beginAtZero: true,
-
                         ticks: {
                             precision: 0
                         }
@@ -1400,11 +1396,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     legend: {
                         display: false
                     }
-                },
-
-                onHover: function (evento, elementos) {
-                    evento.native.target.style.cursor =
-                        elementos.length ? "pointer" : "default";
                 }
             }
         });
@@ -1453,7 +1444,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 maintainAspectRatio: false,
 
                 animation: {
-                    duration: 900,
+                    duration: 700,
                     easing: "easeOutQuart"
                 },
 
@@ -1465,7 +1456,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 scales: {
                     x: {
                         beginAtZero: true,
-
                         ticks: {
                             precision: 0
                         }
@@ -1487,11 +1477,6 @@ document.addEventListener("DOMContentLoaded", function () {
                             padding: 18
                         }
                     }
-                },
-
-                onHover: function (evento, elementos) {
-                    evento.native.target.style.cursor =
-                        elementos.length ? "pointer" : "default";
                 }
             }
         });
@@ -1587,7 +1572,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // ==========================================
-    // 11. GENERAR EXPLICACIONES DE LAS GRÁFICAS
+    // 11. GENERAR EXPLICACIONES
     // ==========================================
 
     function generarAnalisis(id, grafica, indice, conjunto) {
@@ -1610,7 +1595,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
         let texto = "";
 
-        // Solicitudes por estado
         if (id === "graficaEstados") {
 
             const valores = grafica.data.datasets[0].data.map(Number);
@@ -1622,7 +1606,6 @@ document.addEventListener("DOMContentLoaded", function () {
             texto = `En las solicitudes por estado, ${etiqueta} registra ${valor} solicitudes, representando el ${porcentaje} por ciento del total. El estado con mayor cantidad es ${estadoMayor}, con ${mayor} solicitudes.`;
         }
 
-        // Solicitudes por mes
         else if (id === "graficaMeses") {
 
             const valores = grafica.data.datasets[0].data.map(Number);
@@ -1634,7 +1617,6 @@ document.addEventListener("DOMContentLoaded", function () {
             texto = `En el mes de ${etiqueta} se registraron ${valor} solicitudes. El mes con mayor actividad es ${mesMayor}, con ${mayor} solicitudes.`;
         }
 
-        // Productos por categoría
         else if (id === "graficaCategorias") {
 
             const valores = grafica.data.datasets[0].data.map(Number);
@@ -1646,7 +1628,6 @@ document.addEventListener("DOMContentLoaded", function () {
             texto = `La categoría ${etiqueta} cuenta con ${valor} productos registrados. La categoría con más productos es ${categoriaMayor}, con ${mayor} productos.`;
         }
 
-        // Productos más cotizados
         else if (id === "graficaProductos") {
 
             texto = `${etiqueta}. ${nombreDataset}: ${valor}.`;
@@ -1668,7 +1649,158 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // ==========================================
-    // 12. INTERACCIÓN CON EL CURSOR
+    // 12. TIPOS ALTERNATIVOS DE GRÁFICAS
+    // ==========================================
+
+    const tiposPorGrafica = {
+        graficaEstados: ["doughnut", "pie", "polarArea"],
+        graficaMeses: ["line", "bar"],
+        graficaCategorias: ["bar", "doughnut", "pie"],
+        graficaProductos: ["bar", "line"]
+    };
+
+    const indicesTipos = {};
+    const movimientosMouse = {};
+    const tiemposCambio = {};
+
+    function crearConfiguracionAlternativa(id, tipo) {
+
+        const configuracion = copiarConfiguracion(
+            configuracionesOriginales[id]
+        );
+
+        configuracion.type = tipo;
+
+        // Gráficas circulares
+        if (["doughnut", "pie", "polarArea"].includes(tipo)) {
+
+            configuracion.options = configuracion.options || {};
+
+            delete configuracion.options.scales;
+            delete configuracion.options.indexAxis;
+
+            if (tipo === "doughnut") {
+                configuracion.options.cutout = "60%";
+            } else {
+                delete configuracion.options.cutout;
+            }
+
+            configuracion.data.datasets.forEach(dataset => {
+                dataset.backgroundColor = [
+                    "#C9A227",
+                    "#171717",
+                    "#D6B957",
+                    "#6B7280",
+                    "#A88A2A",
+                    "#374151",
+                    "#E6C75A"
+                ];
+
+                dataset.borderColor = "#FFFFFF";
+                dataset.borderWidth = 3;
+            });
+        }
+
+        // Gráficas de barras
+        if (tipo === "bar") {
+
+            configuracion.options = configuracion.options || {};
+
+            if (id === "graficaCategorias" || id === "graficaProductos") {
+                configuracion.options.indexAxis = "y";
+            } else {
+                configuracion.options.indexAxis = "x";
+            }
+
+            configuracion.options.scales = {
+                x: {
+                    beginAtZero: true,
+                    ticks: { precision: 0 }
+                },
+
+                y: {
+                    beginAtZero: true,
+                    ticks: { precision: 0 },
+                    grid: { display: false }
+                }
+            };
+
+            configuracion.data.datasets.forEach(dataset => {
+                dataset.borderRadius = 8;
+            });
+        }
+
+        // Gráficas de líneas
+        if (tipo === "line") {
+
+            configuracion.options = configuracion.options || {};
+
+            delete configuracion.options.indexAxis;
+
+            configuracion.options.scales = {
+                y: {
+                    beginAtZero: true,
+                    ticks: { precision: 0 }
+                },
+
+                x: {
+                    grid: { display: false }
+                }
+            };
+
+            configuracion.data.datasets.forEach((dataset, indice) => {
+
+                dataset.borderColor = indice === 0
+                    ? "#C9A227"
+                    : "#374151";
+
+                dataset.backgroundColor = indice === 0
+                    ? "rgba(201, 162, 39, 0.15)"
+                    : "rgba(55, 65, 81, 0.12)";
+
+                dataset.fill = false;
+                dataset.tension = 0.4;
+                dataset.pointRadius = 5;
+            });
+        }
+
+        return configuracion;
+    }
+
+    function cambiarTipoGrafica(id, tipo) {
+
+        const canvas = document.getElementById(id);
+
+        if (!canvas) return;
+
+        const graficaActual = Chart.getChart(canvas);
+
+        if (graficaActual) {
+            graficaActual.destroy();
+        }
+
+        const configuracion = crearConfiguracionAlternativa(id, tipo);
+
+        try {
+            graficas[id] = new Chart(canvas, configuracion);
+        } catch (error) {
+            console.error("No se pudo cambiar el tipo de gráfica:", error);
+        }
+    }
+
+    function restaurarGrafica(id) {
+
+        const tipos = tiposPorGrafica[id];
+
+        if (!tipos) return;
+
+        indicesTipos[id] = 0;
+
+        cambiarTipoGrafica(id, tipos[0]);
+    }
+
+    // ==========================================
+    // 13. INTERACCIÓN CON EL CURSOR
     // ==========================================
 
     let ultimoDato = "";
@@ -1680,13 +1812,65 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (!canvas) return;
 
+        const tipos = tiposPorGrafica[id];
+
+        indicesTipos[id] = 0;
+        tiemposCambio[id] = 0;
+
+        movimientosMouse[id] = {
+            x: null,
+            y: null
+        };
+
         canvas.addEventListener("mouseenter", function () {
+
             clearTimeout(temporizadorSalida);
+
             panelResultados.classList.add("visible");
+
+            movimientosMouse[id] = {
+                x: null,
+                y: null
+            };
         });
 
         canvas.addEventListener("mousemove", function (evento) {
 
+            // Cambiar el tipo mientras se mueve el mouse
+            const posicionAnterior = movimientosMouse[id];
+
+            if (posicionAnterior.x !== null) {
+
+                const distancia = Math.hypot(
+                    evento.clientX - posicionAnterior.x,
+                    evento.clientY - posicionAnterior.y
+                );
+
+                const ahora = Date.now();
+
+                if (
+                    distancia > 8 &&
+                    ahora - tiemposCambio[id] > 700
+                ) {
+
+                    indicesTipos[id] =
+                        (indicesTipos[id] + 1) % tipos.length;
+
+                    cambiarTipoGrafica(
+                        id,
+                        tipos[indicesTipos[id]]
+                    );
+
+                    tiemposCambio[id] = ahora;
+                }
+            }
+
+            movimientosMouse[id] = {
+                x: evento.clientX,
+                y: evento.clientY
+            };
+
+            // Mantener el análisis y la voz
             const grafica = Chart.getChart(canvas);
 
             if (!grafica) return;
@@ -1726,9 +1910,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             textoResultado.innerHTML = `
                 <strong>${resultado.titulo}</strong><br>
-
                 ${resultado.conjunto}: ${resultado.valor}<br>
-
                 Participación: ${resultado.porcentaje}%
             `;
 
@@ -1741,18 +1923,28 @@ document.addEventListener("DOMContentLoaded", function () {
 
             ultimoDato = "";
 
+            // Regresar a la gráfica original
+            restaurarGrafica(id);
+
+            movimientosMouse[id] = {
+                x: null,
+                y: null
+            };
+
             temporizadorSalida = setTimeout(function () {
+
                 panelResultados.classList.remove("visible");
 
                 if ("speechSynthesis" in window) {
                     window.speechSynthesis.cancel();
                 }
+
             }, 180);
         });
     }
 
     // ==========================================
-    // 13. ACTIVAR INTERACCIÓN EN LAS CUATRO
+    // 14. ACTIVAR LAS CUATRO GRÁFICAS
     // ==========================================
 
     [
