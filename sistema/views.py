@@ -7465,6 +7465,58 @@ def monitoreo_iot(request):
     )
 
 
+@csrf_exempt
+def recibir_medicion_iot(request):
+    # Solo se permiten peticiones POST
+    if request.method != 'POST':
+        return JsonResponse(
+            {'error': 'Método no permitido'},
+            status=405
+        )
+
+    # Validar el token secreto del dispositivo
+    token = request.headers.get('X-IOT-TOKEN')
+
+    if not settings.IOT_API_TOKEN or token != settings.IOT_API_TOKEN:
+        return JsonResponse(
+            {'error': 'No autorizado'},
+            status=401
+        )
+
+    try:
+        # Obtener los datos enviados por el ESP32
+        datos = json.loads(request.body)
+
+        temperatura = float(datos['temperatura'])
+        humedad = float(datos['humedad'])
+
+        # Validar los valores recibidos
+        if not (-40 <= temperatura <= 80 and 0 <= humedad <= 100):
+            return JsonResponse(
+                {'error': 'Valores fuera de rango'},
+                status=400
+            )
+
+        # Guardar la medición en la base de datos
+        medicion = MedicionIoT.objects.create(
+            dispositivo=datos.get(
+                'dispositivo',
+                'ESP32 - DHT22'
+            ),
+            temperatura=temperatura,
+            humedad=humedad
+        )
+
+        return JsonResponse({
+            'mensaje': 'Medición guardada correctamente',
+            'id': medicion.id
+        }, status=201)
+
+    except (ValueError, KeyError, json.JSONDecodeError):
+        return JsonResponse(
+            {'error': 'Datos inválidos'},
+            status=400
+        )
 
 from django.core.mail import EmailMultiAlternatives
 from django.utils.html import escape

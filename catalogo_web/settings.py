@@ -217,3 +217,6 @@ AXES_COOLOFF_TIME = timedelta(minutes=15)
 AXES_LOCKOUT_PARAMETERS = [["username", "ip_address"]]
 AXES_RESET_ON_SUCCESS = True
 AXES_LOCKOUT_TEMPLATE = "registration/login.html"
+
+
+IOT_API_TOKEN = os.environ.get('IOT_API_TOKEN', '')
