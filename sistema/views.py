@@ -7289,6 +7289,7 @@ def registrar_actividad(usuario, accion, descripcion):
 
 
 
+
 @csrf_exempt
 def recibir_medicion_iot(request):
     if request.method != 'POST':
@@ -7297,17 +7298,27 @@ def recibir_medicion_iot(request):
             status=405
         )
 
+    # Validar el token secreto del dispositivo
+    token = request.headers.get('X-IOT-TOKEN')
+
+    if not settings.IOT_API_TOKEN or token != settings.IOT_API_TOKEN:
+        return JsonResponse(
+            {'error': 'No autorizado'},
+            status=401
+        )
+
     try:
         datos = json.loads(request.body)
 
         dispositivo = datos.get(
             'dispositivo',
-            'Sensor IoT de demostración'
+            'ESP32 - DHT22'
         )
         temperatura = float(datos['temperatura'])
         humedad = float(datos['humedad'])
 
-        if not (-40 <= temperatura <= 100):
+        # Validar los valores recibidos
+        if not (-40 <= temperatura <= 80):
             return JsonResponse(
                 {'error': 'Temperatura fuera de rango'},
                 status=400
@@ -7319,7 +7330,7 @@ def recibir_medicion_iot(request):
                 status=400
             )
 
-        # Guardar la medición recibida
+        # Guardar la medición
         medicion = MedicionIoT.objects.create(
             dispositivo=dispositivo,
             temperatura=temperatura,
@@ -7328,16 +7339,16 @@ def recibir_medicion_iot(request):
 
         alertas = []
 
-        # Solo la temperatura crítica genera correo.
-        # Este umbral es únicamente para pruebas.
+        # Revisar temperatura crítica
         temperatura_critica = settings.IOT_TEMPERATURA_CRITICA
         clave_alerta = f'iot_alerta_critica_{dispositivo}'
 
         if temperatura >= temperatura_critica:
             alertas.append('Temperatura crítica')
 
-            # Evitar repetir el correo mientras la alerta siga activa
+            # Evitar correos repetidos mientras siga activa la alerta
             if not cache.get(clave_alerta, False):
+
                 asunto = (
                     f'ALERTA CRÍTICA DE TEMPERATURA - {dispositivo}'
                 )
@@ -7412,11 +7423,10 @@ def recibir_medicion_iot(request):
                 )
 
                 if enviado:
-                    # La alerta no se repite mientras siga activa.
                     cache.set(clave_alerta, True, timeout=None)
 
         else:
-            # Permitir una nueva alerta si vuelve a ser crítica
+            # Reactivar la posibilidad de enviar otra alerta
             cache.delete(clave_alerta)
 
         return JsonResponse({
@@ -7434,6 +7444,7 @@ def recibir_medicion_iot(request):
             {'error': 'Los datos enviados no son válidos'},
             status=400
         )
+
 
 
 
@@ -7465,58 +7476,35 @@ def monitoreo_iot(request):
     )
 
 
-@csrf_exempt
-def recibir_medicion_iot(request):
-    # Solo se permiten peticiones POST
-    if request.method != 'POST':
-        return JsonResponse(
-            {'error': 'Método no permitido'},
-            status=405
-        )
 
-    # Validar el token secreto del dispositivo
-    token = request.headers.get('X-IOT-TOKEN')
-
-    if not settings.IOT_API_TOKEN or token != settings.IOT_API_TOKEN:
+@login_required
+def consultar_mediciones_iot(request):
+    if not request.user.groups.filter(name='Administrador').exists():
         return JsonResponse(
             {'error': 'No autorizado'},
-            status=401
+            status=403
         )
 
-    try:
-        # Obtener los datos enviados por el ESP32
-        datos = json.loads(request.body)
+    mediciones = MedicionIoT.objects.all()[:20]
 
-        temperatura = float(datos['temperatura'])
-        humedad = float(datos['humedad'])
+    datos = []
 
-        # Validar los valores recibidos
-        if not (-40 <= temperatura <= 80 and 0 <= humedad <= 100):
-            return JsonResponse(
-                {'error': 'Valores fuera de rango'},
-                status=400
-            )
+    for medicion in mediciones:
+        datos.append({
+            'id': medicion.id,
+            'dispositivo': medicion.dispositivo,
+            'temperatura': medicion.temperatura,
+            'humedad': medicion.humedad,
+            'fecha': medicion.fecha.strftime('%d/%m/%Y %H:%M:%S'),
+            'fecha_iso': medicion.fecha.isoformat(),
+        })
 
-        # Guardar la medición en la base de datos
-        medicion = MedicionIoT.objects.create(
-            dispositivo=datos.get(
-                'dispositivo',
-                'ESP32 - DHT22'
-            ),
-            temperatura=temperatura,
-            humedad=humedad
-        )
+    return JsonResponse({
+        'mediciones': datos,
+        'total_mediciones': MedicionIoT.objects.count(),
+    })
 
-        return JsonResponse({
-            'mensaje': 'Medición guardada correctamente',
-            'id': medicion.id
-        }, status=201)
 
-    except (ValueError, KeyError, json.JSONDecodeError):
-        return JsonResponse(
-            {'error': 'Datos inválidos'},
-            status=400
-        )
 
 from django.core.mail import EmailMultiAlternatives
 from django.utils.html import escape

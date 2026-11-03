@@ -112,7 +112,7 @@
             margin-bottom: 6px;
         }
 
-        /* TARJETAS DE RESUMEN */
+        /* TARJETAS */
         .iot-stat-card {
             position: relative;
             overflow: hidden;
@@ -197,7 +197,7 @@
             transform: translateY(-2px);
         }
 
-        /* TARJETAS DE RANGOS */
+        /* TARJETAS Y GRÁFICAS */
         .iot-range-card {
             background: white;
             border-radius: 22px;
@@ -237,7 +237,7 @@
             border-top: 5px solid #EF4444;
         }
 
-        /* ETIQUETAS DE ESTADO */
+        /* ESTADOS */
         .iot-status {
             display: inline-flex;
             align-items: center;
@@ -395,19 +395,28 @@
                 </p>
             </div>
 
-            <button type="button" class="iot-refresh"
-                    onclick="location.reload()">
-                <i class="bi bi-arrow-clockwise me-2"></i>
-                Actualizar datos
-            </button>
+            <div class="d-flex flex-wrap align-items-center gap-3">
+                <span class="iot-badge" id="iot-connection-status">
+                    <i class="bi bi-arrow-repeat me-1"></i>
+                    Consultando dispositivo...
+                </span>
+
+                <button type="button" class="iot-refresh" id="iot-refresh-button">
+                    <i class="bi bi-arrow-clockwise me-2"></i>
+                    Actualizar datos
+                </button>
+            </div>
         </div>
 
         <!-- AVISO -->
         <div class="iot-notice">
-            <i class="bi bi-info-circle-fill me-2"></i>
-            <strong>Prototipo de demostración:</strong>
-            las mediciones son simuladas y no provienen de sensores físicos.
-            Los límites mostrados no representan umbrales de seguridad reales.
+            <i class="bi bi-cpu-fill me-2"></i>
+            <strong>Sensor físico conectado:</strong>
+            las mediciones se reciben desde un ESP32 con sensor DHT22
+            y se almacenan en la base de datos. El panel consulta nuevos
+            registros automáticamente. Los rangos son referencias
+            configuradas en el sistema y no sustituyen equipos ni
+            procedimientos de seguridad.
         </div>
 
         <!-- TARJETAS DE RESUMEN -->
@@ -419,7 +428,7 @@
                         <i class="bi bi-activity"></i>
                     </div>
                     <div class="stat-label">Total de mediciones</div>
-                    <h2>{{ total_mediciones }}</h2>
+                    <h2 id="iot-total-mediciones">{{ total_mediciones }}</h2>
                     <small>Registros almacenados en la base de datos</small>
                 </div>
             </div>
@@ -430,7 +439,7 @@
                         <i class="bi bi-thermometer-half"></i>
                     </div>
                     <div class="stat-label">Última temperatura</div>
-                    <h2>
+                    <h2 id="iot-ultima-temperatura">
                         {% if ultima_medicion %}
                             {{ ultima_medicion.temperatura|floatformat:1 }} °C
                         {% else %}
@@ -447,7 +456,7 @@
                         <i class="bi bi-droplet-half"></i>
                     </div>
                     <div class="stat-label">Última humedad</div>
-                    <h2>
+                    <h2 id="iot-ultima-humedad">
                         {% if ultima_medicion %}
                             {{ ultima_medicion.humedad|floatformat:1 }} %
                         {% else %}
@@ -458,6 +467,47 @@
                 </div>
             </div>
 
+        </section>
+
+        <p class="text-muted small mb-4" id="iot-ultima-actualizacion">
+            Última medición registrada:
+            {% if ultima_medicion %}
+                {{ ultima_medicion.fecha|date:"d/m/Y H:i:s" }}
+            {% else %}
+                Sin mediciones
+            {% endif %}
+        </p>
+
+        <!-- GRÁFICAS -->
+        <section class="mb-5">
+            <div class="mb-3">
+                <h2 class="iot-content-title">Comportamiento de las mediciones</h2>
+                <p class="text-muted mb-0">
+                    Evolución de temperatura y humedad en los últimos registros.
+                </p>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-lg-6">
+                    <div class="iot-range-card">
+                        <h5>
+                            <i class="bi bi-thermometer-half me-2" style="color:#B8860B;"></i>
+                            Temperatura (°C)
+                        </h5>
+                        <canvas id="iot-chart-temperatura" height="150"></canvas>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="iot-range-card">
+                        <h5>
+                            <i class="bi bi-droplet-half me-2" style="color:#B8860B;"></i>
+                            Humedad (%)
+                        </h5>
+                        <canvas id="iot-chart-humedad" height="150"></canvas>
+                    </div>
+                </div>
+            </div>
         </section>
 
         <!-- RANGOS E INDICADORES -->
@@ -571,7 +621,6 @@
 
             <div class="table-responsive">
                 <table class="table table-hover iot-table">
-
                     <thead>
                         <tr>
                             <th>Dispositivo</th>
@@ -582,13 +631,12 @@
                         </tr>
                     </thead>
 
-                    <tbody>
+                    <tbody id="iot-historial-body">
 
                         {% for medicion in mediciones %}
                         <tr>
                             <td>
-                                <i class="bi bi-cpu me-2"
-                                   style="color: #B8860B;"></i>
+                                <i class="bi bi-cpu me-2" style="color:#B8860B;"></i>
                                 {{ medicion.dispositivo }}
                             </td>
 
@@ -653,11 +701,9 @@
                         <tr>
                             <td colspan="5" class="text-center py-5">
                                 <i class="bi bi-inbox fs-1 d-block mb-3 text-muted"></i>
-
                                 <strong>Aún no hay mediciones registradas</strong>
-
                                 <p class="text-muted mt-2 mb-0">
-                                    Cuando el simulador envíe datos,
+                                    Cuando el ESP32 envíe mediciones,
                                     aparecerán en este historial.
                                 </p>
                             </td>
@@ -679,6 +725,326 @@
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+        const endpoint = "{% url 'consultar_mediciones_iot' %}";
+
+        const temperaturaMin = Number("{{ temperatura_min|escapejs }}");
+        const temperaturaMax = Number("{{ temperatura_max|escapejs }}");
+        const temperaturaCritica = Number("{{ temperatura_critica|escapejs }}");
+        const humedadMin = Number("{{ humedad_min|escapejs }}");
+        const humedadMax = Number("{{ humedad_max|escapejs }}");
+
+        const statusEl = document.getElementById('iot-connection-status');
+        const totalEl = document.getElementById('iot-total-mediciones');
+        const temperaturaEl = document.getElementById('iot-ultima-temperatura');
+        const humedadEl = document.getElementById('iot-ultima-humedad');
+        const ultimaActualizacionEl = document.getElementById('iot-ultima-actualizacion');
+        const historialBody = document.getElementById('iot-historial-body');
+        const refreshButton = document.getElementById('iot-refresh-button');
+
+        // Evitar insertar contenido HTML recibido directamente
+        const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, char => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        }[char]));
+
+        function estadoTemperatura(t) {
+            if (t >= temperaturaCritica) return 'critical';
+            if (t < temperaturaMin || t > temperaturaMax) return 'warning';
+            return 'normal';
+        }
+
+        function estadoMedicion(m) {
+            if (m.temperatura >= temperaturaCritica) return 'critical';
+
+            if (
+                m.temperatura < temperaturaMin ||
+                m.temperatura > temperaturaMax ||
+                m.humedad < humedadMin ||
+                m.humedad > humedadMax
+            ) {
+                return 'warning';
+            }
+
+            return 'normal';
+        }
+
+        function badge(tipo, icono, texto) {
+            const clases = {
+                normal: 'iot-status iot-status-normal',
+                warning: 'iot-status iot-status-warning',
+                critical: 'iot-status iot-status-critical'
+            };
+
+            return `<span class="${clases[tipo]}">
+                <i class="bi ${icono}"></i>
+                ${texto}
+            </span>`;
+        }
+
+        // Configuración de las gráficas
+        function opcionesGrafica(etiqueta) {
+            return {
+                responsive: true,
+                maintainAspectRatio: true,
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: {
+                            maxRotation: 0,
+                            autoSkip: true,
+                            maxTicksLimit: 7
+                        }
+                    },
+                    y: {
+                        beginAtZero: false,
+                        title: {
+                            display: true,
+                            text: etiqueta
+                        }
+                    }
+                }
+            };
+        }
+
+        // Gráfica de temperatura
+        const temperaturaChart = new Chart(
+            document.getElementById('iot-chart-temperatura'),
+            {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Temperatura',
+                        data: [],
+                        borderColor: '#C9A227',
+                        backgroundColor: 'rgba(201,162,39,.15)',
+                        fill: true,
+                        tension: .3
+                    }]
+                },
+                options: opcionesGrafica('Temperatura (°C)')
+            }
+        );
+
+        // Gráfica de humedad
+        const humedadChart = new Chart(
+            document.getElementById('iot-chart-humedad'),
+            {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Humedad',
+                        data: [],
+                        borderColor: '#2697C7',
+                        backgroundColor: 'rgba(38,151,199,.13)',
+                        fill: true,
+                        tension: .3
+                    }]
+                },
+                options: opcionesGrafica('Humedad (%)')
+            }
+        );
+
+        // Actualizar las filas del historial
+        function pintarHistorial(mediciones) {
+
+            if (!mediciones.length) {
+                historialBody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="text-center py-5">
+                            <i class="bi bi-inbox fs-1 d-block mb-3 text-muted"></i>
+                            <strong>Aún no hay mediciones registradas</strong>
+                            <p class="text-muted mt-2 mb-0">
+                                Cuando el ESP32 envíe mediciones, aparecerán aquí.
+                            </p>
+                        </td>
+                    </tr>`;
+                return;
+            }
+
+            historialBody.innerHTML = mediciones.map(m => {
+
+                const t = Number(m.temperatura);
+                const h = Number(m.humedad);
+
+                const estadoT = estadoTemperatura(t);
+                const estadoH =
+                    (h < humedadMin || h > humedadMax) ? 'warning' : 'normal';
+
+                const estado = estadoMedicion({
+                    temperatura: t,
+                    humedad: h
+                });
+
+                const iconoT = estadoT === 'critical'
+                    ? 'bi-thermometer-high'
+                    : 'bi-thermometer-half';
+
+                const iconoEstado =
+                    estado === 'critical'
+                        ? 'bi-exclamation-octagon-fill'
+                        : estado === 'warning'
+                            ? 'bi-exclamation-triangle-fill'
+                            : 'bi-check-circle-fill';
+
+                const textoEstado =
+                    estado === 'critical'
+                        ? 'CRÍTICO'
+                        : estado === 'warning'
+                            ? 'ADVERTENCIA'
+                            : 'NORMAL';
+
+                return `
+                    <tr>
+                        <td>
+                            <i class="bi bi-cpu me-2" style="color:#B8860B;"></i>
+                            ${escapeHtml(m.dispositivo)}
+                        </td>
+
+                        <td>
+                            ${badge(estadoT, iconoT, `${t.toFixed(1)} °C`)}
+                        </td>
+
+                        <td>
+                            ${badge(estadoH, 'bi-droplet-half', `${h.toFixed(1)} %`)}
+                        </td>
+
+                        <td>
+                            ${badge(estado, iconoEstado, textoEstado)}
+                        </td>
+
+                        <td>${escapeHtml(m.fecha)}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Consultar los datos nuevos en Django
+        async function actualizarMediciones() {
+
+            try {
+                const response = await fetch(endpoint, {
+                    method: 'GET',
+                    credentials: 'same-origin',
+                    cache: 'no-store',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Error HTTP ${response.status}`);
+                }
+
+                const resultado = await response.json();
+                const mediciones = resultado.mediciones || [];
+
+                // Actualizar total de registros
+                totalEl.textContent = resultado.total_mediciones ?? 0;
+
+                // Actualizar historial
+                pintarHistorial(mediciones);
+
+                if (mediciones.length > 0) {
+
+                    const ultima = mediciones[0];
+
+                    // Actualizar tarjetas
+                    temperaturaEl.textContent =
+                        `${Number(ultima.temperatura).toFixed(1)} °C`;
+
+                    humedadEl.textContent =
+                        `${Number(ultima.humedad).toFixed(1)} %`;
+
+                    ultimaActualizacionEl.textContent =
+                        `Última medición registrada: ${ultima.fecha}`;
+
+                    // Ordenar registros para las gráficas
+                    const ordenadas = [...mediciones].reverse();
+
+                    const etiquetas = ordenadas.map(m => {
+
+                        const fecha = new Date(m.fecha_iso);
+
+                        return Number.isNaN(fecha.getTime())
+                            ? m.fecha
+                            : fecha.toLocaleTimeString('es-MX', {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                second: '2-digit'
+                            });
+                    });
+
+                    // Actualizar gráfica de temperatura
+                    temperaturaChart.data.labels = etiquetas;
+
+                    temperaturaChart.data.datasets[0].data =
+                        ordenadas.map(m => Number(m.temperatura));
+
+                    temperaturaChart.update();
+
+                    // Actualizar gráfica de humedad
+                    humedadChart.data.labels = etiquetas;
+
+                    humedadChart.data.datasets[0].data =
+                        ordenadas.map(m => Number(m.humedad));
+
+                    humedadChart.update();
+                }
+
+                statusEl.innerHTML = `
+                    <i class="bi bi-check-circle-fill text-success me-1"></i>
+                    Actualizado automáticamente
+                `;
+
+            } catch (error) {
+
+                console.error(
+                    'Error al consultar mediciones IoT:',
+                    error
+                );
+
+                statusEl.innerHTML = `
+                    <i class="bi bi-exclamation-triangle-fill text-danger me-1"></i>
+                    Sin actualización
+                `;
+            }
+        }
+
+        // Botón de actualización manual
+        refreshButton.addEventListener(
+            'click',
+            actualizarMediciones
+        );
+
+        // Primera consulta al abrir el panel
+        actualizarMediciones();
+
+        // Consultar cada 15 segundos
+        setInterval(
+            actualizarMediciones,
+            15000
+        );
+
+    });
+    </script>
 
 </body>
 </html>

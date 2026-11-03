@@ -349,6 +349,13 @@ urlpatterns = [
         views.recibir_medicion_iot,
         name='recibir_medicion_iot'
     ),
+
+    path(
+        'api/iot/mediciones/ultimas/',
+        views.consultar_mediciones_iot,
+        name='consultar_mediciones_iot'
+    ),
+
     path(
         "api/notificaciones/cotizaciones/",
         views.api_notificaciones_cotizaciones,
