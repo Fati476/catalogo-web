@@ -7477,6 +7477,7 @@ def monitoreo_iot(request):
 
 
 
+
 @login_required
 def consultar_mediciones_iot(request):
     if not request.user.groups.filter(name='Administrador').exists():
@@ -7490,19 +7491,22 @@ def consultar_mediciones_iot(request):
     datos = []
 
     for medicion in mediciones:
+        fecha_local = timezone.localtime(medicion.fecha)
+
         datos.append({
             'id': medicion.id,
             'dispositivo': medicion.dispositivo,
             'temperatura': medicion.temperatura,
             'humedad': medicion.humedad,
-            'fecha': medicion.fecha.strftime('%d/%m/%Y %H:%M:%S'),
-            'fecha_iso': medicion.fecha.isoformat(),
+            'fecha': fecha_local.strftime('%d/%m/%Y %H:%M:%S'),
+            'fecha_iso': fecha_local.isoformat(),
         })
 
     return JsonResponse({
         'mediciones': datos,
         'total_mediciones': MedicionIoT.objects.count(),
     })
+
 
 
 
