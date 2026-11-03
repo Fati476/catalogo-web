@@ -7449,18 +7449,24 @@ def recibir_medicion_iot(request):
 
 
 
+
 @login_required
 def monitoreo_iot(request):
     if not request.user.groups.filter(name='Administrador').exists():
         return redirect('inicio')
 
-    mediciones = MedicionIoT.objects.all()[:20]
-    ultima_medicion = mediciones.first()
+    todas_mediciones = MedicionIoT.objects.all()
+
+    paginador = Paginator(todas_mediciones, 10)
+    pagina_actual = paginador.get_page(request.GET.get('page'))
+
+    ultima_medicion = todas_mediciones.first()
 
     contexto = {
-        'mediciones': mediciones,
+        'mediciones': pagina_actual,
+        'pagina_actual': pagina_actual,
         'ultima_medicion': ultima_medicion,
-        'total_mediciones': MedicionIoT.objects.count(),
+        'total_mediciones': todas_mediciones.count(),
 
         'temperatura_min': settings.IOT_TEMPERATURA_MIN,
         'temperatura_max': settings.IOT_TEMPERATURA_MAX,
@@ -7478,6 +7484,8 @@ def monitoreo_iot(request):
 
 
 
+
+
 @login_required
 def consultar_mediciones_iot(request):
     if not request.user.groups.filter(name='Administrador').exists():
@@ -7486,26 +7494,42 @@ def consultar_mediciones_iot(request):
             status=403
         )
 
-    mediciones = MedicionIoT.objects.all()[:20]
+    todas_mediciones = MedicionIoT.objects.all()
 
-    datos = []
+    # PAGINACIÓN DEL HISTORIAL
+    paginador = Paginator(todas_mediciones, 10)
+    pagina_actual = paginador.get_page(request.GET.get('page', 1))
 
-    for medicion in mediciones:
-        fecha_local = timezone.localtime(medicion.fecha)
+    # ÚLTIMOS 20 REGISTROS PARA LAS GRÁFICAS
+    ultimas_mediciones = todas_mediciones[:20]
 
-        datos.append({
-            'id': medicion.id,
-            'dispositivo': medicion.dispositivo,
-            'temperatura': medicion.temperatura,
-            'humedad': medicion.humedad,
-            'fecha': fecha_local.strftime('%d/%m/%Y %H:%M:%S'),
-            'fecha_iso': fecha_local.isoformat(),
-        })
+    def convertir_mediciones(registros):
+        datos = []
+
+        for medicion in registros:
+            fecha_local = timezone.localtime(medicion.fecha)
+
+            datos.append({
+                'id': medicion.id,
+                'dispositivo': medicion.dispositivo,
+                'temperatura': medicion.temperatura,
+                'humedad': medicion.humedad,
+                'fecha': fecha_local.strftime('%d/%m/%Y %H:%M:%S'),
+                'fecha_iso': fecha_local.isoformat(),
+            })
+
+        return datos
 
     return JsonResponse({
-        'mediciones': datos,
-        'total_mediciones': MedicionIoT.objects.count(),
+        'mediciones': convertir_mediciones(pagina_actual.object_list),
+        'grafica': convertir_mediciones(ultimas_mediciones),
+        'total_mediciones': todas_mediciones.count(),
+        'total_paginas': paginador.num_pages,
+        'pagina_actual': pagina_actual.number,
+        'tiene_anterior': pagina_actual.has_previous(),
+        'tiene_siguiente': pagina_actual.has_next(),
     })
+
 
 
 

@@ -101,7 +101,7 @@
 
         /* CONTENIDO */
         .iot-content {
-            width: min(1250px, calc(100% - 36px));
+            width: min(1680px, calc(100% - 56px));
             margin: 55px auto 80px;
             position: relative;
             z-index: 5;
@@ -195,6 +195,11 @@
             background: #B8860B;
             color: #111827;
             transform: translateY(-2px);
+        }
+
+        .iot-refresh:disabled {
+            opacity: .6;
+            cursor: wait;
         }
 
         /* TARJETAS Y GRÁFICAS */
@@ -312,13 +317,150 @@
             background: #faf9f6;
         }
 
+        /* GRÁFICAS RESPONSIVE */
+        .iot-chart-wrap {
+            position: relative;
+            width: 100%;
+            height: clamp(230px, 27vw, 340px);
+        }
+
+        .iot-chart-wrap canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        /* PAGINACIÓN */
+        .iot-pagination {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-top: 22px;
+        }
+
+        .iot-page-button {
+            border: 1px solid #d1d5db;
+            background: #fff;
+            color: #111827;
+            border-radius: 999px;
+            padding: 10px 17px;
+            font-weight: 800;
+            transition: .2s ease;
+        }
+
+        .iot-page-button:hover:not(:disabled) {
+            background: #111827;
+            color: #fff;
+            border-color: #111827;
+        }
+
+        .iot-page-button:disabled {
+            opacity: .4;
+            cursor: not-allowed;
+        }
+
+        /* ANÁLISIS INTELIGENTE */
+        .iot-insight-panel {
+            position: fixed;
+            right: 24px;
+            bottom: 88px;
+            z-index: 1050;
+            width: min(360px, calc(100vw - 32px));
+            padding: 18px 20px;
+            border-radius: 18px;
+            background: #111827;
+            color: #fff;
+            box-shadow: 0 15px 40px rgba(0,0,0,.24);
+            border: 1px solid rgba(201,162,39,.45);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(12px);
+            transition: .22s ease;
+        }
+
+        .iot-insight-panel.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .iot-insight-heading {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            color: #E7C766;
+            font-weight: 900;
+            margin-bottom: 12px;
+        }
+
+        .iot-insight-heading button {
+            border: 0;
+            background: transparent;
+            color: #fff;
+            padding: 4px 6px;
+        }
+
+        .iot-insight-panel strong {
+            display: block;
+            font-size: 1rem;
+            margin-bottom: 7px;
+        }
+
+        .iot-insight-panel p {
+            color: rgba(255,255,255,.78);
+            font-size: .88rem;
+            line-height: 1.55;
+            margin: 0;
+        }
+
+        /* BOTÓN DE VOZ */
+        .iot-voice-button {
+            position: fixed;
+            right: 24px;
+            bottom: 22px;
+            z-index: 1051;
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            border: 0;
+            border-radius: 999px;
+            padding: 12px 18px;
+            background: #C9A227;
+            color: #111827;
+            font-weight: 900;
+            box-shadow: 0 8px 24px rgba(0,0,0,.18);
+            transition: .2s ease;
+        }
+
+        .iot-voice-button:hover {
+            background: #E6C75A;
+            transform: translateY(-2px);
+        }
+
+        .iot-voice-button.muted {
+            background: #111827;
+            color: #fff;
+            border: 1px solid rgba(255,255,255,.2);
+        }
+
+        /* RESPONSIVE */
         @media (max-width: 991px) {
+            .iot-content {
+                width: calc(100% - 36px);
+            }
+
             .iot-hero {
                 padding: 70px 28px 90px;
             }
 
             .iot-hero h1 {
                 font-size: 2.25rem;
+            }
+
+            .iot-chart-wrap {
+                height: 300px;
             }
         }
 
@@ -327,28 +469,66 @@
                 padding-top: 88px;
             }
 
+            .iot-content {
+                width: calc(100% - 24px);
+                margin: 32px auto 60px;
+            }
+
             .iot-hero {
-                padding: 70px 22px 85px;
+                min-height: 310px;
+                padding: 65px 20px 80px;
+            }
+
+            .iot-hero-content {
+                padding-top: 90px;
             }
 
             .iot-hero h1 {
-                font-size: 1.9rem;
-            }
-
-            .iot-content {
-                margin: 40px auto 60px;
-            }
-
-            .iot-history {
-                padding: 16px;
+                font-size: clamp(1.8rem, 8vw, 2.3rem);
             }
 
             .iot-stat-card {
+                padding: 20px;
                 min-height: 165px;
+            }
+
+            .iot-stat-card h2 {
+                font-size: 1.75rem;
             }
 
             .iot-range-card {
                 padding: 18px;
+            }
+
+            .iot-history {
+                padding: 16px;
+                border-radius: 18px;
+            }
+
+            .iot-pagination {
+                align-items: stretch;
+            }
+
+            .iot-pagination > div {
+                width: 100%;
+            }
+
+            .iot-page-button {
+                flex: 1;
+                padding: 10px 12px;
+                font-size: .82rem;
+            }
+
+            .iot-insight-panel {
+                right: 12px;
+                bottom: 78px;
+                width: calc(100vw - 24px);
+            }
+
+            .iot-voice-button {
+                right: 12px;
+                bottom: 12px;
+                padding: 11px 15px;
             }
         }
     </style>
@@ -484,6 +664,7 @@
                 <h2 class="iot-content-title">Comportamiento de las mediciones</h2>
                 <p class="text-muted mb-0">
                     Evolución de temperatura y humedad en los últimos registros.
+                    Pasa el cursor o toca un punto para escuchar su análisis.
                 </p>
             </div>
 
@@ -494,7 +675,9 @@
                             <i class="bi bi-thermometer-half me-2" style="color:#B8860B;"></i>
                             Temperatura (°C)
                         </h5>
-                        <canvas id="iot-chart-temperatura" height="150"></canvas>
+                        <div class="iot-chart-wrap">
+                            <canvas id="iot-chart-temperatura"></canvas>
+                        </div>
                     </div>
                 </div>
 
@@ -504,7 +687,9 @@
                             <i class="bi bi-droplet-half me-2" style="color:#B8860B;"></i>
                             Humedad (%)
                         </h5>
-                        <canvas id="iot-chart-humedad" height="150"></canvas>
+                        <div class="iot-chart-wrap">
+                            <canvas id="iot-chart-humedad"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -609,7 +794,7 @@
                 <div>
                     <h3 class="mb-1">Historial de mediciones</h3>
                     <p class="text-muted mb-0">
-                        Clasificación visual de los últimos 20 registros.
+                        Consulta todas las mediciones registradas, organizadas en páginas de 10 registros.
                     </p>
                 </div>
 
@@ -714,6 +899,19 @@
                 </table>
             </div>
 
+            <!-- PAGINACIÓN -->
+            <div id="iot-paginacion" class="iot-pagination">
+                <span id="iot-paginacion-info" class="text-muted small">Página 1</span>
+                <div class="d-flex gap-2">
+                    <button type="button" class="iot-page-button" id="iot-anterior" disabled>
+                        <i class="bi bi-chevron-left"></i> Anterior
+                    </button>
+                    <button type="button" class="iot-page-button" id="iot-siguiente" disabled>
+                        Siguiente <i class="bi bi-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+
             <div class="mt-3 small text-muted">
                 <i class="bi bi-info-circle me-1"></i>
                 Los colores representan los rangos configurados en el prototipo.
@@ -723,6 +921,26 @@
         </section>
 
     </main>
+
+    <!-- ANÁLISIS INTELIGENTE -->
+    <aside id="iot-insight-panel" class="iot-insight-panel" aria-live="polite">
+        <div class="iot-insight-heading">
+            <span><i class="bi bi-stars me-2"></i>Análisis inteligente</span>
+            <button type="button" id="iot-insight-close" aria-label="Cerrar análisis">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <strong id="iot-insight-title">Selecciona un punto de la gráfica</strong>
+        <p id="iot-insight-text">
+            Pasa el cursor sobre un punto o tócalo para conocer su medición.
+        </p>
+    </aside>
+
+    <!-- BOTÓN DE VOZ -->
+    <button type="button" id="iot-voice-button" class="iot-voice-button" aria-pressed="true">
+        <i class="bi bi-volume-up-fill"></i>
+        <span>Voz activada</span>
+    </button>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -745,6 +963,19 @@
         const ultimaActualizacionEl = document.getElementById('iot-ultima-actualizacion');
         const historialBody = document.getElementById('iot-historial-body');
         const refreshButton = document.getElementById('iot-refresh-button');
+        const anteriorButton = document.getElementById('iot-anterior');
+        const siguienteButton = document.getElementById('iot-siguiente');
+        const paginacionInfo = document.getElementById('iot-paginacion-info');
+        const vozButton = document.getElementById('iot-voice-button');
+        const insightPanel = document.getElementById('iot-insight-panel');
+        const insightTitle = document.getElementById('iot-insight-title');
+        const insightText = document.getElementById('iot-insight-text');
+
+        let paginaActual = Number("{{ pagina_actual.number|default:1 }}") || 1;
+        let totalPaginas = Number("{{ pagina_actual.paginator.num_pages|default:1 }}") || 1;
+        let vozActivada = true;
+        let ultimaNarracion = '';
+        let consultando = false;
 
         // Evitar insertar contenido HTML recibido directamente
         const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, char => ({
@@ -761,14 +992,18 @@
             return 'normal';
         }
 
+        function estadoHumedad(h) {
+            return (h < humedadMin || h > humedadMax) ? 'warning' : 'normal';
+        }
+
         function estadoMedicion(m) {
-            if (m.temperatura >= temperaturaCritica) return 'critical';
+            if (Number(m.temperatura) >= temperaturaCritica) return 'critical';
 
             if (
-                m.temperatura < temperaturaMin ||
-                m.temperatura > temperaturaMax ||
-                m.humedad < humedadMin ||
-                m.humedad > humedadMax
+                Number(m.temperatura) < temperaturaMin ||
+                Number(m.temperatura) > temperaturaMax ||
+                Number(m.humedad) < humedadMin ||
+                Number(m.humedad) > humedadMax
             ) {
                 return 'warning';
             }
@@ -784,85 +1019,11 @@
             };
 
             return `<span class="${clases[tipo]}">
-                <i class="bi ${icono}"></i>
-                ${texto}
+                <i class="bi ${icono}"></i>${texto}
             </span>`;
         }
 
-        // Configuración de las gráficas
-        function opcionesGrafica(etiqueta) {
-            return {
-                responsive: true,
-                maintainAspectRatio: true,
-                interaction: {
-                    intersect: false,
-                    mode: 'index'
-                },
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                },
-                scales: {
-                    x: {
-                        ticks: {
-                            maxRotation: 0,
-                            autoSkip: true,
-                            maxTicksLimit: 7
-                        }
-                    },
-                    y: {
-                        beginAtZero: false,
-                        title: {
-                            display: true,
-                            text: etiqueta
-                        }
-                    }
-                }
-            };
-        }
-
-        // Gráfica de temperatura
-        const temperaturaChart = new Chart(
-            document.getElementById('iot-chart-temperatura'),
-            {
-                type: 'line',
-                data: {
-                    labels: [],
-                    datasets: [{
-                        label: 'Temperatura',
-                        data: [],
-                        borderColor: '#C9A227',
-                        backgroundColor: 'rgba(201,162,39,.15)',
-                        fill: true,
-                        tension: .3
-                    }]
-                },
-                options: opcionesGrafica('Temperatura (°C)')
-            }
-        );
-
-        // Gráfica de humedad
-        const humedadChart = new Chart(
-            document.getElementById('iot-chart-humedad'),
-            {
-                type: 'line',
-                data: {
-                    labels: [],
-                    datasets: [{
-                        label: 'Humedad',
-                        data: [],
-                        borderColor: '#2697C7',
-                        backgroundColor: 'rgba(38,151,199,.13)',
-                        fill: true,
-                        tension: .3
-                    }]
-                },
-                options: opcionesGrafica('Humedad (%)')
-            }
-        );
-
-        // Actualizar las filas del historial
+        // PINTAR HISTORIAL
         function pintarHistorial(mediciones) {
 
             if (!mediciones.length) {
@@ -885,31 +1046,24 @@
                 const h = Number(m.humedad);
 
                 const estadoT = estadoTemperatura(t);
-                const estadoH =
-                    (h < humedadMin || h > humedadMax) ? 'warning' : 'normal';
-
-                const estado = estadoMedicion({
-                    temperatura: t,
-                    humedad: h
-                });
+                const estadoH = estadoHumedad(h);
+                const estado = estadoMedicion(m);
 
                 const iconoT = estadoT === 'critical'
                     ? 'bi-thermometer-high'
                     : 'bi-thermometer-half';
 
-                const iconoEstado =
-                    estado === 'critical'
-                        ? 'bi-exclamation-octagon-fill'
-                        : estado === 'warning'
-                            ? 'bi-exclamation-triangle-fill'
-                            : 'bi-check-circle-fill';
+                const iconoEstado = estado === 'critical'
+                    ? 'bi-exclamation-octagon-fill'
+                    : estado === 'warning'
+                        ? 'bi-exclamation-triangle-fill'
+                        : 'bi-check-circle-fill';
 
-                const textoEstado =
-                    estado === 'critical'
-                        ? 'CRÍTICO'
-                        : estado === 'warning'
-                            ? 'ADVERTENCIA'
-                            : 'NORMAL';
+                const textoEstado = estado === 'critical'
+                    ? 'CRÍTICO'
+                    : estado === 'warning'
+                        ? 'ADVERTENCIA'
+                        : 'NORMAL';
 
                 return `
                     <tr>
@@ -917,30 +1071,286 @@
                             <i class="bi bi-cpu me-2" style="color:#B8860B;"></i>
                             ${escapeHtml(m.dispositivo)}
                         </td>
-
-                        <td>
-                            ${badge(estadoT, iconoT, `${t.toFixed(1)} °C`)}
-                        </td>
-
-                        <td>
-                            ${badge(estadoH, 'bi-droplet-half', `${h.toFixed(1)} %`)}
-                        </td>
-
-                        <td>
-                            ${badge(estado, iconoEstado, textoEstado)}
-                        </td>
-
+                        <td>${badge(estadoT, iconoT, `${t.toFixed(1)} °C`)}</td>
+                        <td>${badge(estadoH, 'bi-droplet-half', `${h.toFixed(1)} %`)}</td>
+                        <td>${badge(estado, iconoEstado, textoEstado)}</td>
                         <td>${escapeHtml(m.fecha)}</td>
                     </tr>
                 `;
             }).join('');
         }
 
-        // Consultar los datos nuevos en Django
+        // ACTUALIZAR PAGINACIÓN
+        function actualizarPaginacion(resultado) {
+
+            paginaActual = resultado.pagina_actual || 1;
+            totalPaginas = resultado.total_paginas || 1;
+
+            const total = Number(resultado.total_mediciones || 0);
+
+            paginacionInfo.textContent = total === 0
+                ? 'Sin registros para mostrar'
+                : `Página ${paginaActual} de ${totalPaginas} · ${total} mediciones registradas`;
+
+            anteriorButton.disabled = !resultado.tiene_anterior;
+            siguienteButton.disabled = !resultado.tiene_siguiente;
+        }
+
+        // NARRACIÓN POR VOZ
+        function hablar(texto) {
+
+            if (!vozActivada || !('speechSynthesis' in window)) return;
+
+            window.speechSynthesis.cancel();
+
+            const mensaje = new SpeechSynthesisUtterance(texto);
+
+            mensaje.lang = 'es-MX';
+            mensaje.rate = 1;
+            mensaje.pitch = 1;
+            mensaje.volume = 1;
+
+            const voces = window.speechSynthesis.getVoices();
+
+            const vozEspanol = voces.find(v =>
+                v.lang.toLowerCase() === 'es-mx'
+            ) || voces.find(v =>
+                v.lang.toLowerCase().startsWith('es')
+            );
+
+            if (vozEspanol) {
+                mensaje.voice = vozEspanol;
+            }
+
+            window.speechSynthesis.speak(mensaje);
+        }
+
+        // ANÁLISIS DE LOS PUNTOS
+        function mostrarAnalisis(tipo, indice, grafica) {
+
+            const medicion = grafica.$mediciones?.[indice];
+
+            if (!medicion) return;
+
+            const valor = tipo === 'temperatura'
+                ? Number(medicion.temperatura)
+                : Number(medicion.humedad);
+
+            const fecha = medicion.fecha || 'fecha no disponible';
+
+            const estado = tipo === 'temperatura'
+                ? estadoTemperatura(valor)
+                : estadoHumedad(valor);
+
+            const nombreEstado = estado === 'critical'
+                ? 'crítico'
+                : estado === 'warning'
+                    ? 'fuera del rango normal'
+                    : 'normal';
+
+            const titulo = tipo === 'temperatura'
+                ? 'Temperatura'
+                : 'Humedad';
+
+            const unidad = tipo === 'temperatura'
+                ? 'grados Celsius'
+                : 'por ciento';
+
+            const texto = tipo === 'temperatura'
+                ? `El ${fecha}, la temperatura registrada fue de ${valor.toFixed(1)} ${unidad}. El valor se encuentra ${nombreEstado}.`
+                : `El ${fecha}, la humedad registrada fue de ${valor.toFixed(1)} ${unidad}. El valor se encuentra ${nombreEstado}.`;
+
+            const clave = `${tipo}-${indice}-${valor}-${fecha}`;
+
+            if (clave === ultimaNarracion) return;
+
+            ultimaNarracion = clave;
+
+            insightTitle.textContent =
+                `${titulo}: ${valor.toFixed(1)} ${tipo === 'temperatura' ? '°C' : '%'}`;
+
+            insightText.textContent =
+                `${fecha}. Estado: ${nombreEstado}.`;
+
+            insightPanel.classList.add('visible');
+
+            hablar(texto);
+        }
+
+        // CONFIGURACIÓN DE LAS GRÁFICAS
+        function opcionesGrafica(etiqueta, tipo) {
+
+            return {
+                responsive: true,
+                maintainAspectRatio: false,
+
+                interaction: {
+                    intersect: true,
+                    mode: 'nearest'
+                },
+
+                onHover: (evento, elementos, grafica) => {
+                    if (elementos.length) {
+                        mostrarAnalisis(tipo, elementos[0].index, grafica);
+                    }
+                },
+
+                onClick: (evento, elementos, grafica) => {
+                    if (elementos.length) {
+                        mostrarAnalisis(tipo, elementos[0].index, grafica);
+                    }
+                },
+
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+
+                    tooltip: {
+                        enabled: true,
+                        callbacks: {
+                            label: contexto =>
+                                `${contexto.dataset.label}: ${Number(contexto.parsed.y).toFixed(1)} ${tipo === 'temperatura' ? '°C' : '%'}`
+                        }
+                    }
+                },
+
+                scales: {
+                    x: {
+                        ticks: {
+                            maxRotation: 0,
+                            autoSkip: true,
+                            maxTicksLimit: 7
+                        },
+                        grid: {
+                            display: false
+                        }
+                    },
+
+                    y: {
+                        beginAtZero: false,
+                        title: {
+                            display: true,
+                            text: etiqueta
+                        }
+                    }
+                }
+            };
+        }
+
+        // GRÁFICA DE TEMPERATURA
+        const temperaturaChart = new Chart(
+            document.getElementById('iot-chart-temperatura'),
+            {
+                type: 'line',
+
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Temperatura',
+                        data: [],
+                        borderColor: '#C9A227',
+                        backgroundColor: 'rgba(201,162,39,.15)',
+                        fill: true,
+                        tension: .3,
+                        borderWidth: 3,
+                        pointRadius: 5,
+                        pointHoverRadius: 9,
+                        pointHitRadius: 14,
+                        pointBackgroundColor: '#C9A227'
+                    }]
+                },
+
+                options: opcionesGrafica(
+                    'Temperatura (°C)',
+                    'temperatura'
+                )
+            }
+        );
+
+        // GRÁFICA DE HUMEDAD
+        const humedadChart = new Chart(
+            document.getElementById('iot-chart-humedad'),
+            {
+                type: 'line',
+
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Humedad',
+                        data: [],
+                        borderColor: '#2697C7',
+                        backgroundColor: 'rgba(38,151,199,.13)',
+                        fill: true,
+                        tension: .3,
+                        borderWidth: 3,
+                        pointRadius: 5,
+                        pointHoverRadius: 9,
+                        pointHitRadius: 14,
+                        pointBackgroundColor: '#2697C7'
+                    }]
+                },
+
+                options: opcionesGrafica(
+                    'Humedad (%)',
+                    'humedad'
+                )
+            }
+        );
+
+        // ACTUALIZAR GRÁFICAS CON LOS ÚLTIMOS 20 REGISTROS
+        function actualizarGraficas(mediciones) {
+
+            if (!mediciones.length) return;
+
+            const ordenadas = [...mediciones].reverse();
+
+            const etiquetas = ordenadas.map(m => {
+
+                const fecha = new Date(m.fecha_iso);
+
+                return Number.isNaN(fecha.getTime())
+                    ? m.fecha
+                    : fecha.toLocaleTimeString('es-MX', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        timeZone: 'America/Mexico_City'
+                    });
+            });
+
+            temperaturaChart.data.labels = etiquetas;
+
+            temperaturaChart.data.datasets[0].data =
+                ordenadas.map(m => Number(m.temperatura));
+
+            temperaturaChart.$mediciones = ordenadas;
+
+            temperaturaChart.update('none');
+
+            humedadChart.data.labels = etiquetas;
+
+            humedadChart.data.datasets[0].data =
+                ordenadas.map(m => Number(m.humedad));
+
+            humedadChart.$mediciones = ordenadas;
+
+            humedadChart.update('none');
+        }
+
+        // CONSULTAR DATOS EN DJANGO
         async function actualizarMediciones() {
 
+            if (consultando) return;
+
+            consultando = true;
+            refreshButton.disabled = true;
+
             try {
-                const response = await fetch(endpoint, {
+
+                const url = `${endpoint}?page=${paginaActual}`;
+
+                const response = await fetch(url, {
                     method: 'GET',
                     credentials: 'same-origin',
                     cache: 'no-store',
@@ -954,19 +1364,25 @@
                 }
 
                 const resultado = await response.json();
+
                 const mediciones = resultado.mediciones || [];
+                const registrosGrafica = resultado.grafica || [];
 
-                // Actualizar total de registros
-                totalEl.textContent = resultado.total_mediciones ?? 0;
+                // TOTAL DE MEDICIONES
+                totalEl.textContent =
+                    resultado.total_mediciones ?? 0;
 
-                // Actualizar historial
+                // HISTORIAL
                 pintarHistorial(mediciones);
 
-                if (mediciones.length > 0) {
+                // PAGINACIÓN
+                actualizarPaginacion(resultado);
 
-                    const ultima = mediciones[0];
+                // ÚLTIMAS MEDICIONES
+                if (registrosGrafica.length > 0) {
 
-                    // Actualizar tarjetas
+                    const ultima = registrosGrafica[0];
+
                     temperaturaEl.textContent =
                         `${Number(ultima.temperatura).toFixed(1)} °C`;
 
@@ -976,37 +1392,15 @@
                     ultimaActualizacionEl.textContent =
                         `Última medición registrada: ${ultima.fecha}`;
 
-                    // Ordenar registros para las gráficas
-                    const ordenadas = [...mediciones].reverse();
+                    actualizarGraficas(registrosGrafica);
 
-                    const etiquetas = ordenadas.map(m => {
+                } else {
 
-                        const fecha = new Date(m.fecha_iso);
+                    temperaturaEl.textContent = '-- °C';
+                    humedadEl.textContent = '-- %';
 
-                        return Number.isNaN(fecha.getTime())
-                            ? m.fecha
-                            : fecha.toLocaleTimeString('es-MX', {
-                                hour: '2-digit',
-                                minute: '2-digit',
-                                second: '2-digit'
-                            });
-                    });
-
-                    // Actualizar gráfica de temperatura
-                    temperaturaChart.data.labels = etiquetas;
-
-                    temperaturaChart.data.datasets[0].data =
-                        ordenadas.map(m => Number(m.temperatura));
-
-                    temperaturaChart.update();
-
-                    // Actualizar gráfica de humedad
-                    humedadChart.data.labels = etiquetas;
-
-                    humedadChart.data.datasets[0].data =
-                        ordenadas.map(m => Number(m.humedad));
-
-                    humedadChart.update();
+                    ultimaActualizacionEl.textContent =
+                        'Sin mediciones registradas';
                 }
 
                 statusEl.innerHTML = `
@@ -1025,19 +1419,73 @@
                     <i class="bi bi-exclamation-triangle-fill text-danger me-1"></i>
                     Sin actualización
                 `;
+
+            } finally {
+
+                consultando = false;
+                refreshButton.disabled = false;
             }
         }
 
-        // Botón de actualización manual
+        // BOTÓN ANTERIOR
+        anteriorButton.addEventListener('click', () => {
+
+            if (paginaActual > 1) {
+                paginaActual--;
+                actualizarMediciones();
+            }
+        });
+
+        // BOTÓN SIGUIENTE
+        siguienteButton.addEventListener('click', () => {
+
+            if (paginaActual < totalPaginas) {
+                paginaActual++;
+                actualizarMediciones();
+            }
+        });
+
+        // ACTUALIZACIÓN MANUAL
         refreshButton.addEventListener(
             'click',
             actualizarMediciones
         );
 
-        // Primera consulta al abrir el panel
+        // CERRAR PANEL DE ANÁLISIS
+        document.getElementById('iot-insight-close').addEventListener('click', () => {
+
+            insightPanel.classList.remove('visible');
+
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+            }
+        });
+
+        // ACTIVAR O DESACTIVAR VOZ
+        vozButton.addEventListener('click', () => {
+
+            vozActivada = !vozActivada;
+
+            vozButton.innerHTML = vozActivada
+                ? '<i class="bi bi-volume-up-fill"></i><span>Voz activada</span>'
+                : '<i class="bi bi-volume-mute-fill"></i><span>Voz desactivada</span>';
+
+            vozButton.classList.toggle('muted', !vozActivada);
+
+            vozButton.setAttribute(
+                'aria-pressed',
+                String(vozActivada)
+            );
+
+            if (!vozActivada && 'speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+            }
+        });
+
+        // PRIMERA CONSULTA
         actualizarMediciones();
 
-        // Consultar cada 15 segundos
+        // ACTUALIZACIÓN AUTOMÁTICA CADA 15 SEGUNDOS
         setInterval(
             actualizarMediciones,
             15000
