@@ -7538,7 +7538,7 @@ def consultar_mediciones_iot(request):
         'fecha': fecha,
     })
 
-from datetime import date
+from datetime import date, datetime, time, timedelta
 
 def filtrar_mediciones_iot(request):
     fecha = request.GET.get('fecha', '').strip()
@@ -7549,8 +7549,20 @@ def filtrar_mediciones_iot(request):
         try:
             fecha_seleccionada = date.fromisoformat(fecha)
 
+            inicio_dia = timezone.make_aware(
+                datetime.combine(fecha_seleccionada, time.min)
+            )
+
+            fin_dia = timezone.make_aware(
+                datetime.combine(
+                    fecha_seleccionada + timedelta(days=1),
+                    time.min
+                )
+            )
+
             mediciones = mediciones.filter(
-                fecha__date=fecha_seleccionada
+                fecha__gte=inicio_dia,
+                fecha__lt=fin_dia
             )
 
         except ValueError:
