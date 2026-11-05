@@ -804,6 +804,56 @@
                 </span>
             </div>
 
+                        <!-- FILTRO POR FECHA -->
+            <div class="mb-4 p-3 rounded-4"
+                 style="background:#f8f7f3; border:1px solid #e5dfce;">
+
+                <label for="iot-filtro-fecha" class="form-label fw-bold">
+                    <i class="bi bi-calendar3 me-2" style="color:#B8860B;"></i>
+                    Consultar mediciones de un día específico
+                </label>
+
+                <div class="d-flex flex-wrap gap-2">
+
+                    <input
+                        type="date"
+                        id="iot-filtro-fecha"
+                        class="form-control"
+                        value="{{ fecha }}"
+                        style="max-width:250px; border-radius:12px;"
+                    >
+
+                    <button type="button"
+                            class="iot-refresh"
+                            id="iot-buscar-fecha">
+                        <i class="bi bi-search me-1"></i>
+                        Buscar
+                    </button>
+
+                    <button type="button"
+                            class="btn rounded-pill px-4"
+                            id="iot-hablar-fecha"
+                            style="background:#111827; color:white; font-weight:800;">
+                        <i class="bi bi-mic-fill me-1"></i>
+                        Hablar para filtrar
+                    </button>
+
+                    <button type="button"
+                            class="btn btn-outline-secondary rounded-pill px-4"
+                            id="iot-limpiar-fecha">
+                        <i class="bi bi-x-circle me-1"></i>
+                        Limpiar
+                    </button>
+
+                </div>
+
+                <small class="text-muted d-block mt-2">
+                    Selecciona una fecha para consultar las mediciones
+                    registradas durante ese día.
+                </small>
+
+            </div>
+
             <div class="table-responsive">
                 <table class="table table-hover iot-table">
                     <thead>
@@ -970,6 +1020,11 @@
         const insightPanel = document.getElementById('iot-insight-panel');
         const insightTitle = document.getElementById('iot-insight-title');
         const insightText = document.getElementById('iot-insight-text');
+        // ELEMENTOS DEL FILTRO POR FECHA
+        const fechaInput = document.getElementById('iot-filtro-fecha');
+        const buscarFechaButton = document.getElementById('iot-buscar-fecha');
+        const limpiarFechaButton = document.getElementById('iot-limpiar-fecha');
+        const hablarFechaButton = document.getElementById('iot-hablar-fecha');
 
         let paginaActual = Number("{{ pagina_actual.number|default:1 }}") || 1;
         let totalPaginas = Number("{{ pagina_actual.paginator.num_pages|default:1 }}") || 1;
@@ -1348,7 +1403,15 @@
 
             try {
 
-                const url = `${endpoint}?page=${paginaActual}`;
+                const parametros = new URLSearchParams();
+
+                parametros.set('page', paginaActual);
+
+                if (fechaInput.value) {
+                    parametros.set('fecha', fechaInput.value);
+                }
+
+                const url = `${endpoint}?${parametros.toString()}`;
 
                 const response = await fetch(url, {
                     method: 'GET',
@@ -1450,6 +1513,146 @@
             'click',
             actualizarMediciones
         );
+
+        // RECONOCIMIENTO DE VOZ PARA FILTRAR POR FECHA
+        function escucharFecha() {
+
+            const SpeechRecognition =
+                window.SpeechRecognition || window.webkitSpeechRecognition;
+
+            if (!SpeechRecognition) {
+                alert('Tu navegador no admite reconocimiento de voz. Puedes utilizar el selector de fecha.');
+                return;
+            }
+
+            const reconocimiento = new SpeechRecognition();
+
+            reconocimiento.lang = 'es-MX';
+            reconocimiento.continuous = false;
+            reconocimiento.interimResults = false;
+
+            hablarFechaButton.disabled = true;
+            hablarFechaButton.innerHTML =
+                '<i class="bi bi-mic-fill me-1"></i> Escuchando...';
+
+            reconocimiento.onresult = (event) => {
+
+                const frase = event.results[0][0].transcript
+                    .toLowerCase()
+                    .normalize('NFD')
+                    .replace(/[\u0300-\u036f]/g, '');
+
+                console.log('Comando reconocido:', frase);
+
+                const hoy = new Date();
+
+                let fecha = null;
+
+                // IDENTIFICAR HOY
+                if (frase.includes('hoy')) {
+                    fecha = new Date(
+                        hoy.getFullYear(),
+                        hoy.getMonth(),
+                        hoy.getDate()
+                    );
+                }
+
+                // IDENTIFICAR AYER
+                else if (frase.includes('ayer')) {
+                    fecha = new Date(
+                        hoy.getFullYear(),
+                        hoy.getMonth(),
+                        hoy.getDate() - 1
+                    );
+                }
+
+                // IDENTIFICAR FECHAS ESPECÍFICAS
+                else {
+
+                    const meses = {
+                        enero: 0,
+                        febrero: 1,
+                        marzo: 2,
+                        abril: 3,
+                        mayo: 4,
+                        junio: 5,
+                        julio: 6,
+                        agosto: 7,
+                        septiembre: 8,
+                        setiembre: 8,
+                        octubre: 9,
+                        noviembre: 10,
+                        diciembre: 11
+                    };
+
+                    const coincidencia = frase.match(
+                        /(?:del\\s+|el\\s+)?(\\d{1,2})\\s+de\\s+([a-z]+)(?:\\s+de\\s+(\\d{4}))?/
+                    );
+
+                    if (coincidencia && meses[coincidencia[2]] !== undefined) {
+
+                        const dia = Number(coincidencia[1]);
+                        const mes = meses[coincidencia[2]];
+                        const anio = coincidencia[3]
+                            ? Number(coincidencia[3])
+                            : hoy.getFullYear();
+
+                        const fechaComprobacion = new Date(anio, mes, dia);
+
+                        if (
+                            fechaComprobacion.getFullYear() === anio &&
+                            fechaComprobacion.getMonth() === mes &&
+                            fechaComprobacion.getDate() === dia
+                        ) {
+                            fecha = fechaComprobacion;
+                        }
+                    }
+                }
+
+                if (!fecha) {
+                    alert('No pude identificar la fecha. Intenta decir: mediciones de hoy, ayer o del 4 de noviembre.');
+                    return;
+                }
+
+                // CONVERTIR FECHA AL FORMATO DEL SELECTOR
+                const anio = fecha.getFullYear();
+                const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+                const dia = String(fecha.getDate()).padStart(2, '0');
+
+                fechaInput.value = `${anio}-${mes}-${dia}`;
+
+                paginaActual = 1;
+                actualizarMediciones();
+            };
+
+            reconocimiento.onerror = (event) => {
+                console.error('Error de reconocimiento de voz:', event.error);
+                alert('No se pudo reconocer tu voz. Verifica el permiso del micrófono e inténtalo nuevamente.');
+            };
+
+            reconocimiento.onend = () => {
+                hablarFechaButton.disabled = false;
+                hablarFechaButton.innerHTML =
+                    '<i class="bi bi-mic-fill me-1"></i> Hablar para filtrar';
+            };
+
+            reconocimiento.start();
+        }
+        // ACTIVAR MICRÓFONO
+        hablarFechaButton.addEventListener('click', escucharFecha);
+
+        // BUSCAR MEDICIONES POR FECHA
+        buscarFechaButton.addEventListener('click', () => {
+            paginaActual = 1;
+            actualizarMediciones();
+        });
+
+        // LIMPIAR FILTRO
+        limpiarFechaButton.addEventListener('click', () => {
+            fechaInput.value = '';
+            paginaActual = 1;
+            actualizarMediciones();
+        });
 
         // CERRAR PANEL DE ANÁLISIS
         document.getElementById('iot-insight-close').addEventListener('click', () => {

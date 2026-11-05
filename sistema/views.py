@@ -7455,10 +7455,14 @@ def monitoreo_iot(request):
     if not request.user.groups.filter(name='Administrador').exists():
         return redirect('inicio')
 
-    todas_mediciones = MedicionIoT.objects.all()
+    todas_mediciones, fecha, error = filtrar_mediciones_iot(request)
+
+    if error:
+        todas_mediciones = MedicionIoT.objects.all()
+        fecha = ''
 
     paginador = Paginator(todas_mediciones, 10)
-    pagina_actual = paginador.get_page(request.GET.get('page'))
+    pagina_actual = paginador.get_page(request.GET.get('page', 1))
 
     ultima_medicion = todas_mediciones.first()
 
@@ -7467,6 +7471,8 @@ def monitoreo_iot(request):
         'pagina_actual': pagina_actual,
         'ultima_medicion': ultima_medicion,
         'total_mediciones': todas_mediciones.count(),
+        'fecha': fecha,
+        'error_filtro': error,
 
         'temperatura_min': settings.IOT_TEMPERATURA_MIN,
         'temperatura_max': settings.IOT_TEMPERATURA_MAX,
@@ -7494,13 +7500,14 @@ def consultar_mediciones_iot(request):
             status=403
         )
 
-    todas_mediciones = MedicionIoT.objects.all()
+    todas_mediciones, fecha, error = filtrar_mediciones_iot(request)
 
-    # PAGINACIÓN DEL HISTORIAL
+    if error:
+        return JsonResponse({'error': error}, status=400)
+
     paginador = Paginator(todas_mediciones, 10)
     pagina_actual = paginador.get_page(request.GET.get('page', 1))
 
-    # ÚLTIMOS 20 REGISTROS PARA LAS GRÁFICAS
     ultimas_mediciones = todas_mediciones[:20]
 
     def convertir_mediciones(registros):
@@ -7528,10 +7535,28 @@ def consultar_mediciones_iot(request):
         'pagina_actual': pagina_actual.number,
         'tiene_anterior': pagina_actual.has_previous(),
         'tiene_siguiente': pagina_actual.has_next(),
+        'fecha': fecha,
     })
 
+from datetime import date
 
+def filtrar_mediciones_iot(request):
+    fecha = request.GET.get('fecha', '').strip()
 
+    mediciones = MedicionIoT.objects.all()
+
+    if fecha:
+        try:
+            fecha_seleccionada = date.fromisoformat(fecha)
+
+            mediciones = mediciones.filter(
+                fecha__date=fecha_seleccionada
+            )
+
+        except ValueError:
+            return None, '', 'La fecha seleccionada no es válida.'
+
+    return mediciones, fecha, None
 
 
 from django.core.mail import EmailMultiAlternatives
