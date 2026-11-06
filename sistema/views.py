@@ -7756,15 +7756,21 @@ def notificar_nueva_solicitud(solicitud):
     </html>
     """
 
-    correo = EmailMultiAlternatives(
-        subject=asunto,
-        body=mensaje_texto,
+    mensaje = Mail(
         from_email=settings.DEFAULT_FROM_EMAIL,
-        to=[settings.IOT_ALERT_EMAIL],
+        to_emails=settings.IOT_ALERT_EMAIL,
+        subject=asunto,
+        plain_text_content=mensaje_texto,
+        html_content=html
     )
-    correo.attach_alternative(html, "text/html")
-    correo.send(fail_silently=False)
 
+    sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
+    respuesta = sg.send(mensaje)
+
+    print(f"Notificación enviada. Código: {respuesta.status_code}")
+
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 
 
 
