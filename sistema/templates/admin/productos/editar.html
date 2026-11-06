@@ -362,6 +362,30 @@ textarea.form-control{
         text-align:center;
     }
 }
+
+
+.alerta-personalizada {
+    border-radius: 20px !important;
+    padding: 25px !important;
+    border-top: 5px solid #C9A227 !important;
+}
+
+.alerta-titulo {
+    color: #333333 !important;
+    font-weight: 700 !important;
+}
+
+.alerta-boton {
+    border-radius: 10px !important;
+    padding: 10px 28px !important;
+    font-weight: 600 !important;
+    box-shadow: none !important;
+}
+
+.alerta-boton:focus {
+    box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.25) !important;
+}
+
 </style>
 </head>
 
@@ -412,10 +436,6 @@ textarea.form-control{
             <div class="col-md-5 mb-4">
                 <label><i class="bi bi-coin"></i> Precio base</label>
                 {{ form.precio }}
-
-                <div id="precio-error" class="text-danger mt-2" style="display:none;">
-                    <small>No se permiten números negativos.</small>
-                </div>
             </div>
         </div>
 
@@ -508,21 +528,23 @@ textarea.form-control{
 
 </main>
 
+
 <script>
 const input = document.getElementById('imagenInput');
 const previewContainer = document.getElementById('preview-container');
 
 let archivosSeleccionados = [];
 
-input.addEventListener('change', function(){
+input.addEventListener('change', function () {
     const nuevosArchivos = Array.from(this.files);
+
     archivosSeleccionados.push(...nuevosArchivos);
 
     actualizarInput();
     mostrarPreview();
 });
 
-function actualizarInput(){
+function actualizarInput() {
     const dataTransfer = new DataTransfer();
 
     archivosSeleccionados.forEach(archivo => {
@@ -532,13 +554,13 @@ function actualizarInput(){
     input.files = dataTransfer.files;
 }
 
-function mostrarPreview(){
+function mostrarPreview() {
     previewContainer.innerHTML = '';
 
     archivosSeleccionados.forEach((archivo, index) => {
         const reader = new FileReader();
 
-        reader.onload = function(e){
+        reader.onload = function (e) {
             const card = document.createElement('div');
 
             card.innerHTML = `
@@ -557,35 +579,76 @@ function mostrarPreview(){
     });
 }
 
-function eliminarImagen(index){
+function eliminarImagen(index) {
     archivosSeleccionados.splice(index, 1);
 
     actualizarInput();
     mostrarPreview();
 }
 
-const precioInput = document.getElementById("id_precio");
-const precioError = document.getElementById("precio-error");
 
-precioInput.addEventListener("input", function () {
+// VALIDACIÓN DEL PRECIO CON ALERTA
 
-    const valor = parseFloat(this.value);
+const precioInput = document.getElementById('id_precio');
 
-    if (!isNaN(valor) && valor < 0) {
+if (precioInput) {
+    precioInput.addEventListener('input', function () {
 
-        precioError.style.display = "block";
-        this.classList.add("is-invalid");
+        const valor = parseFloat(this.value);
 
-    } else {
+        if (!isNaN(valor) && valor < 0) {
 
-        precioError.style.display = "none";
-        this.classList.remove("is-invalid");
+            this.classList.add('is-invalid');
 
-    }
+            Swal.fire({
+                icon: 'warning',
+                title: 'Precio no válido',
+                text: 'No se permiten números negativos.',
+                confirmButtonText: 'Entendido',
+                confirmButtonColor: '#C9A227',
+                background: '#ffffff',
+                color: '#333333',
+                customClass: {
+                    popup: 'alerta-personalizada',
+                    title: 'alerta-titulo',
+                    confirmButton: 'alerta-boton'
+                }
+            });
 
+        } else {
+            this.classList.remove('is-invalid');
+        }
+
+    });
+}
+</script>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const precio = document.getElementById('id_precio');
+
+    if (!precio) return;
+
+    precio.addEventListener('input', function () {
+        if (this.value !== '' && Number(this.value) < 0) {
+            this.value = '';
+
+            Swal.fire({
+                icon: 'warning',
+                title: 'Precio no válido',
+                text: 'No se permiten números negativos.',
+                confirmButtonText: 'Entendido',
+                confirmButtonColor: '#C9A227',
+                background: '#ffffff',
+                color: '#333333'
+            });
+        }
+    });
 });
-
-
 </script>
 
 </body>
