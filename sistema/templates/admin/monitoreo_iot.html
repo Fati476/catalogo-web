@@ -1655,6 +1655,20 @@
                 fechaInput.value = `${anio}-${mes}-${dia}`;
 
                 paginaActual = 1;
+
+                // CONFIRMAR LA FECHA POR VOZ
+                const fechaTexto = fecha.toLocaleDateString('es-MX', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric',
+                    timeZone: 'America/Mexico_City'
+                });
+
+                hablar(
+                    `Claro, estoy filtrando las mediciones del ${fechaTexto}.`
+                );
+
+                // CONSULTAR MEDICIONES
                 actualizarMediciones();
             };
 
