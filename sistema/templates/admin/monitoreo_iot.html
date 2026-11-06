@@ -531,6 +531,67 @@
                 padding: 11px 15px;
             }
         }
+
+        /* ALERTAS PREMIUM CATÁLOGO WEB */
+.iot-swal-popup {
+    border: 1px solid #EEE5D0 !important;
+    border-radius: 26px !important;
+    padding: 30px 25px !important;
+    box-shadow: 0 20px 60px rgba(17,24,39,.16) !important;
+    font-family: 'Montserrat', sans-serif !important;
+}
+
+.iot-swal-title {
+    color: #172033 !important;
+    font-weight: 900 !important;
+    letter-spacing: -.5px;
+}
+
+.iot-swal-popup .swal2-html-container {
+    color: #687386 !important;
+    font-size: 16px !important;
+    line-height: 1.7 !important;
+}
+
+.iot-swal-popup .swal2-icon {
+    border-color: #C9A227 !important;
+    color: #B58A16 !important;
+}
+
+.iot-swal-popup .swal2-icon.swal2-success {
+    border-color: #86B99A !important;
+}
+
+.iot-swal-popup .swal2-icon.swal2-success [class^='swal2-success-line'] {
+    background-color: #32945C !important;
+}
+
+.iot-swal-button {
+    background: linear-gradient(135deg, #D8B33E, #B58A16) !important;
+    color: #FFFFFF !important;
+    font-weight: 800 !important;
+    border-radius: 14px !important;
+    padding: 13px 30px !important;
+    box-shadow: 0 5px 14px rgba(181,138,22,.22) !important;
+    transition: transform .2s ease !important;
+}
+
+.iot-swal-button:hover {
+    transform: translateY(-2px);
+}
+
+.iot-swal-text {
+    color: #687386 !important;
+    font-size: 15px !important;
+    line-height: 1.7 !important;
+}
+
+.iot-swal-date {
+    color: #B58A16 !important;
+    font-size: 23px !important;
+    font-weight: 900 !important;
+    margin-top: 15px !important;
+}
     </style>
 </head>
 
@@ -1648,13 +1709,20 @@
                     Swal.fire({
                         icon: 'warning',
                         title: 'No se identificó la fecha',
-                        text: 'No logramos reconocer el día solicitado. Intenta decir, por ejemplo: consulta las mediciones de ayer.',
+                        html: `
+                            <p>No logramos reconocer el día que solicitaste.</p>
+                            <p>Intenta nuevamente con una frase como:</p>
+                            <strong>"Consulta las mediciones de ayer"</strong>
+                        `,
                         confirmButtonText: 'Intentar nuevamente',
                         confirmButtonColor: '#C9A227',
-                        background: '#111827',
-                        color: '#ffffff',
+                        background: '#FFFFFF',
+                        color: '#172033',
                         customClass: {
-                            popup: 'iot-swal-popup'
+                            popup: 'iot-swal-popup',
+                            title: 'iot-swal-title',
+                            htmlContainer: 'iot-swal-text',
+                            confirmButton: 'iot-swal-button'
                         }
                     });
 
@@ -1684,14 +1752,23 @@
 
                 Swal.fire({
                     icon: 'success',
-                    title: 'Consulta por voz',
-                    html: `Estoy filtrando las mediciones del <strong>${fechaTexto}</strong>.`,
-                    confirmButtonText: 'Entendido',
+                    title: '¡Consulta por voz!',
+                    html: `
+                        <p>Entendí tu solicitud. Estoy consultando las mediciones correspondientes al:</p>
+                        <h3 class="iot-swal-date">${fechaTexto}</h3>
+                    `,
+                    confirmButtonText: 'Perfecto, continuar',
                     confirmButtonColor: '#C9A227',
-                    background: '#111827',
-                    color: '#ffffff',
-                    timer: 3500,
-                    timerProgressBar: true
+                    background: '#FFFFFF',
+                    color: '#172033',
+                    timer: 4500,
+                    timerProgressBar: true,
+                    customClass: {
+                        popup: 'iot-swal-popup',
+                        title: 'iot-swal-title',
+                        htmlContainer: 'iot-swal-text',
+                        confirmButton: 'iot-swal-button'
+                    }
                 });
 
                 hablar(
