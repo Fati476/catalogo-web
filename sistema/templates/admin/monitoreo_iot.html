@@ -994,6 +994,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -1643,7 +1644,24 @@
                 }                
 
                 if (!fecha) {
-                    alert('No pude identificar la fecha. Intenta decir: mediciones de hoy, ayer o del 4 de noviembre.');
+
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'No se identificó la fecha',
+                        text: 'No logramos reconocer el día solicitado. Intenta decir, por ejemplo: consulta las mediciones de ayer.',
+                        confirmButtonText: 'Intentar nuevamente',
+                        confirmButtonColor: '#C9A227',
+                        background: '#111827',
+                        color: '#ffffff',
+                        customClass: {
+                            popup: 'iot-swal-popup'
+                        }
+                    });
+
+                    hablar(
+                        'No logré identificar la fecha. Por favor, intenta decirla nuevamente.'
+                    );
+
                     return;
                 }
 
@@ -1664,11 +1682,22 @@
                     timeZone: 'America/Mexico_City'
                 });
 
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Consulta por voz',
+                    html: `Estoy filtrando las mediciones del <strong>${fechaTexto}</strong>.`,
+                    confirmButtonText: 'Entendido',
+                    confirmButtonColor: '#C9A227',
+                    background: '#111827',
+                    color: '#ffffff',
+                    timer: 3500,
+                    timerProgressBar: true
+                });
+
                 hablar(
                     `Claro, estoy filtrando las mediciones del ${fechaTexto}.`
                 );
 
-                // CONSULTAR MEDICIONES
                 actualizarMediciones();
             };
 
