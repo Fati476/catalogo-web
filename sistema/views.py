@@ -7817,3 +7817,452 @@ def api_notificaciones_cotizaciones(request):
         "notificaciones": notificaciones
     })
 
+
+@login_required
+def chatbot_admin(request):
+    """
+    PiroIA Administrativo:
+    - Consulta estadísticas del catálogo.
+    - Analiza solicitudes y cotizaciones.
+    - Consulta información de productos y usuarios.
+    - Prepara instrucciones para las herramientas del Dashboard.
+    - Utiliza texto y voz desde su propio frontend.
+    """
+
+    try:
+        # ======================================================
+        # 1. VALIDAR MÉTODO
+        # ======================================================
+
+        if request.method != "POST":
+            return JsonResponse({
+                "ok": False,
+                "respuesta": "Método de solicitud no permitido."
+            }, status=405)
+
+        # ======================================================
+        # 2. VALIDAR ADMINISTRADOR
+        # ======================================================
+
+        if not request.user.groups.filter(
+            name="Administrador"
+        ).exists():
+
+            return JsonResponse({
+                "ok": False,
+                "respuesta": (
+                    "No tienes autorización para utilizar "
+                    "PiroIA administrativo."
+                )
+            }, status=403)
+
+        # ======================================================
+        # 3. DATOS RECIBIDOS
+        # ======================================================
+
+        data = json.loads(request.body)
+
+        pregunta = data.get("mensaje", "").strip()
+
+        historial = data.get("historial", [])
+
+        if not isinstance(historial, list):
+            historial = []
+
+        historial = historial[-10:]
+
+        if not pregunta:
+            return JsonResponse({
+                "ok": False,
+                "respuesta": "Escribe o di algo para consultar."
+            }, status=400)
+
+        # ======================================================
+        # 4. OBTENER INFORMACIÓN REAL DEL SISTEMA
+        # ======================================================
+
+        hoy = timezone.localdate()
+
+        total_productos = Producto.objects.count()
+
+        total_categorias = Categoria.objects.count()
+
+        productos_activos = Producto.objects.filter(
+            estado=True
+        ).count()
+
+        productos_inactivos = Producto.objects.filter(
+            estado=False
+        ).count()
+
+        total_usuarios = User.objects.count()
+
+        solicitudes = SolicitudCotizacion.objects.filter(
+            enviada=True
+        )
+
+        total_solicitudes = solicitudes.count()
+
+        solicitudes_revision = solicitudes.filter(
+            estado="revision"
+        ).count()
+
+        solicitudes_cotizadas = solicitudes.filter(
+            estado="cotizada"
+        ).count()
+
+        solicitudes_rechazadas = solicitudes.filter(
+            estado="rechazada"
+        ).count()
+
+        # ======================================================
+        # 5. PRODUCTOS MÁS COTIZADOS
+        # ======================================================
+
+        productos_mas_cotizados = []
+
+        detalles = (
+            DetalleSolicitud.objects
+            .filter(
+                solicitud__enviada=True,
+                solicitud__estado="cotizada"
+            )
+            .values("producto__nombre")
+            .annotate(
+                total_unidades=Sum("cantidad"),
+                total_solicitudes=Count("solicitud", distinct=True)
+            )
+            .order_by("-total_unidades")[:5]
+        )
+
+        for producto in detalles:
+            productos_mas_cotizados.append({
+                "nombre": producto["producto__nombre"],
+                "unidades": producto["total_unidades"],
+                "solicitudes": producto["total_solicitudes"]
+            })
+
+        # ======================================================
+        # 6. CONSTRUIR ESTADÍSTICAS
+        # ======================================================
+
+        estadisticas = {
+            "fecha_consulta": hoy.isoformat(),
+
+            "productos": {
+                "total": total_productos,
+                "activos": productos_activos,
+                "inactivos": productos_inactivos
+            },
+
+            "categorias": total_categorias,
+
+            "usuarios": total_usuarios,
+
+            "solicitudes": {
+                "total": total_solicitudes,
+                "revision": solicitudes_revision,
+                "cotizadas": solicitudes_cotizadas,
+                "rechazadas": solicitudes_rechazadas
+            },
+
+            "productos_mas_cotizados": productos_mas_cotizados
+        }
+
+        # ======================================================
+        # 7. OBTENER API KEY DE GROQ
+        # ======================================================
+
+        api_key = os.getenv("GROQ_API_KEY")
+
+        if not api_key:
+            return JsonResponse({
+                "ok": False,
+                "respuesta": (
+                    "No se encontró la configuración "
+                    "de PiroIA."
+                )
+            }, status=500)
+
+        # ======================================================
+        # 8. HISTORIAL DE CONVERSACIÓN
+        # ======================================================
+
+        historial_texto = json.dumps(
+            historial,
+            ensure_ascii=False
+        )
+
+        estadisticas_texto = json.dumps(
+            estadisticas,
+            ensure_ascii=False
+        )
+
+        # ======================================================
+        # 9. INSTRUCCIONES ADMINISTRATIVAS
+        # ======================================================
+
+        instrucciones = f"""
+Eres PiroIA, el asistente administrativo inteligente
+del sistema Catálogo Web.
+
+Tu función es ayudar al administrador a consultar,
+comprender y analizar la información del sistema.
+
+ESTADÍSTICAS REALES:
+
+{estadisticas_texto}
+
+HISTORIAL RECIENTE:
+
+{historial_texto}
+
+INSTRUCCIONES:
+
+1. Responde siempre en español.
+2. Utiliza los datos reales proporcionados.
+3. No inventes estadísticas.
+4. Explica los resultados de manera clara y natural.
+5. Puedes realizar comparaciones únicamente cuando
+   los datos disponibles lo permitan.
+6. Si falta información, indícalo.
+7. No muestres información confidencial de usuarios.
+8. No modifiques productos, usuarios ni solicitudes.
+9. No afirmes haber cambiado gráficas o filtros.
+10. No afirmes haber generado un PDF si no se ha ejecutado.
+
+CAPACIDADES SOLICITADAS:
+
+Puedes identificar instrucciones relacionadas con:
+
+- Consultar estadísticas.
+- Analizar productos.
+- Consultar solicitudes.
+- Comparar resultados.
+- Mostrar información IoT.
+- Cambiar filtros y gráficas.
+- Generar reportes PDF.
+
+Las herramientas para ejecutar acciones visuales,
+consultar mediciones IoT y generar documentos
+se incorporarán mediante funciones autorizadas de Django.
+
+FORMATO OBLIGATORIO:
+
+Devuelve únicamente JSON válido con esta estructura:
+
+{{
+    "respuesta": "Respuesta para el administrador",
+    "accion": "ninguna",
+    "tipo_accion": "consulta",
+    "datos": {{}}
+}}
+
+TIPOS DE ACCIÓN:
+
+- consulta
+- analizar
+- filtrar
+- cambiar_grafica
+- consultar_iot
+- generar_reporte
+- ninguna
+
+Si el usuario solicita una acción que todavía no está
+disponible, explica que su ejecución se encuentra
+en proceso de integración.
+
+PREGUNTA ACTUAL:
+
+{pregunta}
+"""
+
+        # ======================================================
+        # 10. CONEXIÓN CON GROQ
+        # ======================================================
+
+        url = (
+            "https://api.groq.com/openai/v1/chat/completions"
+        )
+
+        headers = {
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json"
+        }
+
+        payload = {
+            "model": "openai/gpt-oss-120b",
+
+            "messages": [
+                {
+                    "role": "system",
+                    "content": (
+                        "Eres PiroIA administrativo. "
+                        "Sigue las instrucciones y devuelve "
+                        "únicamente JSON válido."
+                    )
+                },
+                {
+                    "role": "user",
+                    "content": instrucciones
+                }
+            ],
+
+            "temperature": 0.1,
+            "max_tokens": 900,
+            "reasoning_effort": "low",
+
+            "response_format": {
+                "type": "json_object"
+            }
+        }
+
+        # ======================================================
+        # 11. ENVIAR SOLICITUD
+        # ======================================================
+
+        respuesta_groq = requests.post(
+            url,
+            headers=headers,
+            json=payload,
+            timeout=(5, 30)
+        )
+
+        if respuesta_groq.status_code != 200:
+
+            print(
+                "ERROR PIROIA ADMIN:",
+                respuesta_groq.status_code,
+                respuesta_groq.text[:1500]
+            )
+
+            return JsonResponse({
+                "ok": False,
+                "respuesta": (
+                    "PiroIA no pudo procesar la consulta. "
+                    "Intenta nuevamente."
+                )
+            }, status=502)
+
+        # ======================================================
+        # 12. PROCESAR RESPUESTA
+        # ======================================================
+
+        resultado = respuesta_groq.json()
+
+        choices = resultado.get("choices", [])
+
+        if not choices:
+            raise ValueError(
+                "Groq no devolvió una respuesta."
+            )
+
+        contenido = (
+            choices[0]
+            .get("message", {})
+            .get("content")
+        )
+
+        if not contenido:
+            raise ValueError(
+                "La respuesta de Groq está vacía."
+            )
+
+        resultado_ia = json.loads(contenido)
+
+        respuesta_texto = resultado_ia.get(
+            "respuesta",
+            "No pude interpretar tu consulta."
+        )
+
+        accion = resultado_ia.get(
+            "accion",
+            "ninguna"
+        )
+
+        tipo_accion = resultado_ia.get(
+            "tipo_accion",
+            "consulta"
+        )
+
+        datos = resultado_ia.get(
+            "datos",
+            {}
+        )
+
+        # ======================================================
+        # 13. VALIDAR RESPUESTA
+        # ======================================================
+
+        acciones_permitidas = [
+            "ninguna",
+            "consulta",
+            "analizar",
+            "filtrar",
+            "cambiar_grafica",
+            "consultar_iot",
+            "generar_reporte"
+        ]
+
+        if accion not in acciones_permitidas:
+            accion = "ninguna"
+
+        if not isinstance(datos, dict):
+            datos = {}
+
+        # ======================================================
+        # 14. RESPUESTA AL FRONTEND
+        # ======================================================
+
+        return JsonResponse({
+            "ok": True,
+            "respuesta": respuesta_texto,
+            "accion": accion,
+            "tipo_accion": tipo_accion,
+            "datos": datos,
+            "estadisticas": estadisticas
+        })
+
+    # ==========================================================
+    # 15. ERRORES
+    # ==========================================================
+
+    except json.JSONDecodeError:
+
+        return JsonResponse({
+            "ok": False,
+            "respuesta": "La solicitud contiene JSON inválido."
+        }, status=400)
+
+    except requests.exceptions.Timeout:
+
+        return JsonResponse({
+            "ok": False,
+            "respuesta": (
+                "PiroIA tardó demasiado en responder. "
+                "Intenta nuevamente."
+            )
+        }, status=504)
+
+    except requests.exceptions.RequestException as e:
+
+        print("ERROR DE CONEXIÓN PIROIA ADMIN:", str(e))
+
+        return JsonResponse({
+            "ok": False,
+            "respuesta": (
+                "No fue posible conectar con PiroIA."
+            )
+        }, status=502)
+
+    except Exception as e:
+
+        print("ERROR GENERAL PIROIA ADMIN:", str(e))
+
+        return JsonResponse({
+            "ok": False,
+            "respuesta": (
+                "Ocurrió un problema al procesar "
+                "tu solicitud administrativa."
+            )
+        }, status=500)

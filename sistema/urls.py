@@ -369,6 +369,12 @@ urlpatterns = [
         name="descargar_preorden_pdf",
     ),
 
+    path(
+        'api/chatbot-admin/',
+        views.chatbot_admin,
+        name='chatbot_admin'
+    ),
+
 
 
 

@@ -1,0 +1,633 @@
+
+{% load static %}
+
+<style>
+    #piroia-admin-button {
+        position: fixed;
+        left: 24px;
+        bottom: 24px;
+        z-index: 3000;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 19px;
+        border: 1px solid #D6B84A;
+        border-radius: 50px;
+        background: linear-gradient(135deg,#292929,#111);
+        color: #F4E4A6;
+        font-weight: 800;
+        box-shadow: 0 8px 25px #0003;
+        cursor: pointer;
+        transition: .25s;
+    }
+
+    #piroia-admin-button:hover {
+        transform: translateY(-4px);
+        background: #C9A227;
+        color: #171717;
+    }
+
+    #piroia-admin-button i {
+        font-size: 21px;
+    }
+
+    #piroia-admin-window {
+        position: fixed;
+        left: 24px;
+        bottom: 85px;
+        z-index: 3001;
+        width: min(390px,calc(100vw - 30px));
+        height: min(570px,calc(100vh - 110px));
+        display: none;
+        flex-direction: column;
+        overflow: hidden;
+        background: white;
+        border: 1px solid #D6B84A;
+        border-radius: 22px;
+        box-shadow: 0 18px 55px #0004;
+        font-family: 'Montserrat',sans-serif;
+    }
+
+    #piroia-admin-window.open {
+        display: flex;
+        animation: piroiaEntrada .25s ease;
+    }
+
+    @keyframes piroiaEntrada {
+        from {opacity:0;transform:translateY(15px)}
+        to {opacity:1;transform:translateY(0)}
+    }
+
+    .piroia-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px;
+        color: white;
+        background: linear-gradient(135deg,#171717,#34302A);
+        border-bottom: 2px solid #C9A227;
+    }
+
+    .piroia-header-info {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+    }
+
+    .piroia-avatar {
+        width: 43px;
+        height: 43px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 14px;
+        background: linear-gradient(135deg,#F4E4A6,#C9A227);
+        color: #171717;
+        font-size: 22px;
+    }
+
+    .piroia-header h5 {
+        margin: 0;
+        color: #F4E4A6;
+        font-size: .95rem;
+        font-weight: 900;
+    }
+
+    .piroia-header small {
+        color: #ddd;
+        font-size: .7rem;
+    }
+
+    #piroia-admin-close {
+        border: 0;
+        background: transparent;
+        color: white;
+        font-size: 22px;
+        cursor: pointer;
+    }
+
+    .piroia-status {
+        padding: 9px 15px;
+        background: #FAF8F1;
+        color: #16834A;
+        font-size: .72rem;
+        font-weight: 700;
+        border-bottom: 1px solid #eee;
+    }
+
+    #piroia-admin-messages {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        overflow-y: auto;
+        padding: 16px;
+        background: #F8F7F3;
+    }
+
+    .piroia-message {
+        max-width: 88%;
+        padding: 12px 14px;
+        border-radius: 15px;
+        font-size: .81rem;
+        line-height: 1.6;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+    }
+
+    .piroia-message.bot {
+        align-self: flex-start;
+        background: white;
+        color: #292929;
+        border: 1px solid #eee8d8;
+        border-bottom-left-radius: 4px;
+    }
+
+    .piroia-message.user {
+        align-self: flex-end;
+        background: #292929;
+        color: white;
+        border-bottom-right-radius: 4px;
+    }
+
+    .piroia-message.typing {
+        color: #8A6D12;
+        font-style: italic;
+    }
+
+    .piroia-suggestions {
+        display: flex;
+        gap: 7px;
+        padding: 10px;
+        overflow-x: auto;
+        background: white;
+        border-top: 1px solid #eee;
+    }
+
+    .piroia-suggestions button {
+        flex-shrink: 0;
+        padding: 7px 11px;
+        border: 1px solid #D9C47B;
+        border-radius: 20px;
+        background: #FFFCF2;
+        color: #70570E;
+        font-size: .7rem;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .piroia-input-area {
+        padding: 12px;
+        background: white;
+        border-top: 1px solid #eee;
+    }
+
+    .piroia-input-row {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        padding: 5px;
+        background: #F7F6F2;
+        border: 1px solid #E5DFCE;
+        border-radius: 15px;
+    }
+
+    #piroia-admin-input {
+        flex: 1;
+        min-width: 0;
+        padding: 10px 8px;
+        border: 0;
+        outline: 0;
+        background: transparent;
+        color: #222;
+        font-size: .8rem;
+    }
+
+    .piroia-control {
+        width: 38px;
+        height: 38px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 0;
+        border-radius: 12px;
+        background: #292929;
+        color: #F4E4A6;
+        cursor: pointer;
+    }
+
+    .piroia-control:hover {
+        background: #C9A227;
+        color: #171717;
+    }
+
+    .piroia-control:disabled {
+        opacity: .5;
+        cursor: not-allowed;
+    }
+
+    #piroia-admin-mic.listening {
+        background: #B91C1C;
+        color: white;
+    }
+
+    .piroia-footer {
+        padding: 7px;
+        text-align: center;
+        color: #999;
+        background: white;
+        font-size: .62rem;
+    }
+
+    @media(max-width:576px) {
+        #piroia-admin-button {
+            left: 15px;
+            bottom: 15px;
+        }
+
+        #piroia-admin-window {
+            left: 15px;
+            bottom: 78px;
+        }
+    }
+</style>
+
+
+<!-- BOTÓN FLOTANTE -->
+
+<button id="piroia-admin-button" type="button">
+    <i class="bi bi-robot"></i>
+    PiroIA Admin
+</button>
+
+
+<!-- VENTANA DEL CHAT -->
+
+<div id="piroia-admin-window">
+
+    <div class="piroia-header">
+
+        <div class="piroia-header-info">
+
+            <div class="piroia-avatar">
+                <i class="bi bi-robot"></i>
+            </div>
+
+            <div>
+                <h5>PiroIA Administrativo</h5>
+                <small>Asistente inteligente del sistema</small>
+            </div>
+
+        </div>
+
+        <button id="piroia-admin-close" type="button">
+            <i class="bi bi-x-lg"></i>
+        </button>
+
+    </div>
+
+    <div class="piroia-status">
+        <i class="bi bi-circle-fill"></i>
+        Asistente disponible
+    </div>
+
+    <div id="piroia-admin-messages">
+
+        <div class="piroia-message bot">
+            ¡Hola! Soy PiroIA, tu asistente administrativo.
+
+            Puedo ayudarte a consultar las estadísticas,
+            analizar las solicitudes y conocer el movimiento
+            del catálogo.
+
+            ¿Qué necesitas consultar?
+        </div>
+
+    </div>
+
+    <div class="piroia-suggestions">
+
+        <button type="button"
+                data-prompt="Dame un resumen de las estadísticas actuales del sistema.">
+            <i class="bi bi-bar-chart"></i> Resumen
+        </button>
+
+        <button type="button"
+                data-prompt="Compara las solicitudes cotizadas, rechazadas y en revisión.">
+            <i class="bi bi-arrow-left-right"></i> Comparar
+        </button>
+
+        <button type="button"
+                data-prompt="¿Cuáles son los cinco productos más cotizados?">
+            <i class="bi bi-trophy"></i> Productos
+        </button>
+
+    </div>
+
+    <div class="piroia-input-area">
+
+        <div class="piroia-input-row">
+
+            <button id="piroia-admin-mic"
+                    class="piroia-control"
+                    type="button"
+                    title="Hablar">
+                <i class="bi bi-mic-fill"></i>
+            </button>
+
+            <input
+                id="piroia-admin-input"
+                type="text"
+                placeholder="Escribe tu consulta..."
+                autocomplete="off">
+
+            <button id="piroia-admin-send"
+                    class="piroia-control"
+                    type="button"
+                    title="Enviar">
+                <i class="bi bi-send-fill"></i>
+            </button>
+
+        </div>
+
+    </div>
+
+    <div class="piroia-footer">
+        PiroIA · Inteligencia artificial administrativa
+    </div>
+
+</div>
+
+
+<!-- TOKEN CSRF -->
+
+<form id="piroia-admin-csrf" hidden>
+    {% csrf_token %}
+</form>
+
+
+<script>
+(function () {
+
+    // Evita registrar los eventos más de una vez.
+    if (window.piroiaAdminInicializado) return;
+    window.piroiaAdminInicializado = true;
+
+    function iniciarPiroIA() {
+
+        const boton = document.getElementById("piroia-admin-button");
+        const ventana = document.getElementById("piroia-admin-window");
+        const cerrar = document.getElementById("piroia-admin-close");
+        const mensajes = document.getElementById("piroia-admin-messages");
+        const entrada = document.getElementById("piroia-admin-input");
+        const enviar = document.getElementById("piroia-admin-send");
+        const microfono = document.getElementById("piroia-admin-mic");
+
+        if (!boton || !ventana) return;
+
+        let historial = [];
+        let reconocimiento = null;
+        let escuchando = false;
+
+        // ABRIR Y CERRAR
+
+        boton.addEventListener("click", function () {
+            ventana.classList.toggle("open");
+
+            if (ventana.classList.contains("open")) {
+                entrada.focus();
+            }
+        });
+
+        cerrar.addEventListener("click", function () {
+            ventana.classList.remove("open");
+        });
+
+        // CSRF
+
+        function obtenerCSRF() {
+            const token = document.querySelector(
+                "#piroia-admin-csrf [name=csrfmiddlewaretoken]"
+            );
+
+            return token ? token.value : "";
+        }
+
+        // AGREGAR MENSAJES
+
+        function agregarMensaje(texto, tipo) {
+            const elemento = document.createElement("div");
+
+            elemento.className = "piroia-message " + tipo;
+            elemento.textContent = texto;
+
+            mensajes.appendChild(elemento);
+            mensajes.scrollTop = mensajes.scrollHeight;
+
+            return elemento;
+        }
+
+        // RESPUESTA POR VOZ
+
+        function hablar(texto) {
+            if (!("speechSynthesis" in window)) return;
+
+            window.speechSynthesis.cancel();
+
+            const voz = new SpeechSynthesisUtterance(texto);
+            voz.lang = "es-MX";
+            voz.rate = 1;
+
+            window.speechSynthesis.speak(voz);
+        }
+
+        // ENVIAR CONSULTA
+
+        async function enviarMensaje(texto) {
+
+            texto = texto.trim();
+
+            if (!texto || enviar.disabled) return;
+
+            agregarMensaje(texto, "user");
+
+            entrada.value = "";
+            enviar.disabled = true;
+            microfono.disabled = true;
+
+            const escribiendo = agregarMensaje(
+                "PiroIA está analizando tu consulta...",
+                "bot typing"
+            );
+
+            try {
+
+                const respuesta = await fetch(
+                    "/api/chatbot-admin/",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRFToken": obtenerCSRF()
+                        },
+
+                        credentials: "same-origin",
+
+                        body: JSON.stringify({
+                            mensaje: texto,
+                            historial: historial
+                        })
+                    }
+                );
+
+                const resultado = await respuesta.json();
+
+                escribiendo.remove();
+
+                if (!respuesta.ok || !resultado.ok) {
+                    agregarMensaje(
+                        resultado.respuesta ||
+                        "No fue posible procesar la consulta.",
+                        "bot"
+                    );
+                    return;
+                }
+
+                const textoRespuesta = resultado.respuesta ||
+                    "No recibí una respuesta.";
+
+                agregarMensaje(textoRespuesta, "bot");
+
+                historial.push({
+                    role: "user",
+                    content: texto
+                });
+
+                historial.push({
+                    role: "assistant",
+                    content: textoRespuesta
+                });
+
+                historial = historial.slice(-10);
+
+                hablar(textoRespuesta);
+
+            } catch (error) {
+
+                escribiendo.remove();
+
+                console.error("Error PiroIA:", error);
+
+                agregarMensaje(
+                    "No pude conectar con el servidor. Intenta nuevamente.",
+                    "bot"
+                );
+
+            } finally {
+
+                enviar.disabled = false;
+                microfono.disabled = false;
+                entrada.focus();
+
+            }
+        }
+
+        // BOTÓN ENVIAR
+
+        enviar.addEventListener("click", function () {
+            enviarMensaje(entrada.value);
+        });
+
+        // ENTER
+
+        entrada.addEventListener("keydown", function (event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                enviarMensaje(entrada.value);
+            }
+        });
+
+        // PREGUNTAS SUGERIDAS
+
+        document.querySelectorAll(
+            "#piroia-admin-window [data-prompt]"
+        ).forEach(function (elemento) {
+
+            elemento.addEventListener("click", function () {
+                enviarMensaje(this.dataset.prompt);
+            });
+
+        });
+
+        // RECONOCIMIENTO DE VOZ
+
+        const SpeechRecognition =
+            window.SpeechRecognition ||
+            window.webkitSpeechRecognition;
+
+        if (SpeechRecognition) {
+
+            reconocimiento = new SpeechRecognition();
+
+            reconocimiento.lang = "es-MX";
+            reconocimiento.continuous = false;
+            reconocimiento.interimResults = false;
+
+            reconocimiento.onstart = function () {
+                escuchando = true;
+                microfono.classList.add("listening");
+            };
+
+            reconocimiento.onresult = function (event) {
+                const texto = event.results[0][0].transcript;
+                entrada.value = texto;
+                enviarMensaje(texto);
+            };
+
+            reconocimiento.onerror = function (event) {
+                console.error("Error de voz:", event.error);
+
+                agregarMensaje(
+                    "No pude reconocer tu voz. Intenta nuevamente.",
+                    "bot"
+                );
+            };
+
+            reconocimiento.onend = function () {
+                escuchando = false;
+                microfono.classList.remove("listening");
+            };
+
+            microfono.addEventListener("click", function () {
+
+                if (escuchando) {
+                    reconocimiento.stop();
+                } else {
+                    try {
+                        reconocimiento.start();
+                    } catch (error) {
+                        console.error(error);
+                    }
+                }
+
+            });
+
+        } else {
+
+            microfono.disabled = true;
+            microfono.title = "Reconocimiento de voz no disponible.";
+
+        }
+
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", iniciarPiroIA);
+    } else {
+        iniciarPiroIA();
+    }
+
+})();
+</script>
