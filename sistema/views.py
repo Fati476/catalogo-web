@@ -8825,13 +8825,41 @@ PREGUNTA:
             ).order_by("-total")[:10]
         )
 
-        meses_grafica = list(
-            solicitudes_grafica.annotate(
-                mes=TruncMonth("fecha")
-            ).values("mes").annotate(
-                total=Count("id")
-            ).order_by("mes")
+        
+        # Agrupar solicitudes por mes utilizando Python
+        # Evita utilizar CONVERT_TZ de MySQL mediante TruncMonth.
+
+        conteo_meses = {}
+
+        fechas_solicitudes = solicitudes_grafica.values_list(
+            "fecha",
+            flat=True
         )
+
+        for fecha_solicitud in fechas_solicitudes:
+
+            if not fecha_solicitud:
+                continue
+
+            # Convertir a la zona horaria local desde Python.
+            if timezone.is_aware(fecha_solicitud):
+                fecha_solicitud = timezone.localtime(fecha_solicitud)
+
+            clave = (
+                fecha_solicitud.year,
+                fecha_solicitud.month
+            )
+
+            conteo_meses[clave] = conteo_meses.get(clave, 0) + 1
+
+        meses_grafica = [
+            {
+                "etiqueta": datetime(anio, mes, 1).strftime("%b %Y"),
+                "total": total
+            }
+            for (anio, mes), total in sorted(conteo_meses.items())
+        ]
+
 
         graficas_piroia = {
             "estados": {
@@ -8858,7 +8886,7 @@ PREGUNTA:
             },
             "meses": {
                 "labels": [
-                    item["mes"].strftime("%b %Y")
+                    item["etiqueta"]
                     for item in meses_grafica
                 ],
                 "valores": [
