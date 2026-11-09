@@ -9484,21 +9484,42 @@ def generar_reporte_general_piroia(request):
     return respuesta
 
 
+
 def interpretar_periodo_piroia(texto, hoy=None):
     import re
+    import unicodedata
     from datetime import date, timedelta
     from calendar import monthrange
 
     hoy = hoy or date.today()
-    texto = texto.lower().strip()
+
+    # Normalizar texto para reconocer meses con o sin acentos.
+    texto = unicodedata.normalize("NFD", texto.lower().strip())
+    texto = "".join(
+        caracter for caracter in texto
+        if unicodedata.category(caracter) != "Mn"
+    )
 
     meses = {
-        "enero": 1, "febrero": 2, "marzo": 3,
-        "abril": 4, "mayo": 5, "junio": 6,
-        "julio": 7, "agosto": 8, "septiembre": 9,
-        "setiembre": 9, "octubre": 10, "noviembre": 11,
+        "enero": 1,
+        "febrero": 2,
+        "marzo": 3,
+        "abril": 4,
+        "mayo": 5,
+        "junio": 6,
+        "julio": 7,
+        "agosto": 8,
+        "septiembre": 9,
+        "setiembre": 9,
+        "octubre": 10,
+        "noviembre": 11,
         "diciembre": 12
     }
+
+    patron_meses = (
+        r"enero|febrero|marzo|abril|mayo|junio|julio|agosto|"
+        r"septiembre|setiembre|octubre|noviembre|diciembre"
+    )
 
     # Hoy
     if re.search(r"\b(hoy|de hoy)\b", texto):
@@ -9510,13 +9531,18 @@ def interpretar_periodo_piroia(texto, hoy=None):
         return ayer, ayer
 
     # Últimos N días
-    match = re.search(r"(?:ultimos|ultimas)\s+(\d+)\s+dias", texto)
+    match = re.search(
+        r"(?:ultimos|ultimas)\s+(\d+)\s+dias",
+        texto
+    )
+
     if match:
         cantidad = int(match.group(1))
+
         if 1 <= cantidad <= 366:
             return hoy - timedelta(days=cantidad - 1), hoy
 
-    # Esta semana (lunes hasta hoy)
+    # Esta semana
     if "esta semana" in texto:
         inicio = hoy - timedelta(days=hoy.weekday())
         return inicio, hoy
@@ -9527,40 +9553,53 @@ def interpretar_periodo_piroia(texto, hoy=None):
 
     # Mes pasado
     if "mes pasado" in texto or "mes anterior" in texto:
-        ultimo_dia_mes_anterior = hoy.replace(day=1) - timedelta(days=1)
+        ultimo_dia = hoy.replace(day=1) - timedelta(days=1)
+
         return (
-            ultimo_dia_mes_anterior.replace(day=1),
-            ultimo_dia_mes_anterior
+            ultimo_dia.replace(day=1),
+            ultimo_dia
         )
 
     # Año actual
-    if "este año" in texto or "año actual" in texto:
+    if "este ano" in texto or "ano actual" in texto:
         return date(hoy.year, 1, 1), hoy
 
-    # Fechas numéricas: del 01/10/2026 al 15/10/2026
+    # Fechas numéricas:
+    # Del 01/10/2026 al 15/10/2026
     match = re.search(
         r"del?\s+(\d{1,2})[/-](\d{1,2})[/-](\d{4})"
         r"\s+(?:al|hasta)\s+(\d{1,2})[/-](\d{1,2})[/-](\d{4})",
         texto
     )
+
     if match:
         try:
-            inicio = date(int(match.group(3)), int(match.group(2)), int(match.group(1)))
-            fin = date(int(match.group(6)), int(match.group(5)), int(match.group(4)))
+            inicio = date(
+                int(match.group(3)),
+                int(match.group(2)),
+                int(match.group(1))
+            )
+
+            fin = date(
+                int(match.group(6)),
+                int(match.group(5)),
+                int(match.group(4))
+            )
+
             if inicio <= fin:
                 return inicio, fin
+
         except ValueError:
             pass
 
     # Del día X al día Y de un mes:
-    # "del 1 al 15 de octubre"
+    # Del 1 al 15 de octubre
     match = re.search(
-        r"del?\s+(\d{1,2})\s+al\s+(\d{1,2})\s+"
-        r"de\s+(enero|febrero|marzo|abril|mayo|junio|julio|agosto|"
-        r"septiembre|setiembre|octubre|noviembre|diciembre)"
-        r"(?:\s+de\s+(\d{4}))?",
+        rf"del?\s+(\d{{1,2}})\s+al\s+(\d{{1,2}})\s+"
+        rf"de\s+({patron_meses})(?:\s+de\s+(\d{{4}}))?",
         texto
     )
+
     if match:
         try:
             dia_inicio = int(match.group(1))
@@ -9573,35 +9612,51 @@ def interpretar_periodo_piroia(texto, hoy=None):
 
             if inicio <= fin:
                 return inicio, fin
+
         except ValueError:
             pass
 
     # Del día X de un mes al día Y de otro mes:
-    # "del 1 de enero al 15 de febrero de 2026"
+    # Del 1 de enero al 15 de febrero de 2026
     match = re.search(
-        r"del?\s+(\d{1,2})\s+de\s+([a-z]+)\s+al\s+"
-        r"(\d{1,2})\s+de\s+([a-z]+)(?:\s+de\s+(\d{4}))?",
+        rf"del?\s+(\d{{1,2}})\s+de\s+({patron_meses})\s+al\s+"
+        rf"(\d{{1,2}})\s+de\s+({patron_meses})(?:\s+de\s+(\d{{4}}))?",
         texto
     )
-    if match and match.group(2) in meses and match.group(4) in meses:
+
+    if match:
         try:
             anio = int(match.group(5)) if match.group(5) else hoy.year
-            inicio = date(anio, meses[match.group(2)], int(match.group(1)))
-            fin = date(anio, meses[match.group(4)], int(match.group(3)))
+
+            inicio = date(
+                anio,
+                meses[match.group(2)],
+                int(match.group(1))
+            )
+
+            fin = date(
+                anio,
+                meses[match.group(4)],
+                int(match.group(3))
+            )
 
             if inicio <= fin:
                 return inicio, fin
+
         except ValueError:
             pass
 
     # De enero a marzo de 2026
     match = re.search(
-        r"de\s+([a-z]+)\s+a\s+([a-z]+)(?:\s+de\s+(\d{4}))?",
+        rf"de\s+({patron_meses})\s+a\s+({patron_meses})"
+        rf"(?:\s+de\s+(\d{{4}}))?",
         texto
     )
-    if match and match.group(1) in meses and match.group(2) in meses:
+
+    if match:
         try:
             anio = int(match.group(3)) if match.group(3) else hoy.year
+
             mes_inicio = meses[match.group(1)]
             mes_fin = meses[match.group(2)]
 
@@ -9611,19 +9666,58 @@ def interpretar_periodo_piroia(texto, hoy=None):
 
             if inicio <= fin:
                 return inicio, fin
+
+        except ValueError:
+            pass
+
+    # Desde el día X de un mes hasta hoy:
+    # Desde el 7 de junio
+    # A partir del 7 de junio
+    # Desde el 7 de junio de 2026 hasta hoy
+    match = re.search(
+        rf"(?:desde|a partir del|del)\s+(\d{{1,2}})\s+"
+        rf"de\s+({patron_meses})(?:\s+de\s+(\d{{4}}))?",
+        texto
+    )
+
+    if match:
+        try:
+            dia = int(match.group(1))
+            mes = meses[match.group(2)]
+            anio = int(match.group(3)) if match.group(3) else hoy.year
+
+            inicio = date(anio, mes, dia)
+
+            if inicio <= hoy:
+                return inicio, hoy
+
         except ValueError:
             pass
 
     # Solo un día de inicio y fin, sin mencionar el mes:
-    # "del 1 al 15" -> mes y año actuales
-    match = re.search(r"del?\s+(\d{1,2})\s+al\s+(\d{1,2})(?![\d/])", texto)
+    # Del 1 al 15 -> mes y año actuales
+    match = re.search(
+        r"del?\s+(\d{1,2})\s+al\s+(\d{1,2})(?![\d/])",
+        texto
+    )
+
     if match:
         try:
-            inicio = date(hoy.year, hoy.month, int(match.group(1)))
-            fin = date(hoy.year, hoy.month, int(match.group(2)))
+            inicio = date(
+                hoy.year,
+                hoy.month,
+                int(match.group(1))
+            )
+
+            fin = date(
+                hoy.year,
+                hoy.month,
+                int(match.group(2))
+            )
 
             if inicio <= fin:
                 return inicio, fin
+
         except ValueError:
             pass
 
