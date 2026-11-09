@@ -1999,6 +1999,67 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // ==========================================
+    // CONEXIÓN DEL DASHBOARD CON PIROIA
+    // ==========================================
+    window.piroiaAdminDashboard = {
+
+        cambiarGrafica: function(id, tipo) {
+            const canvas = document.getElementById(id);
+
+            if (!canvas || !tiposPorGrafica[id]) {
+                return false;
+            }
+
+            if (!tiposPorGrafica[id].includes(tipo)) {
+                return false;
+            }
+
+            cambiarTipoGrafica(id, tipo);
+            indicesTipos[id] = tiposPorGrafica[id].indexOf(tipo);
+
+            return true;
+        },
+
+        aplicarFiltros: function(datos) {
+            const formulario = document.querySelector(".dashboard-filter");
+
+            if (!formulario || !datos) {
+                return false;
+            }
+
+            const fechaInicio = formulario.querySelector("#fecha_inicio");
+            const fechaFin = formulario.querySelector("#fecha_fin");
+            const estado = formulario.querySelector("#estado");
+
+            const estadosPermitidos = [
+                "todos",
+                "revision",
+                "cotizada",
+                "rechazada"
+            ];
+
+            if (datos.fecha_inicio && fechaInicio) {
+                fechaInicio.value = datos.fecha_inicio;
+            }
+
+            if (datos.fecha_fin && fechaFin) {
+                fechaFin.value = datos.fecha_fin;
+            }
+
+            if (
+                datos.estado &&
+                estado &&
+                estadosPermitidos.includes(datos.estado)
+            ) {
+                estado.value = datos.estado;
+            }
+    
+            formulario.requestSubmit();
+            return true;
+        }
+    };
+
+    // ==========================================
     // 15. ROTACIÓN AUTOMÁTICA CADA MINUTO
     // ==========================================
 
@@ -2128,6 +2189,36 @@ document.addEventListener("DOMContentLoaded", function () {
     ].forEach(conectarInteraccion);
 
     console.log("Dashboard interactivo cargado correctamente.");
+
+    // ==========================================
+    // RECUPERAR ACCIONES PENDIENTES DE PIROIA
+    // ==========================================
+    const accionPendiente = sessionStorage.getItem(
+        "piroia_accion_pendiente"
+    );
+
+    if (accionPendiente) {
+        try {
+            const pendiente = JSON.parse(accionPendiente);
+
+            if (
+                pendiente.accion === "cambiar_grafica" &&
+                pendiente.datos &&
+                window.piroiaAdminDashboard
+            ) {
+                window.piroiaAdminDashboard.cambiarGrafica(
+                    pendiente.datos.grafica,
+                    pendiente.datos.tipo
+                );
+            }
+
+        } catch (error) {
+            console.error("Error al recuperar acción de PiroIA:", error);
+
+        } finally {
+            sessionStorage.removeItem("piroia_accion_pendiente");
+        }
+    }
 
 });
 </script>

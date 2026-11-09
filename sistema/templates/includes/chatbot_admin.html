@@ -414,6 +414,21 @@
             return token ? token.value : "";
         }
 
+        // ==========================================
+        // OBTENER FILTROS ACTUALES DEL DASHBOARD
+        // ==========================================
+        function obtenerFiltrosDashboard() {
+            const fechaInicio = document.getElementById("fecha_inicio");
+            const fechaFin = document.getElementById("fecha_fin");
+            const estado = document.getElementById("estado");
+
+            return {
+                fecha_inicio: fechaInicio ? fechaInicio.value : "",
+                fecha_fin: fechaFin ? fechaFin.value : "",
+                estado: estado ? estado.value : "todos"
+            };
+        }
+
         // AGREGAR MENSAJES
 
         function agregarMensaje(texto, tipo) {
@@ -426,6 +441,78 @@
             mensajes.scrollTop = mensajes.scrollHeight;
 
             return elemento;
+        }
+
+        // ==========================================
+        // EJECUTAR ACCIONES DE PIROIA
+        // ==========================================
+        function ejecutarAccion(resultado) {
+
+            const accion = resultado.accion;
+            const datos = resultado.datos || {};
+            const urlDashboard = resultado.url_dashboard;
+
+            // Abrir el Dashboard
+            if (accion === "abrir_dashboard") {
+                if (urlDashboard) {
+                    window.location.href = urlDashboard;
+                }
+                return;
+            }
+
+            // Aplicar filtros del Dashboard
+            if (accion === "filtrar_dashboard") {
+
+                if (window.piroiaAdminDashboard) {
+                    window.piroiaAdminDashboard.aplicarFiltros(datos);
+                    return;
+                }
+
+                if (urlDashboard) {
+                    const parametros = new URLSearchParams();
+
+                    if (datos.fecha_inicio) {
+                        parametros.set("fecha_inicio", datos.fecha_inicio);
+                    }
+
+                    if (datos.fecha_fin) {
+                        parametros.set("fecha_fin", datos.fecha_fin);
+                    }
+
+                    if (datos.estado) {
+                        parametros.set("estado", datos.estado);
+                    }
+
+                    window.location.href =
+                        urlDashboard + "?" + parametros.toString();
+                }
+
+                return;
+            }
+
+            // Cambiar el tipo de gráfica
+            if (accion === "cambiar_grafica") {
+
+               if (window.piroiaAdminDashboard) {
+                    window.piroiaAdminDashboard.cambiarGrafica(
+                        datos.grafica,
+                        datos.tipo
+                    );
+                    return;
+                }
+
+                if (urlDashboard) {
+                    sessionStorage.setItem(
+                        "piroia_accion_pendiente",
+                        JSON.stringify({
+                            accion: accion,
+                            datos: datos
+                        })
+                    );
+
+                    window.location.href = urlDashboard;
+                }
+            }
         }
 
         // RESPUESTA POR VOZ
@@ -477,7 +564,8 @@
 
                         body: JSON.stringify({
                             mensaje: texto,
-                            historial: historial
+                            historial: historial,
+                            filtros_dashboard: obtenerFiltrosDashboard()
                         })
                     }
                 );
@@ -499,6 +587,7 @@
                     "No recibí una respuesta.";
 
                 agregarMensaje(textoRespuesta, "bot");
+                ejecutarAccion(resultado);
 
                 historial.push({
                     role: "user",
