@@ -8002,13 +8002,26 @@ ACCIONES PERMITIDAS:
 Para preguntas, análisis y conversaciones normales.
 
 2. abrir_dashboard
-Para solicitudes de abrir el dashboard.
+Para abrir específicamente el Dashboard.
 
-3. filtrar_dashboard
-Para aplicar fechas y estados.
+3. abrir_modulo
+Para navegar a otro módulo administrativo.
 
-4. cambiar_grafica
+4. filtrar_dashboard
+Para aplicar fechas y estados al Dashboard.
+
+5. cambiar_grafica
 Para cambiar el formato de una gráfica.
+
+MÓDULOS ADMINISTRATIVOS DISPONIBLES:
+
+productos
+categorias
+usuarios
+solicitudes
+cotizaciones
+seguridad
+monitoreo_iot
 
 ESTADOS:
 todos, revision, cotizada, rechazada.
@@ -8041,17 +8054,44 @@ REGLAS:
 
 REGLAS PRIORITARIAS PARA ACCIONES:
 
-- Si el administrador pide abrir, mostrar o ir al Dashboard,
+- Si pide ir, abrir o dirigirse al Dashboard,
   utiliza accion abrir_dashboard.
-- Si únicamente pide abrir el Dashboard, no generes estadísticas.
+
+- Si pide ir, abrir o dirigirse a productos,
+  utiliza accion abrir_modulo y modulo productos.
+
+- Si pide ir, abrir o dirigirse a categorías,
+  utiliza accion abrir_modulo y modulo categorias.
+
+- Si pide ir, abrir o dirigirse a usuarios,
+  utiliza accion abrir_modulo y modulo usuarios.
+
+- Si pide ir, abrir o dirigirse a solicitudes,
+  utiliza accion abrir_modulo y modulo solicitudes.
+
+- Si pide ir, abrir o dirigirse a cotizaciones,
+  utiliza accion abrir_modulo y modulo cotizaciones.
+
+- Si pide ir, abrir o dirigirse a seguridad,
+  utiliza accion abrir_modulo y modulo seguridad.
+
+- Si pide ir, abrir o dirigirse al monitoreo IoT,
+  utiliza accion abrir_modulo y modulo monitoreo_iot.
+
+- Si pregunta por estadísticas o información de productos,
+  no navegues a otro módulo; utiliza accion ninguna.
+
 - Si pide cambiar el formato de una gráfica, utiliza
   accion cambiar_grafica.
-- Si únicamente pide cambiar una gráfica, no generes un
-  análisis estadístico.
-- Si pide aplicar fechas o estados al Dashboard, utiliza
-  accion filtrar_dashboard.
-- Las acciones tienen prioridad sobre las consultas estadísticas.
-- Devuelve los datos necesarios para ejecutar la acción.
+
+- Si pide aplicar fechas o estados al Dashboard,
+  utiliza accion filtrar_dashboard.
+
+- Las acciones de navegación tienen prioridad cuando
+  solicita explícitamente abrir o dirigirse a un módulo.
+
+- Nunca confundas abrir un módulo con consultar sus datos.
+- No inventes módulos ni direcciones.
 
 DEVUELVE EXCLUSIVAMENTE JSON:
 
@@ -8134,6 +8174,7 @@ PREGUNTA DEL ADMINISTRADOR:
         acciones_permitidas = (
             "ninguna",
             "abrir_dashboard",
+            "abrir_modulo",
             "filtrar_dashboard",
             "cambiar_grafica"
         )
@@ -8145,6 +8186,36 @@ PREGUNTA DEL ADMINISTRADOR:
 
         if not isinstance(datos, dict):
             datos = {}
+
+        # ==================================================
+        # VALIDAR MÓDULO ADMINISTRATIVO
+        # ==================================================
+
+        modulos_permitidos = {
+            "productos": "lista_productos",
+            "categorias": "lista_categorias",
+            "usuarios": "lista_usuarios",
+            "solicitudes": "lista_solicitudes",
+            "cotizaciones": "administrar_cotizaciones",
+            "seguridad": "seguridad_admin",
+            "monitoreo_iot": "monitoreo_iot",
+        }
+
+        modulo = datos.get("modulo", "")
+
+        if not isinstance(modulo, str):
+            modulo = ""
+
+        if accion == "abrir_modulo":
+
+            if modulo not in modulos_permitidos:
+                accion = "ninguna"
+                respuesta_texto = (
+                    "No pude identificar el módulo administrativo "
+                    "al que deseas dirigirte."
+                )
+            else:
+                url_modulo = reverse(modulos_permitidos[modulo])
 
         respuesta_texto = resultado_ia.get(
             "respuesta",
@@ -8243,6 +8314,7 @@ PREGUNTA DEL ADMINISTRADOR:
 
         if accion in (
             "abrir_dashboard",
+            "abrir_modulo",
             "filtrar_dashboard",
             "cambiar_grafica"
         ):
@@ -8251,6 +8323,23 @@ PREGUNTA DEL ADMINISTRADOR:
 
                 respuesta_final = (
                     "Claro, te estoy dirigiendo al Dashboard."
+                )
+
+            elif accion == "abrir_modulo":
+
+                nombres_modulos = {
+                    "productos": "Productos",
+                    "categorias": "Categorías",
+                    "usuarios": "Usuarios",
+                    "solicitudes": "Solicitudes",
+                    "cotizaciones": "Cotizaciones",
+                    "seguridad": "Seguridad",
+                    "monitoreo_iot": "Monitoreo IoT",
+                }
+
+                respuesta_final = (
+                    f"Claro, te estoy dirigiendo al módulo de "
+                    f"{nombres_modulos[modulo]}."
                 )
 
             elif accion == "filtrar_dashboard":

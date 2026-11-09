@@ -373,14 +373,19 @@
 </form>
 
 
+
 <script>
 (function () {
 
-    // Evita registrar los eventos más de una vez.
+    // Evitar inicializar PiroIA más de una vez.
     if (window.piroiaAdminInicializado) return;
     window.piroiaAdminInicializado = true;
 
     function iniciarPiroIA() {
+
+        // ==========================================
+        // 1. ELEMENTOS DEL CHAT
+        // ==========================================
 
         const boton = document.getElementById("piroia-admin-button");
         const ventana = document.getElementById("piroia-admin-window");
@@ -391,10 +396,12 @@
         const microfono = document.getElementById("piroia-admin-mic");
         const detenerVoz = document.getElementById("piroia-admin-stop");
 
-        if (!boton || !ventana) return;
+        if (!boton || !ventana || !mensajes || !entrada || !enviar) {
+            return;
+        }
 
         // ==========================================
-        // HISTORIAL DE CONVERSACIÓN
+        // 2. VARIABLES E HISTORIAL
         // ==========================================
 
         const CLAVE_HISTORIAL = "piroia_admin_historial";
@@ -404,85 +411,74 @@
         let reconocimiento = null;
         let escuchando = false;
 
-        // GUARDAR HISTORIAL
-
         function guardarHistorial() {
-            const datos = {
-                fecha: Date.now(),
-                mensajes: historial
-            };
+            try {
+                const datos = {
+                    fecha: Date.now(),
+                    mensajes: historial
+                };
 
-            localStorage.setItem(
-                CLAVE_HISTORIAL,
-                JSON.stringify(datos)
-            );
-        }
-
-        // RECUPERAR HISTORIAL
-
-        function recuperarHistorial() {        
-    try {
-        const guardado = localStorage.getItem(CLAVE_HISTORIAL);
-
-        if (!guardado) return;
-
-        const datos = JSON.parse(guardado);
-
-        if (
-            !datos.fecha ||
-            Date.now() - datos.fecha >= DURACION_HISTORIAL
-        ) {
-            localStorage.removeItem(CLAVE_HISTORIAL);
-            return;
-        }
-
-        if (!Array.isArray(datos.mensajes)) return;
-
-        historial = datos.mensajes.slice(-10);
-
-        // Limpiar los mensajes iniciales para recuperar
-        // la conversación sin duplicar el saludo.
-        mensajes.innerHTML = "";
-
-        historial.forEach(function (mensaje) {
-            if (
-                mensaje.role === "user" ||
-                mensaje.role === "assistant"
-            ) {
-                agregarMensaje(
-                    mensaje.content,
-                    mensaje.role === "user" ? "user" : "bot"
+                localStorage.setItem(
+                    CLAVE_HISTORIAL,
+                    JSON.stringify(datos)
                 );
+
+            } catch (error) {
+                console.error("Error al guardar historial:", error);
             }
-        });
+        }
 
-    } catch (error) {
-        console.error("Error al recuperar historial:", error);
-        localStorage.removeItem(CLAVE_HISTORIAL);
-    }
-}
+        function recuperarHistorial() {
 
-        // RECUPERAR AL INICIAR PIROIA
+            try {
+                const guardado = localStorage.getItem(CLAVE_HISTORIAL);
 
-        recuperarHistorial();
+                if (!guardado) return;
 
-        // ABRIR Y CERRAR
+                const datos = JSON.parse(guardado);
 
-        boton.addEventListener("click", function () {
-            ventana.classList.toggle("open");
+                if (
+                    !datos.fecha ||
+                    Date.now() - datos.fecha >= DURACION_HISTORIAL
+                ) {
+                    localStorage.removeItem(CLAVE_HISTORIAL);
+                    return;
+                }
 
-            if (ventana.classList.contains("open")) {
-                entrada.focus();
+                if (!Array.isArray(datos.mensajes)) return;
+
+                historial = datos.mensajes.slice(-10);
+
+                mensajes.innerHTML = "";
+
+                historial.forEach(function (mensaje) {
+
+                    if (
+                        mensaje.role === "user" ||
+                        mensaje.role === "assistant"
+                    ) {
+                        agregarMensaje(
+                            mensaje.content,
+                            mensaje.role === "user" ? "user" : "bot"
+                        );
+                    }
+
+                });
+
+            } catch (error) {
+
+                console.error("Error al recuperar historial:", error);
+                localStorage.removeItem(CLAVE_HISTORIAL);
+
             }
-        });
+        }
 
-        cerrar.addEventListener("click", function () {
-            ventana.classList.remove("open");
-        });
-
-        // CSRF
+        // ==========================================
+        // 3. FUNCIONES GENERALES
+        // ==========================================
 
         function obtenerCSRF() {
+
             const token = document.querySelector(
                 "#piroia-admin-csrf [name=csrfmiddlewaretoken]"
             );
@@ -490,10 +486,8 @@
             return token ? token.value : "";
         }
 
-        // ==========================================
-        // OBTENER FILTROS ACTUALES DEL DASHBOARD
-        // ==========================================
         function obtenerFiltrosDashboard() {
+
             const fechaInicio = document.getElementById("fecha_inicio");
             const fechaFin = document.getElementById("fecha_fin");
             const estado = document.getElementById("estado");
@@ -505,9 +499,8 @@
             };
         }
 
-        // AGREGAR MENSAJES
-
         function agregarMensaje(texto, tipo) {
+
             const elemento = document.createElement("div");
 
             elemento.className = "piroia-message " + tipo;
@@ -520,128 +513,112 @@
         }
 
         // ==========================================
-        // EJECUTAR ACCIONES DE PIROIA
+        // 4. ABRIR Y CERRAR EL CHAT
         // ==========================================
-        function ejecutarAccion(resultado) {
 
-            const accion = resultado.accion;
-            const datos = resultado.datos || {};
-            const urlDashboard = resultado.url_dashboard;
+        boton.addEventListener("click", function () {
 
-            // Abrir el Dashboard
-            if (accion === "abrir_dashboard") {
-                if (urlDashboard) {
-                    window.location.href = urlDashboard;
-                }
-                return;
+            ventana.classList.toggle("open");
+
+            if (ventana.classList.contains("open")) {
+                entrada.focus();
             }
 
-            // Aplicar filtros del Dashboard
-            if (accion === "filtrar_dashboard") {
+        });
 
-                if (window.piroiaAdminDashboard) {
-                    window.piroiaAdminDashboard.aplicarFiltros(datos);
-                    return;
-                }
-
-                if (urlDashboard) {
-                    const parametros = new URLSearchParams();
-
-                    if (datos.fecha_inicio) {
-                        parametros.set("fecha_inicio", datos.fecha_inicio);
-                    }
-
-                    if (datos.fecha_fin) {
-                        parametros.set("fecha_fin", datos.fecha_fin);
-                    }
-
-                    if (datos.estado) {
-                        parametros.set("estado", datos.estado);
-                    }
-
-                    window.location.href =
-                        urlDashboard + "?" + parametros.toString();
-                }
-
-                return;
-            }
-
-            // Cambiar el tipo de gráfica
-            if (accion === "cambiar_grafica") {
-
-               if (window.piroiaAdminDashboard) {
-                    window.piroiaAdminDashboard.cambiarGrafica(
-                        datos.grafica,
-                        datos.tipo
-                    );
-                    return;
-                }
-
-                if (urlDashboard) {
-                    sessionStorage.setItem(
-                        "piroia_accion_pendiente",
-                        JSON.stringify({
-                            accion: accion,
-                            datos: datos
-                        })
-                    );
-
-                    window.location.href = urlDashboard;
-                }
-            }
+        if (cerrar) {
+            cerrar.addEventListener("click", function () {
+                ventana.classList.remove("open");
+            });
         }
 
-        // RESPUESTA POR VOZ
-
         // ==========================================
-        // RESPUESTA Y CONTROL DE VOZ
+        // 5. RESPUESTA Y CONTROL DE VOZ
         // ==========================================
 
         function hablar(texto) {
+
             if (!("speechSynthesis" in window)) return;
 
             window.speechSynthesis.cancel();
 
             const voz = new SpeechSynthesisUtterance(texto);
+
             voz.lang = "es-MX";
             voz.rate = 1;
 
             window.speechSynthesis.speak(voz);
         }
 
-        // DETENER LA VOZ
+        if (detenerVoz) {
 
-        detenerVoz.addEventListener("click", function () {
-            if ("speechSynthesis" in window) {
-                window.speechSynthesis.cancel();
-            }
-        });
+            detenerVoz.addEventListener("click", function () {
+
+                if ("speechSynthesis" in window) {
+                    window.speechSynthesis.cancel();
+                }
+
+            });
+
+        }
 
         // ==========================================
-        // EJECUTAR ACCIONES DE PIROIA
+        // 6. EJECUTAR ACCIONES DE PIROIA
         // ==========================================
 
         function ejecutarAccion(resultado) {
 
             const accion = resultado.accion;
             const datos = resultado.datos || {};
+
             const urlDashboard = resultado.url_dashboard;
+            const urlModulo = resultado.url_modulo;
+
+            // --------------------------------------
+            // ABRIR DASHBOARD
+            // --------------------------------------
 
             if (accion === "abrir_dashboard") {
+
                 if (urlDashboard) {
                     window.location.href = urlDashboard;
                 }
+
                 return;
             }
+
+            // --------------------------------------
+            // ABRIR OTROS MÓDULOS ADMINISTRATIVOS
+            // --------------------------------------
+
+            if (accion === "abrir_modulo") {
+
+                if (urlModulo) {
+                    window.location.href = urlModulo;
+                } else {
+                    agregarMensaje(
+                        "No recibí la dirección del módulo solicitado.",
+                        "bot"
+                    );
+                }
+
+                return;
+            }
+
+            // --------------------------------------
+            // APLICAR FILTROS DEL DASHBOARD
+            // --------------------------------------
 
             if (accion === "filtrar_dashboard") {
 
                 if (window.piroiaAdminDashboard) {
+
                     window.piroiaAdminDashboard.aplicarFiltros(datos);
                     return;
                 }
 
                 if (urlDashboard) {
+
                     const parametros = new URLSearchParams();
 
                     if (datos.fecha_inicio) {
@@ -663,17 +640,24 @@
                 return;
             }
 
+            // --------------------------------------
+            // CAMBIAR FORMATO DE GRÁFICA
+            // --------------------------------------
+
             if (accion === "cambiar_grafica") {
 
                 if (window.piroiaAdminDashboard) {
+
                     window.piroiaAdminDashboard.cambiarGrafica(
                         datos.grafica,
                         datos.tipo
                     );
+
                     return;
                 }
 
                 if (urlDashboard) {
+
                     sessionStorage.setItem(
                         "piroia_accion_pendiente",
                         JSON.stringify({
@@ -684,10 +668,13 @@
 
                     window.location.href = urlDashboard;
                 }
+
             }
         }
 
-        // ENVIAR CONSULTA
+        // ==========================================
+        // 7. ENVIAR MENSAJES A PIROIA
+        // ==========================================
 
         async function enviarMensaje(texto) {
 
@@ -699,7 +686,10 @@
 
             entrada.value = "";
             enviar.disabled = true;
-            microfono.disabled = true;
+
+            if (microfono) {
+                microfono.disabled = true;
+            }
 
             const escribiendo = agregarMensaje(
                 "PiroIA está analizando tu consulta...",
@@ -733,11 +723,13 @@
                 escribiendo.remove();
 
                 if (!respuesta.ok || !resultado.ok) {
+
                     agregarMensaje(
                         resultado.respuesta ||
                         "No fue posible procesar la consulta.",
                         "bot"
                     );
+
                     return;
                 }
 
@@ -745,7 +737,9 @@
                     "No recibí una respuesta.";
 
                 agregarMensaje(textoRespuesta, "bot");
-                ejecutarAccion(resultado);
+
+                // Guardar la conversación antes de ejecutar
+                // acciones que puedan cambiar de página.
 
                 historial.push({
                     role: "user",
@@ -759,8 +753,13 @@
 
                 historial = historial.slice(-10);
 
-                // Guardar la conversación durante 24 horas.
                 guardarHistorial();
+
+                // Ejecutar la acción recibida desde Django.
+
+                ejecutarAccion(resultado);
+
+                // Reproducir la respuesta por voz.
 
                 hablar(textoRespuesta);
 
@@ -778,28 +777,36 @@
             } finally {
 
                 enviar.disabled = false;
-                microfono.disabled = false;
-                entrada.focus();
 
+                if (microfono) {
+                    microfono.disabled = false;
+                }
+
+                entrada.focus();
             }
         }
 
-        // BOTÓN ENVIAR
+        // ==========================================
+        // 8. BOTÓN ENVIAR Y TECLA ENTER
+        // ==========================================
 
         enviar.addEventListener("click", function () {
             enviarMensaje(entrada.value);
         });
 
-        // ENTER
-
         entrada.addEventListener("keydown", function (event) {
+
             if (event.key === "Enter") {
+
                 event.preventDefault();
                 enviarMensaje(entrada.value);
             }
+
         });
 
-        // PREGUNTAS SUGERIDAS
+        // ==========================================
+        // 9. PREGUNTAS SUGERIDAS
+        // ==========================================
 
         document.querySelectorAll(
             "#piroia-admin-window [data-prompt]"
@@ -811,13 +818,15 @@
 
         });
 
-        // RECONOCIMIENTO DE VOZ
+        // ==========================================
+        // 10. RECONOCIMIENTO DE VOZ
+        // ==========================================
 
         const SpeechRecognition =
             window.SpeechRecognition ||
             window.webkitSpeechRecognition;
 
-        if (SpeechRecognition) {
+        if (microfono && SpeechRecognition) {
 
             reconocimiento = new SpeechRecognition();
 
@@ -826,17 +835,21 @@
             reconocimiento.interimResults = false;
 
             reconocimiento.onstart = function () {
+
                 escuchando = true;
                 microfono.classList.add("listening");
             };
 
             reconocimiento.onresult = function (event) {
+
                 const texto = event.results[0][0].transcript;
+
                 entrada.value = texto;
                 enviarMensaje(texto);
             };
 
             reconocimiento.onerror = function (event) {
+
                 console.error("Error de voz:", event.error);
 
                 agregarMensaje(
@@ -846,6 +859,7 @@
             };
 
             reconocimiento.onend = function () {
+
                 escuchando = false;
                 microfono.classList.remove("listening");
             };
@@ -853,8 +867,11 @@
             microfono.addEventListener("click", function () {
 
                 if (escuchando) {
+
                     reconocimiento.stop();
+
                 } else {
+
                     try {
                         reconocimiento.start();
                     } catch (error) {
@@ -864,18 +881,29 @@
 
             });
 
-        } else {
+        } else if (microfono) {
 
             microfono.disabled = true;
             microfono.title = "Reconocimiento de voz no disponible.";
-
         }
+
+        // ==========================================
+        // 11. RECUPERAR CONVERSACIÓN
+        // ==========================================
+
+        recuperarHistorial();
 
     }
 
     if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", iniciarPiroIA);
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            iniciarPiroIA
+        );
+
     } else {
+
         iniciarPiroIA();
     }
 
