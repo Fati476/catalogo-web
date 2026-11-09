@@ -10106,19 +10106,22 @@ def interpretar_periodo_piroia(texto, hoy=None):
                 return inicio, fin
 
     # Desde una fecha hasta hoy
+    # Desde una fecha hasta hoy
     match = re.search(
         r"(?:desde|a partir del|a partir de)\s+"
-        r"(\d{1,2})\s+de\s+([a-z]+)"
+        r"(?:el\s+)?(\d{1,2})\s+de\s+([a-z]+)"
         r"(?:\s+de\s+(\d{4}))?",
         texto
     )
+
     if match:
         dia, nombre_mes, anio = match.groups()
         mes = meses.get(nombre_mes)
-        anio = int(anio or obtener_anio(mes)) if mes else hoy.year
 
         if mes:
+            anio = int(anio or obtener_anio(mes))
             inicio = crear_fecha(dia, mes, anio)
+
             if inicio and inicio <= hoy:
                 return inicio, hoy
 
