@@ -562,6 +562,106 @@
 
         }
 
+        
+        // ==========================================
+        // GENERAR REPORTE PDF
+        // ==========================================
+
+        async function generarReportePDF(url, datos) {
+
+            const escribiendo = agregarMensaje(
+                "Estoy generando tu reporte PDF...",
+                "bot typing"
+            );
+
+            try {
+
+                const respuesta = await fetch(url, {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": obtenerCSRF()
+                    },
+
+                    credentials: "same-origin",
+
+                    body: JSON.stringify({
+                        fecha_inicio: datos.fecha_inicio,
+                        fecha_fin: datos.fecha_fin
+                    })
+                });
+
+                if (!respuesta.ok) {
+                    let mensajeError = "No se pudo generar el reporte.";
+
+                    try {
+                        const error = await respuesta.json();
+                        mensajeError = error.error || error.respuesta || mensajeError;
+                    } catch (_) {}
+
+                    throw new Error(mensajeError);
+                }
+
+                const blob = await respuesta.blob();
+
+                if (blob.type !== "application/pdf") {
+                    throw new Error("El servidor no devolvió un PDF válido.");
+                }
+
+                const archivoURL = URL.createObjectURL(blob);
+
+                escribiendo.remove();
+
+                const tarjeta = document.createElement("div");
+
+                tarjeta.className = "piroia-message bot";
+
+                const titulo = document.createElement("strong");
+                titulo.textContent = "Reporte administrativo generado";
+
+                const periodo = document.createElement("p");
+                periodo.textContent =
+                    "Periodo: " + datos.fecha_inicio +
+                    " al " + datos.fecha_fin;
+
+                const enlace = document.createElement("a");
+                enlace.href = archivoURL;
+                enlace.download = "reporte_administrativo.pdf";
+                enlace.textContent = "Descargar PDF";
+
+                enlace.style.display = "inline-block";
+                enlace.style.padding = "10px 15px";
+                enlace.style.marginTop = "8px";
+                enlace.style.background = "#C9A227";
+                enlace.style.color = "#171717";
+                enlace.style.borderRadius = "8px";
+                enlace.style.textDecoration = "none";
+                enlace.style.fontWeight = "bold";
+
+                tarjeta.appendChild(titulo);
+                tarjeta.appendChild(periodo);
+                tarjeta.appendChild(enlace);
+
+                mensajes.appendChild(tarjeta);
+                mensajes.scrollTop = mensajes.scrollHeight;
+
+                hablar("Tu reporte administrativo está listo para descargar.");
+
+            } catch (error) {
+
+                escribiendo.remove();
+
+                console.error("Error al generar PDF:", error);
+
+                agregarMensaje(
+                    "No pude generar el reporte: " + error.message,
+                    "bot"
+                );
+            }
+        }
+
+
         // ==========================================
         // 6. EJECUTAR ACCIONES DE PIROIA
         // ==========================================
@@ -573,6 +673,25 @@
 
             const urlDashboard = resultado.url_dashboard;
             const urlModulo = resultado.url_modulo;
+            const urlReporte = resultado.url_reporte;
+
+                        // --------------------------------------
+            // GENERAR REPORTE PDF
+            // --------------------------------------
+
+            if (accion === "generar_reporte") {
+
+                if (urlReporte) {
+                    generarReportePDF(urlReporte, datos);
+                } else {
+                    agregarMensaje(
+                        "No recibí la dirección para generar el reporte.",
+                        "bot"
+                    );
+                }
+
+                return;
+            }
 
             // --------------------------------------
             // ABRIR DASHBOARD

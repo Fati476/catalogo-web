@@ -8121,9 +8121,88 @@ def chatbot_admin(request):
                         )
                     })
 
+        
         # ==================================================
-        # 6. CONFIGURAR GROQ
+        # 6. RECONOCER SOLICITUD DE REPORTE PDF
         # ==================================================
+
+        patrones_generacion = (
+            r"\b(?:genera|generar|generame|generarme)\b",
+            r"\b(?:crea|crear|creame)\b",
+            r"\b(?:prepara|preparar|preparame)\b",
+            r"\b(?:descarga|descargar|descargame)\b",
+            r"\b(?:exporta|exportar)\b",
+            r"\b(?:haz|hazme|elabora|elaborar|realiza|realizar)\b",
+            r"\b(?:quiero|necesito)\s+(?:un\s+)?(?:reporte|informe|pdf)\b",
+        )
+
+        menciona_reporte = bool(
+            re.search(
+                r"\b(?:reporte|informes?|pdf)\b",
+                pregunta_normalizada
+            )
+        )
+
+        solicita_generacion = any(
+            re.search(patron, pregunta_normalizada)
+            for patron in patrones_generacion
+        )
+
+        if menciona_reporte and solicita_generacion:
+
+            fecha_inicio, fecha_fin = interpretar_periodo_piroia(
+                pregunta_normalizada,
+                hoy=hoy
+            )
+
+            # Si no especifica periodo, utiliza los filtros actuales.
+            if not fecha_inicio or not fecha_fin:
+                fecha_inicio = desde_actual
+                fecha_fin = hasta_actual
+
+            # Validar el rango de fechas.
+            if fecha_inicio > fecha_fin:
+                return JsonResponse({
+                    "ok": True,
+                    "respuesta": (
+                        "La fecha inicial no puede ser posterior "
+                        "a la fecha final."
+                    ),
+                    "accion": "ninguna"
+                })
+
+            if (fecha_fin - fecha_inicio).days > 366:
+                return JsonResponse({
+                    "ok": True,
+                    "respuesta": (
+                        "El periodo del reporte no puede superar "
+                        "un año. Indícame un rango más corto."
+                    ),
+                    "accion": "ninguna"
+                })
+
+            return JsonResponse({
+                "ok": True,
+                "respuesta": (
+                    "Estoy preparando tu reporte administrativo "
+                    f"del {fecha_inicio.strftime('%d/%m/%Y')} "
+                    f"al {fecha_fin.strftime('%d/%m/%Y')}."
+                ),
+                "accion": "generar_reporte",
+                "tipo_accion": "reporte",
+                "datos": {
+                    "fecha_inicio": fecha_inicio.isoformat(),
+                    "fecha_fin": fecha_fin.isoformat()
+                },
+                "url_reporte": reverse(
+                    "generar_reporte_general_piroia"
+                )
+            })
+
+        # ==================================================
+        # 7. CONFIGURAR GROQ
+        # ==================================================
+
 
         api_key = os.getenv("GROQ_API_KEY")
 
@@ -8819,3 +8898,734 @@ Devuelve exclusivamente JSON válido:
                 "tu solicitud administrativa."
             )
         }, status=500)
+
+
+@login_required
+def generar_reporte_general_piroia(request):
+    import json
+    from io import BytesIO
+    from datetime import date, datetime, timedelta
+
+    from django.http import HttpResponse, JsonResponse
+    from django.utils import timezone
+    from django.db.models import Count, Sum
+    from django.contrib.auth.models import User
+
+    from reportlab.lib import colors
+    from reportlab.lib.enums import TA_CENTER, TA_LEFT
+    from reportlab.lib.pagesizes import letter
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib.units import cm
+    from reportlab.platypus import (
+        SimpleDocTemplate,
+        Paragraph,
+        Spacer,
+        Table,
+        TableStyle,
+        HRFlowable,
+        KeepTogether
+    )
+    from reportlab.pdfbase.pdfmetrics import stringWidth
+    from xml.sax.saxutils import escape
+
+    from .models import (
+        Producto,
+        Categoria,
+        SolicitudCotizacion,
+        DetalleSolicitud
+    )
+
+    # ==========================================
+    # 1. VALIDAR ACCESO
+    # ==========================================
+
+    if request.method != "POST":
+        return JsonResponse({
+            "ok": False,
+            "mensaje": "Método no permitido."
+        }, status=405)
+
+    if not request.user.groups.filter(
+        name="Administrador"
+    ).exists():
+        return JsonResponse({
+            "ok": False,
+            "mensaje": "No tienes autorización."
+        }, status=403)
+
+    # ==========================================
+    # 2. RECIBIR Y VALIDAR FECHAS
+    # ==========================================
+
+    try:
+        datos = json.loads(request.body or "{}")
+
+        hoy = timezone.localdate()
+
+        fecha_inicio = date.fromisoformat(
+            datos.get(
+                "fecha_inicio",
+                hoy.replace(day=1).isoformat()
+            )
+        )
+
+        fecha_fin = date.fromisoformat(
+            datos.get(
+                "fecha_fin",
+                hoy.isoformat()
+            )
+        )
+
+        if fecha_inicio > fecha_fin:
+            return JsonResponse({
+                "ok": False,
+                "mensaje": "La fecha inicial no puede ser posterior a la final."
+            }, status=400)
+
+        if (fecha_fin - fecha_inicio).days > 366:
+            return JsonResponse({
+                "ok": False,
+                "mensaje": "El periodo máximo permitido es de un año."
+            }, status=400)
+
+    except (ValueError, TypeError, json.JSONDecodeError):
+        return JsonResponse({
+            "ok": False,
+            "mensaje": "Las fechas proporcionadas no son válidas."
+        }, status=400)
+
+    # ==========================================
+    # 3. CONSULTAR DATOS REALES
+    # ==========================================
+
+    desde = timezone.make_aware(
+        datetime.combine(fecha_inicio, datetime.min.time()),
+        timezone.get_current_timezone()
+    )
+
+    hasta = timezone.make_aware(
+        datetime.combine(
+            fecha_fin + timedelta(days=1),
+            datetime.min.time()
+        ),
+        timezone.get_current_timezone()
+    )
+
+    total_productos = Producto.objects.count()
+
+    productos_activos = Producto.objects.filter(
+        estado=True
+    ).count()
+
+    productos_inactivos = Producto.objects.filter(
+        estado=False
+    ).count()
+
+    total_categorias = Categoria.objects.count()
+
+    total_usuarios = User.objects.count()
+
+    solicitudes = SolicitudCotizacion.objects.filter(
+        enviada=True,
+        fecha__gte=desde,
+        fecha__lt=hasta
+    )
+
+    total_solicitudes = solicitudes.count()
+
+    solicitudes_revision = solicitudes.filter(
+        estado="revision"
+    ).count()
+
+    solicitudes_cotizadas = solicitudes.filter(
+        estado="cotizada"
+    ).count()
+
+    solicitudes_rechazadas = solicitudes.filter(
+        estado="rechazada"
+    ).count()
+
+    productos_solicitados = (
+        DetalleSolicitud.objects.filter(
+            solicitud__in=solicitudes,
+            seleccionado=True
+        )
+        .values("producto__nombre")
+        .annotate(
+            total_unidades=Sum("cantidad"),
+            total_solicitudes=Count(
+                "solicitud",
+                distinct=True
+            )
+        )
+        .order_by("-total_unidades")[:10]
+    )
+
+    # ==========================================
+    # 4. CONFIGURACIÓN DEL DOCUMENTO
+    # ==========================================
+
+    buffer = BytesIO()
+
+    dorado = colors.HexColor("#C9A227")
+    negro = colors.HexColor("#000000")
+    gris = colors.HexColor("#F3F4F6")
+    gris_texto = colors.HexColor("#555555")
+
+    logo_path = os.path.join(
+        settings.BASE_DIR,
+        "static",
+        "img",
+        "logo_cooperativa.png"
+    )
+
+    folio = (
+        f"RGA-{timezone.localtime().strftime('%Y%m%d-%H%M%S')}"
+    )
+
+    documento = SimpleDocTemplate(
+        buffer,
+        pagesize=letter,
+        rightMargin=1.5 * cm,
+        leftMargin=1.5 * cm,
+        topMargin=4.3 * cm,
+        bottomMargin=2.8 * cm,
+        title="Reporte General Administrativo",
+        author="Cooperativa Pirotécnica"
+    )
+
+    # ==========================================
+    # 5. ENCABEZADO INSTITUCIONAL
+    # ==========================================
+
+    def dibujar_encabezado(canvas, doc):
+
+        canvas.saveState()
+
+        width, height = letter
+
+        if os.path.exists(logo_path):
+            canvas.drawImage(
+                logo_path,
+                30,
+                height - 105,
+                width=90,
+                height=90,
+                mask="auto",
+                preserveAspectRatio=True,
+                anchor="c"
+            )
+
+        canvas.setFillColor(negro)
+        canvas.setFont("Helvetica-Bold", 13)
+
+        canvas.drawCentredString(
+            width / 2 + 40,
+            height - 45,
+            "Comercializadora Cooperativa de Sustancias Químicas"
+        )
+
+        canvas.drawCentredString(
+            width / 2 + 40,
+            height - 63,
+            "para uso del Artesano Pirotécnico, S.A. de C.V."
+        )
+
+        canvas.setFont("Helvetica", 9)
+
+        canvas.drawCentredString(
+            width / 2 + 40,
+            height - 80,
+            "Venta de Sustancias Químicas para la Pirotecnia,"
+        )
+
+        canvas.drawCentredString(
+            width / 2 + 40,
+            height - 93,
+            "Venta de Artificios Pirotécnicos y Transporte Especializado"
+        )
+
+        canvas.setStrokeColor(dorado)
+        canvas.setLineWidth(2)
+
+        canvas.line(
+            30,
+            height - 112,
+            width - 30,
+            height - 112
+        )
+
+        canvas.restoreState()
+
+    # ==========================================
+    # 6. PIE INSTITUCIONAL
+    # ==========================================
+
+    def dibujar_pie(canvas, doc):
+
+        canvas.saveState()
+
+        width, height = letter
+
+        canvas.setStrokeColor(dorado)
+        canvas.setLineWidth(1)
+
+        canvas.line(
+            30,
+            65,
+            width - 30,
+            65
+        )
+
+        canvas.setFillColor(negro)
+        canvas.setFont("Helvetica", 8)
+
+        canvas.drawString(
+            30,
+            48,
+            "San Mateo Tlalchichilpan, Almoloya de Juárez, Edo. de México"
+        )
+
+        canvas.drawString(
+            30,
+            34,
+            "C.P. 50900"
+        )
+
+        canvas.drawRightString(
+            width - 30,
+            48,
+            "Tel. 725 136 07 31"
+        )
+
+        canvas.drawRightString(
+            width - 30,
+            34,
+            "comer_coop_2013@live.com.mx"
+        )
+
+        canvas.setFont("Helvetica", 7)
+        canvas.setFillColor(gris_texto)
+
+        canvas.drawCentredString(
+            width / 2,
+            20,
+            f"Página {doc.page}"
+        )
+
+        canvas.restoreState()
+
+    # ==========================================
+    # 7. ESTILOS
+    # ==========================================
+
+    estilos = getSampleStyleSheet()
+
+    estilo_titulo = ParagraphStyle(
+        "TituloReporte",
+        parent=estilos["Title"],
+        fontName="Helvetica-Bold",
+        fontSize=17,
+        leading=21,
+        alignment=TA_CENTER,
+        textColor=negro,
+        spaceAfter=8
+    )
+
+    estilo_subtitulo = ParagraphStyle(
+        "SubtituloReporte",
+        parent=estilos["Normal"],
+        fontName="Helvetica",
+        fontSize=9,
+        leading=13,
+        alignment=TA_CENTER,
+        textColor=gris_texto
+    )
+
+    estilo_seccion = ParagraphStyle(
+        "SeccionReporte",
+        parent=estilos["Heading2"],
+        fontName="Helvetica-Bold",
+        fontSize=12,
+        leading=15,
+        textColor=negro,
+        spaceBefore=12,
+        spaceAfter=8
+    )
+
+    estilo_texto = ParagraphStyle(
+        "TextoReporte",
+        parent=estilos["Normal"],
+        fontName="Helvetica",
+        fontSize=9,
+        leading=13,
+        textColor=negro
+    )
+
+    estilo_celda = ParagraphStyle(
+        "CeldaReporte",
+        parent=estilos["Normal"],
+        fontName="Helvetica",
+        fontSize=8,
+        leading=10
+    )
+
+    # ==========================================
+    # 8. CONSTRUIR CONTENIDO
+    # ==========================================
+
+    elementos = []
+
+    elementos.append(Paragraph(
+        "REPORTE GENERAL ADMINISTRATIVO",
+        estilo_titulo
+    ))
+
+    elementos.append(Paragraph(
+        f"Folio interno: {folio}",
+        estilo_subtitulo
+    ))
+
+    elementos.append(Paragraph(
+        f"Periodo consultado: {fecha_inicio.strftime('%d/%m/%Y')} "
+        f"al {fecha_fin.strftime('%d/%m/%Y')}",
+        estilo_subtitulo
+    ))
+
+    elementos.append(Paragraph(
+        f"Fecha de generación: {hoy.strftime('%d/%m/%Y')}",
+        estilo_subtitulo
+    ))
+
+    elementos.append(Spacer(1, 12))
+
+    elementos.append(HRFlowable(
+        width="100%",
+        thickness=1,
+        color=dorado
+    ))
+
+    # ==========================================
+    # 9. RESUMEN DEL SISTEMA
+    # ==========================================
+
+    elementos.append(Paragraph(
+        "1. Resumen del sistema",
+        estilo_seccion
+    ))
+
+    resumen = [
+        ["Indicador", "Cantidad"],
+        ["Productos registrados", str(total_productos)],
+        ["Productos activos", str(productos_activos)],
+        ["Productos inactivos", str(productos_inactivos)],
+        ["Categorías registradas", str(total_categorias)],
+        ["Usuarios registrados", str(total_usuarios)]
+    ]
+
+    tabla = Table(
+        resumen,
+        colWidths=[11 * cm, 5 * cm],
+        repeatRows=1
+    )
+
+    tabla.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, 0), gris),
+        ("TEXTCOLOR", (0, 0), (-1, -1), negro),
+        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+        ("LINEBELOW", (0, 0), (-1, 0), 2, dorado),
+        ("GRID", (0, 0), (-1, -1), 0.4, colors.HexColor("#D5D5D5")),
+        ("ALIGN", (1, 0), (1, -1), "CENTER"),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        ("PADDING", (0, 0), (-1, -1), 8),
+        ("FONTSIZE", (0, 0), (-1, -1), 9)
+    ]))
+
+    elementos.append(tabla)
+
+    # ==========================================
+    # 10. ESTADO DE SOLICITUDES
+    # ==========================================
+
+    elementos.append(Paragraph(
+        "2. Estado de las solicitudes",
+        estilo_seccion
+    ))
+
+    tabla_estados = [
+        ["Estado", "Cantidad"],
+        ["Total de solicitudes", str(total_solicitudes)],
+        ["En revisión", str(solicitudes_revision)],
+        ["Cotizadas", str(solicitudes_cotizadas)],
+        ["Rechazadas", str(solicitudes_rechazadas)]
+    ]
+
+    tabla = Table(
+        tabla_estados,
+        colWidths=[11 * cm, 5 * cm],
+        repeatRows=1
+    )
+
+    tabla.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, 0), gris),
+        ("TEXTCOLOR", (0, 0), (-1, -1), negro),
+        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+        ("LINEBELOW", (0, 0), (-1, 0), 2, dorado),
+        ("GRID", (0, 0), (-1, -1), 0.4, colors.HexColor("#D5D5D5")),
+        ("ALIGN", (1, 0), (1, -1), "CENTER"),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        ("PADDING", (0, 0), (-1, -1), 8),
+        ("FONTSIZE", (0, 0), (-1, -1), 9)
+    ]))
+
+    elementos.append(tabla)
+
+    # ==========================================
+    # 11. PRODUCTOS MÁS SOLICITADOS
+    # ==========================================
+
+    elementos.append(Paragraph(
+        "3. Productos más solicitados",
+        estilo_seccion
+    ))
+
+    filas_productos = [[
+        "Producto",
+        "Unidades",
+        "Solicitudes"
+    ]]
+
+    for producto in productos_solicitados:
+
+        filas_productos.append([
+            Paragraph(
+                escape(producto["producto__nombre"] or ""),
+                estilo_celda
+            ),
+            str(producto["total_unidades"] or 0),
+            str(producto["total_solicitudes"])
+        ])
+
+    if len(filas_productos) == 1:
+
+        filas_productos.append([
+            "Sin registros en el periodo",
+            "0",
+            "0"
+        ])
+
+    tabla = Table(
+        filas_productos,
+        colWidths=[8 * cm, 4 * cm, 4 * cm],
+        repeatRows=1
+    )
+
+    tabla.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, 0), gris),
+        ("TEXTCOLOR", (0, 0), (-1, -1), negro),
+        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+        ("LINEBELOW", (0, 0), (-1, 0), 2, dorado),
+        ("GRID", (0, 0), (-1, -1), 0.4, colors.HexColor("#D5D5D5")),
+        ("ALIGN", (1, 0), (-1, -1), "CENTER"),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        ("PADDING", (0, 0), (-1, -1), 7),
+        ("FONTSIZE", (0, 0), (-1, -1), 8)
+    ]))
+
+    elementos.append(tabla)
+
+    # ==========================================
+    # 12. NOTA FINAL
+    # ==========================================
+
+    elementos.append(Spacer(1, 18))
+
+    elementos.append(Paragraph(
+        "Este documento fue generado por PiroIA Administrativo "
+        "a partir de los registros disponibles en Catálogo Web. "
+        "Los indicadores corresponden al periodo seleccionado.",
+        estilo_texto
+    ))
+
+    # ==========================================
+    # 13. GENERAR PDF
+    # ==========================================
+
+    documento.build(
+        elementos,
+        onFirstPage=lambda canvas, doc: (
+            dibujar_encabezado(canvas, doc),
+            dibujar_pie(canvas, doc)
+        ),
+        onLaterPages=lambda canvas, doc: (
+            dibujar_encabezado(canvas, doc),
+            dibujar_pie(canvas, doc)
+        )
+    )
+
+    buffer.seek(0)
+
+    nombre_archivo = (
+        f"Reporte_General_{fecha_inicio.isoformat()}_"
+        f"{fecha_fin.isoformat()}.pdf"
+    )
+
+    respuesta = HttpResponse(
+        buffer.getvalue(),
+        content_type="application/pdf"
+    )
+
+    respuesta["Content-Disposition"] = (
+        f'attachment; filename="{nombre_archivo}"'
+    )
+
+    respuesta["X-Reporte-Folio"] = folio
+
+    return respuesta
+
+
+def interpretar_periodo_piroia(texto, hoy=None):
+    import re
+    from datetime import date, timedelta
+    from calendar import monthrange
+
+    hoy = hoy or date.today()
+    texto = texto.lower().strip()
+
+    meses = {
+        "enero": 1, "febrero": 2, "marzo": 3,
+        "abril": 4, "mayo": 5, "junio": 6,
+        "julio": 7, "agosto": 8, "septiembre": 9,
+        "setiembre": 9, "octubre": 10, "noviembre": 11,
+        "diciembre": 12
+    }
+
+    # Hoy
+    if re.search(r"\b(hoy|de hoy)\b", texto):
+        return hoy, hoy
+
+    # Ayer
+    if re.search(r"\b(ayer|de ayer)\b", texto):
+        ayer = hoy - timedelta(days=1)
+        return ayer, ayer
+
+    # Últimos N días
+    match = re.search(r"(?:ultimos|ultimas)\s+(\d+)\s+dias", texto)
+    if match:
+        cantidad = int(match.group(1))
+        if 1 <= cantidad <= 366:
+            return hoy - timedelta(days=cantidad - 1), hoy
+
+    # Esta semana (lunes hasta hoy)
+    if "esta semana" in texto:
+        inicio = hoy - timedelta(days=hoy.weekday())
+        return inicio, hoy
+
+    # Este mes
+    if "este mes" in texto or "del mes actual" in texto:
+        return hoy.replace(day=1), hoy
+
+    # Mes pasado
+    if "mes pasado" in texto or "mes anterior" in texto:
+        ultimo_dia_mes_anterior = hoy.replace(day=1) - timedelta(days=1)
+        return (
+            ultimo_dia_mes_anterior.replace(day=1),
+            ultimo_dia_mes_anterior
+        )
+
+    # Año actual
+    if "este año" in texto or "año actual" in texto:
+        return date(hoy.year, 1, 1), hoy
+
+    # Fechas numéricas: del 01/10/2026 al 15/10/2026
+    match = re.search(
+        r"del?\s+(\d{1,2})[/-](\d{1,2})[/-](\d{4})"
+        r"\s+(?:al|hasta)\s+(\d{1,2})[/-](\d{1,2})[/-](\d{4})",
+        texto
+    )
+    if match:
+        try:
+            inicio = date(int(match.group(3)), int(match.group(2)), int(match.group(1)))
+            fin = date(int(match.group(6)), int(match.group(5)), int(match.group(4)))
+            if inicio <= fin:
+                return inicio, fin
+        except ValueError:
+            pass
+
+    # Del día X al día Y de un mes:
+    # "del 1 al 15 de octubre"
+    match = re.search(
+        r"del?\s+(\d{1,2})\s+al\s+(\d{1,2})\s+"
+        r"de\s+(enero|febrero|marzo|abril|mayo|junio|julio|agosto|"
+        r"septiembre|setiembre|octubre|noviembre|diciembre)"
+        r"(?:\s+de\s+(\d{4}))?",
+        texto
+    )
+    if match:
+        try:
+            dia_inicio = int(match.group(1))
+            dia_fin = int(match.group(2))
+            mes = meses[match.group(3)]
+            anio = int(match.group(4)) if match.group(4) else hoy.year
+
+            inicio = date(anio, mes, dia_inicio)
+            fin = date(anio, mes, dia_fin)
+
+            if inicio <= fin:
+                return inicio, fin
+        except ValueError:
+            pass
+
+    # Del día X de un mes al día Y de otro mes:
+    # "del 1 de enero al 15 de febrero de 2026"
+    match = re.search(
+        r"del?\s+(\d{1,2})\s+de\s+([a-z]+)\s+al\s+"
+        r"(\d{1,2})\s+de\s+([a-z]+)(?:\s+de\s+(\d{4}))?",
+        texto
+    )
+    if match and match.group(2) in meses and match.group(4) in meses:
+        try:
+            anio = int(match.group(5)) if match.group(5) else hoy.year
+            inicio = date(anio, meses[match.group(2)], int(match.group(1)))
+            fin = date(anio, meses[match.group(4)], int(match.group(3)))
+
+            if inicio <= fin:
+                return inicio, fin
+        except ValueError:
+            pass
+
+    # De enero a marzo de 2026
+    match = re.search(
+        r"de\s+([a-z]+)\s+a\s+([a-z]+)(?:\s+de\s+(\d{4}))?",
+        texto
+    )
+    if match and match.group(1) in meses and match.group(2) in meses:
+        try:
+            anio = int(match.group(3)) if match.group(3) else hoy.year
+            mes_inicio = meses[match.group(1)]
+            mes_fin = meses[match.group(2)]
+
+            inicio = date(anio, mes_inicio, 1)
+            ultimo_dia = monthrange(anio, mes_fin)[1]
+            fin = date(anio, mes_fin, ultimo_dia)
+
+            if inicio <= fin:
+                return inicio, fin
+        except ValueError:
+            pass
+
+    # Solo un día de inicio y fin, sin mencionar el mes:
+    # "del 1 al 15" -> mes y año actuales
+    match = re.search(r"del?\s+(\d{1,2})\s+al\s+(\d{1,2})(?![\d/])", texto)
+    if match:
+        try:
+            inicio = date(hoy.year, hoy.month, int(match.group(1)))
+            fin = date(hoy.year, hoy.month, int(match.group(2)))
+
+            if inicio <= fin:
+                return inicio, fin
+        except ValueError:
+            pass
+
+    # Si no identifica un periodo, conserva el periodo predeterminado.
+    return None, None

@@ -375,6 +375,12 @@ urlpatterns = [
         name='chatbot_admin'
     ),
 
+    path(
+        "api/chatbot-admin/reporte-general/",
+        views.generar_reporte_general_piroia,
+        name="generar_reporte_general_piroia"
+    ),
+
 
 
 
