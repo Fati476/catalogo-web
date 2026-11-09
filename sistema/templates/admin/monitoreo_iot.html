@@ -1577,6 +1577,7 @@
         );
 
         // RECONOCIMIENTO DE VOZ PARA FILTRAR POR FECHA
+        
         function escucharFecha() {
 
             const SpeechRecognition =
@@ -1593,48 +1594,102 @@
             reconocimiento.continuous = false;
             reconocimiento.interimResults = false;
 
+            let fraseReconocida = '';
+            let errorReconocimiento = false;
+            let resultadoProcesado = false;
+
             hablarFechaButton.disabled = true;
             hablarFechaButton.innerHTML =
                 '<i class="bi bi-mic-fill me-1"></i> Escuchando...';
 
+            // RECIBIR LOS RESULTADOS SIN MOSTRAR ALERTAS TODAVÍA
             reconocimiento.onresult = (event) => {
 
-                const frase = event.results[0][0].transcript
+                fraseReconocida = Array.from(event.results)
+                    .filter(resultado => resultado.isFinal)
+                    .map(resultado => resultado[0].transcript)
+                    .join(' ')
+                    .trim();
+
+            };
+
+            // SI OCURRE UN ERROR, MOSTRAR UNA SOLA ALERTA
+            reconocimiento.onerror = (event) => {
+
+                console.error('Error de reconocimiento de voz:', event.error);
+
+                errorReconocimiento = true;
+
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'No se pudo reconocer tu voz',
+                    text: 'Verifica el permiso del micrófono e inténtalo nuevamente.',
+                    confirmButtonText: 'Intentar nuevamente',
+                    confirmButtonColor: '#C9A227',
+                    background: '#FFFFFF',
+                    color: '#172033',
+                    customClass: {
+                        popup: 'iot-swal-popup',
+                        title: 'iot-swal-title',
+                        htmlContainer: 'iot-swal-text',
+                        confirmButton: 'iot-swal-button'
+                    }
+                });
+            };
+
+            // PROCESAR LA FRASE SOLAMENTE CUANDO TERMINE DE ESCUCHAR
+            reconocimiento.onend = () => {
+
+                hablarFechaButton.disabled = false;
+                hablarFechaButton.innerHTML =
+                    '<i class="bi bi-mic-fill me-1"></i> Hablar para filtrar';
+
+                if (errorReconocimiento || resultadoProcesado) return;
+
+                resultadoProcesado = true;
+
+                const frase = fraseReconocida
                     .toLowerCase()
                     .normalize('NFD')
                     .replace(/[\u0300-\u036f]/g, '')
                     .trim();
 
-                console.log('Frase reconocida:', frase);
+                console.log('Frase completa reconocida:', frase);
 
                 const hoy = new Date();
                 let fecha = null;
 
                 // CONSULTAR HOY
                 if (/\bhoy\b/.test(frase)) {
+
                     fecha = new Date(
                         hoy.getFullYear(),
                         hoy.getMonth(),
                         hoy.getDate()
                     );
+
                 }
 
                 // CONSULTAR AYER
                 else if (/\bayer\b/.test(frase)) {
+
                     fecha = new Date(
                         hoy.getFullYear(),
                         hoy.getMonth(),
                         hoy.getDate() - 1
                     );
+
                 }
 
                 // CONSULTAR ANTEAYER
                 else if (/\banteayer\b/.test(frase)) {
+
                     fecha = new Date(
                         hoy.getFullYear(),
                         hoy.getMonth(),
                         hoy.getDate() - 2
                     );
+
                 }
 
                 else {
@@ -1682,9 +1737,13 @@
                         ) {
                             fecha = comprobacion;
                         }
+
                     }
 
-                    else if (textual && meses[textual[2]] !== undefined) {
+                    else if (
+                        textual &&
+                        meses[textual[2]] !== undefined
+                    ) {
 
                         const dia = Number(textual[1]);
                         const mes = meses[textual[2]];
@@ -1701,9 +1760,10 @@
                         ) {
                             fecha = comprobacion;
                         }
-                    }                
-                }                
+                    }
+                }
 
+                // SI NO SE RECONOCIÓ UNA FECHA
                 if (!fecha) {
 
                     Swal.fire({
@@ -1742,7 +1802,7 @@
 
                 paginaActual = 1;
 
-                // CONFIRMAR LA FECHA POR VOZ
+                // CONFIRMAR UNA SOLA VEZ LA FECHA RECONOCIDA
                 const fechaTexto = fecha.toLocaleDateString('es-MX', {
                     day: 'numeric',
                     month: 'long',
@@ -1752,16 +1812,16 @@
 
                 Swal.fire({
                     icon: 'success',
-                    title: '¡Consulta por voz!',
+                    title: '¡Fecha reconocida!',
                     html: `
-                        <p>Entendí tu solicitud. Estoy consultando las mediciones correspondientes al:</p>
+                        <p>Estoy consultando las mediciones correspondientes al:</p>
                         <h3 class="iot-swal-date">${fechaTexto}</h3>
                     `,
-                    confirmButtonText: 'Perfecto, continuar',
+                    confirmButtonText: 'Perfecto',
                     confirmButtonColor: '#C9A227',
                     background: '#FFFFFF',
                     color: '#172033',
-                    timer: 4500,
+                    timer: 3500,
                     timerProgressBar: true,
                     customClass: {
                         popup: 'iot-swal-popup',
@@ -1769,28 +1829,18 @@
                         htmlContainer: 'iot-swal-text',
                         confirmButton: 'iot-swal-button'
                     }
+                }).then(() => {
+                    actualizarMediciones();
                 });
 
                 hablar(
                     `Claro, estoy filtrando las mediciones del ${fechaTexto}.`
                 );
-
-                actualizarMediciones();
-            };
-
-            reconocimiento.onerror = (event) => {
-                console.error('Error de reconocimiento de voz:', event.error);
-                alert('No se pudo reconocer tu voz. Verifica el permiso del micrófono e inténtalo nuevamente.');
-            };
-
-            reconocimiento.onend = () => {
-                hablarFechaButton.disabled = false;
-                hablarFechaButton.innerHTML =
-                    '<i class="bi bi-mic-fill me-1"></i> Hablar para filtrar';
             };
 
             reconocimiento.start();
         }
+
         // ACTIVAR MICRÓFONO
         hablarFechaButton.addEventListener('click', escucharFecha);
 
