@@ -7828,13 +7828,15 @@ def chatbot_admin(request):
     - Compara solicitudes.
     - Controla filtros del dashboard.
     - Cambia las gráficas.
-    - Utiliza Groq para interpretar instrucciones.
+    - Navega entre módulos administrativos.
+    - Utiliza Groq para interpretar consultas.
     """
 
     import json
     import os
     import re
     import requests
+    import unicodedata
 
     from datetime import datetime, date, timedelta
 
@@ -7844,8 +7846,9 @@ def chatbot_admin(request):
     from django.urls import reverse
 
     try:
+
         # ==================================================
-        # 1. VALIDACIONES DE ACCESO
+        # 1. VALIDACIONES
         # ==================================================
 
         if request.method != "POST":
@@ -7862,10 +7865,6 @@ def chatbot_admin(request):
                 "respuesta": "No tienes autorización para utilizar PiroIA."
             }, status=403)
 
-        # ==================================================
-        # 2. RECIBIR MENSAJE E HISTORIAL
-        # ==================================================
-
         data = json.loads(request.body or "{}")
 
         pregunta = data.get("mensaje", "")
@@ -7880,6 +7879,10 @@ def chatbot_admin(request):
                 "ok": False,
                 "respuesta": "Escribe una instrucción para continuar."
             }, status=400)
+
+        # ==================================================
+        # 2. HISTORIAL
+        # ==================================================
 
         historial = data.get("historial", [])
 
@@ -7906,26 +7909,39 @@ def chatbot_admin(request):
                 })
 
         # ==================================================
-        # 3. FECHAS Y FILTROS ACTUALES
+        # 3. FECHAS Y FILTROS
         # ==================================================
 
         hoy = timezone.localdate()
-        lunes_semana = hoy - timedelta(days=hoy.weekday())
+
+        lunes_semana = hoy - timedelta(
+            days=hoy.weekday()
+        )
+
         primer_dia_mes = hoy.replace(day=1)
 
-        filtros_actuales = data.get("filtros_dashboard", {})
+        filtros_actuales = data.get(
+            "filtros_dashboard",
+            {}
+        )
 
         if not isinstance(filtros_actuales, dict):
             filtros_actuales = {}
 
         fecha_actual_inicio = filtros_actuales.get(
             "fecha_inicio",
-            request.GET.get("fecha_inicio", lunes_semana.isoformat())
+            request.GET.get(
+                "fecha_inicio",
+                lunes_semana.isoformat()
+            )
         )
 
         fecha_actual_fin = filtros_actuales.get(
             "fecha_fin",
-            request.GET.get("fecha_fin", hoy.isoformat())
+            request.GET.get(
+                "fecha_fin",
+                hoy.isoformat()
+            )
         )
 
         estado_actual = filtros_actuales.get(
@@ -7933,12 +7949,18 @@ def chatbot_admin(request):
             request.GET.get("estado", "todos")
         )
 
-        if estado_actual not in (
-            "todos", "revision", "cotizada", "rechazada"
-        ):
+        estados_permitidos = (
+            "todos",
+            "revision",
+            "cotizada",
+            "rechazada"
+        )
+
+        if estado_actual not in estados_permitidos:
             estado_actual = "todos"
 
         def convertir_fecha(valor):
+
             if not isinstance(valor, str):
                 return None
 
@@ -7947,8 +7969,13 @@ def chatbot_admin(request):
             except ValueError:
                 return None
 
-        desde_actual = convertir_fecha(fecha_actual_inicio)
-        hasta_actual = convertir_fecha(fecha_actual_fin)
+        desde_actual = convertir_fecha(
+            fecha_actual_inicio
+        )
+
+        hasta_actual = convertir_fecha(
+            fecha_actual_fin
+        )
 
         if (
             not desde_actual
@@ -7959,7 +7986,143 @@ def chatbot_admin(request):
             hasta_actual = hoy
 
         # ==================================================
-        # 4. CONFIGURAR GROQ
+        # 4. RUTAS DE MÓDULOS ADMINISTRATIVOS
+        # ==================================================
+
+        modulos_permitidos = {
+            "productos": "lista_productos",
+            "categorias": "lista_categorias",
+            "usuarios": "lista_usuarios",
+            "solicitudes": "lista_solicitudes",
+            "cotizaciones": "administrar_cotizaciones",
+            "seguridad": "seguridad_admin",
+            "monitoreo_iot": "monitoreo_iot"
+        }
+
+        nombres_modulos = {
+            "productos": "Productos",
+            "categorias": "Categorías",
+            "usuarios": "Usuarios",
+            "solicitudes": "Solicitudes",
+            "cotizaciones": "Cotizaciones",
+            "seguridad": "Seguridad",
+            "monitoreo_iot": "Monitoreo IoT"
+        }
+
+        # Normalizar texto para reconocer instrucciones.
+
+        def normalizar_texto(texto):
+
+            texto = unicodedata.normalize(
+                "NFD",
+                texto.lower()
+            )
+
+            texto = "".join(
+                caracter
+                for caracter in texto
+                if unicodedata.category(caracter) != "Mn"
+            )
+
+            return texto
+
+        pregunta_normalizada = normalizar_texto(
+            pregunta
+        )
+
+        # ==================================================
+        # 5. RECONOCER NAVEGACIÓN DIRECTAMENTE
+        # ==================================================
+
+        patrones_navegacion = {
+            "productos": (
+                r"\bproductos?\b"
+            ),
+            "categorias": (
+                r"\bcategorias?\b"
+            ),
+            "usuarios": (
+                r"\busuarios?\b"
+            ),
+            "solicitudes": (
+                r"\bsolicitudes?\b"
+            ),
+            "cotizaciones": (
+                r"\bcotizaciones?\b"
+            ),
+            "seguridad": (
+                r"\bseguridad\b"
+            ),
+            "monitoreo_iot": (
+                r"\b(?:monitoreo\s+iot|iot)\b"
+            )
+        }
+
+        patrones_intencion = (
+            r"\b(?:"
+            r"ve|vete|ir|voy|dirigeme|dirigirse|"
+            r"abre|abrir|entra|entrar|"
+            r"llevame|muestrame|mostrar|"
+            r"accede|acceder|ingresa|ingresar"
+            r")\b"
+        )
+
+        intencion_navegacion = bool(
+            re.search(
+                patrones_intencion,
+                pregunta_normalizada
+            )
+        )
+
+        # El Dashboard tiene su propia acción.
+
+        if intencion_navegacion and re.search(
+            r"\bdashboard\b",
+            pregunta_normalizada
+        ):
+
+            return JsonResponse({
+                "ok": True,
+                "respuesta": (
+                    "Claro, te estoy dirigiendo al Dashboard."
+                ),
+                "accion": "abrir_dashboard",
+                "tipo_accion": "accion",
+                "datos": {},
+                "url_dashboard": reverse("dashboard"),
+                "url_modulo": ""
+            })
+
+        # Reconocer otros módulos.
+
+        if intencion_navegacion:
+
+            for modulo, patron in patrones_navegacion.items():
+
+                if re.search(
+                    patron,
+                    pregunta_normalizada
+                ):
+
+                    return JsonResponse({
+                        "ok": True,
+                        "respuesta": (
+                            "Claro, te estoy dirigiendo al módulo de "
+                            f"{nombres_modulos[modulo]}."
+                        ),
+                        "accion": "abrir_modulo",
+                        "tipo_accion": "accion",
+                        "datos": {
+                            "modulo": modulo
+                        },
+                        "url_dashboard": reverse("dashboard"),
+                        "url_modulo": reverse(
+                            modulos_permitidos[modulo]
+                        )
+                    })
+
+        # ==================================================
+        # 6. CONFIGURAR GROQ
         # ==================================================
 
         api_key = os.getenv("GROQ_API_KEY")
@@ -7970,7 +8133,9 @@ def chatbot_admin(request):
                 "respuesta": "No se encontró GROQ_API_KEY."
             }, status=500)
 
-        url = "https://api.groq.com/openai/v1/chat/completions"
+        url = (
+            "https://api.groq.com/openai/v1/chat/completions"
+        )
 
         headers = {
             "Authorization": f"Bearer {api_key}",
@@ -7978,14 +8143,13 @@ def chatbot_admin(request):
         }
 
         # ==================================================
-        # 5. INSTRUCCIONES PARA INTERPRETAR LA PETICIÓN
+        # 7. INSTRUCCIONES PARA GROQ
         # ==================================================
 
         instrucciones = f"""
 Eres PiroIA, el asistente administrativo de Catálogo Web.
 
-Tu tarea es interpretar la instrucción del administrador
-y decidir qué acción debe realizar el dashboard.
+Tu tarea es interpretar las consultas del administrador.
 
 FECHA ACTUAL: {hoy.isoformat()}
 INICIO DE SEMANA: {lunes_semana.isoformat()}
@@ -7999,22 +8163,21 @@ Estado: {estado_actual}
 ACCIONES PERMITIDAS:
 
 1. ninguna
-Para preguntas, análisis y conversaciones normales.
+Para preguntas y consultas normales.
 
 2. abrir_dashboard
-Para abrir específicamente el Dashboard.
+Para abrir el Dashboard.
 
 3. abrir_modulo
-Para navegar a otro módulo administrativo.
+Para abrir un módulo administrativo.
 
 4. filtrar_dashboard
-Para aplicar fechas y estados al Dashboard.
+Para aplicar fechas y estados.
 
 5. cambiar_grafica
 Para cambiar el formato de una gráfica.
 
-MÓDULOS ADMINISTRATIVOS DISPONIBLES:
-
+MÓDULOS:
 productos
 categorias
 usuarios
@@ -8044,59 +8207,22 @@ REGLAS:
 - Si dice este mes, usa el primer día del mes y hoy.
 - Si dice hoy, usa la fecha actual en ambos campos.
 - Si menciona un estado, selecciona el estado correspondiente.
-- Si solicita comparar estados, usa estado todos.
+- Si solicita comparar estados, utiliza estado todos.
 - Si pide cambiar una gráfica, identifica su nombre y formato.
 - Si no menciona fechas, conserva los filtros actuales.
-- Si la petición es informativa, utiliza accion ninguna.
+- Las preguntas estadísticas utilizan accion ninguna.
 - No solicites ni ejecutes modificaciones de registros.
-- No afirmes que generaste PDF o consultaste dispositivos IoT.
-- Si no identificas una gráfica o formato, no ejecutes el cambio.
-
-REGLAS PRIORITARIAS PARA ACCIONES:
-
-- Si pide ir, abrir o dirigirse al Dashboard,
-  utiliza accion abrir_dashboard.
-
-- Si pide ir, abrir o dirigirse a productos,
-  utiliza accion abrir_modulo y modulo productos.
-
-- Si pide ir, abrir o dirigirse a categorías,
-  utiliza accion abrir_modulo y modulo categorias.
-
-- Si pide ir, abrir o dirigirse a usuarios,
-  utiliza accion abrir_modulo y modulo usuarios.
-
-- Si pide ir, abrir o dirigirse a solicitudes,
-  utiliza accion abrir_modulo y modulo solicitudes.
-
-- Si pide ir, abrir o dirigirse a cotizaciones,
-  utiliza accion abrir_modulo y modulo cotizaciones.
-
-- Si pide ir, abrir o dirigirse a seguridad,
-  utiliza accion abrir_modulo y modulo seguridad.
-
-- Si pide ir, abrir o dirigirse al monitoreo IoT,
-  utiliza accion abrir_modulo y modulo monitoreo_iot.
-
-- Si pregunta por estadísticas o información de productos,
-  no navegues a otro módulo; utiliza accion ninguna.
-
-- Si pide cambiar el formato de una gráfica, utiliza
-  accion cambiar_grafica.
-
-- Si pide aplicar fechas o estados al Dashboard,
-  utiliza accion filtrar_dashboard.
-
-- Las acciones de navegación tienen prioridad cuando
-  solicita explícitamente abrir o dirigirse a un módulo.
-
-- Nunca confundas abrir un módulo con consultar sus datos.
+- No afirmes que generaste PDF ni consultaste dispositivos IoT.
 - No inventes módulos ni direcciones.
 
-DEVUELVE EXCLUSIVAMENTE JSON:
+IMPORTANTE:
+La navegación se ejecuta únicamente cuando existe una
+instrucción explícita para abrir o dirigirse a un módulo.
+
+Devuelve exclusivamente JSON válido:
 
 {{
-    "respuesta": "Breve explicación de la instrucción identificada",
+    "respuesta": "Respuesta breve",
     "accion": "ninguna",
     "tipo_accion": "consulta",
     "datos": {{
@@ -8104,11 +8230,12 @@ DEVUELVE EXCLUSIVAMENTE JSON:
         "fecha_fin": "",
         "estado": "todos",
         "grafica": "",
-        "tipo": ""
+        "tipo": "",
+        "modulo": ""
     }}
 }}
 
-PREGUNTA DEL ADMINISTRADOR:
+PREGUNTA:
 {pregunta}
 """
 
@@ -8119,8 +8246,7 @@ PREGUNTA DEL ADMINISTRADOR:
                     "role": "system",
                     "content": (
                         "Eres PiroIA Administrativo. "
-                        "Interpreta instrucciones y devuelve "
-                        "únicamente JSON válido."
+                        "Devuelve exclusivamente JSON válido."
                     )
                 },
                 {
@@ -8144,6 +8270,7 @@ PREGUNTA DEL ADMINISTRADOR:
         )
 
         if respuesta_groq.status_code != 200:
+
             print(
                 "ERROR GROQ PIROIA ADMIN:",
                 respuesta_groq.status_code,
@@ -8152,7 +8279,9 @@ PREGUNTA DEL ADMINISTRADOR:
 
             return JsonResponse({
                 "ok": False,
-                "respuesta": "No pude procesar tu instrucción con Groq."
+                "respuesta": (
+                    "No pude procesar tu instrucción con Groq."
+                )
             }, status=502)
 
         resultado_groq = respuesta_groq.json()
@@ -8166,10 +8295,13 @@ PREGUNTA DEL ADMINISTRADOR:
         resultado_ia = json.loads(contenido)
 
         # ==================================================
-        # 6. VALIDAR ACCIÓN
+        # 8. VALIDAR ACCIÓN
         # ==================================================
 
-        accion = resultado_ia.get("accion", "ninguna")
+        accion = resultado_ia.get(
+            "accion",
+            "ninguna"
+        )
 
         acciones_permitidas = (
             "ninguna",
@@ -8187,36 +8319,6 @@ PREGUNTA DEL ADMINISTRADOR:
         if not isinstance(datos, dict):
             datos = {}
 
-        # ==================================================
-        # VALIDAR MÓDULO ADMINISTRATIVO
-        # ==================================================
-
-        modulos_permitidos = {
-            "productos": "lista_productos",
-            "categorias": "lista_categorias",
-            "usuarios": "lista_usuarios",
-            "solicitudes": "lista_solicitudes",
-            "cotizaciones": "administrar_cotizaciones",
-            "seguridad": "seguridad_admin",
-            "monitoreo_iot": "monitoreo_iot",
-        }
-
-        modulo = datos.get("modulo", "")
-
-        if not isinstance(modulo, str):
-            modulo = ""
-
-        if accion == "abrir_modulo":
-
-            if modulo not in modulos_permitidos:
-                accion = "ninguna"
-                respuesta_texto = (
-                    "No pude identificar el módulo administrativo "
-                    "al que deseas dirigirte."
-                )
-            else:
-                url_modulo = reverse(modulos_permitidos[modulo])
-
         respuesta_texto = resultado_ia.get(
             "respuesta",
             "He recibido tu instrucción."
@@ -8225,21 +8327,32 @@ PREGUNTA DEL ADMINISTRADOR:
         if not isinstance(respuesta_texto, str):
             respuesta_texto = "He recibido tu instrucción."
 
+        modulo = datos.get("modulo", "")
+
+        if not isinstance(modulo, str):
+            modulo = ""
+
         # ==================================================
-        # 7. VALIDAR FILTROS
+        # 9. VALIDAR FECHAS Y ESTADOS
         # ==================================================
 
-        estados_permitidos = (
-            "todos", "revision", "cotizada", "rechazada"
+        estado = datos.get(
+            "estado",
+            estado_actual
         )
-
-        estado = datos.get("estado", estado_actual)
 
         if estado not in estados_permitidos:
             estado = estado_actual
 
-        fecha_inicio = datos.get("fecha_inicio", "")
-        fecha_fin = datos.get("fecha_fin", "")
+        fecha_inicio = datos.get(
+            "fecha_inicio",
+            ""
+        )
+
+        fecha_fin = datos.get(
+            "fecha_fin",
+            ""
+        )
 
         if not isinstance(fecha_inicio, str):
             fecha_inicio = ""
@@ -8247,7 +8360,6 @@ PREGUNTA DEL ADMINISTRADOR:
         if not isinstance(fecha_fin, str):
             fecha_fin = ""
 
-        # Si Groq no propone fechas, se conservan las actuales.
         if not fecha_inicio:
             fecha_inicio = desde_actual.isoformat()
 
@@ -8262,32 +8374,46 @@ PREGUNTA DEL ADMINISTRADOR:
             or not hasta
             or desde > hasta
         ):
-            accion = "ninguna"
             desde = desde_actual
             hasta = hasta_actual
             estado = estado_actual
 
-            respuesta_texto = (
-                "No pude identificar un periodo válido. "
-                "Indícame las fechas nuevamente."
-            )
+            if accion == "filtrar_dashboard":
+                accion = "ninguna"
+
+                respuesta_texto = (
+                    "No pude identificar un periodo válido. "
+                    "Indícame las fechas nuevamente."
+                )
 
         # ==================================================
-        # 8. VALIDAR GRÁFICAS
+        # 10. VALIDAR GRÁFICAS
         # ==================================================
 
         graficas_permitidas = {
             "graficaEstados": (
-                "doughnut", "pie", "barVertical", "polarArea"
+                "doughnut",
+                "pie",
+                "barVertical",
+                "polarArea"
             ),
             "graficaMeses": (
-                "line", "barVertical", "area", "radar"
+                "line",
+                "barVertical",
+                "area",
+                "radar"
             ),
             "graficaCategorias": (
-                "barHorizontal", "barVertical", "doughnut", "pie"
+                "barHorizontal",
+                "barVertical",
+                "doughnut",
+                "pie"
             ),
             "graficaProductos": (
-                "barHorizontal", "barVertical", "line", "radar"
+                "barHorizontal",
+                "barVertical",
+                "line",
+                "radar"
             )
         }
 
@@ -8298,8 +8424,12 @@ PREGUNTA DEL ADMINISTRADOR:
 
             if (
                 grafica not in graficas_permitidas
-                or tipo not in graficas_permitidas.get(grafica, ())
+                or tipo not in graficas_permitidas.get(
+                    grafica,
+                    ()
+                )
             ):
+
                 accion = "ninguna"
 
                 respuesta_texto = (
@@ -8307,9 +8437,8 @@ PREGUNTA DEL ADMINISTRADOR:
                     "un formato válido para realizar el cambio."
                 )
 
-
         # ==================================================
-        # 8.1 RESPUESTAS DIRECTAS PARA ACCIONES
+        # 11. RESPUESTAS DIRECTAS PARA ACCIONES
         # ==================================================
 
         if accion in (
@@ -8327,18 +8456,16 @@ PREGUNTA DEL ADMINISTRADOR:
 
             elif accion == "abrir_modulo":
 
-                nombres_modulos = {
-                    "productos": "Productos",
-                    "categorias": "Categorías",
-                    "usuarios": "Usuarios",
-                    "solicitudes": "Solicitudes",
-                    "cotizaciones": "Cotizaciones",
-                    "seguridad": "Seguridad",
-                    "monitoreo_iot": "Monitoreo IoT",
-                }
+                if modulo not in modulos_permitidos:
+                    return JsonResponse({
+                        "ok": False,
+                        "respuesta": (
+                            "No pude identificar el módulo solicitado."
+                        )
+                    }, status=400)
 
                 respuesta_final = (
-                    f"Claro, te estoy dirigiendo al módulo de "
+                    "Claro, te estoy dirigiendo al módulo de "
                     f"{nombres_modulos[modulo]}."
                 )
 
@@ -8348,7 +8475,7 @@ PREGUNTA DEL ADMINISTRADOR:
                     "Claro, estoy aplicando los filtros solicitados."
                 )
 
-            elif accion == "cambiar_grafica":
+            else:
 
                 nombres_graficas = {
                     "graficaEstados": "estados",
@@ -8368,19 +8495,10 @@ PREGUNTA DEL ADMINISTRADOR:
                     "polarArea": "área polar"
                 }
 
-                nombre_grafica = nombres_graficas.get(
-                    grafica,
-                    "gráfica"
-                )
-
-                nombre_tipo = nombres_tipos.get(
-                    tipo,
-                    "formato solicitado"
-                )
-
                 respuesta_final = (
-                    f"Claro, estoy cambiando la gráfica de "
-                    f"{nombre_grafica} a {nombre_tipo}."
+                    "Claro, estoy cambiando la gráfica de "
+                    f"{nombres_graficas[grafica]} a "
+                    f"{nombres_tipos[tipo]}."
                 )
 
             return JsonResponse({
@@ -8393,18 +8511,26 @@ PREGUNTA DEL ADMINISTRADOR:
                     "fecha_fin": hasta.isoformat(),
                     "estado": estado,
                     "grafica": grafica,
-                    "tipo": tipo
+                    "tipo": tipo,
+                    "modulo": modulo
                 },
-                "url_dashboard": reverse("dashboard")
+                "url_dashboard": reverse("dashboard"),
+                "url_modulo": (
+                    reverse(modulos_permitidos[modulo])
+                    if accion == "abrir_modulo"
+                    else ""
+                )
             })
-        
 
         # ==================================================
-        # 9. CONSULTAR DATOS REALES DEL PERIODO
+        # 12. CONSULTAR DATOS REALES
         # ==================================================
 
         desde_dt = timezone.make_aware(
-            datetime.combine(desde, datetime.min.time()),
+            datetime.combine(
+                desde,
+                datetime.min.time()
+            ),
             timezone.get_current_timezone()
         )
 
@@ -8423,7 +8549,9 @@ PREGUNTA DEL ADMINISTRADOR:
         )
 
         if estado != "todos":
-            solicitudes = solicitudes.filter(estado=estado)
+            solicitudes = solicitudes.filter(
+                estado=estado
+            )
 
         total_solicitudes = solicitudes.count()
 
@@ -8440,10 +8568,11 @@ PREGUNTA DEL ADMINISTRADOR:
         ).count()
 
         # ==================================================
-        # 10. ESTADÍSTICAS GENERALES
+        # 13. ESTADÍSTICAS GENERALES
         # ==================================================
 
         total_productos = Producto.objects.count()
+
         total_categorias = Categoria.objects.count()
 
         productos_activos = Producto.objects.filter(
@@ -8457,7 +8586,7 @@ PREGUNTA DEL ADMINISTRADOR:
         total_usuarios = User.objects.count()
 
         # ==================================================
-        # 11. PRODUCTOS MÁS COTIZADOS DEL PERIODO
+        # 14. PRODUCTOS MÁS COTIZADOS
         # ==================================================
 
         productos_mas_cotizados = (
@@ -8485,6 +8614,7 @@ PREGUNTA DEL ADMINISTRADOR:
         lista_productos = []
 
         for producto in productos_mas_cotizados:
+
             lista_productos.append({
                 "nombre": producto["producto__nombre"],
                 "solicitudes": producto["total_solicitudes"],
@@ -8492,7 +8622,7 @@ PREGUNTA DEL ADMINISTRADOR:
             })
 
         # ==================================================
-        # 12. ESTADÍSTICAS PARA GROQ
+        # 15. PREPARAR ESTADÍSTICAS
         # ==================================================
 
         estadisticas = {
@@ -8518,7 +8648,7 @@ PREGUNTA DEL ADMINISTRADOR:
         }
 
         # ==================================================
-        # 13. GENERAR RESPUESTA CON DATOS REALES
+        # 16. RESPUESTA CON GROQ
         # ==================================================
 
         estadisticas_texto = json.dumps(
@@ -8532,8 +8662,8 @@ Eres PiroIA Administrativo de Catálogo Web.
 Pregunta del administrador:
 {pregunta}
 
-Acción identificada:
-{accion}
+Historial reciente:
+{json.dumps(historial_seguro, ensure_ascii=False)}
 
 Datos reales calculados por Django:
 {estadisticas_texto}
@@ -8545,10 +8675,9 @@ Instrucciones:
 - Si solicita comparar estados, compara sus cantidades.
 - Si un estado tiene cero solicitudes, indícalo.
 - No inventes tendencias ni porcentajes.
-- Si el administrador solicita una explicación,
-  proporciona una respuesta clara y útil.
-- No afirmes que ejecutaste acciones que no se realizaron.
 - No menciones datos personales de usuarios.
+- No afirmes que realizaste acciones que no se ejecutaron.
+- No afirmes que generaste PDF ni consultaste dispositivos IoT.
 
 Devuelve exclusivamente JSON válido:
 {{
@@ -8562,8 +8691,8 @@ Devuelve exclusivamente JSON válido:
                 {
                     "role": "system",
                     "content": (
-                        "Analiza estadísticas administrativas "
-                        "reales y responde exclusivamente con JSON."
+                        "Analiza estadísticas administrativas reales "
+                        "y responde exclusivamente con JSON."
                     )
                 },
                 {
@@ -8587,6 +8716,7 @@ Devuelve exclusivamente JSON válido:
         )
 
         if respuesta_analisis.status_code != 200:
+
             print(
                 "ERROR ANALISIS PIROIA:",
                 respuesta_analisis.status_code,
@@ -8595,7 +8725,9 @@ Devuelve exclusivamente JSON válido:
 
             return JsonResponse({
                 "ok": False,
-                "respuesta": "No pude completar el análisis de los datos."
+                "respuesta": (
+                    "No pude completar el análisis de los datos."
+                )
             }, status=502)
 
         resultado_analisis = respuesta_analisis.json()
@@ -8606,7 +8738,9 @@ Devuelve exclusivamente JSON válido:
             .get("content", "")
         )
 
-        respuesta_final = json.loads(contenido_analisis).get(
+        respuesta_final = json.loads(
+            contenido_analisis
+        ).get(
             "respuesta",
             respuesta_texto
         )
@@ -8615,7 +8749,7 @@ Devuelve exclusivamente JSON válido:
             respuesta_final = respuesta_texto
 
         # ==================================================
-        # 14. PREPARAR ACCIÓN PARA EL DASHBOARD
+        # 17. RESPUESTA FINAL
         # ==================================================
 
         datos_finales = {
@@ -8623,39 +8757,26 @@ Devuelve exclusivamente JSON válido:
             "fecha_fin": hasta.isoformat(),
             "estado": estado,
             "grafica": grafica,
-            "tipo": tipo
+            "tipo": tipo,
+            "modulo": modulo
         }
-
-        if accion == "filtrar_dashboard":
-            respuesta_final = (
-                respuesta_final
-                or "Voy a aplicar los filtros solicitados."
-            )
-
-        elif accion == "cambiar_grafica":
-            respuesta_final = (
-                respuesta_final
-                or "Voy a cambiar la presentación de la gráfica."
-            )
-
-        # ==================================================
-        # 15. RESPUESTA FINAL
-        # ==================================================
 
         return JsonResponse({
             "ok": True,
             "respuesta": respuesta_final,
             "accion": accion,
             "tipo_accion": resultado_ia.get(
-                "tipo_accion", "consulta"
+                "tipo_accion",
+                "consulta"
             ),
             "datos": datos_finales,
             "estadisticas": estadisticas,
-            "url_dashboard": reverse("dashboard")
+            "url_dashboard": reverse("dashboard"),
+            "url_modulo": ""
         })
 
     # ==================================================
-    # 16. MANEJO DE ERRORES
+    # 18. MANEJO DE ERRORES
     # ==================================================
 
     except json.JSONDecodeError:
@@ -8674,7 +8795,10 @@ Devuelve exclusivamente JSON válido:
 
     except requests.exceptions.RequestException as error:
 
-        print("ERROR DE CONEXIÓN PIROIA:", str(error))
+        print(
+            "ERROR DE CONEXIÓN PIROIA:",
+            str(error)
+        )
 
         return JsonResponse({
             "ok": False,
@@ -8683,7 +8807,10 @@ Devuelve exclusivamente JSON válido:
 
     except Exception as error:
 
-        print("ERROR GENERAL PIROIA ADMIN:", str(error))
+        print(
+            "ERROR GENERAL PIROIA ADMIN:",
+            str(error)
+        )
 
         return JsonResponse({
             "ok": False,
