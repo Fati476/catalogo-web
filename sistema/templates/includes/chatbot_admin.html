@@ -341,6 +341,12 @@
                 type="text"
                 placeholder="Escribe tu consulta..."
                 autocomplete="off">
+            <button id="piroia-admin-stop"
+                    class="piroia-control"
+                    type="button"
+                    title="Detener voz">
+                <i class="bi bi-stop-fill"></i>
+            </button>
 
             <button id="piroia-admin-send"
                     class="piroia-control"
@@ -383,12 +389,82 @@
         const entrada = document.getElementById("piroia-admin-input");
         const enviar = document.getElementById("piroia-admin-send");
         const microfono = document.getElementById("piroia-admin-mic");
+        const detenerVoz = document.getElementById("piroia-admin-stop");
 
         if (!boton || !ventana) return;
+
+        // ==========================================
+        // HISTORIAL DE CONVERSACIÓN
+        // ==========================================
+
+        const CLAVE_HISTORIAL = "piroia_admin_historial";
+        const DURACION_HISTORIAL = 24 * 60 * 60 * 1000;
 
         let historial = [];
         let reconocimiento = null;
         let escuchando = false;
+
+        // GUARDAR HISTORIAL
+
+        function guardarHistorial() {
+            const datos = {
+                fecha: Date.now(),
+                mensajes: historial
+            };
+
+            localStorage.setItem(
+                CLAVE_HISTORIAL,
+                JSON.stringify(datos)
+            );
+        }
+
+        // RECUPERAR HISTORIAL
+
+        function recuperarHistorial() {        
+    try {
+        const guardado = localStorage.getItem(CLAVE_HISTORIAL);
+
+        if (!guardado) return;
+
+        const datos = JSON.parse(guardado);
+
+        if (
+            !datos.fecha ||
+            Date.now() - datos.fecha >= DURACION_HISTORIAL
+        ) {
+            localStorage.removeItem(CLAVE_HISTORIAL);
+            return;
+        }
+
+        if (!Array.isArray(datos.mensajes)) return;
+
+        historial = datos.mensajes.slice(-10);
+
+        // Limpiar los mensajes iniciales para recuperar
+        // la conversación sin duplicar el saludo.
+        mensajes.innerHTML = "";
+
+        historial.forEach(function (mensaje) {
+            if (
+                mensaje.role === "user" ||
+                mensaje.role === "assistant"
+            ) {
+                agregarMensaje(
+                    mensaje.content,
+                    mensaje.role === "user" ? "user" : "bot"
+                );
+            }
+        });
+
+    } catch (error) {
+        console.error("Error al recuperar historial:", error);
+        localStorage.removeItem(CLAVE_HISTORIAL);
+    }
+}
+
+        // RECUPERAR AL INICIAR PIROIA
+
+        recuperarHistorial();
 
         // ABRIR Y CERRAR
 
@@ -517,6 +593,10 @@
 
         // RESPUESTA POR VOZ
 
+        // ==========================================
+        // RESPUESTA Y CONTROL DE VOZ
+        // ==========================================
+
         function hablar(texto) {
             if (!("speechSynthesis" in window)) return;
 
@@ -527,6 +607,84 @@
             voz.rate = 1;
 
             window.speechSynthesis.speak(voz);
+        }
+
+        // DETENER LA VOZ
+
+        detenerVoz.addEventListener("click", function () {
+            if ("speechSynthesis" in window) {
+                window.speechSynthesis.cancel();
+            }
+        });
+
+        // ==========================================
+        // EJECUTAR ACCIONES DE PIROIA
+        // ==========================================
+
+        function ejecutarAccion(resultado) {
+
+            const accion = resultado.accion;
+            const datos = resultado.datos || {};
+            const urlDashboard = resultado.url_dashboard;
+
+            if (accion === "abrir_dashboard") {
+                if (urlDashboard) {
+                    window.location.href = urlDashboard;
+                }
+                return;
+            }
+
+            if (accion === "filtrar_dashboard") {
+
+                if (window.piroiaAdminDashboard) {
+                    window.piroiaAdminDashboard.aplicarFiltros(datos);
+                    return;
+                }
+
+                if (urlDashboard) {
+                    const parametros = new URLSearchParams();
+
+                    if (datos.fecha_inicio) {
+                        parametros.set("fecha_inicio", datos.fecha_inicio);
+                    }
+
+                    if (datos.fecha_fin) {
+                        parametros.set("fecha_fin", datos.fecha_fin);
+                    }
+
+                    if (datos.estado) {
+                        parametros.set("estado", datos.estado);
+                    }
+
+                    window.location.href =
+                        urlDashboard + "?" + parametros.toString();
+                }
+
+                return;
+            }
+
+            if (accion === "cambiar_grafica") {
+
+                if (window.piroiaAdminDashboard) {
+                    window.piroiaAdminDashboard.cambiarGrafica(
+                        datos.grafica,
+                        datos.tipo
+                    );
+                    return;
+                }
+
+                if (urlDashboard) {
+                    sessionStorage.setItem(
+                        "piroia_accion_pendiente",
+                        JSON.stringify({
+                            accion: accion,
+                            datos: datos
+                        })
+                    );
+
+                    window.location.href = urlDashboard;
+                }
+            }
         }
 
         // ENVIAR CONSULTA
@@ -600,6 +758,9 @@
                 });
 
                 historial = historial.slice(-10);
+
+                // Guardar la conversación durante 24 horas.
+                guardarHistorial();
 
                 hablar(textoRespuesta);
 

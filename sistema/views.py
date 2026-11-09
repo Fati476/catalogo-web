@@ -8025,7 +8025,7 @@ line, area, radar, polarArea.
 
 REGLAS:
 
-- Responde en español.
+- Responde siempre en español.
 - No inventes fechas.
 - Si dice esta semana, usa el lunes actual y hoy.
 - Si dice este mes, usa el primer día del mes y hoy.
@@ -8038,6 +8038,20 @@ REGLAS:
 - No solicites ni ejecutes modificaciones de registros.
 - No afirmes que generaste PDF o consultaste dispositivos IoT.
 - Si no identificas una gráfica o formato, no ejecutes el cambio.
+
+REGLAS PRIORITARIAS PARA ACCIONES:
+
+- Si el administrador pide abrir, mostrar o ir al Dashboard,
+  utiliza accion abrir_dashboard.
+- Si únicamente pide abrir el Dashboard, no generes estadísticas.
+- Si pide cambiar el formato de una gráfica, utiliza
+  accion cambiar_grafica.
+- Si únicamente pide cambiar una gráfica, no generes un
+  análisis estadístico.
+- Si pide aplicar fechas o estados al Dashboard, utiliza
+  accion filtrar_dashboard.
+- Las acciones tienen prioridad sobre las consultas estadísticas.
+- Devuelve los datos necesarios para ejecutar la acción.
 
 DEVUELVE EXCLUSIVAMENTE JSON:
 
@@ -8221,6 +8235,80 @@ PREGUNTA DEL ADMINISTRADOR:
                     "Necesito identificar una gráfica y "
                     "un formato válido para realizar el cambio."
                 )
+
+
+        # ==================================================
+        # 8.1 RESPUESTAS DIRECTAS PARA ACCIONES
+        # ==================================================
+
+        if accion in (
+            "abrir_dashboard",
+            "filtrar_dashboard",
+            "cambiar_grafica"
+        ):
+
+            if accion == "abrir_dashboard":
+
+                respuesta_final = (
+                    "Claro, te estoy dirigiendo al Dashboard."
+                )
+
+            elif accion == "filtrar_dashboard":
+
+                respuesta_final = (
+                    "Claro, estoy aplicando los filtros solicitados."
+                )
+
+            elif accion == "cambiar_grafica":
+
+                nombres_graficas = {
+                    "graficaEstados": "estados",
+                    "graficaMeses": "solicitudes por mes",
+                    "graficaCategorias": "categorías",
+                    "graficaProductos": "productos"
+                }
+
+                nombres_tipos = {
+                    "doughnut": "dona",
+                    "pie": "pastel",
+                    "barVertical": "barras verticales",
+                    "barHorizontal": "barras horizontales",
+                    "line": "líneas",
+                    "area": "área",
+                    "radar": "radar",
+                    "polarArea": "área polar"
+                }
+
+                nombre_grafica = nombres_graficas.get(
+                    grafica,
+                    "gráfica"
+                )
+
+                nombre_tipo = nombres_tipos.get(
+                    tipo,
+                    "formato solicitado"
+                )
+
+                respuesta_final = (
+                    f"Claro, estoy cambiando la gráfica de "
+                    f"{nombre_grafica} a {nombre_tipo}."
+                )
+
+            return JsonResponse({
+                "ok": True,
+                "respuesta": respuesta_final,
+                "accion": accion,
+                "tipo_accion": "accion",
+                "datos": {
+                    "fecha_inicio": desde.isoformat(),
+                    "fecha_fin": hasta.isoformat(),
+                    "estado": estado,
+                    "grafica": grafica,
+                    "tipo": tipo
+                },
+                "url_dashboard": reverse("dashboard")
+            })
+        
 
         # ==================================================
         # 9. CONSULTAR DATOS REALES DEL PERIODO
