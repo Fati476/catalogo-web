@@ -373,7 +373,8 @@
 </form>
 
 
-
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 (function () {
 
@@ -562,9 +563,8 @@
 
         }
 
-        
         // ==========================================
-        // GENERAR REPORTE PDF
+        // 6. GENERAR REPORTE PDF
         // ==========================================
 
         async function generarReportePDF(url, datos) {
@@ -597,7 +597,11 @@
 
                     try {
                         const error = await respuesta.json();
-                        mensajeError = error.error || error.respuesta || mensajeError;
+                        mensajeError =
+                            error.error ||
+                            error.mensaje ||
+                            error.respuesta ||
+                            mensajeError;
                     } catch (_) {}
 
                     throw new Error(mensajeError);
@@ -650,7 +654,9 @@
 
             } catch (error) {
 
-                escribiendo.remove();
+                if (escribiendo && escribiendo.isConnected) {
+                    escribiendo.remove();
+                }
 
                 console.error("Error al generar PDF:", error);
 
@@ -661,21 +667,209 @@
             }
         }
 
+        // ==========================================
+        // 7. GRÁFICAS DINÁMICAS DENTRO DEL CHAT
+        // ==========================================
+
+        let graficasChat = [];
+
+        function mostrarGraficaEnChat(nombre, tipo, datos) {
+
+            // Equivalencias de nombres entre Django y JavaScript.
+            const equivalencias = {
+                graficaEstados: "estados",
+                graficaCategorias: "categorias",
+                graficaMeses: "meses",
+                graficaProductos: "productos"
+            };
+
+            const claveGrafica = equivalencias[nombre] || nombre;
+
+            const configuraciones = {
+                estados: {
+                    titulo: "Solicitudes por estado",
+                    labels: datos.estados?.labels || [],
+                    valores: datos.estados?.valores || []
+                },
+
+                categorias: {
+                    titulo: "Productos por categoría",
+                    labels: datos.categorias?.labels || [],
+                    valores: datos.categorias?.valores || []
+                },
+
+                meses: {
+                    titulo: "Solicitudes por mes",
+                    labels: datos.meses?.labels || [],
+                    valores: datos.meses?.valores || []
+                },
+
+                productos: {
+                    titulo: "Productos más solicitados",
+                    labels: datos.productos?.labels || [],
+                    valores:
+                        datos.productos?.unidades ||
+                        datos.productos?.solicitudes ||
+                        []
+                }
+            };
+
+            const grafica = configuraciones[claveGrafica];
+
+            if (!grafica || !grafica.labels.length) {
+                agregarMensaje(
+                    "No hay datos suficientes para mostrar esa gráfica.",
+                    "bot"
+                );
+                return;
+            }
+
+            if (typeof Chart === "undefined") {
+                agregarMensaje(
+                    "No se pudo cargar Chart.js.",
+                    "bot"
+                );
+                return;
+            }
+
+            const tarjeta = document.createElement("div");
+            tarjeta.className = "piroia-message bot";
+            tarjeta.style.width = "100%";
+            tarjeta.style.maxWidth = "100%";
+
+            const titulo = document.createElement("strong");
+            titulo.textContent = grafica.titulo;
+
+            const contenedor = document.createElement("div");
+            contenedor.style.height = "230px";
+            contenedor.style.width = "100%";
+            contenedor.style.marginTop = "12px";
+
+            const canvas = document.createElement("canvas");
+            contenedor.appendChild(canvas);
+
+            tarjeta.appendChild(titulo);
+            tarjeta.appendChild(contenedor);
+
+            mensajes.appendChild(tarjeta);
+
+            // Convertir formatos del backend a formatos de Chart.js.
+            const equivalenciasTipo = {
+                barVertical: "bar",
+                barHorizontal: "bar",
+                area: "line"
+            };
+
+            const tipoNormalizado = equivalenciasTipo[tipo] || tipo;
+
+            const tiposValidos = [
+                "bar",
+                "line",
+                "doughnut",
+                "pie",
+                "polarArea",
+                "radar"
+            ];
+
+            const tipoFinal = tiposValidos.includes(tipoNormalizado)
+                ? tipoNormalizado
+                : "bar";
+
+            const esHorizontal = tipo === "barHorizontal";
+
+            const colores = [
+                "#C9A227",
+                "#171717",
+                "#D6B957",
+                "#6B7280",
+                "#A88A2A",
+                "#374151",
+                "#E6C75A"
+            ];
+
+            const nuevaGrafica = new Chart(canvas, {
+
+                type: tipoFinal,
+
+                data: {
+                    labels: grafica.labels,
+
+                    datasets: [{
+                        label: grafica.titulo,
+                        data: grafica.valores,
+                        backgroundColor: colores,
+                        borderColor: "#C9A227",
+                        borderWidth: 2,
+                        borderRadius: 7,
+                        tension: 0.35,
+                        fill: tipoFinal === "line" &&
+                            (tipo === "area" || tipo === "line")
+                    }]
+                },
+
+                options: {
+
+                    indexAxis: esHorizontal ? "y" : "x",
+                    responsive: true,
+                    maintainAspectRatio: false,
+
+                    plugins: {
+                        legend: {
+                            display: [
+                                "doughnut",
+                                "pie",
+                                "polarArea",
+                                "radar"
+                            ].includes(tipoFinal),
+
+                            position: "bottom"
+                        }
+                    },
+
+                    scales: [
+                        "doughnut",
+                        "pie",
+                        "polarArea",
+                        "radar"
+                    ].includes(tipoFinal)
+                        ? {}
+                        : {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    precision: 0
+                                }
+                            }
+                        }
+                }
+            });
+
+            graficasChat.push(nuevaGrafica);
+
+            mensajes.scrollTop = mensajes.scrollHeight;
+        }
 
         // ==========================================
-        // 6. EJECUTAR ACCIONES DE PIROIA
+        // 8. EJECUTAR ACCIONES DE PIROIA
         // ==========================================
 
         function ejecutarAccion(resultado) {
 
             const accion = resultado.accion;
-            const datos = resultado.datos || {};
+
+            // Aceptar ambos nombres para mantener compatibilidad.
+            const datos =
+                resultado.datos ||
+                resultado.datos_finales ||
+                {};
 
             const urlDashboard = resultado.url_dashboard;
             const urlModulo = resultado.url_modulo;
             const urlReporte = resultado.url_reporte;
 
-                        // --------------------------------------
+            const estadisticas = resultado.estadisticas || {};
+
+            // --------------------------------------
             // GENERAR REPORTE PDF
             // --------------------------------------
 
@@ -689,6 +883,21 @@
                         "bot"
                     );
                 }
+
+                return;
+            }
+
+            // --------------------------------------
+            // MOSTRAR GRÁFICA EN EL CHAT
+            // --------------------------------------
+
+            if (accion === "mostrar_grafica") {
+
+                mostrarGraficaEnChat(
+                    datos.grafica,
+                    datos.tipo || datos.formato,
+                    estadisticas.graficas || {}
+                );
 
                 return;
             }
@@ -769,7 +978,7 @@
 
                     window.piroiaAdminDashboard.cambiarGrafica(
                         datos.grafica,
-                        datos.tipo
+                        datos.tipo || datos.formato
                     );
 
                     return;
@@ -792,7 +1001,7 @@
         }
 
         // ==========================================
-        // 7. ENVIAR MENSAJES A PIROIA
+        // 9. ENVIAR MENSAJES A PIROIA
         // ==========================================
 
         async function enviarMensaje(texto) {
@@ -837,7 +1046,15 @@
                     }
                 );
 
-                const resultado = await respuesta.json();
+                let resultado;
+
+                try {
+                    resultado = await respuesta.json();
+                } catch (_) {
+                    throw new Error(
+                        "El servidor devolvió una respuesta que no es JSON válido."
+                    );
+                }
 
                 escribiendo.remove();
 
@@ -884,7 +1101,9 @@
 
             } catch (error) {
 
-                escribiendo.remove();
+                if (escribiendo && escribiendo.isConnected) {
+                    escribiendo.remove();
+                }
 
                 console.error("Error PiroIA:", error);
 
@@ -906,7 +1125,7 @@
         }
 
         // ==========================================
-        // 8. BOTÓN ENVIAR Y TECLA ENTER
+        // 10. BOTÓN ENVIAR Y TECLA ENTER
         // ==========================================
 
         enviar.addEventListener("click", function () {
@@ -924,7 +1143,7 @@
         });
 
         // ==========================================
-        // 9. PREGUNTAS SUGERIDAS
+        // 11. PREGUNTAS SUGERIDAS
         // ==========================================
 
         document.querySelectorAll(
@@ -938,7 +1157,7 @@
         });
 
         // ==========================================
-        // 10. RECONOCIMIENTO DE VOZ
+        // 12. RECONOCIMIENTO DE VOZ
         // ==========================================
 
         const SpeechRecognition =
@@ -1007,7 +1226,7 @@
         }
 
         // ==========================================
-        // 11. RECUPERAR CONVERSACIÓN
+        // 13. RECUPERAR CONVERSACIÓN
         // ==========================================
 
         recuperarHistorial();

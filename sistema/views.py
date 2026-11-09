@@ -8157,6 +8157,26 @@ def chatbot_admin(request):
 
             # Si no especifica periodo, utiliza los filtros actuales.
             if not fecha_inicio or not fecha_fin:
+                menciona_periodo = bool(re.search(
+                    r"\b(desde|del|hasta|al|entre|"
+                    r"ultimos|ultimas|semana|mes|"
+                    r"enero|febrero|marzo|abril|mayo|junio|"
+                    r"julio|agosto|septiembre|setiembre|"
+                    r"octubre|noviembre|diciembre)\b",
+                    pregunta_normalizada
+                ))
+
+                if menciona_periodo:
+                    return JsonResponse({
+                        "ok": True,
+                        "respuesta": (
+                            "No pude identificar correctamente "
+                            "las fechas. ¿Puedes indicarme el "
+                            "periodo nuevamente?"
+                        ),
+                        "accion": "ninguna"
+                    })
+
                 fecha_inicio = desde_actual
                 fecha_fin = hasta_actual
 
@@ -8264,6 +8284,30 @@ solicitudes
 cotizaciones
 seguridad
 monitoreo_iot
+
+6. mostrar_grafica
+Para mostrar una gráfica directamente dentro del chat.
+
+GRÁFICAS PARA EL CHAT:
+estados
+categorias
+meses
+productos
+
+FORMATOS PARA EL CHAT:
+bar
+line
+doughnut
+pie
+polarArea
+radar
+
+REGLAS:
+- Si el administrador pide ver una gráfica dentro del chat,
+  utiliza accion mostrar_grafica.
+- En datos.grafica indica una de las gráficas permitidas.
+- En datos.tipo indica el formato solicitado.
+- Si no especifica formato, utiliza bar.
 
 ESTADOS:
 todos, revision, cotizada, rechazada.
@@ -8387,7 +8431,8 @@ PREGUNTA:
             "abrir_dashboard",
             "abrir_modulo",
             "filtrar_dashboard",
-            "cambiar_grafica"
+            "cambiar_grafica",
+            "mostrar_grafica"
         )
 
         if accion not in acciones_permitidas:
@@ -8415,39 +8460,47 @@ PREGUNTA:
         # 9. VALIDAR FECHAS Y ESTADOS
         # ==================================================
 
-        estado = datos.get(
-            "estado",
-            estado_actual
-        )
+        estado = datos.get("estado", estado_actual)
 
         if estado not in estados_permitidos:
             estado = estado_actual
 
-        fecha_inicio = datos.get(
-            "fecha_inicio",
-            ""
+        # Primero se intenta reconocer el periodo directamente
+        # desde lo que escribió el administrador.
+        periodo_detectado = interpretar_periodo_piroia(
+            pregunta_normalizada,
+            hoy=hoy
         )
 
-        fecha_fin = datos.get(
-            "fecha_fin",
-            ""
-        )
+        if (
+            isinstance(periodo_detectado, tuple)
+            and len(periodo_detectado) == 2
+            and periodo_detectado[0]
+            and periodo_detectado[1]
+        ):
+            desde, hasta = periodo_detectado
 
-        if not isinstance(fecha_inicio, str):
-            fecha_inicio = ""
+        else:
+            # Si no se reconoce un periodo en el mensaje,
+            # se utilizan las fechas que devolvió Groq.
+            fecha_inicio = datos.get("fecha_inicio", "")
+            fecha_fin = datos.get("fecha_fin", "")
 
-        if not isinstance(fecha_fin, str):
-            fecha_fin = ""
+            if (
+                isinstance(fecha_inicio, str)
+                and isinstance(fecha_fin, str)
+                and fecha_inicio
+                and fecha_fin
+            ):
+                desde = convertir_fecha(fecha_inicio)
+                hasta = convertir_fecha(fecha_fin)
+            else:
+                # Si no se mencionaron fechas, conservar
+                # los filtros seleccionados en el Dashboard.
+                desde = desde_actual
+                hasta = hasta_actual
 
-        if not fecha_inicio:
-            fecha_inicio = desde_actual.isoformat()
-
-        if not fecha_fin:
-            fecha_fin = hasta_actual.isoformat()
-
-        desde = convertir_fecha(fecha_inicio)
-        hasta = convertir_fecha(fecha_fin)
-
+        # Validar que las fechas sean correctas.
         if (
             not desde
             or not hasta
@@ -8461,8 +8514,21 @@ PREGUNTA:
                 accion = "ninguna"
 
                 respuesta_texto = (
-                    "No pude identificar un periodo válido. "
+                    "No pude identificar correctamente el periodo. "
                     "Indícame las fechas nuevamente."
+                )
+
+        # Evitar consultas con periodos excesivamente largos.
+        elif (hasta - desde).days > 366:
+
+            desde = desde_actual
+            hasta = hasta_actual
+
+            if accion == "filtrar_dashboard":
+                accion = "ninguna"
+
+                respuesta_texto = (
+                    "El periodo solicitado no puede superar un año."
                 )
 
         # ==================================================
@@ -8499,22 +8565,53 @@ PREGUNTA:
         grafica = datos.get("grafica", "")
         tipo = datos.get("tipo", "")
 
-        if accion == "cambiar_grafica":
+        # Formatos admitidos para las gráficas del chat.
+        formatos_chat = (
+            "bar",
+            "line",
+            "doughnut",
+            "pie",
+            "polarArea",
+            "radar",
+            "barVertical",
+            "barHorizontal",
+            "area"
+        )
 
-            if (
-                grafica not in graficas_permitidas
-                or tipo not in graficas_permitidas.get(
-                    grafica,
-                    ()
-                )
-            ):
+        if accion in ("mostrar_grafica", "cambiar_grafica"):
+
+            if grafica not in graficas_permitidas:
 
                 accion = "ninguna"
 
                 respuesta_texto = (
-                    "Necesito identificar una gráfica y "
-                    "un formato válido para realizar el cambio."
+                    "No pude identificar la gráfica que deseas utilizar."
                 )
+
+            elif accion == "mostrar_grafica":
+
+                # Si no indica formato, mostrar barras.
+                if not tipo:
+                    tipo = "bar"
+
+                if tipo not in formatos_chat:
+                    accion = "ninguna"
+
+                    respuesta_texto = (
+                        "El formato solicitado no está disponible "
+                        "para mostrar la gráfica."
+                    )
+
+            elif accion == "cambiar_grafica":
+
+                if tipo not in graficas_permitidas[grafica]:
+
+                    accion = "ninguna"
+
+                    respuesta_texto = (
+                        "Ese formato no está disponible para "
+                        "la gráfica seleccionada."
+                    )
 
         # ==================================================
         # 11. RESPUESTAS DIRECTAS PARA ACCIONES
@@ -8700,6 +8797,95 @@ PREGUNTA:
                 "unidades": producto["total_unidades"] or 0
             })
 
+        
+        # ==================================================
+        # DATOS PARA GRÁFICAS DE PIROIA
+        # ==================================================
+
+        solicitudes_grafica = SolicitudCotizacion.objects.filter(
+            enviada=True,
+            fecha__gte=desde_dt,
+            fecha__lt=hasta_dt
+        )
+
+        estados_grafica = {
+            "revision": solicitudes_grafica.filter(
+                estado="revision"
+            ).count(),
+            "cotizada": solicitudes_grafica.filter(
+                estado="cotizada"
+            ).count(),
+            "rechazada": solicitudes_grafica.filter(
+                estado="rechazada"
+            ).count()
+        }
+
+        categorias_grafica = list(
+            Producto.objects.values(
+                "categoria__nombre"
+            ).annotate(
+                total=Count("id")
+            ).order_by("-total")[:10]
+        )
+
+        meses_grafica = list(
+            solicitudes_grafica.annotate(
+                mes=TruncMonth("fecha")
+            ).values("mes").annotate(
+                total=Count("id")
+            ).order_by("mes")
+        )
+
+        graficas_piroia = {
+            "estados": {
+                "labels": [
+                    "En revisión",
+                    "Cotizadas",
+                    "Rechazadas"
+                ],
+                "valores": [
+                    estados_grafica["revision"],
+                    estados_grafica["cotizada"],
+                    estados_grafica["rechazada"]
+                ]
+            },
+            "categorias": {
+                "labels": [
+                    item["categoria__nombre"] or "Sin categoría"
+                    for item in categorias_grafica
+                ],
+                "valores": [
+                    item["total"]
+                    for item in categorias_grafica
+                ]
+            },
+            "meses": {
+                "labels": [
+                    item["mes"].strftime("%b %Y")
+                    for item in meses_grafica
+                ],
+                "valores": [
+                    item["total"]
+                    for item in meses_grafica
+                ]
+            },
+            "productos": {
+                "labels": [
+                    item["nombre"]
+                    for item in lista_productos
+                ],
+                "solicitudes": [
+                    item["solicitudes"]
+                    for item in lista_productos
+                ],
+                "unidades": [
+                    item["unidades"]
+                    for item in lista_productos
+                ]
+            }
+        }
+
+
         # ==================================================
         # 15. PREPARAR ESTADÍSTICAS
         # ==================================================
@@ -8723,7 +8909,8 @@ PREGUNTA:
                 "cotizadas": solicitudes_cotizadas,
                 "rechazadas": solicitudes_rechazadas
             },
-            "productos_mas_cotizados": lista_productos
+            "productos_mas_cotizados": lista_productos,
+            "graficas": graficas_piroia
         }
 
         # ==================================================
@@ -9521,8 +9708,15 @@ def interpretar_periodo_piroia(texto, hoy=None):
         r"septiembre|setiembre|octubre|noviembre|diciembre"
     )
 
-    # Hoy
-    if re.search(r"\b(hoy|de hoy)\b", texto):
+    # Hoy: respetar primero los periodos completos.
+    if (
+        re.search(r"\b(hoy|de hoy)\b", texto)
+        and not re.search(
+            r"\b(desde|del|ultimos|ultimas|esta semana|"
+            r"este mes|mes pasado|mes anterior|a partir del)\b",
+            texto
+        )
+    ):
         return hoy, hoy
 
     # Ayer
@@ -9559,6 +9753,27 @@ def interpretar_periodo_piroia(texto, hoy=None):
             ultimo_dia.replace(day=1),
             ultimo_dia
         )
+        # Mes mencionado directamente:
+    # octubre
+    # octubre de 2026
+
+    match = re.search(
+        rf"\b({patron_meses})(?:\s+de\s+(\d{{4}}))?\b",
+        texto
+    )
+
+    if match:
+        try:
+            mes = meses[match.group(1)]
+            anio = int(match.group(2)) if match.group(2) else hoy.year
+
+            inicio = date(anio, mes, 1)
+            fin = date(anio, mes, monthrange(anio, mes)[1])
+
+            return inicio, fin
+
+        except ValueError:
+            pass
 
     # Año actual
     if "este ano" in texto or "ano actual" in texto:
@@ -9675,7 +9890,7 @@ def interpretar_periodo_piroia(texto, hoy=None):
     # A partir del 7 de junio
     # Desde el 7 de junio de 2026 hasta hoy
     match = re.search(
-        rf"(?:desde|a partir del|del)\s+(\d{{1,2}})\s+"
+        rf"(?:desde|a partir del|del)\s+(?:el\s+)?(\d{{1,2}})\s+"
         rf"de\s+({patron_meses})(?:\s+de\s+(\d{{4}}))?",
         texto
     )
