@@ -9073,17 +9073,11 @@ Devuelve exclusivamente JSON válido:
 
     except Exception as error:
 
-        print(
-            "ERROR GENERAL PIROIA ADMIN:",
-            str(error)
-        )
+        print("ERROR GENERAL PIROIA ADMIN:", str(error))
+        traceback.print_exc()
 
         return JsonResponse({
-            "ok": False,
-            "respuesta": (
-                "Ocurrió un problema al procesar "
-                "tu solicitud administrativa."
-            )
+            "respuesta": "Ocurrió un error al procesar tu solicitud."
         }, status=500)
 
 
