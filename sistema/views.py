@@ -1103,9 +1103,8 @@ def dashboard(request):
     )
 
     solicitudes = SolicitudCotizacion.objects.filter(
-        enviada=True,
         fecha__gte=desde_dt,
-        fecha__lt=hasta_dt,
+        fecha__lt=hasta_dt
     )
 
     if estado in ("revision", "cotizada", "rechazada"):
@@ -8062,7 +8061,7 @@ def chatbot_admin(request):
             r"\b(?:"
             r"ve|vete|ir|voy|dirigeme|dirigirse|"
             r"abre|abrir|entra|entrar|"
-            r"llevame|muestrame|mostrar|"
+            r"llevame|"
             r"accede|acceder|ingresa|ingresar"
             r")\b"
         )
@@ -8767,7 +8766,6 @@ PREGUNTA:
 
         productos_mas_cotizados = (
             DetalleSolicitud.objects.filter(
-                solicitud__enviada=True,
                 solicitud__estado="cotizada",
                 solicitud__fecha__gte=desde_dt,
                 solicitud__fecha__lt=hasta_dt,
@@ -8803,7 +8801,6 @@ PREGUNTA:
         # ==================================================
 
         solicitudes_grafica = SolicitudCotizacion.objects.filter(
-            enviada=True,
             fecha__gte=desde_dt,
             fecha__lt=hasta_dt
         )
@@ -9081,19 +9078,23 @@ Devuelve exclusivamente JSON válido:
         }, status=500)
 
 
+
 @login_required
 def generar_reporte_general_piroia(request):
     import json
+    import os
     from io import BytesIO
     from datetime import date, datetime, timedelta
+    from collections import defaultdict
 
+    from django.conf import settings
     from django.http import HttpResponse, JsonResponse
     from django.utils import timezone
     from django.db.models import Count, Sum
     from django.contrib.auth.models import User
 
     from reportlab.lib import colors
-    from reportlab.lib.enums import TA_CENTER, TA_LEFT
+    from reportlab.lib.enums import TA_CENTER
     from reportlab.lib.pagesizes import letter
     from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
     from reportlab.lib.units import cm
@@ -9106,7 +9107,8 @@ def generar_reporte_general_piroia(request):
         HRFlowable,
         KeepTogether
     )
-    from reportlab.pdfbase.pdfmetrics import stringWidth
+    from reportlab.graphics.shapes import Drawing, String, Rect, Line
+    from reportlab.graphics.charts.piecharts import Pie
     from xml.sax.saxutils import escape
 
     from .models import (
@@ -9143,19 +9145,17 @@ def generar_reporte_general_piroia(request):
 
         hoy = timezone.localdate()
 
-        fecha_inicio = date.fromisoformat(
-            datos.get(
-                "fecha_inicio",
-                hoy.replace(day=1).isoformat()
-            )
-        )
+        fecha_inicio_texto = datos.get("fecha_inicio")
+        fecha_fin_texto = datos.get("fecha_fin")
 
-        fecha_fin = date.fromisoformat(
-            datos.get(
-                "fecha_fin",
-                hoy.isoformat()
-            )
-        )
+        if not fecha_inicio_texto or not fecha_fin_texto:
+            return JsonResponse({
+                "ok": False,
+                "mensaje": "Debes proporcionar la fecha inicial y final del reporte."
+            }, status=400)
+
+        fecha_inicio = date.fromisoformat(fecha_inicio_texto)
+        fecha_fin = date.fromisoformat(fecha_fin_texto)
 
         if fecha_inicio > fecha_fin:
             return JsonResponse({
@@ -9176,12 +9176,14 @@ def generar_reporte_general_piroia(request):
         }, status=400)
 
     # ==========================================
-    # 3. CONSULTAR DATOS REALES
+    # 3. CONSULTAR DATOS DEL PERIODO
     # ==========================================
+
+    zona = timezone.get_current_timezone()
 
     desde = timezone.make_aware(
         datetime.combine(fecha_inicio, datetime.min.time()),
-        timezone.get_current_timezone()
+        zona
     )
 
     hasta = timezone.make_aware(
@@ -9189,8 +9191,10 @@ def generar_reporte_general_piroia(request):
             fecha_fin + timedelta(days=1),
             datetime.min.time()
         ),
-        timezone.get_current_timezone()
+        zona
     )
+
+    # Datos generales actuales del sistema.
 
     total_productos = Producto.objects.count()
 
@@ -9206,8 +9210,12 @@ def generar_reporte_general_piroia(request):
 
     total_usuarios = User.objects.count()
 
+    # IMPORTANTE:
+    # Se incluyen todas las solicitudes del periodo.
+    # No se utiliza enviada=True porque también deben
+    # contabilizarse las solicitudes que no han sido enviadas.
+
     solicitudes = SolicitudCotizacion.objects.filter(
-        enviada=True,
         fecha__gte=desde,
         fecha__lt=hasta
     )
@@ -9226,7 +9234,11 @@ def generar_reporte_general_piroia(request):
         estado="rechazada"
     ).count()
 
-    productos_solicitados = (
+    # ==========================================
+    # 4. PRODUCTOS MÁS SOLICITADOS
+    # ==========================================
+
+    productos_solicitados = list(
         DetalleSolicitud.objects.filter(
             solicitud__in=solicitudes,
             seleccionado=True
@@ -9243,15 +9255,66 @@ def generar_reporte_general_piroia(request):
     )
 
     # ==========================================
-    # 4. CONFIGURACIÓN DEL DOCUMENTO
+    # 5. SOLICITUDES POR MES
+    # ==========================================
+
+    conteo_meses = defaultdict(int)
+
+    fechas_solicitudes = solicitudes.values_list(
+        "fecha",
+        flat=True
+    )
+
+    for fecha_registro in fechas_solicitudes:
+
+        if not fecha_registro:
+            continue
+
+        if timezone.is_aware(fecha_registro):
+            fecha_registro = timezone.localtime(fecha_registro)
+
+        clave = (
+            fecha_registro.year,
+            fecha_registro.month
+        )
+
+        conteo_meses[clave] += 1
+
+    nombres_meses = [
+        "Enero", "Febrero", "Marzo", "Abril",
+        "Mayo", "Junio", "Julio", "Agosto",
+        "Septiembre", "Octubre", "Noviembre", "Diciembre"
+    ]
+
+    meses_grafica = []
+
+    for (anio, mes), total in sorted(conteo_meses.items()):
+        meses_grafica.append({
+            "nombre": f"{nombres_meses[mes - 1]} {anio}",
+            "total": total
+        })
+
+    # ==========================================
+    # 6. CONFIGURACIÓN DEL PDF
     # ==========================================
 
     buffer = BytesIO()
 
     dorado = colors.HexColor("#C9A227")
-    negro = colors.HexColor("#000000")
+    negro = colors.HexColor("#171717")
     gris = colors.HexColor("#F3F4F6")
     gris_texto = colors.HexColor("#555555")
+    gris_linea = colors.HexColor("#D5D5D5")
+
+    colores_grafica = [
+        colors.HexColor("#C9A227"),
+        colors.HexColor("#171717"),
+        colors.HexColor("#D6B957"),
+        colors.HexColor("#6B7280"),
+        colors.HexColor("#A88A2A"),
+        colors.HexColor("#374151"),
+        colors.HexColor("#E6C75A")
+    ]
 
     logo_path = os.path.join(
         settings.BASE_DIR,
@@ -9276,7 +9339,7 @@ def generar_reporte_general_piroia(request):
     )
 
     # ==========================================
-    # 5. ENCABEZADO INSTITUCIONAL
+    # 7. ENCABEZADO INSTITUCIONAL
     # ==========================================
 
     def dibujar_encabezado(canvas, doc):
@@ -9339,7 +9402,7 @@ def generar_reporte_general_piroia(request):
         canvas.restoreState()
 
     # ==========================================
-    # 6. PIE INSTITUCIONAL
+    # 8. PIE INSTITUCIONAL
     # ==========================================
 
     def dibujar_pie(canvas, doc):
@@ -9397,7 +9460,7 @@ def generar_reporte_general_piroia(request):
         canvas.restoreState()
 
     # ==========================================
-    # 7. ESTILOS
+    # 9. ESTILOS DEL DOCUMENTO
     # ==========================================
 
     estilos = getSampleStyleSheet()
@@ -9452,7 +9515,161 @@ def generar_reporte_general_piroia(request):
     )
 
     # ==========================================
-    # 8. CONSTRUIR CONTENIDO
+    # 10. FUNCIONES PARA CREAR GRÁFICAS
+    # ==========================================
+
+    def crear_grafica_barras(titulo, etiquetas, valores):
+
+        ancho = 480
+        alto = max(170, 65 + len(etiquetas) * 25)
+
+        dibujo = Drawing(ancho, alto)
+
+        dibujo.add(String(
+            10,
+            alto - 15,
+            titulo,
+            fontName="Helvetica-Bold",
+            fontSize=10,
+            fillColor=negro
+        ))
+
+        if not etiquetas:
+            dibujo.add(String(
+                ancho / 2 - 55,
+                alto / 2,
+                "Sin datos para este periodo",
+                fontName="Helvetica",
+                fontSize=9,
+                fillColor=gris_texto
+            ))
+            return dibujo
+
+        maximo = max(valores) if valores else 0
+        maximo = max(maximo, 1)
+
+        inicio_y = alto - 48
+        alto_barra = 12
+        espacio = 25
+        ancho_maximo = 270
+
+        for indice, (etiqueta, valor) in enumerate(
+            zip(etiquetas, valores)
+        ):
+
+            y = inicio_y - indice * espacio
+
+            dibujo.add(String(
+                10,
+                y + 2,
+                str(etiqueta)[:32],
+                fontName="Helvetica",
+                fontSize=7,
+                fillColor=negro
+            ))
+
+            ancho_barra = (valor / maximo) * ancho_maximo
+
+            dibujo.add(Rect(
+                185,
+                y,
+                max(ancho_barra, 1),
+                alto_barra,
+                fillColor=colores_grafica[indice % len(colores_grafica)],
+                strokeColor=None
+            ))
+
+            dibujo.add(String(
+                190 + ancho_barra,
+                y + 2,
+                str(valor),
+                fontName="Helvetica-Bold",
+                fontSize=8,
+                fillColor=negro
+            ))
+
+        return dibujo
+
+    def crear_grafica_pastel():
+
+        dibujo = Drawing(480, 210)
+
+        dibujo.add(String(
+            10,
+            190,
+            "Distribución de solicitudes por estado",
+            fontName="Helvetica-Bold",
+            fontSize=10,
+            fillColor=negro
+        ))
+
+        valores = [
+            solicitudes_revision,
+            solicitudes_cotizadas,
+            solicitudes_rechazadas
+        ]
+
+        etiquetas = [
+            "En revisión",
+            "Cotizadas",
+            "Rechazadas"
+        ]
+
+        if sum(valores) == 0:
+            dibujo.add(String(
+                170,
+                100,
+                "Sin solicitudes en el periodo",
+                fontName="Helvetica",
+                fontSize=9,
+                fillColor=gris_texto
+            ))
+            return dibujo
+
+        pastel = Pie()
+        pastel.x = 55
+        pastel.y = 25
+        pastel.width = 150
+        pastel.height = 150
+        pastel.data = valores
+        pastel.labels = etiquetas
+        pastel.sideLabels = True
+        pastel.simpleLabels = False
+        pastel.slices.strokeWidth = 0.5
+
+        for indice, color in enumerate(colores_grafica[:3]):
+            pastel.slices[indice].fillColor = color
+
+        dibujo.add(pastel)
+
+        leyenda_y = 145
+
+        for indice, (etiqueta, valor) in enumerate(
+            zip(etiquetas, valores)
+        ):
+
+            dibujo.add(Rect(
+                285,
+                leyenda_y - indice * 30,
+                12,
+                12,
+                fillColor=colores_grafica[indice],
+                strokeColor=None
+            ))
+
+            dibujo.add(String(
+                305,
+                leyenda_y + 2 - indice * 30,
+                f"{etiqueta}: {valor}",
+                fontName="Helvetica",
+                fontSize=9,
+                fillColor=negro
+            ))
+
+        return dibujo
+
+    # ==========================================
+    # 11. CONSTRUIR CONTENIDO
     # ==========================================
 
     elementos = []
@@ -9487,7 +9704,7 @@ def generar_reporte_general_piroia(request):
     ))
 
     # ==========================================
-    # 9. RESUMEN DEL SISTEMA
+    # 12. RESUMEN DEL SISTEMA
     # ==========================================
 
     elementos.append(Paragraph(
@@ -9501,7 +9718,8 @@ def generar_reporte_general_piroia(request):
         ["Productos activos", str(productos_activos)],
         ["Productos inactivos", str(productos_inactivos)],
         ["Categorías registradas", str(total_categorias)],
-        ["Usuarios registrados", str(total_usuarios)]
+        ["Usuarios registrados", str(total_usuarios)],
+        ["Solicitudes del periodo", str(total_solicitudes)]
     ]
 
     tabla = Table(
@@ -9515,7 +9733,7 @@ def generar_reporte_general_piroia(request):
         ("TEXTCOLOR", (0, 0), (-1, -1), negro),
         ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
         ("LINEBELOW", (0, 0), (-1, 0), 2, dorado),
-        ("GRID", (0, 0), (-1, -1), 0.4, colors.HexColor("#D5D5D5")),
+        ("GRID", (0, 0), (-1, -1), 0.4, gris_linea),
         ("ALIGN", (1, 0), (1, -1), "CENTER"),
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
         ("PADDING", (0, 0), (-1, -1), 8),
@@ -9525,7 +9743,7 @@ def generar_reporte_general_piroia(request):
     elementos.append(tabla)
 
     # ==========================================
-    # 10. ESTADO DE SOLICITUDES
+    # 13. ESTADO DE LAS SOLICITUDES
     # ==========================================
 
     elementos.append(Paragraph(
@@ -9552,7 +9770,7 @@ def generar_reporte_general_piroia(request):
         ("TEXTCOLOR", (0, 0), (-1, -1), negro),
         ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
         ("LINEBELOW", (0, 0), (-1, 0), 2, dorado),
-        ("GRID", (0, 0), (-1, -1), 0.4, colors.HexColor("#D5D5D5")),
+        ("GRID", (0, 0), (-1, -1), 0.4, gris_linea),
         ("ALIGN", (1, 0), (1, -1), "CENTER"),
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
         ("PADDING", (0, 0), (-1, -1), 8),
@@ -9561,12 +9779,65 @@ def generar_reporte_general_piroia(request):
 
     elementos.append(tabla)
 
+    # Gráfica de pastel por estado.
+
+    elementos.append(Spacer(1, 10))
+    elementos.append(crear_grafica_pastel())
+
     # ==========================================
-    # 11. PRODUCTOS MÁS SOLICITADOS
+    # 14. SOLICITUDES POR MES
     # ==========================================
 
     elementos.append(Paragraph(
-        "3. Productos más solicitados",
+        "3. Comportamiento mensual de las solicitudes",
+        estilo_seccion
+    ))
+
+    tabla_meses = [["Mes", "Solicitudes"]]
+
+    for mes in meses_grafica:
+        tabla_meses.append([
+            mes["nombre"],
+            str(mes["total"])
+        ])
+
+    if len(tabla_meses) == 1:
+        tabla_meses.append(["Sin registros", "0"])
+
+    tabla = Table(
+        tabla_meses,
+        colWidths=[11 * cm, 5 * cm],
+        repeatRows=1
+    )
+
+    tabla.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, 0), gris),
+        ("TEXTCOLOR", (0, 0), (-1, -1), negro),
+        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+        ("LINEBELOW", (0, 0), (-1, 0), 2, dorado),
+        ("GRID", (0, 0), (-1, -1), 0.4, gris_linea),
+        ("ALIGN", (1, 0), (1, -1), "CENTER"),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        ("PADDING", (0, 0), (-1, -1), 7),
+        ("FONTSIZE", (0, 0), (-1, -1), 8)
+    ]))
+
+    elementos.append(tabla)
+
+    elementos.append(Spacer(1, 10))
+
+    elementos.append(crear_grafica_barras(
+        "Solicitudes registradas por mes",
+        [mes["nombre"] for mes in meses_grafica],
+        [mes["total"] for mes in meses_grafica]
+    ))
+
+    # ==========================================
+    # 15. PRODUCTOS MÁS SOLICITADOS
+    # ==========================================
+
+    elementos.append(Paragraph(
+        "4. Productos más solicitados",
         estilo_seccion
     ))
 
@@ -9580,7 +9851,7 @@ def generar_reporte_general_piroia(request):
 
         filas_productos.append([
             Paragraph(
-                escape(producto["producto__nombre"] or ""),
+                escape(producto["producto__nombre"] or "Sin nombre"),
                 estilo_celda
             ),
             str(producto["total_unidades"] or 0),
@@ -9588,7 +9859,6 @@ def generar_reporte_general_piroia(request):
         ])
 
     if len(filas_productos) == 1:
-
         filas_productos.append([
             "Sin registros en el periodo",
             "0",
@@ -9606,7 +9876,7 @@ def generar_reporte_general_piroia(request):
         ("TEXTCOLOR", (0, 0), (-1, -1), negro),
         ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
         ("LINEBELOW", (0, 0), (-1, 0), 2, dorado),
-        ("GRID", (0, 0), (-1, -1), 0.4, colors.HexColor("#D5D5D5")),
+        ("GRID", (0, 0), (-1, -1), 0.4, gris_linea),
         ("ALIGN", (1, 0), (-1, -1), "CENTER"),
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
         ("PADDING", (0, 0), (-1, -1), 7),
@@ -9615,8 +9885,22 @@ def generar_reporte_general_piroia(request):
 
     elementos.append(tabla)
 
+    elementos.append(Spacer(1, 10))
+
+    elementos.append(crear_grafica_barras(
+        "Productos con mayor demanda (unidades)",
+        [
+            producto["producto__nombre"] or "Sin nombre"
+            for producto in productos_solicitados
+        ],
+        [
+            producto["total_unidades"] or 0
+            for producto in productos_solicitados
+        ]
+    ))
+
     # ==========================================
-    # 12. NOTA FINAL
+    # 16. NOTA FINAL
     # ==========================================
 
     elementos.append(Spacer(1, 18))
@@ -9624,12 +9908,16 @@ def generar_reporte_general_piroia(request):
     elementos.append(Paragraph(
         "Este documento fue generado por PiroIA Administrativo "
         "a partir de los registros disponibles en Catálogo Web. "
-        "Los indicadores corresponden al periodo seleccionado.",
+        "Las solicitudes, sus estados, el comportamiento mensual "
+        "y los productos solicitados corresponden exclusivamente "
+        "al periodo seleccionado. Los indicadores generales de "
+        "productos, categorías y usuarios representan el estado "
+        "actual del sistema.",
         estilo_texto
     ))
 
     # ==========================================
-    # 13. GENERAR PDF
+    # 17. GENERAR PDF
     # ==========================================
 
     documento.build(
@@ -9666,269 +9954,191 @@ def generar_reporte_general_piroia(request):
 
 
 
+
+
+
+import re
+import calendar
+import unicodedata
+from datetime import date, timedelta
+
+
 def interpretar_periodo_piroia(texto, hoy=None):
-    import re
-    import unicodedata
-    from datetime import date, timedelta
-    from calendar import monthrange
+    if hoy is None:
+        hoy = date.today()
 
-    hoy = hoy or date.today()
-
-    # Normalizar texto para reconocer meses con o sin acentos.
-    texto = unicodedata.normalize("NFD", texto.lower().strip())
+    texto = (texto or "").lower().strip()
+    texto = unicodedata.normalize("NFD", texto)
     texto = "".join(
-        caracter for caracter in texto
-        if unicodedata.category(caracter) != "Mn"
+        c for c in texto if unicodedata.category(c) != "Mn"
     )
 
     meses = {
-        "enero": 1,
-        "febrero": 2,
-        "marzo": 3,
-        "abril": 4,
-        "mayo": 5,
-        "junio": 6,
-        "julio": 7,
-        "agosto": 8,
-        "septiembre": 9,
-        "setiembre": 9,
-        "octubre": 10,
-        "noviembre": 11,
+        "enero": 1, "febrero": 2, "marzo": 3,
+        "abril": 4, "mayo": 5, "junio": 6,
+        "julio": 7, "agosto": 8, "septiembre": 9,
+        "setiembre": 9, "octubre": 10, "noviembre": 11,
         "diciembre": 12
     }
 
-    patron_meses = (
-        r"enero|febrero|marzo|abril|mayo|junio|julio|agosto|"
-        r"septiembre|setiembre|octubre|noviembre|diciembre"
-    )
+    def crear_fecha(dia, mes, anio):
+        try:
+            return date(int(anio), int(mes), int(dia))
+        except (ValueError, TypeError):
+            return None
 
-    # Hoy: respetar primero los periodos completos.
-    if (
-        re.search(r"\b(hoy|de hoy)\b", texto)
-        and not re.search(
-            r"\b(desde|del|ultimos|ultimas|esta semana|"
-            r"este mes|mes pasado|mes anterior|a partir del)\b",
-            texto
-        )
-    ):
+    def obtener_anio(mes):
+        return hoy.year - 1 if mes > hoy.month else hoy.year
+
+    # Hoy
+    if re.search(r"\b(hoy|este dia)\b", texto):
         return hoy, hoy
 
     # Ayer
-    if re.search(r"\b(ayer|de ayer)\b", texto):
+    if re.search(r"\bayer\b", texto):
         ayer = hoy - timedelta(days=1)
         return ayer, ayer
 
     # Últimos N días
-    match = re.search(
-        r"(?:ultimos|ultimas)\s+(\d+)\s+dias",
-        texto
-    )
-
+    match = re.search(r"(?:ultimos|ultimas|hace)\s+(\d+)\s+dias?", texto)
     if match:
-        cantidad = int(match.group(1))
-
-        if 1 <= cantidad <= 366:
-            return hoy - timedelta(days=cantidad - 1), hoy
+        dias = int(match.group(1))
+        return hoy - timedelta(days=dias - 1), hoy
 
     # Esta semana
     if "esta semana" in texto:
         inicio = hoy - timedelta(days=hoy.weekday())
         return inicio, hoy
 
+    # Semana pasada
+    if "semana pasada" in texto:
+        fin = hoy - timedelta(days=hoy.weekday() + 1)
+        inicio = fin - timedelta(days=6)
+        return inicio, fin
+
     # Este mes
-    if "este mes" in texto or "del mes actual" in texto:
+    if "este mes" in texto or "mes actual" in texto:
         return hoy.replace(day=1), hoy
 
     # Mes pasado
-    if "mes pasado" in texto or "mes anterior" in texto:
-        ultimo_dia = hoy.replace(day=1) - timedelta(days=1)
-
-        return (
-            ultimo_dia.replace(day=1),
-            ultimo_dia
-        )
-        # Mes mencionado directamente:
-    # octubre
-    # octubre de 2026
-
-    match = re.search(
-        rf"\b({patron_meses})(?:\s+de\s+(\d{{4}}))?\b",
-        texto
-    )
-
-    if match:
-        try:
-            mes = meses[match.group(1)]
-            anio = int(match.group(2)) if match.group(2) else hoy.year
-
-            inicio = date(anio, mes, 1)
-            fin = date(anio, mes, monthrange(anio, mes)[1])
-
-            return inicio, fin
-
-        except ValueError:
-            pass
+    if "mes pasado" in texto:
+        primero_mes_actual = hoy.replace(day=1)
+        ultimo_mes_anterior = primero_mes_actual - timedelta(days=1)
+        inicio = ultimo_mes_anterior.replace(day=1)
+        return inicio, ultimo_mes_anterior
 
     # Año actual
     if "este ano" in texto or "ano actual" in texto:
         return date(hoy.year, 1, 1), hoy
 
-    # Fechas numéricas:
-    # Del 01/10/2026 al 15/10/2026
+    # Rango numérico: del 01/10/2026 al 15/10/2026
     match = re.search(
-        r"del?\s+(\d{1,2})[/-](\d{1,2})[/-](\d{4})"
+        r"(?:del|desde)\s+(\d{1,2})[/-](\d{1,2})[/-](\d{4})"
         r"\s+(?:al|hasta)\s+(\d{1,2})[/-](\d{1,2})[/-](\d{4})",
         texto
     )
-
     if match:
-        try:
-            inicio = date(
-                int(match.group(3)),
-                int(match.group(2)),
-                int(match.group(1))
-            )
+        inicio = crear_fecha(match.group(1), match.group(2), match.group(3))
+        fin = crear_fecha(match.group(4), match.group(5), match.group(6))
+        if inicio and fin and inicio <= fin:
+            return inicio, fin
 
-            fin = date(
-                int(match.group(6)),
-                int(match.group(5)),
-                int(match.group(4))
-            )
+    # Rango con meses: del 6 de junio al 9 de noviembre de 2026
+    match = re.search(
+        r"(?:del|desde)\s+(\d{1,2})\s+de\s+([a-z]+)"
+        r"(?:\s+de\s+(\d{4}))?\s+"
+        r"(?:al|hasta)\s+(\d{1,2})\s+de\s+([a-z]+)"
+        r"(?:\s+de\s+(\d{4}))?",
+        texto
+    )
+    if match:
+        dia1, nombre1, anio1, dia2, nombre2, anio2 = match.groups()
+        mes1 = meses.get(nombre1)
+        mes2 = meses.get(nombre2)
+
+        if mes1 and mes2:
+            anio2 = int(anio2 or anio1 or hoy.year)
+            anio1 = int(anio1 or anio2)
+
+            inicio = crear_fecha(dia1, mes1, anio1)
+            fin = crear_fecha(dia2, mes2, anio2)
+
+            if inicio and fin and inicio <= fin:
+                return inicio, fin
+
+    # Rango: del 1 al 15 de septiembre de 2026
+    match = re.search(
+        r"(?:del|desde)\s+(\d{1,2})\s+"
+        r"(?:al|hasta)\s+(\d{1,2})\s+de\s+([a-z]+)"
+        r"(?:\s+de\s+(\d{4}))?",
+        texto
+    )
+    if match:
+        dia1, dia2, nombre_mes, anio = match.groups()
+        mes = meses.get(nombre_mes)
+        anio = int(anio or hoy.year)
+
+        if mes:
+            inicio = crear_fecha(dia1, mes, anio)
+            fin = crear_fecha(dia2, mes, anio)
+            if inicio and fin and inicio <= fin:
+                return inicio, fin
+
+    # Rango de meses: de enero a marzo de 2026
+    match = re.search(
+        r"(?:de|desde)\s+([a-z]+)\s+"
+        r"(?:a|hasta)\s+([a-z]+)"
+        r"(?:\s+de\s+(\d{4}))?",
+        texto
+    )
+    if match:
+        nombre1, nombre2, anio = match.groups()
+        mes1 = meses.get(nombre1)
+        mes2 = meses.get(nombre2)
+        anio = int(anio or hoy.year)
+
+        if mes1 and mes2:
+            inicio = date(anio, mes1, 1)
+            ultimo_dia = calendar.monthrange(anio, mes2)[1]
+            fin = date(anio, mes2, ultimo_dia)
 
             if inicio <= fin:
                 return inicio, fin
 
-        except ValueError:
-            pass
-
-    # Del día X al día Y de un mes:
-    # Del 1 al 15 de octubre
+    # Desde una fecha hasta hoy
     match = re.search(
-        rf"del?\s+(\d{{1,2}})\s+al\s+(\d{{1,2}})\s+"
-        rf"de\s+({patron_meses})(?:\s+de\s+(\d{{4}}))?",
+        r"(?:desde|a partir del|a partir de)\s+"
+        r"(\d{1,2})\s+de\s+([a-z]+)"
+        r"(?:\s+de\s+(\d{4}))?",
         texto
     )
-
     if match:
-        try:
-            dia_inicio = int(match.group(1))
-            dia_fin = int(match.group(2))
-            mes = meses[match.group(3)]
-            anio = int(match.group(4)) if match.group(4) else hoy.year
+        dia, nombre_mes, anio = match.groups()
+        mes = meses.get(nombre_mes)
+        anio = int(anio or obtener_anio(mes)) if mes else hoy.year
 
-            inicio = date(anio, mes, dia_inicio)
-            fin = date(anio, mes, dia_fin)
-
-            if inicio <= fin:
-                return inicio, fin
-
-        except ValueError:
-            pass
-
-    # Del día X de un mes al día Y de otro mes:
-    # Del 1 de enero al 15 de febrero de 2026
-    match = re.search(
-        rf"del?\s+(\d{{1,2}})\s+de\s+({patron_meses})\s+al\s+"
-        rf"(\d{{1,2}})\s+de\s+({patron_meses})(?:\s+de\s+(\d{{4}}))?",
-        texto
-    )
-
-    if match:
-        try:
-            anio = int(match.group(5)) if match.group(5) else hoy.year
-
-            inicio = date(
-                anio,
-                meses[match.group(2)],
-                int(match.group(1))
-            )
-
-            fin = date(
-                anio,
-                meses[match.group(4)],
-                int(match.group(3))
-            )
-
-            if inicio <= fin:
-                return inicio, fin
-
-        except ValueError:
-            pass
-
-    # De enero a marzo de 2026
-    match = re.search(
-        rf"de\s+({patron_meses})\s+a\s+({patron_meses})"
-        rf"(?:\s+de\s+(\d{{4}}))?",
-        texto
-    )
-
-    if match:
-        try:
-            anio = int(match.group(3)) if match.group(3) else hoy.year
-
-            mes_inicio = meses[match.group(1)]
-            mes_fin = meses[match.group(2)]
-
-            inicio = date(anio, mes_inicio, 1)
-            ultimo_dia = monthrange(anio, mes_fin)[1]
-            fin = date(anio, mes_fin, ultimo_dia)
-
-            if inicio <= fin:
-                return inicio, fin
-
-        except ValueError:
-            pass
-
-    # Desde el día X de un mes hasta hoy:
-    # Desde el 7 de junio
-    # A partir del 7 de junio
-    # Desde el 7 de junio de 2026 hasta hoy
-    match = re.search(
-        rf"(?:desde|a partir del|del)\s+(?:el\s+)?(\d{{1,2}})\s+"
-        rf"de\s+({patron_meses})(?:\s+de\s+(\d{{4}}))?",
-        texto
-    )
-
-    if match:
-        try:
-            dia = int(match.group(1))
-            mes = meses[match.group(2)]
-            anio = int(match.group(3)) if match.group(3) else hoy.year
-
-            inicio = date(anio, mes, dia)
-
-            if inicio <= hoy:
+        if mes:
+            inicio = crear_fecha(dia, mes, anio)
+            if inicio and inicio <= hoy:
                 return inicio, hoy
 
-        except ValueError:
-            pass
-
-    # Solo un día de inicio y fin, sin mencionar el mes:
-    # Del 1 al 15 -> mes y año actuales
+    # Mes completo: octubre, octubre de 2026, todo octubre
     match = re.search(
-        r"del?\s+(\d{1,2})\s+al\s+(\d{1,2})(?![\d/])",
+        r"\b(?:todo\s+el\s+|todo\s+|mes\s+de\s+)?"
+        r"(enero|febrero|marzo|abril|mayo|junio|julio|"
+        r"agosto|septiembre|setiembre|octubre|noviembre|diciembre)"
+        r"(?:\s+de\s+(\d{4}))?\b",
         texto
     )
-
     if match:
-        try:
-            inicio = date(
-                hoy.year,
-                hoy.month,
-                int(match.group(1))
-            )
+        nombre_mes, anio = match.groups()
+        mes = meses[nombre_mes]
+        anio = int(anio or hoy.year)
 
-            fin = date(
-                hoy.year,
-                hoy.month,
-                int(match.group(2))
-            )
+        inicio = date(anio, mes, 1)
+        ultimo_dia = calendar.monthrange(anio, mes)[1]
+        fin = date(anio, mes, ultimo_dia)
 
-            if inicio <= fin:
-                return inicio, fin
+        return inicio, fin
 
-        except ValueError:
-            pass
-
-    # Si no identifica un periodo, conserva el periodo predeterminado.
     return None, None
